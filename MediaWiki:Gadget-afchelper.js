@@ -21,6 +21,9 @@
 			baseurl: scriptpath + '?action=raw&ctype=text/javascript&title=MediaWiki:Gadget-afchelper.js'
 		};
 
+		// FIXME: Right now mw.loader.using doesn't let you load urls.
+		// We can probably use $.ajax instead (also needs to be fixed
+		// in core.js) until this is fixed in mediawiki-core.
 		mw.loader.using( AFCH.consts.baseurl + '/core.js', function () {
 			if ( AFCH.beforeLoad() ) {
 				AFCH.load( afctype );
@@ -30,5 +33,5 @@
 			}
 		} );
 	}
-} )( mediawiki, window );
+} )( mediaWiki, window );
 //</nowiki>

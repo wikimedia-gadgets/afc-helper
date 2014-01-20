@@ -32,7 +32,7 @@
 			// Run setup function
 			AFCH.beforeLoad();
 
-			// Load css
+			// FIXME: Do this via ResourceLoader
 			mw.loader.load( AFCH.consts.scriptpath + '?action=raw&ctype=text/css&title=MediaWiki:Gadget-afchelper.css', 'text/css' );
 
 			// Load dependencies if required
@@ -76,12 +76,12 @@
 		initFeedback: function ( $element, type ) {
 			var feedback = new mw.Feedback( {
 					title: new mw.Title( 'Wikipedia talk:Articles for creation/Helper script/Feedback' ),
-					bugsLink: '//github.com/WPAFC/afch/issues/new',
-					bugsListLink: '//github.com/WPAFC/afch/issues?labels=REWRITE&state=open'
+					bugsLink: 'https://github.com/WPAFC/afch/issues/new',
+					bugsListLink: 'https://github.com/WPAFC/afch/issues?labels=REWRITE&state=open'
 				} ),
 				feedbackLink = $( '<span>' )
 					.text( 'Give feedback!' )
-					.addClass( 'feedbackLink' )
+					.addClass( 'afch-feedbackLink' )
 					.click( function () {
 						feedback.launch( {
 							subject: type ? 'Feedback about ' + type : 'AFCH feedback',
@@ -92,6 +92,39 @@
 			} );
 		},
 
+
+		/**
+		 * Represents a page, mainly a wrapper for various actions
+		 */
+		Page: function ( name ) {
+			var pg = this;
+
+			this.Title = new mw.Title( name );
+			this.additionalData = {}
+
+			this.getText = function ( usecache ) {
+				if ( usecache && this.pageText ) {
+					return this.pageText;
+				}
+				$.when( AFCH.action.getPageText( this.Title.getPrefixedText(), { hide: true, moreProps: 'timestamp' } ).done(
+					function ( pagetext, data ) {
+						pg.pageText = pagetext;
+						// Teehee, let's use this opportunity to get some data for later
+						pg.additionalData.lastModified = new Date( data.timestamp );
+					} );
+
+				return this.pageText;
+			};
+
+			this.getLastModifiedDate = function () {
+				// FIXME: I guess the nice thing to do would be to make an API call if necessary.
+				// But that seems like a huge pain and would require some more functionality.
+				// For now we just get the text first. Stupid, I know.
+				this.getText();
+				return this.additionalData.lastModified;
+			};
+		}
+
 		/**
 		 * Perform a specific action
 		 * FIXME: callback functions? Or else return $.Promise()?
@@ -100,10 +133,14 @@
 			/**
 			 * Gets the full wikicode content of a page
 			 * @param {string} pagename The page to get the contents of, namespace included
-			 * @param {bool} hide Set to true to hide the API request in the status log
+			 * @param {object} options Object with properties:
+			 * 	                       hide: {bool} set to true to hide the API request in the status log
+			 * 	                       moreProps: {string} additional properties to request
+			 * @return {string} Page text or false if error
 			 */
-			getPageText: function ( pagename, hide ) {
-				var status, request;
+			getPageText: function ( pagename, options ) {
+				var status, request, rvprop = 'content',
+					deferred = $.Deferred();
 
 				if ( !options.hide ) {
 					status = new AFCH.status.Element( 'Getting $1...',
@@ -115,27 +152,39 @@
 					status = AFCH.consts.nullstatus;
 				}
 
-			request = {
-				action: 'query',
-				prop: 'revisions',
-				rvprop: 'content',
-				format: 'json',
-				indexpageids: true,
-				titles: pagename
-			};
+				if ( options.moreProps ) {
+					rvprop += '|' + options.moreProps;
+				}
 
-			AFCH.api.post( request )
-				.done( function ( data ) {
-					if ( data && data.edit && data.edit.result && data.edit.result == 'Success' ) {
-						status.update( 'Got $1' );
-					} else {
-						// FIXME: get error info from API result
-					}
-				} )
-				.error( function ( err ) {
-					// FIXME
-				} );
-			},
+				request = {
+					action: 'query',
+					prop: 'revisions',
+					rvprop: rvprop,
+					format: 'json',
+					indexpageids: true,
+					titles: pagename
+				};
+
+				$.when( AFCH.api.post( request ) )
+					.done( function ( data ) {
+						var rev, id = data.query.pageids[0];
+						if ( id && data.query.pages ) {
+							rev = data.query.pages[id].revisions[0];
+							deferred.resolve( rev['*'], rev );
+							status.update( 'Got $1' );
+						} else {
+							deferred.reject( data );
+							// FIXME: get detailed error info from API result
+							status.update( 'Error getting $1: ' + JSON.stringify( data ) );
+						}
+					} )
+					.fail( function ( err ) {
+						deferred.reject( err );
+						status.update( 'Error getting $1: ' + JSON.stringify( err ) );
+					} );
+
+				return deferred;
+			}
 
 			/**
 			 * Modifies a page's content
@@ -147,10 +196,14 @@
 			 *                         	mode: {string} 'appendtext' or 'prependtext'; default: (replace everything)
 			 *                         	patrol: {bool} by default true; set to false to not patrol the page
 			 *                         	hide: {bool} Set to true to supress logging in statusWindow
-			 * @return {bool} Page was saved successfully
+			 * @return {jQuery.Deferred} Page was saved successfully
 			 */
 			editPage: function ( pagename, options ) {
-				var status, request;
+				var status, request, deferred = $.Deferred();
+
+				if ( !options ) {
+					options = {};
+				}
 
 				if ( !options.hide ) {
 					status = new AFCH.status.Element( 'Editing $1...',
@@ -160,10 +213,6 @@
 						} );
 				} else {
 					status = AFCH.consts.nullstatus;
-				}
-
-				if ( options === undefined ) {
-					options = {};
 				}
 
 				request = {
@@ -180,14 +229,20 @@
 				AFCH.api.post( request )
 					.done( function ( data ) {
 						if ( data && data.edit && data.edit.result && data.edit.result == 'Success' ) {
+							deferred.resolve( data );
 							status.update( 'Saved $1' );
 						} else {
-							// FIXME: get error info from API result
+							deferred.reject( data );
+							// FIXME: get detailed error info from API result??
+							status.update( 'Error saving $1: ' + JSON.stringify( data ) );
 						}
 					} )
-					.error( function ( err ) {
-						// FIXME
+					.fail( function ( err ) {
+						deferred.reject( err );
+						status.update( 'Error saving $1: ' + JSON.stringify( err ) );
 					} );
+
+				return deferred;
 			},
 
 			/**
@@ -208,7 +263,7 @@
 		status: {
 
 			/**
-			 * Represents the status container, overwritten by init()
+			 * Represents the status container, created ub init()
 			 */
 			container: false,
 
@@ -272,6 +327,43 @@
 				this.update( initialText );
 			}
 		},
+
+		/**
+		 * A simple framework for getting/setting interface messages.
+		 * Not every message necessarily needs to go through here. But
+		 * it's nice to separate long messages from the code itself.
+		 * @type {Object}
+		 */
+		msg: {
+			/**
+			 * AFCH messages loaded by default for all subscripts.
+			 * @type {Object}
+			 */
+			store: {},
+
+			/**
+			 * Retrieve the text of a message, or a placeholder if the
+			 * message is not set
+			 * @param {string} key Message key
+			 * @return {string} Message value
+			 */
+			get: function ( key ) {
+				return AFCH.msg.store[key] || '<' + key + '>';
+			},
+
+			/**
+			 * Set a new message or messages
+			 * @param {string|object} key
+			 * @param {string} value if key is a string, value
+			 */
+			set: function ( key, value ) {
+				if ( typeof key === 'object' ) {
+					$.extend( AFCH.msg.store, key );
+				} else {
+					AFCH.msg.store[key] = value;
+				}
+			}
+		}
 	};
-} )( AFCH, jQuery, mediawiki );
+} )( AFCH, jQuery, mediaWiki );
 //</nowiki>
