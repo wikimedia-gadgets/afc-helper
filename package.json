@@ -1,0 +1,17 @@
+{
+  "name": "afch-rewrite",
+  "version": "0.0.1",
+  "homepage": "https://github.com/WPAFC/afch-rewrite",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/WPAFC/afch-rewrite"
+  },
+  "scripts": {
+    "test": "grunt test"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "grunt": "0.4.2",
+    "grunt-contrib-jshint": "0.7.2"
+  }
+}

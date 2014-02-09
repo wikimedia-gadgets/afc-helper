@@ -1,0 +1,25 @@
+{
+	// Enforcing
+	"camelcase": true,
+	"curly": true,
+	"eqeqeq": true,
+	"immed": true,
+	"latedef": true,
+	"newcap": true,
+	"noarg": true,
+	"noempty": true,
+	"nonew": true,
+	"quotmark": "single",
+	"undef": true,
+	"unused": true,
+	"trailing": true,
+	"onevar": true,
+
+	// Environment
+	"browser": true,
+
+	"globals": {
+		"jQuery": false,
+		"mediaWiki": false
+	}
+}
