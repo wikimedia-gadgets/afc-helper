@@ -1,8 +1,7 @@
 //<nowiki>
 // Script should be located at [[MediaWiki:Gadget-afchelper.js/core.js]]
-
 ( function ( AFCH, $, mw ) {
-	$.extend( AFCH, {
+	AFCH = $.extend( AFCH, {
 
 		/**
 		 * Prepares the AFCH gadget by setting constants and checking environment
@@ -32,11 +31,10 @@
 			// Run setup function
 			AFCH.beforeLoad();
 
-			// FIXME: Do this via ResourceLoader
-			mw.loader.load( AFCH.consts.scriptpath + '?action=raw&ctype=text/css&title=MediaWiki:Gadget-afchelper.css', 'text/css' );
-
-			// Load dependencies if required
 			if ( AFCH.consts.beta ) {
+				// Load css
+				mw.loader.load( AFCH.consts.scriptpath + '?action=raw&ctype=text/css&title=MediaWiki:Gadget-afchelper.css', 'text/css' );
+				// Load dependencies
 				mw.loader.load( [ 'mediawiki.feedback', 'mediawiki.api', 'jquery.chosen' ] );
 			}
 
@@ -44,7 +42,7 @@
 			AFCH.afterLoad();
 
 			// And finally load the subscript
-			mw.loader.load( AFCH.consts.baseurl + '/' + type + '.js' );
+			$.getScript( AFCH.consts.baseurl + '/' + type + '.js' );
 		},
 
 		/**
@@ -64,7 +62,7 @@
 				// Link to the current page, "/wiki/Wikipedia talk:Articles for creation/sandbox"
 				pagelink: mw.util.getUrl(),
 				// Used when status is disabled
-				nullstatus: { update: function () {} }
+				nullstatus: { update: function () { return; } }
 			} );
 		},
 
@@ -78,18 +76,17 @@
 					title: new mw.Title( 'Wikipedia talk:Articles for creation/Helper script/Feedback' ),
 					bugsLink: 'https://github.com/WPAFC/afch/issues/new',
 					bugsListLink: 'https://github.com/WPAFC/afch/issues?labels=REWRITE&state=open'
-				} ),
-				feedbackLink = $( '<span>' )
-					.text( 'Give feedback!' )
-					.addClass( 'afch-feedbackLink' )
-					.click( function () {
-						feedback.launch( {
-							subject: type ? 'Feedback about ' + type : 'AFCH feedback',
-							contents: 'Replace this with your error report or feedback, positive or negative. Please be as detailed as possible!'
-						} );
-					} )
-					.appendTo( $element );
-			} );
+				} );
+			$( '<span>' )
+				.text( 'Give feedback!' )
+				.addClass( 'afch-feedbackLink' )
+				.click( function () {
+					feedback.launch( {
+						subject: type ? 'Feedback about ' + type : 'AFCH feedback',
+						contents: 'Replace this with your error report or feedback, positive or negative. Please be as detailed as possible!'
+					} );
+				} )
+				.appendTo( $element );
 		},
 
 
@@ -123,7 +120,7 @@
 				this.getText();
 				return this.additionalData.lastModified;
 			};
-		}
+		},
 
 		/**
 		 * Perform a specific action
@@ -145,7 +142,7 @@
 				if ( !options.hide ) {
 					status = new AFCH.status.Element( 'Getting $1...',
 						{ '$1': $( '<a>' )
-							.attr( 'href', mw.util.getUrl( pagename ) ),
+							.attr( 'href', mw.util.getUrl( pagename ) )
 							.text( pagename )
 						} );
 				} else {
@@ -184,7 +181,7 @@
 					} );
 
 				return deferred;
-			}
+			},
 
 			/**
 			 * Modifies a page's content
@@ -364,6 +361,6 @@
 				}
 			}
 		}
-	};
-} )( AFCH, jQuery, mediaWiki );
+	} );
+}( AFCH, jQuery, mediaWiki ) );
 //</nowiki>
