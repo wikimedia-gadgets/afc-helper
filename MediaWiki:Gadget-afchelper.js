@@ -3,11 +3,13 @@
 ( function ( mw, window ) {
 	var pageName = mw.config.get( 'wgPageName' ), type;
 
-	if ( pageName.indexOf( ) ) {
+	if ( pageName.indexOf( 'Wikipedia:Articles_for_creation/' ) !== -1 ||
+		pageName.indexOf( 'Wikipedia_talk:Articles_for_creation/' ) !== -1 ||
+		pageName.indexOf( 'User:' ) !== -1 ) {
 		type = 'submissions';
-	} else if ( pageName.indexOf( ) ) {
+	} else if ( pageName.indexOf( 'Wikipedia:Articles_for_creation/Redirects' ) !== -1 ) {
 		type = 'redirects';
-	} else if ( pageName.indexOf( ) ) {
+	} else if ( pageName.indexOf( 'Wikipedia:Files_for_upload' ) !== -1 ) {
 		type = 'ffu';
 	}
 
@@ -16,22 +18,20 @@
 		window.AFCH = {};
 
 		// Set up constants
-		AFCH.consts = {
-			scriptpath: mw.config.get('wgServer') + mw.config.get('wgScript'),
-			baseurl: scriptpath + '?action=raw&ctype=text/javascript&title=MediaWiki:Gadget-afchelper.js'
-		};
+		AFCH.consts = {};
+		AFCH.consts.scriptpath = mw.config.get( 'wgServer' ) + mw.config.get( 'wgScript' );
+		AFCH.consts.baseurl = AFCH.consts.scriptpath +
+			'?action=raw&ctype=text/javascript&title=MediaWiki:Gadget-afchelper.js';
 
-		// FIXME: Right now mw.loader.using doesn't let you load urls.
-		// We can probably use $.ajax instead (also needs to be fixed
-		// in core.js) until this is fixed in mediawiki-core.
-		mw.loader.using( AFCH.consts.baseurl + '/core.js', function () {
+		// FIXME: Right now mw.loader.using doesn't let you load urls :(
+		$.getScript( AFCH.consts.baseurl + '/core.js', function () {
 			if ( AFCH.beforeLoad() ) {
-				AFCH.load( afctype );
+				AFCH.load( type );
 			} else {
 				mw.notify( 'AFCH could not be loaded:' + ( AFCH.error ? AFCH.error : 'unknown error' ),
 					{ title: 'AFCH error' } );
 			}
 		} );
 	}
-} )( mediaWiki, window );
+}( mediaWiki, window ) );
 //</nowiki>
