@@ -2,25 +2,66 @@
 // Script should be located at [[MediaWiki:Gadget-afchelper.js/submissions.js]]
 
 ( function ( AFCH, $, mw ) {
-	var $afchReviewPanel;
+	var $afchReviewPanel,
+		thePage,
+		theSubmission;
 
-	AFCH.Page.prototype.isG13Elgibile = function () {
-		// older than six months FIXME
-		if ( this.getLastModifiedDate() ) {
+	/* const */
 
+	AFCH.Page.prototype.isG13Eligible = function () {
+		// A page is eligible if it has not been modified in 6 months
+		this.getLastModifiedDate().done( function ( lastEdited ),
+		var timeNow = new Date(),
+			sixMonthsAgo = ( new Date() ).setMonth( timeNow.getMonth() - 6 ),
+			lastEdited = 
+		if ( ( timeNow.getTime() - lastEdited.getTime() ) >
+			( timeNow.getTime() - sixMonthsAgo.getTime() ) ) {
+			return true;
 		}
+		return false;
 	}
 
-	AFCH.Page.prototype.getAFCTemplates = function () {
-		// FIXME: Is this the best place for this?
-		// Should we have a designated AFCH.Submission class
-		// instead, perhaps? That makes more sense.
-	}
+	AFCH.Submission = function ( /* Page */ page ) {
+		this.Page = page;
+		this.isCurrentlySubmitted = false;
+		this.parse( page );
+	};
+
+	AFCH.Submission.prototype.isG13Eligible = function () {
+		return ( this.Page.isG13Eligible() && this.isCurrentlySubmitted === false );
+	};
+
+	AFCH.Submission.prototype.parse = function ( page ) {
+		// Simply find the submission templates, parse them for applicable data,
+		// set some variables, and voila! Simply, right?
+		var sub = this;
+
+		// Get the page text
+		page.getText().done( function ( text ) {
+
+			// Then get all templates
+			AFCH.parseTemplates( text ).done( function ( templates ) {
+
+				// FIXME: Finish this
+				templates.
+
+				// Represent each AfC submission template as an object.
+				var submissionTemplates = [];
+				$.each( templates, function ( _, template ) {
+					var tdata;
+					if ( template.target.toLowerCase() === 'afc submission' ) {
+						submissionTemplates.push( {
+							status: template.params['1'],
+							timestamp: template.params.ts
+						} );
+					}
+				} );
+			}
+	};
 
 	function addMessages() {
 		AFCH.msg.set( {
-			'accept': 'Accept',
-			'decline': 'Decline',
+			// FIXME
 		} );
 	}
 
@@ -31,8 +72,12 @@
 				.addClass( 'accept' )
 				.text( 'Accept' );
 			$declineButton,
-			$commentButton,
-			;
+			$commentButton;
+
+		/* global */
+		thePage = new AFCH.Page( AFCH.consts.pagename );
+		/* global */
+		theSubmission = new AFCH.Submission( thePage );
 
 		// FIXME: Do this conditionally
 		$buttonWrapper.append(
@@ -63,5 +108,5 @@
 			setupReviewPanel();
 		})
 
-} )( AFCH, jQuery, mediawiki );
+}( AFCH, jQuery, mediaWiki ) );
 //</nowiki>
