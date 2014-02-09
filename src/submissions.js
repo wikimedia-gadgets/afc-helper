@@ -6,20 +6,20 @@
 		thePage,
 		theSubmission;
 
-	/* const */
-
 	AFCH.Page.prototype.isG13Eligible = function () {
+		var deferred = $.Deferred();
 		// A page is eligible if it has not been modified in 6 months
-		this.getLastModifiedDate().done( function ( lastEdited ),
-		var timeNow = new Date(),
-			sixMonthsAgo = ( new Date() ).setMonth( timeNow.getMonth() - 6 ),
-			lastEdited = 
-		if ( ( timeNow.getTime() - lastEdited.getTime() ) >
-			( timeNow.getTime() - sixMonthsAgo.getTime() ) ) {
-			return true;
-		}
-		return false;
-	}
+		this.getLastModifiedDate().done( function ( lastEdited ) {
+			var timeNow = new Date(),
+				sixMonthsAgo = ( new Date() ).setMonth( timeNow.getMonth() - 6 );
+			if ( ( timeNow.getTime() - lastEdited.getTime() ) >
+				( timeNow.getTime() - sixMonthsAgo.getTime() ) ) {
+				deferred.resolve( true );
+			}
+			deferred.resolve( false );
+		} );
+		return deferred;
+	};
 
 	AFCH.Submission = function ( /* Page */ page ) {
 		this.Page = page;
@@ -28,7 +28,9 @@
 	};
 
 	AFCH.Submission.prototype.isG13Eligible = function () {
-		return ( this.Page.isG13Eligible() && this.isCurrentlySubmitted === false );
+		this.Page.isG13Eligible().done( function ( eligible ) {
+			return ( eligible && this.isCurrentlySubmitted === false );
+		} );
 	};
 
 	AFCH.Submission.prototype.parse = function ( page ) {
@@ -42,9 +44,7 @@
 			// Then get all templates
 			AFCH.parseTemplates( text ).done( function ( templates ) {
 
-				// FIXME: Finish this
-				templates.
-
+				// FIXME: Finish this...no idea what i was doing...
 				// Represent each AfC submission template as an object.
 				var submissionTemplates = [];
 				$.each( templates, function ( _, template ) {
@@ -56,7 +56,9 @@
 						} );
 					}
 				} );
-			}
+
+			} );
+		} );
 	};
 
 	function addMessages() {
@@ -70,7 +72,7 @@
 				.addClass( 'afch-actions' ),
 			$acceptButton = $( '<button>' )
 				.addClass( 'accept' )
-				.text( 'Accept' );
+				.text( 'Accept' ),
 			$declineButton,
 			$commentButton;
 
@@ -106,7 +108,7 @@
 		.on( 'click', function () {
 			$afchReviewPanel.show( 'slide', { direction: 'down' } );
 			setupReviewPanel();
-		})
+		} );
 
 }( AFCH, jQuery, mediaWiki ) );
 //</nowiki>

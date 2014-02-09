@@ -136,8 +136,8 @@
 			 * Gets the full wikicode content of a page
 			 * @param {string} pagename The page to get the contents of, namespace included
 			 * @param {object} options Object with properties:
-			 * 	                       hide: {bool} set to true to hide the API request in the status log
-			 * 	                       moreProps: {string} additional properties to request
+			 *                          hide: {bool} set to true to hide the API request in the status log
+			 *                          moreProps: {string} additional properties to request
 			 * @return {$.Deferred} Resolves with pagetext and full data available as parameters
 			 */
 			getPageText: function ( pagename, options ) {
@@ -192,12 +192,12 @@
 			 * Modifies a page's content
 			 * @param {string} pagename The page to be modified, namespace included
 			 * @param {object} options Object with properties:
-			 *                         	contents: {string} the text to add to/replace the page,
-			 *                         	summary: {string} edit summary, will have the edit summary ad at the end,
-			 *                         	createonly: {bool} set to true to only edit the page if it doesn't exist,
-			 *                         	mode: {string} 'appendtext' or 'prependtext'; default: (replace everything)
-			 *                         	patrol: {bool} by default true; set to false to not patrol the page
-			 *                         	hide: {bool} Set to true to supress logging in statusWindow
+			 *                          contents: {string} the text to add to/replace the page,
+			 *                          summary: {string} edit summary, will have the edit summary ad at the end,
+			 *                          createonly: {bool} set to true to only edit the page if it doesn't exist,
+			 *                          mode: {string} 'appendtext' or 'prependtext'; default: (replace everything)
+			 *                          patrol: {bool} by default true; set to false to not patrol the page
+			 *                          hide: {bool} Set to true to supress logging in statusWindow
 			 * @return {jQuery.Deferred} Resolves if saved with all data
 			 */
 			editPage: function ( pagename, options ) {
