@@ -365,6 +365,52 @@
 					AFCH.msg.store[key] = value;
 				}
 			}
+		},
+
+		/**
+		 * Use Parsoid web api to parse the given wikitext
+		 * @param {string} text Text to parse
+		 * @return {$.Deferred} Resolves with a list of parsed templates
+		 */
+		parseTemplates: function ( text ) {
+			var deferred = $.Deferred(),
+				status = new AFCH.status.Element( 'Parsing templates using Parsoid...' );
+
+			// Sneakily use the Parsoid API which Flow has oh-so-nicely exposed
+			// for us. Hopefully they don't, y'know, suddenly remove it.
+			AFCH.api.get( {
+				action: 'flow-parsoid-utils',
+				from: 'wikitext',
+				to: 'html',
+				content: text,
+				title: 'Main Page' // Teehee
+			} ).done( function ( data ) {
+				// Use the Parsoid data-mw attributes to gather a bunch of data about
+				// the templates on the page, denoted by mw:Transclusion
+				var rawTemplates = $( data['flow-parsoid-utils'].content ).find( '[typeof="mw:Transclusion"]' ),
+					templates = [];
+
+				rawTemplates.each( function ( _, t ) {
+					// Get the data-mw attribute and then drill down through the JSON, whoopee!
+					var tdata = ( $( t ).data( 'mw' ) ).parts[0].template,
+						tmpl = { target: tdata.target.wt, params: {} };
+
+					$.each( tdata.params, function ( k, v ) {
+						tmpl.params[k] = v.wt;
+					} );
+
+					templates.push( tmpl );
+				} );
+
+				status.update( 'Templates parsed successfully!' );
+				deferred.resolve( templates );
+			} )
+			.fail( function ( err ) {
+				status.update( 'Error parsing templates: ' + JSON.stringify( err ) );
+				deferred.reject( err );
+			} );
+
+			return deferred;
 		}
 	} );
 }( AFCH, jQuery, mediaWiki ) );
