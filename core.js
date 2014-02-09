@@ -97,34 +97,39 @@
 			var pg = this;
 
 			this.Title = new mw.Title( name );
-			this.additionalData = {}
+			this.additionalData = {};
 
 			this.getText = function ( usecache ) {
-				if ( usecache && this.pageText ) {
-					return this.pageText;
+				var deferred = $.Deferred();
+
+				if ( usecache && pg.pageText ) {
+					deferred.resolve( pg.pageText );
 				}
-				$.when( AFCH.action.getPageText( this.Title.getPrefixedText(), { hide: true, moreProps: 'timestamp' } ).done(
-					function ( pagetext, data ) {
+
+				AFCH.action.getPageText( pg.Title.getPrefixedText(), { hide: true, moreProps: 'timestamp' } )
+					.done( function ( pagetext, data ) {
 						pg.pageText = pagetext;
 						// Teehee, let's use this opportunity to get some data for later
 						pg.additionalData.lastModified = new Date( data.timestamp );
+
+						deferred.resolve( pg.pageText );
 					} );
 
-				return this.pageText;
+				return deferred;
 			};
 
 			this.getLastModifiedDate = function () {
 				// FIXME: I guess the nice thing to do would be to make an API call if necessary.
-				// But that seems like a huge pain and would require some more functionality.
-				// For now we just get the text first. Stupid, I know.
-				this.getText();
-				return this.additionalData.lastModified;
+				// But that seems like a huge pain and would require some more functionality. I'm
+				// lazy. For now we just get the text first. Stupid, I know.
+				var deferred = $.Deferred();
+				pg.getText( true ).done( deferred.resolve( pg.additionalData.lastModified ) );
+				return deferred;
 			};
 		},
 
 		/**
 		 * Perform a specific action
-		 * FIXME: callback functions? Or else return $.Promise()?
 		 */
 		action: {
 			/**
@@ -133,7 +138,7 @@
 			 * @param {object} options Object with properties:
 			 * 	                       hide: {bool} set to true to hide the API request in the status log
 			 * 	                       moreProps: {string} additional properties to request
-			 * @return {string} Page text or false if error
+			 * @return {$.Deferred} Resolves with pagetext and full data available as parameters
 			 */
 			getPageText: function ( pagename, options ) {
 				var status, request, rvprop = 'content',
@@ -162,7 +167,7 @@
 					titles: pagename
 				};
 
-				$.when( AFCH.api.post( request ) )
+				AFCH.api.get( request )
 					.done( function ( data ) {
 						var rev, id = data.query.pageids[0];
 						if ( id && data.query.pages ) {
@@ -193,7 +198,7 @@
 			 *                         	mode: {string} 'appendtext' or 'prependtext'; default: (replace everything)
 			 *                         	patrol: {bool} by default true; set to false to not patrol the page
 			 *                         	hide: {bool} Set to true to supress logging in statusWindow
-			 * @return {jQuery.Deferred} Page was saved successfully
+			 * @return {jQuery.Deferred} Resolves if saved with all data
 			 */
 			editPage: function ( pagename, options ) {
 				var status, request, deferred = $.Deferred();
@@ -205,7 +210,7 @@
 				if ( !options.hide ) {
 					status = new AFCH.status.Element( 'Editing $1...',
 						{ '$1': $( '<a>' )
-							.attr( 'href', mw.util.getUrl( pagename ) ),
+							.attr( 'href', mw.util.getUrl( pagename ) )
 							.text( pagename )
 						} );
 				} else {
@@ -217,15 +222,15 @@
 					text: options.contents,
 					title: pagename,
 					summary: options.summary + AFCH.prefs.summaryAd
-				}
+				};
 
 				if ( options.mode ) {
-					request[mode] = true;
+					request[options.mode] = true;
 				}
 
 				AFCH.api.post( request )
 					.done( function ( data ) {
-						if ( data && data.edit && data.edit.result && data.edit.result == 'Success' ) {
+						if ( data && data.edit && data.edit.result && data.edit.result === 'Success' ) {
 							deferred.resolve( data );
 							status.update( 'Saved $1' );
 						} else {
@@ -250,7 +255,7 @@
 			 */
 			deletePage: function ( pagename, reason ) {
 				// FIXME: implement
-				return true;
+				return false;
 			}
 		},
 
@@ -273,7 +278,7 @@
 				AFCH.status.container = $( '<div>' )
 					.attr( 'id', 'afchStatus' )
 					.addClass( 'afchStatus' )
-					.prependTo( location ? location : '#mw-content-text' );
+					.prependTo( location || '#mw-content-text' );
 			},
 
 			/**
