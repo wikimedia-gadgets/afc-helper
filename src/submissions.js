@@ -6,59 +6,222 @@
 		thePage,
 		theSubmission;
 
-	AFCH.Page.prototype.isG13Eligible = function () {
+	/**
+	 * Represents an AfC submission and its status. Call submission.parse() to
+	 * actually get the data.
+	 *
+	 * @param {AFCH.Page} page The submission page
+	 */
+	AFCH.Submission = function ( page ) {
+		// The associated page
+		this.page = page;
+
+		// Various submission states, set in parse()
+		this.isPending = false;
+		this.isUnderReview = false;
+		this.isDeclined = false;
+		this.isDraft = false;
+
+		// Set in updateAttributesAfterParse()
+		this.isCurrentlySubmitted = false;
+
+		// Holds all of the {{afc submission}} templates that still
+		// apply to the page
+		this.templates = [];
+	};
+
+	/**
+	 * Parses a submission, writing its current status and data to various properties
+	 * @return {$.Deferred} Resolves when submission parsed successfully
+	 */
+	AFCH.Submission.prototype.parse = function () {
+		var sub = this,
+			deferred = $.Deferred();
+
+		// Get the page text
+		this.page.getText().done( function ( text ) {
+
+			// Then get all templates and parse them
+			AFCH.parseTemplates( text ).done( function ( templates ) {
+				sub.parseDataFromTemplates( templates );
+				sub.updateAttributesAfterParse();
+				deferred.resolve();
+			} );
+
+		} );
+	};
+
+	/**
+	 * Internal function
+	 * @param {array} templates list of templates to parse
+	 * @return {bool} [description]
+	 */
+	AFCH.Submission.prototype.parseDataFromTemplates = function ( templates ) {
+		// Represent each AfC submission template as an object.
+		var sub = this,
+			submissionTemplates = [];
+
+		$.each( templates, function ( _, template ) {
+			if ( template.target.toLowerCase() === 'afc submission' ) {
+				submissionTemplates.push( {
+					status: template.params.getAndDelete( '1' ).toLowerCase(),
+					timestamp: +template.params.getAndDelete( 'ts' ),
+					params: template.params
+				} );
+			}
+		} );
+
+		// Sort templates by timestamp; most recent are first
+		submissionTemplates.sort( function ( a, b ) {
+			// If we're passed something that's not a number --
+			// for example, {{REVISIONTIMESTAMP}} -- just sort it
+			// first and be done with it.
+			if ( isNaN( a.timestamp ) ) {
+				return -1;
+			} else if ( isNaN( b.timestamp ) ) {
+				return 1;
+			}
+
+			// Otherwise just sort normally
+			return b.timestamp - a.timestamp;
+		} );
+
+		// Process the submission templates in order, from the most recent to
+		// the oldest. In the process, we remove unneeded templates (for example,
+		// a draft tag when it's already been submitted) and also set various
+		// "isX" properties of the Submission.
+		submissionTemplates = $.grep( submissionTemplates, function ( template ) {
+			switch ( template.status ) {
+				// Declined
+				case 'd':
+					if ( !sub.isPending && !sub.isDraft && !sub.isUnderReview ) {
+						sub.isDeclined = true;
+					}
+					break;
+				// Draft
+				case 't':
+					// If it's been submitted or declined, remove draft tag
+					if ( sub.isPending || sub.isDeclined || sub.isUnderReview ) {
+						return false;
+					}
+					sub.isDraft = true;
+					break;
+				// Under review
+				case 'r':
+					if ( !sub.isPending && !sub.isDeclined ) {
+						sub.isUnderReview = true;
+					}
+					break;
+				// Pending
+				default:
+					// Remove duplicate pending templates or a redundant
+					// pending template when the submission has already been
+					// declined / is already under review
+					if ( sub.isPending || sub.isDeclined || sub.isUnderReview ) {
+						return false;
+					}
+					sub.isPending = true;
+					sub.isDraft = false;
+					sub.isUnderReview = false;
+					break;
+				}
+			return true;
+		} );
+
+		this.templates = submissionTemplates;
+		return true;
+	};
+
+	AFCH.Submission.prototype.updateAttributesAfterParse = function () {
+		this.isCurrentlySubmitted = this.isPending || this.isUnderReview;
+	};
+
+	/**
+	 * Converts the template data to a hunk of template wikicode
+	 * @return {string}
+	 */
+	AFCH.Submission.prototype.makeWikicode = function () {
+		var output = [];
+
+		$.each( this.templates, function ( _, template ) {
+			var tout = '{{AFC submission|' + template.status +
+				'|ts=' + template.timestamp;
+
+			$.each( template.params, function ( key, value ) {
+				tout += '|' + key + '=' + value;
+			} );
+
+			tout += '}}';
+			output.push( tout );
+		} );
+
+		return output.join( '\n' );
+	};
+
+
+	/**
+	 * Checks if submission is G13 eligible
+	 * @return {$.Deferred} Resolves to bool if submission is eligible
+	 */
+	AFCH.Submission.prototype.isG13Eligible = function () {
 		var deferred = $.Deferred();
-		// A page is eligible if it has not been modified in 6 months
+
+		// Not currently submitted
+		if ( this.isCurrentlySubmitted ) {
+			deferred.resolve( false );
+		}
+
+		// And not been modified in 6 months
 		this.getLastModifiedDate().done( function ( lastEdited ) {
 			var timeNow = new Date(),
 				sixMonthsAgo = ( new Date() ).setMonth( timeNow.getMonth() - 6 );
-			if ( ( timeNow.getTime() - lastEdited.getTime() ) >
-				( timeNow.getTime() - sixMonthsAgo.getTime() ) ) {
-				deferred.resolve( true );
-			}
-			deferred.resolve( false );
+
+			deferred.resolve( ( timeNow.getTime() - lastEdited.getTime() ) >
+				( timeNow.getTime() - sixMonthsAgo.getTime() ) );
 		} );
+
 		return deferred;
 	};
 
-	AFCH.Submission = function ( /* Page */ page ) {
-		this.Page = page;
-		this.isCurrentlySubmitted = false;
-		this.parse( page );
+	AFCH.Submission.prototype.setStatus = function ( s ) {
+		var relevantTemplate = this.templates[0];
+
+		if ( [ 'd', 't', 'r', '' ].indexOf( s ) === -1 ) {
+			// Unrecognized status
+			return false;
+		}
+
+		// If there are no templates on the page, generate a new one
+		if ( !relevantTemplate ) {
+			this.makeNewTemplate();
+			relevantTemplate = this.templates[0];
+		}
+
+		// Now set the actual status
+		relevantTemplate.status = s;
+
+		// And finally reparse everything
+		this.parseDataFromTemplates( this.templates );
+
+		return true;
 	};
 
-	AFCH.Submission.prototype.isG13Eligible = function () {
-		this.Page.isG13Eligible().done( function ( eligible ) {
-			return ( eligible && this.isCurrentlySubmitted === false );
+	/**
+	 * Add a new template to the beginning of this.templates
+	 * @return {bool} success
+	 */
+	AFCH.Submission.prototype.makeNewTemplate = function () {
+		this.templates.unshift( {
+			status: '',
+			// FIXME: Create some sort of type which represents a "now" timestamp,
+			// in other words that evaluates to new Date() or somethin' when compared
+			// in JS, but when it's outputted in makeWikicode will be {{REVISIONTIMESTAMP}}
+			// or a related template. Trippy, indeed. ALSO, support this functionality in
+			// parse()...
+			timestamp: 0,
+			params: {}
 		} );
-	};
-
-	AFCH.Submission.prototype.parse = function ( page ) {
-		// Simply find the submission templates, parse them for applicable data,
-		// set some variables, and voila! Simply, right?
-		var sub = this;
-
-		// Get the page text
-		page.getText().done( function ( text ) {
-
-			// Then get all templates
-			AFCH.parseTemplates( text ).done( function ( templates ) {
-
-				// FIXME: Finish this...no idea what i was doing...
-				// Represent each AfC submission template as an object.
-				var submissionTemplates = [];
-				$.each( templates, function ( _, template ) {
-					var tdata;
-					if ( template.target.toLowerCase() === 'afc submission' ) {
-						submissionTemplates.push( {
-							status: template.params['1'],
-							timestamp: template.params.ts
-						} );
-					}
-				} );
-
-			} );
-		} );
+		return true;
 	};
 
 	function addMessages() {
@@ -81,12 +244,15 @@
 		/* global */
 		theSubmission = new AFCH.Submission( thePage );
 
-		// FIXME: Do this conditionally
-		$buttonWrapper.append(
-			$acceptButton,
-			$declineButton,
-			$commentButton
-		);
+		// Parse; when done, append the buttons
+		theSubmission.parse().done( function () {
+			// FIXME: Do this conditionally
+			$buttonWrapper.append(
+				$acceptButton,
+				$declineButton,
+				$commentButton
+			);
+		} );
 
 		AFCH.initFeedback( $afchReviewPanel, 'article review' );
 	}

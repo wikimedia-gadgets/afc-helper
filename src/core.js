@@ -413,5 +413,17 @@
 			return deferred;
 		}
 	} );
+
+	/**
+	 * Removes a key from a given object and returns the value of the key
+	 * @param {string} key
+	 * @return {mixed}
+	 */
+	Object.prototype.getAndDelete = function ( key ) {
+		var v = this[key];
+		delete this[key];
+		return v;
+	};
+
 }( AFCH, jQuery, mediaWiki ) );
 //</nowiki>
