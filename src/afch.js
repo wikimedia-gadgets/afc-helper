@@ -1,6 +1,6 @@
 //<nowiki>
 // Script should be located at [[MediaWiki:Gadget-afchelper.js]]
-( function ( mw, window ) {
+( function ( $, mw ) {
 	var pageName = mw.config.get( 'wgPageName' ), type;
 
 	if ( pageName.indexOf( 'Wikipedia:Articles_for_creation/' ) !== -1 ||
@@ -33,5 +33,5 @@
 			}
 		} );
 	}
-}( mediaWiki, window ) );
+}( jQuery, mediaWiki ) );
 //</nowiki>
