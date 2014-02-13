@@ -347,10 +347,20 @@
 			 * Retrieve the text of a message, or a placeholder if the
 			 * message is not set
 			 * @param {string} key Message key
+			 * @param {object} substitutions replacements to make
 			 * @return {string} Message value
 			 */
-			get: function ( key ) {
-				return AFCH.msg.store[key] || '<' + key + '>';
+			get: function ( key, substitutions ) {
+				var text = AFCH.msg.store[key] || '<' + key + '>';
+
+				// Perform substitutions if necessary
+				if ( substitutions ) {
+					$.each( substitutions, function ( original, replacement ) {
+						text = text.replace( original, replacement );
+					} );
+				}
+
+				return text;
 			},
 
 			/**
