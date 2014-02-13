@@ -198,6 +198,7 @@
 			 *                          mode: {string} 'appendtext' or 'prependtext'; default: (replace everything)
 			 *                          patrol: {bool} by default true; set to false to not patrol the page
 			 *                          hide: {bool} Set to true to supress logging in statusWindow
+			 *                          statusText: {string} message to show in status; default: "Editing"
 			 * @return {jQuery.Deferred} Resolves if saved with all data
 			 */
 			editPage: function ( pagename, options ) {
@@ -208,7 +209,7 @@
 				}
 
 				if ( !options.hide ) {
-					status = new AFCH.status.Element( 'Editing $1...',
+					status = new AFCH.status.Element( ( options.statusText || 'Editing' ) + ' $1...',
 						{ '$1': $( '<a>' )
 							.attr( 'href', mw.util.getUrl( pagename ) )
 							.text( pagename )
@@ -256,6 +257,37 @@
 			deletePage: function ( pagename, reason ) {
 				// FIXME: implement
 				return false;
+			},
+
+			/**
+			 * Notifies a user. Follows redirects and appends a message
+			 * to the bottom of the user's talk page.
+			 * @param  {string} user
+			 * @param  {object} data object with properties
+			 *                   - message: {string}
+			 *                   - summary: {string}
+			 *                   - hide: {bool}, default false
+			 * @return {$.Deferred} Resolves with success/failure
+			 */
+			notifyUser: function ( user, data ) {
+				var deferred = $.Deferred,
+					userPage = new mw.Title( user, 3 ); // User talk namespace
+
+				AFCH.actions.editPage( userPage, {
+					contents: data.message,
+					summary: data.summary,
+					mode: 'appendtext',
+					statusText: 'Notifying',
+					hide: data.hide || false
+				} )
+				.done( function () {
+					deferred.resolve();
+				} )
+				.fail( function () {
+					deferred.reject();
+				} );
+
+				return deferred;
 			}
 		},
 
