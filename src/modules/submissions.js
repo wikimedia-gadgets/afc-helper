@@ -275,5 +275,147 @@
 			setupReviewPanel();
 		} );
 
+	function setupReviewPanel () {
+		/* global */
+		thePage = new AFCH.Page( AFCH.consts.pagename );
+		/* global */
+		theSubmission = new AFCH.Submission( thePage );
+
+		// Set up messages for later
+		setMessages();
+
+		// Parse; when done, append the buttons
+		theSubmission.parse().done( function ( submission ) {
+			var $buttonWrapper = $( '<div>' )
+					.addClass( 'afch-actions' ),
+				$acceptButton = $( '<a>' )
+					.addClass( 'button accept' )
+					.text( 'Accept' )
+					.click( showAcceptOptions ),
+				$declineButton = $( '<a>' )
+					.addClass( 'button decline' )
+					.text( 'Decline' )
+					.click( showDeclineOptions ),
+				$commentButton = $( '<a>' )
+					.addClass( 'button comment' )
+					.text( 'Comment' )
+					.click( showCommentOptions ),
+				$submitButton = $( '<a>' )
+					.addClass( 'button submit' )
+					.text( 'Submit' )
+					.click( showSubmitOptions ),
+				$g13Button = $( '<a>' )
+					.addClass( 'button tag-g13' )
+					.text( 'Tag for G13 deletion' )
+					.click( showG13Options );
+
+				$buttonWrapper.append(
+					$acceptButton.toggleClass( 'show', submission.isCurrentlySubmitted ),
+					$declineButton.toggleClass( 'show', submission.isCurrentlySubmitted ),
+					$commentButton.toggleClass( 'show', submission.isCurrentlySubmitted ),
+					$submitButton.toggleClass( 'show', !submission.isCurrentlySubmitted )
+				);
+
+				// Get G13 eligibility and when known, display the button...
+				// but don't hold up the rest of the loading to do so
+				theSubmission.isG13Eligible().done( function ( eligible ) {
+					$g13Button
+						.toggleClass( 'show', eligible )
+						.appendTo( $buttonWrapper );
+				} );
+			} );
+
+		// Add the feedback link
+		AFCH.initFeedback( $afchReviewPanel, 'article review' );
+	}
+
+	/**
+	 * Stores useful strings to AFCH.msg
+	 */
+	function setMessages () {
+		AFCH.msg.set( {
+			// $1 = article name
+			// $2 = article class or '' if not available
+			'accepted-submission': '{{subst:Afc talk|$1|class=$2|sig=~~~~}}',
+
+			// $1 = article name
+			// $2 = copyright violation ('yes'/'no')
+			'declined-submission': '{{subst:Afc decline|$1|cv=$2|sig=yes}}'
+		} );
+	}
+
+	// These functions show the options before doing something
+	// to a submission.
+
+	function showAcceptOptions () {
+		return;
+	}
+
+	function showDeclineOptions () {
+		return;
+	}
+
+	function showCommentOptions () {
+		return;
+	}
+
+	function showSubmitOptions () {
+		return;
+	}
+
+	function showG13Options () {
+		return;
+	}
+
+	/**
+	 * Get the value of each ".afch-data-field" and store it to a dictionary,
+	 * then call function specified by `fn` with a data object containing
+	 * the grabbed data
+	 */
+	function getFormDataAndCall ( fn ) {
+		$( '.afch-data-field' );
+	}
+
+	// The functions actually perform a given action using data passed
+	// in the `data` parameter.
+
+	/**
+	 * handleAccept
+	 * @param {object} data
+	 *                  - newTitle
+	 *                  - notifyUser
+	 *                  - newClass
+	 */
+	function handleAccept ( data ) {
+		AFCH.actions.movePage( thePage, data.newTitle )
+			.done( function () {
+				if ( data.notifyUser ) {
+					AFCH.actions.notifyUser( data.notifyUser, {
+						msg: AFCH.msg.get( 'accepted-submission',
+							{ '$1': data.newTitle, '$2': data.newClass } )
+					} );
+				}
+			} )
+			.fail( function () {
+
+			} );
+	}
+
+	function handleDecline ( data ) {
+		return;
+	}
+
+	function handleComment ( data ) {
+		return;
+	}
+
+	function handleSubmit ( data ) {
+		return;
+	}
+
+	function handleG13 ( data ) {
+		return;
+	}
+
 }( AFCH, jQuery, mediaWiki ) );
 //</nowiki>
