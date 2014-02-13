@@ -1,6 +1,5 @@
 //<nowiki>
 // Script should be located at [[MediaWiki:Gadget-afchelper.js/submissions.js]]
-
 ( function ( AFCH, $, mw ) {
 	var $afchReviewPanel,
 		thePage,
@@ -25,6 +24,11 @@
 		// Set in updateAttributesAfterParse()
 		this.isCurrentlySubmitted = false;
 
+		// All parameters on the page, zipped up into one
+		// pretty package. The most recent value for any given
+		// parameter (based on `ts`) takes precedent.
+		this.params = {};
+
 		// Holds all of the {{afc submission}} templates that still
 		// apply to the page
 		this.templates = [];
@@ -32,7 +36,7 @@
 
 	/**
 	 * Parses a submission, writing its current status and data to various properties
-	 * @return {$.Deferred} Resolves when submission parsed successfully
+	 * @return {$.Deferred} Resolves with the submission when parsed successfully
 	 */
 	AFCH.Submission.prototype.parse = function () {
 		var sub = this,
@@ -45,16 +49,17 @@
 			AFCH.parseTemplates( text ).done( function ( templates ) {
 				sub.parseDataFromTemplates( templates );
 				sub.updateAttributesAfterParse();
-				deferred.resolve();
+				deferred.resolve( sub );
 			} );
 
 		} );
+
+		return deferred;
 	};
 
 	/**
 	 * Internal function
 	 * @param {array} templates list of templates to parse
-	 * @return {bool} [description]
 	 */
 	AFCH.Submission.prototype.parseDataFromTemplates = function ( templates ) {
 		// Represent each AfC submission template as an object.
@@ -124,16 +129,39 @@
 					sub.isDraft = false;
 					sub.isUnderReview = false;
 					break;
-				}
+			}
+
+			// Save the parameter data. Don't overwrite parameters
+			// that are already set, because we're going newest
+			// to oldest.
+			sub.params = $.extend( template.params, sub.params );
+
 			return true;
 		} );
 
 		this.templates = submissionTemplates;
-		return true;
 	};
 
 	AFCH.Submission.prototype.updateAttributesAfterParse = function () {
 		this.isCurrentlySubmitted = this.isPending || this.isUnderReview;
+	};
+
+	/**
+	 * Pass it a string of text and the old AFC submission templates will be
+	 * removed and the new ones (from makeWikicode) added to the top
+	 * @param {string} text
+	 * @return {string}
+	 */
+	AFCH.Submission.getUpdatedCodeFromText = function ( text ) {
+		// FIXME: Awful regex to remove the old submission templates
+		// This is bad. It works for most cases but has a hellish time
+		// with some double nested templates or faux nested templates (for
+		// example "{{hi|}}}" -- note the extra bracket). Ideally Parsoid
+		// would just return the raw template text as well (currently
+		// working on a patch for that, actually).
+		text = text.replace( /\{\{AFC submission(?:[^{{}}]*|({{.*?}}*))*\}\}/gi, '' );
+		text = this.makeWikicode() + '\n' + text;
+		return text;
 	};
 
 	/**
@@ -183,81 +211,52 @@
 		return deferred;
 	};
 
-	AFCH.Submission.prototype.setStatus = function ( s ) {
+	/**
+	 * Sets the submission status
+	 * @param {string} newStatus status to set, 'd'|'t'|'r'|''
+	 * @return {bool} success
+	 */
+	AFCH.Submission.prototype.setStatus = function ( newStatus ) {
 		var relevantTemplate = this.templates[0];
 
-		if ( [ 'd', 't', 'r', '' ].indexOf( s ) === -1 ) {
+		if ( [ 'd', 't', 'r', '' ].indexOf( newStatus ) === -1 ) {
 			// Unrecognized status
 			return false;
 		}
 
 		// If there are no templates on the page, generate a new one
+		// (addNewTemplate handles the reparsing)
 		if ( !relevantTemplate ) {
-			this.makeNewTemplate();
-			relevantTemplate = this.templates[0];
+			this.addNewTemplate( { status: newStatus } );
+		} else {
+			// Just modify the top template on the stack and then reparse
+			relevantTemplate.status = s;
+			this.parseDataFromTemplates( this.templates );
 		}
-
-		// Now set the actual status
-		relevantTemplate.status = s;
-
-		// And finally reparse everything
-		this.parseDataFromTemplates( this.templates );
 
 		return true;
 	};
 
 	/**
 	 * Add a new template to the beginning of this.templates
+	 * @param {object} data object with properties of template
+	 *                      - status (default: '')
+	 *                      - timestamp (default: '{{subst:REVISIONTIMESTAMP}}')
+	 *                      - params (default: {})
 	 * @return {bool} success
 	 */
-	AFCH.Submission.prototype.makeNewTemplate = function () {
-		this.templates.unshift( {
+	AFCH.Submission.prototype.addNewTemplate = function ( data ) {
+		this.templates.unshift( $.extend( {
 			status: '',
-			// FIXME: Create some sort of type which represents a "now" timestamp,
-			// in other words that evaluates to new Date() or somethin' when compared
-			// in JS, but when it's outputted in makeWikicode will be {{REVISIONTIMESTAMP}}
-			// or a related template. Trippy, indeed. ALSO, support this functionality in
-			// parse()...
-			timestamp: 0,
+			timestamp: '{{subst:REVISIONTIMESTAMP}}',
 			params: {}
-		} );
+		}, data ) );
+
+		// Reparse :P
+		this.parseDataFromTemplates( this.templates );
+
 		return true;
 	};
-
-	function addMessages() {
-		AFCH.msg.set( {
-			// FIXME
-		} );
-	}
-
-	function setupReviewPanel() {
-		var $buttonWrapper = $( '<div>' )
-				.addClass( 'afch-actions' ),
-			$acceptButton = $( '<button>' )
-				.addClass( 'accept' )
-				.text( 'Accept' ),
-			$declineButton,
-			$commentButton;
-
-		/* global */
-		thePage = new AFCH.Page( AFCH.consts.pagename );
-		/* global */
-		theSubmission = new AFCH.Submission( thePage );
-
-		// Parse; when done, append the buttons
-		theSubmission.parse().done( function () {
-			// FIXME: Do this conditionally
-			$buttonWrapper.append(
-				$acceptButton,
-				$declineButton,
-				$commentButton
-			);
-		} );
-
-		AFCH.initFeedback( $afchReviewPanel, 'article review' );
-	}
-
-	addMessages();
 
 	$afchReviewPanel = $( '<div>' )
 		.attr( 'id', 'afch' )
