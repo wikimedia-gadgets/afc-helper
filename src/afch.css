@@ -1,89 +1,171 @@
-/* CSS should be located at [[MediaWiki:Gadget-afchelper.css]] */
+/* GENERAL */
 
-.show {
-	display: inline;
+.hidden {
+	/* seriously, just don't show it. */
+	display: none !important;
 }
 
 #afch-open {
-	padding-left: 1em;
 	font-size: 0.5em;
-}
-
-/* Buttons used in submissions.js */
-.button {
-	background-color: #999;
-	background-image: -webkit-linear-gradient(hsla(0,0%,100%,.05), hsla(0,0%,0%,.1));
-	background-image: -moz-linear-gradient(hsla(0,0%,100%,.05), hsla(0,0%,0%,.1));
-	background-image: -ms-linear-gradient(hsla(0,0%,100%,.05), hsla(0,0%,0%,.1));
-	background-image: -o-linear-gradient(hsla(0,0%,100%,.05), hsla(0,0%,0%,.1));
-	background-image: linear-gradient(hsla(0,0%,100%,.05), hsla(0,0%,0%,.1));
-	border: none;
-	border-radius: .5em;
-	box-shadow: inset 0 0 0 1px hsla(0,0%,0%,.2),
-				inset 0 2px 0 hsla(0,0%,100%,.1),
-				inset 0 1.2em 0 hsla(0,0%,100%,0.1),
-				inset 0 -.2em 0 hsla(0,0%,100%,.1),
-				inset 0 -.25em 0 hsla(0,0%,0%,.25),
-				0 .25em .25em hsla(0,0%,0%,.05);
-	color: #444;
+	padding-left: 5px;
 	cursor: pointer;
-	display: inline-block;
-	font-family: sans-serif;
+}
+
+#afchReviewPanel {
+	border-width: 2px;
+	border-style: solid;
+	font-family: Helvetica, sans-serif;
+	font-size: 1.2em;
+	margin-bottom: 20px;
+}
+
+#afchFeedback {
+	position: absolute;
+	color: #FFFFFF;
 	font-size: 0.75em;
+	padding-left: 0.5em;
+	padding-top: 0.5em;
+	cursor: pointer;
+}
+
+#afchHeader {
+	font-size: 65px;
+	color: #FFFFFF;
 	font-weight: bold;
-	line-height: 1.5;
-	margin: 0 .5em 1em;
-	padding: .5em 1.5em .75em;
-	position: relative;
-	text-decoration: none;
-	text-shadow: 0 1px 1px hsla(0,0%,100%,.25);
+	text-align: right;
+	text-transform: uppercase;
+	overflow: hidden;
+	vertical-align: top;
+}
+
+.header {
+	height: 60px;
+	line-height: 1.2em;
+}
+
+.content {
+	background-color: #FFFFFF;
+	padding: 10px;
+}
+
+.afch-textfield {
+	-webkit-appearance: none;
+	border: 1px solid rgb(217, 217, 217);
+	border-collapse: collapse;
+	box-sizing: border-box;
+	cursor: auto;
+	display: inline-block;
+	font-size: 14px;
+	height: 30px;
+	margin: 0px;
+	padding: 5px;
 	vertical-align: middle;
-	display: none; /* hide by default */
 }
 
-.button:hover {
-	outline: none;
+.afch-textfield:focus {
+	border: 1px solid rgb(145, 145, 145);
+	outline: 0;
 }
 
-.button:hover, .button:focus {
-	box-shadow: inset 0 0 0 1px hsla(0,0%,0%,.2),
-				inset 0 2px 0 hsla(0,0%,100%,.1),
-				inset 0 1.2em 0 hsla(0,0%,100%,.1),
-				inset 0 -.2em 0 hsla(0,0%,100%,.1),
-				inset 0 -.25em 0 hsla(0,0%,0%,.25),
-				inset 0 0 0 3em hsla(0,0%,100%,.2),
-				0 .25em .25em hsla(0,0%,0%,.05);
+.afch-label {
+	font-size: 0.75em;
+	padding: 5px;
 }
 
-.button:active {
-	box-shadow: inset 0 0 0 1px hsla(0,0%,0%,.2),
-				inset 0 2px 0 hsla(0,0%,100%,.1),
-				inset 0 1.2em 0 hsla(0,0%,100%,.1),
-				inset 0 0 0 3em hsla(0,0%,100%,.2),
-				inset 0 .25em .5em hsla(0,0%,0%,.05),
-				0 -1px 1px hsla(0,0%,0%,.1),
-				0 1px 1px hsla(0,0%,100%,.25);
-	margin-top: .25em;
-	outline: none;
-	padding-bottom: .5em;
+/* MAIN (+SPLASH) */
+
+.initial,
+.splash {
+	background-color: #111111; /* black */
+	border-color: #111111;
 }
+
+#afchInitialHeader {
+	padding: 10px;
+	padding-bottom: 15px;
+	font-size: 25px;
+	color: #FFFFFF;
+	text-align: center;
+}
+
+.header-script {
+	display: block;
+	padding-bottom: 5px;
+	font-size: 15px;
+}
+
+#afchButtons {
+	width: 100%;
+	display: table;
+	table-layout: fixed;
+}
+
+.afch-button {
+	vertical-align: middle;
+	height: 2em;
+	font-size: 1.5em;
+	color: #111111; /* black font color */
+	text-align: center;
+	padding: 5px;
+	cursor: pointer;
+	text-decoration: none;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	display: table-cell;
+}
+
+.afch-button:hover {
+	background-image: -webkit-linear-gradient(top, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.2));
+	background-image: -moz-linear-gradient(top, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.2));
+	background-image: -o-linear-gradient(top, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.2));
+	background-image: -ms-linear-gradient(top, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.2));
+	background-image: linear-gradient(top, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.2));
+}
+
+.afch-button:active {
+	color: #111111;
+	background-image: -webkit-linear-gradient(bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.2));
+	background-image: -moz-linear-gradient(bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.2));
+	background-image: -o-linear-gradient(bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.2));
+	background-image: -ms-linear-gradient(bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.2));
+	background-image: linear-gradient(bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.2));
+}
+
+/* ACCEPT */
 
 .accept {
-	background-color: #6fcf6f; /* green */
+	background-color: #2ECC40; /* green */
+	border-color: #2ECC40;
 }
+
+/* DECLINE */
 
 .decline {
-	background-color: #ff6c6f; /* red */
+	background-color: #FF4136; /* red */
+	border-color: #FF4136;
 }
+
+/* COMMENT */
 
 .comment {
-	background-color: #fff6c6; /* yellow */
+	background-color: #FFDC00; /* yellow */
+	border-color: #FFDC00;
 }
+
+/* TAG FOR G13 DELETION */
 
 .tag-g13 {
-	background-color: #f6cf6f; /* orange */
+	background-color: #FF851B; /* orange */
+	border-color: #FF851B;
 }
 
+/* SUBMIT */
+
 .submit {
-	background-color: #6fc6ff; /* blue */
+	background-color: #0074D9; /* blue */
+	border-color: #0074D9;
 }

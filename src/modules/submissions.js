@@ -1,9 +1,7 @@
 //<nowiki>
-// Script should be located at [[MediaWiki:Gadget-afchelper.js/submissions.js]]
 ( function ( AFCH, $, mw ) {
-	var $afchReviewPanel,
-		thePage,
-		theSubmission;
+	var $afchWrapper, afchPage, afchSubmission, afchViews;
+
 	AFCH.log( 'submissions.js executing...' );
 
 	/**
@@ -16,6 +14,9 @@
 		// The associated page
 		this.page = page;
 
+		// 'WT:Articles for creation/Foo' => 'Foo'
+		this.shortTitle = this.page.title.getMainText().match( /([^\/]+$)/ )[1];
+
 		// Various submission states, set in parse()
 		this.isPending = false;
 		this.isUnderReview = false;
@@ -24,6 +25,7 @@
 
 		// Set in updateAttributesAfterParse()
 		this.isCurrentlySubmitted = false;
+		this.hasAfcTemplate = false;
 
 		// All parameters on the page, zipped up into one
 		// pretty package. The most recent value for any given
@@ -145,6 +147,7 @@
 
 	AFCH.Submission.prototype.updateAttributesAfterParse = function () {
 		this.isCurrentlySubmitted = this.isPending || this.isUnderReview;
+		this.hasAfcTemplate = !!this.templates.length;
 	};
 
 	/**
@@ -261,12 +264,23 @@
 		return true;
 	};
 
-	$afchReviewPanel = $( '<div>' )
-		.attr( 'id', 'afch' )
-		.addClass( 'afch-loading' )
+	// Wrapper for all AFCH windows/panels
+	$afchWrapper = $( '<div>' )
+		.attr( 'id', 'afchWrapper' )
 		.prependTo( '#mw-content-text' )
-		// FIXME: Show a sexy loader graphic
-		.text( 'AFCH is loading...' );
+		.append(
+			// Build splash panel in JavaScript rather than via
+			// a template so we don't have to wait for the
+			// HTTP request to go through
+			$( '<div>' )
+					.attr( 'id', 'afchReviewPanel' )
+					.addClass( 'splash hidden' )
+					.append(
+						$( '<div>' )
+							.attr( 'id', 'afchInitialHeader' )
+							.text( 'AFCH v' + AFCH.consts.version + ' / ' + AFCH.consts.versionName )
+					)
+			);
 
 	// Set up the link which opens the interface
 	$( '<span>' )
@@ -274,62 +288,67 @@
 		.appendTo( '#firstHeading' )
 		.text( 'Review submission »' )
 		.on( 'click', function () {
-			$afchReviewPanel.show( 'slide', { direction: 'down' } );
+			$( this ).fadeOut();
+			$( '#afchReviewPanel' ).removeClass( 'hidden' );
 			setupReviewPanel();
 		} );
 
 	function setupReviewPanel () {
+		// Store this to a variable so we can wait for its success
+		var loadViews = $.ajax( {
+				type: 'GET',
+				url: AFCH.consts.baseurl + '/tpl-submissions.js',
+				dataType: 'text'
+			} ).done( function ( data ) {
+				/* global */
+				afchViews = new AFCH.Views( data );
+			} );
+
 		/* global */
-		thePage = new AFCH.Page( AFCH.consts.pagename );
+		afchPage = new AFCH.Page( AFCH.consts.pagename );
+
 		/* global */
-		theSubmission = new AFCH.Submission( thePage );
+		afchSubmission = new AFCH.Submission( afchPage );
 
 		// Set up messages for later
 		setMessages();
 
-		// Parse; when done, append the buttons
-		theSubmission.parse().done( function ( submission ) {
-			var $buttonWrapper = $( '<div>' )
-					.addClass( 'afch-actions' ),
-				$acceptButton = $( '<a>' )
-					.addClass( 'button accept' )
-					.text( 'Accept' )
-					.click( showAcceptOptions ),
-				$declineButton = $( '<a>' )
-					.addClass( 'button decline' )
-					.text( 'Decline' )
-					.click( showDeclineOptions ),
-				$commentButton = $( '<a>' )
-					.addClass( 'button comment' )
-					.text( 'Comment' )
-					.click( showCommentOptions ),
-				$submitButton = $( '<a>' )
-					.addClass( 'button submit' )
-					.text( 'Submit' )
-					.click( showSubmitOptions ),
-				$g13Button = $( '<a>' )
-					.addClass( 'button tag-g13' )
-					.text( 'Tag for G13 deletion' )
-					.click( showG13Options );
+		// Parse the page and load the view templates. When done,
+		// continue with everything else.
+		$.when(
+			afchSubmission.parse(),
+			loadViews
+		).then( function ( submission ) {
+			AFCH.log( 'rendering main view...' );
 
-				$buttonWrapper.append(
-					$acceptButton.toggleClass( 'show', submission.isCurrentlySubmitted ),
-					$declineButton.toggleClass( 'show', submission.isCurrentlySubmitted ),
-					$commentButton.toggleClass( 'show', submission.isCurrentlySubmitted ),
-					$submitButton.toggleClass( 'show', !submission.isCurrentlySubmitted )
-				);
+			// Render the base buttons view
+			$afchWrapper.html( afchViews.renderView( 'main', {
+				title: afchSubmission.shortTitle,
+				accept: submission.isCurrentlySubmitted,
+				decline: submission.isCurrentlySubmitted,
+				comment: submission.isCurrentlySubmitted,
+				submit: !submission.isCurrentlySubmitted,
+				version: AFCH.consts.version,
+				versionName: AFCH.consts.versionName
+			} ) );
 
-				// Get G13 eligibility and when known, display the button...
-				// but don't hold up the rest of the loading to do so
-				theSubmission.isG13Eligible().done( function ( eligible ) {
-					$g13Button
-						.toggleClass( 'show', eligible )
-						.appendTo( $buttonWrapper );
-				} );
+			// Add the feedback link
+			AFCH.initFeedback( '#afchFeedback', 'article review' );
+
+			// Set up click handlers
+			$( '#afchAccept' ).click( showAcceptOptions );
+			$( '#afchDecline' ).click( showDeclineOptions );
+			$( '#afchComment' ).click( showCommentOptions );
+			$( '#afchSubmit' ).click( showSubmitOptions );
+			$( '#afchG13' ).click( showG13Options );
+
+			// Get G13 eligibility and when known, display the button...
+			// but don't hold up the rest of the loading to do so
+			afchSubmission.isG13Eligible().done( function ( eligible ) {
+				$( '#afchG13' ).toggleClass( 'hidden', !eligible );
 			} );
 
-		// Add the feedback link
-		AFCH.initFeedback( $afchReviewPanel, 'article review' );
+		} );
 	}
 
 	/**
@@ -351,6 +370,10 @@
 	// to a submission.
 
 	function showAcceptOptions () {
+		$afchWrapper.html( afchViews.renderView( 'accept', {
+			newTitle: afchSubmission.shortTitle
+		} ) );
+
 		return;
 	}
 
@@ -370,15 +393,6 @@
 		return;
 	}
 
-	/**
-	 * Get the value of each ".afch-data-field" and store it to a dictionary,
-	 * then call function specified by `fn` with a data object containing
-	 * the grabbed data
-	 */
-	function getFormDataAndCall ( fn ) {
-		$( '.afch-data-field' );
-	}
-
 	// The functions actually perform a given action using data passed
 	// in the `data` parameter.
 
@@ -390,7 +404,7 @@
 	 *                  - newClass
 	 */
 	function handleAccept ( data ) {
-		AFCH.actions.movePage( thePage, data.newTitle )
+		AFCH.actions.movePage( afchPage, data.newTitle )
 			.done( function () {
 				if ( data.notifyUser ) {
 					AFCH.actions.notifyUser( data.notifyUser, {

@@ -1,0 +1,43 @@
+//<nowiki>
+
+<!-- main -->
+<div id="afchReviewPanel" class="initial">
+	<div id="afchFeedback"></div>
+	<div id="afchInitialHeader">
+		<span class="header-script">AFCH v{{version}} / {{versionName}}</span>
+		Reviewing "{{title}}"
+	</div>
+	<div id="afchButtons">
+		{{#accept}}<a id="afchAccept" class="accept afch-button">Accept</a>{{/accept}}
+		{{#decline}}<a id="afchDecline" class="decline afch-button">Decline</a>{{/decline}}
+		{{#comment}}<a id="afchComment" class="comment afch-button">Comment</a>{{/comment}}
+		{{#submit}}<a id="afchSubmit" class="submit afch-button">Submit</a>{{/submit}}
+		<a id="afchG13" class="g13 afch-button {{^g13}}hidden{{/g13}}">Tag for G13 deletion</a>
+	</div>
+</div>
+<!-- /main -->
+
+<!-- accept -->
+<div id="afchReviewPanel" class="accept">
+	<div id="afchFeedback"></div>
+	<div id="afchHeader" class="header">Accepting...</div>
+	<div id="afchContent" class="content">
+
+		<label for="newTitle" class="afch-label">Move submission to</label>
+		<input type="text" id="newTitle" class="afch-textfield" placeholder="Target page name"
+			{{#newTitle}}value="{{newTitle}}"{{/newTitle}} />
+
+	</div>
+</div>
+<!-- /accept -->
+
+<!-- decline -->
+<div id="afchReviewPanel" class="decline">
+	<div id="afchFeedback"></div>
+	<div id="afchHeader" class="header">Declining...</div>
+	<div id="afchContent" class="content">
+	</div>
+</div>
+<!-- /decline -->
+
+//</nowiki>
