@@ -4,6 +4,7 @@
 	var $afchReviewPanel,
 		thePage,
 		theSubmission;
+	AFCH.log( 'submissions.js executing...' );
 
 	/**
 	 * Represents an AfC submission and its status. Call submission.parse() to

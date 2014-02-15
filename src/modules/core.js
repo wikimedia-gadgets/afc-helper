@@ -1,7 +1,17 @@
 //<nowiki>
 // Script should be located at [[MediaWiki:Gadget-afchelper.js/core.js]]
 ( function ( AFCH, $, mw ) {
-	AFCH = $.extend( AFCH, {
+	$.extend( AFCH, {
+
+		/**
+		 * Log a string to the console
+		 * @param {string} text
+		 */
+		log: function ( text ) {
+			if ( AFCH.consts.beta ) {
+				mw.log( 'AFCH: ' + text );
+			}
+		},
 
 		/**
 		 * Prepares the AFCH gadget by setting constants and checking environment
@@ -30,6 +40,7 @@
 		load: function ( type ) {
 			// Run setup function
 			AFCH.beforeLoad();
+			AFCH.log( 'loading ' + type );
 
 			if ( AFCH.consts.beta ) {
 				// Load css
