@@ -419,11 +419,12 @@
 		/**
 		 * Use Parsoid web api to parse the given wikitext
 		 * @param {string} text Text to parse
+		 * @param {bool} show display the request in the status list
 		 * @return {$.Deferred} Resolves with a list of parsed templates
 		 */
-		parseTemplates: function ( text ) {
+		parseTemplates: function ( text, show ) {
 			var deferred = $.Deferred(),
-				status = new AFCH.status.Element( 'Parsing templates using Parsoid...' );
+				status = show ? new AFCH.status.Element( 'Parsing templates using Parsoid...' ) : AFCH.consts.nullstatus;
 
 			// Sneakily use the Parsoid API which Flow has oh-so-nicely exposed
 			// for us. Hopefully they don't, y'know, suddenly remove it.
