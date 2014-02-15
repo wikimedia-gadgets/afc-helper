@@ -38,6 +38,10 @@
 		load: function ( type ) {
 			AFCH.log( 'loading ' + type );
 
+			// FIXME: we should load hogan.js "for real", figure out how to
+			// add to ResourceLoader or something??
+			mw.loader.load( AFCH.consts.baseurl + '/hogan.js' );
+
 			if ( AFCH.consts.beta ) {
 				// Load css
 				mw.loader.load( AFCH.consts.scriptpath + '?action=raw&ctype=text/css&title=MediaWiki:Gadget-afch.css', 'text/css' );
@@ -461,6 +465,49 @@
 			} );
 
 			return deferred;
+		},
+
+		/**
+		 * Represents a series of "views", aka templateable thingamajigs.
+		 * When creating a set of views, they are loaded from a given piece of
+		 * text. Uses <hogan.js>.
+		 *
+		 * Views on the cheap! Just use one mega template and divide it up into
+		 * lots of baby templates :)
+		 *
+		 * @param {string} [src] text to parse for template contents initially
+		 */
+		Views: function ( src ) {
+			this.views = {};
+
+			this.setView = function ( name, content ) {
+				this.views[name] = content;
+			};
+
+			this.renderView = function ( name, data ) {
+				var view = this.views[name],
+					template = Hogan.compile( view );
+
+				return template.render( data );
+			};
+
+			this.loadFromSrc = function ( src ) {
+				var viewRegex = /<!--\s(.*?)\s-->\n([\s\S]*?)<!--\s\/(.*?)\s-->/g,
+					match = viewRegex.exec( src );
+
+				while ( match !== null ) {
+					var key = match[1],
+						content = match[2];
+
+					this.setView( key, content );
+
+					// Increment the match
+					match = viewRegex.exec( src );
+				}
+			};
+
+			this.loadFromSrc( src );
+		},
 
 		/**
 		 * Removes a key from a given object and returns the value of the key
