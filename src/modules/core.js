@@ -1,5 +1,4 @@
 //<nowiki>
-// Script should be located at [[MediaWiki:Gadget-afchelper.js/core.js]]
 ( function ( AFCH, $, mw ) {
 	$.extend( AFCH, {
 
@@ -24,7 +23,7 @@
 				return false;
 			}
 
-			if ( AFCH.consts.baseurl.indexOf( 'MediaWiki:' + 'Gadget-afchelper.js' ) === -1 ) {
+			if ( AFCH.consts.baseurl.indexOf( 'MediaWiki:Gadget-afch.js' ) === -1 ) {
 				AFCH.consts.beta = true;
 			}
 
@@ -35,16 +34,13 @@
 		 * Loads the subscript
 		 * @param {string} type Which type of script to load:
 		 *                      'redirects' or 'ffu' or 'submissions'
-		 * @return {bool} Whether or not a subscript was loaded
 		 */
 		load: function ( type ) {
-			// Run setup function
-			AFCH.beforeLoad();
 			AFCH.log( 'loading ' + type );
 
 			if ( AFCH.consts.beta ) {
 				// Load css
-				mw.loader.load( AFCH.consts.scriptpath + '?action=raw&ctype=text/css&title=MediaWiki:Gadget-afchelper.css', 'text/css' );
+				mw.loader.load( AFCH.consts.scriptpath + '?action=raw&ctype=text/css&title=MediaWiki:Gadget-afch.css', 'text/css' );
 				// Load dependencies
 				mw.loader.load( [ 'mediawiki.feedback', 'mediawiki.api', 'jquery.chosen' ] );
 			}
@@ -85,8 +81,8 @@
 		initFeedback: function ( $element, type ) {
 			var feedback = new mw.Feedback( {
 					title: new mw.Title( 'Wikipedia talk:Articles for creation/Helper script/Feedback' ),
-					bugsLink: 'https://github.com/WPAFC/afch/issues/new',
-					bugsListLink: 'https://github.com/WPAFC/afch/issues?labels=REWRITE&state=open'
+					bugsLink: 'https://github.com/WPAFC/afch-rewrite/issues/new',
+					bugsListLink: 'https://github.com/WPAFC/afch-rewrite/issues?state=open'
 				} );
 			$( '<span>' )
 				.text( 'Give feedback!' )
