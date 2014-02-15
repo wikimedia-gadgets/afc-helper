@@ -103,7 +103,7 @@
 		Page: function ( name ) {
 			var pg = this;
 
-			this.Title = new mw.Title( name );
+			this.title = new mw.Title( name );
 			this.additionalData = {};
 
 			this.getText = function ( usecache ) {
@@ -113,7 +113,7 @@
 					deferred.resolve( pg.pageText );
 				}
 
-				AFCH.action.getPageText( pg.Title.getPrefixedText(), { hide: true, moreProps: 'timestamp' } )
+				AFCH.action.getPageText( pg.title.getPrefixedText(), { hide: true, moreProps: 'timestamp' } )
 					.done( function ( pagetext, data ) {
 						pg.pageText = pagetext;
 						// Teehee, let's use this opportunity to get some data for later
@@ -460,19 +460,19 @@
 			} );
 
 			return deferred;
+
+		/**
+		 * Removes a key from a given object and returns the value of the key
+		 * @param {string} key
+		 * @return {mixed}
+		 */
+		getAndDelete: function ( object, key ) {
+			var v = object[key];
+			delete object[key];
+			return v;
 		}
 	} );
 
-	/**
-	 * Removes a key from a given object and returns the value of the key
-	 * @param {string} key
-	 * @return {mixed}
-	 */
-	Object.prototype.getAndDelete = function ( key ) {
-		var v = this[key];
-		delete this[key];
-		return v;
-	};
 
 }( AFCH, jQuery, mediaWiki ) );
 //</nowiki>

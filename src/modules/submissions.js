@@ -201,7 +201,7 @@
 		}
 
 		// And not been modified in 6 months
-		this.getLastModifiedDate().done( function ( lastEdited ) {
+		this.page.getLastModifiedDate().done( function ( lastEdited ) {
 			var timeNow = new Date(),
 				sixMonthsAgo = ( new Date() ).setMonth( timeNow.getMonth() - 6 );
 
