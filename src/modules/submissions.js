@@ -70,8 +70,8 @@
 		$.each( templates, function ( _, template ) {
 			if ( template.target.toLowerCase() === 'afc submission' ) {
 				submissionTemplates.push( {
-					status: template.params.getAndDelete( '1' ).toLowerCase(),
-					timestamp: +template.params.getAndDelete( 'ts' ),
+					status: AFCH.getAndDelete( template.params, '1').toLowerCase(),
+					timestamp: +AFCH.getAndDelete( template.params, 'ts' ),
 					params: template.params
 				} );
 			}
@@ -203,7 +203,9 @@
 		// And not been modified in 6 months
 		this.page.getLastModifiedDate().done( function ( lastEdited ) {
 			var timeNow = new Date(),
-				sixMonthsAgo = ( new Date() ).setMonth( timeNow.getMonth() - 6 );
+				sixMonthsAgo = new Date();
+
+			sixMonthsAgo.setMonth( timeNow.getMonth() - 6 );
 
 			deferred.resolve( ( timeNow.getTime() - lastEdited.getTime() ) >
 				( timeNow.getTime() - sixMonthsAgo.getTime() ) );
@@ -398,7 +400,7 @@
 				}
 			} )
 			.fail( function () {
-
+				return;
 			} );
 	}
 
