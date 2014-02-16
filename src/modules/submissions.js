@@ -1,6 +1,7 @@
 //<nowiki>
 ( function ( AFCH, $, mw ) {
-	var $afchWrapper, afchPage, afchSubmission, afchViews;
+	var $afchLaunchLink, $afch, $afchWrapper,
+		afchPage, afchSubmission, afchViews;
 
 	AFCH.log( 'submissions.js executing...' );
 
@@ -264,34 +265,68 @@
 		return true;
 	};
 
-	// Wrapper for all AFCH windows/panels
-	$afchWrapper = $( '<div>' )
-		.attr( 'id', 'afchWrapper' )
-		.prependTo( '#mw-content-text' )
-		.append(
-			// Build splash panel in JavaScript rather than via
-			// a template so we don't have to wait for the
-			// HTTP request to go through
-			$( '<div>' )
-					.attr( 'id', 'afchReviewPanel' )
-					.addClass( 'splash hidden' )
-					.append(
-						$( '<div>' )
-							.attr( 'id', 'afchInitialHeader' )
-							.text( 'AFCH v' + AFCH.consts.version + ' / ' + AFCH.consts.versionName )
-					)
-			);
-
-	// Set up the link which opens the interface
-	$( '<span>' )
+	// This creates the link in the header which allows
+	// users to launch afch. When launched, the link fades
+	// away, like a unicorn.
+	$afchLaunchLink = $( '<span>' )
 		.attr( 'id', 'afch-open' )
 		.appendTo( '#firstHeading' )
 		.text( 'Review submission »' )
-		.on( 'click', function () {
+		.click( function () {
 			$( this ).fadeOut();
-			$( '#afchReviewPanel' ).removeClass( 'hidden' );
-			setupReviewPanel();
+			createAFCHInstance();
 		} );
+
+
+	function createAFCHInstance () {
+		/**
+		 * global; wraps ALL afch-y things
+		 */
+		$afch = $( '<div>' )
+			.attr( 'id', 'afch' )
+			.prependTo( '#mw-content-text' )
+			.append(
+				// Add the feedback link above the wrapper
+				$( '<div>' )
+					.attr( 'id', 'afchFeedback' )
+					.addClass( 'top-bar-element' ),
+				// Include the close link in the upper right
+				$( '<div>' )
+					.attr( 'id', 'afchClose' )
+					.addClass( 'top-bar-element' )
+					.html( '&times;' )
+					.click( function () {
+						// DIE DIE DIE
+						$afch.remove();
+						// Show the launch link again
+						$afchLaunchLink.fadeIn();
+					} )
+			);
+
+		/**
+		 * global; wrapper for specific afch panels
+		 */
+		$afchWrapper = $( '<div>' )
+			.attr( 'id', 'afchPanelWrapper' )
+			.appendTo( $afch )
+			.append(
+				// Build splash panel in JavaScript rather than via
+				// a template so we don't have to wait for the
+				// HTTP request to go through
+				$( '<div>' )
+						.attr( 'id', 'afchReviewPanel' )
+						.addClass( 'splash' )
+						.append(
+							$( '<div>' )
+								.attr( 'id', 'afchInitialHeader' )
+								.text( 'AFCH v' + AFCH.consts.version + ' / ' + AFCH.consts.versionName )
+						)
+				);
+
+		// Now set up the review panel and replace it with
+		// actually content, not just a splash screen
+		setupReviewPanel();
+	}
 
 	function setupReviewPanel () {
 		// Store this to a variable so we can wait for its success
@@ -384,6 +419,7 @@
 			fn( data );
 		} );
 	}
+
 	// These functions show the options before doing something
 	// to a submission.
 

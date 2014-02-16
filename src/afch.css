@@ -19,13 +19,21 @@
 	margin-bottom: 20px;
 }
 
+.top-bar-element {
+	color: #FFFFFF;
+	font-size: 1em;
+	padding: 0.5em;
+	cursor: pointer;
+}
+
+#afchClose {
+	font-size: 1.2em;
+	float: right;
+	margin-top: -0.4em;
+}
+
 #afchFeedback {
 	position: absolute;
-	color: #FFFFFF;
-	font-size: 0.75em;
-	padding-left: 0.5em;
-	padding-top: 0.5em;
-	cursor: pointer;
 }
 
 #afchHeader {
