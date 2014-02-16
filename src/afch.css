@@ -118,6 +118,10 @@
 	background-image: linear-gradient(bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.2));
 }
 
+.afch-option {
+	display: block;
+}
+
 /* MAIN (+SPLASH) */
 
 .initial,
@@ -175,6 +179,10 @@
 .comment {
 	background-color: #FFDC00; /* yellow */
 	border-color: #FFDC00;
+}
+
+.comment #afchContent {
+	text-align: right;
 }
 
 /* TAG FOR G13 DELETION */
