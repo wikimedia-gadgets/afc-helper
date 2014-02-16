@@ -286,10 +286,23 @@
 			.attr( 'id', 'afch' )
 			.prependTo( '#mw-content-text' )
 			.append(
-				// Add the feedback link above the wrapper
 				$( '<div>' )
-					.attr( 'id', 'afchFeedback' )
-					.addClass( 'top-bar-element' ),
+					.attr( 'id', 'afchLeft' )
+					.addClass( 'top-bar-element' )
+					.append(
+						// Back link appears based on context
+						$( '<span>' )
+							.attr( 'id', 'afchBackLink' )
+							.html( '&#8592; | ' ) // back arrow
+							.addClass( 'hidden' )
+							.click( function () {
+								if ( afchViewer.loadPrevious ) {
+									afchViewer.loadPrevious();
+									$( this ).addClass( 'hidden' );
+								}
+							} )
+					),
+
 				// Include the close link in the upper right
 				$( '<div>' )
 					.attr( 'id', 'afchClose' )
@@ -369,8 +382,8 @@
 				versionName: AFCH.consts.versionName
 			} );
 
-			// Add the feedback link
-			AFCH.initFeedback( '#afchFeedback', 'article review' );
+			// Add the feedback link to the left panel
+			AFCH.initFeedback( '#afchLeft', 'article review' );
 
 			// Set up click handlers
 			$( '#afchAccept' ).click( showAcceptOptions );
