@@ -1,7 +1,7 @@
 //<nowiki>
 ( function ( AFCH, $, mw ) {
 	var $afchLaunchLink, $afch, $afchWrapper,
-		afchPage, afchSubmission, afchViews;
+		afchPage, afchSubmission, afchViews, afchViewer;
 
 	AFCH.log( 'submissions.js executing...' );
 
@@ -337,6 +337,8 @@
 			} ).done( function ( data ) {
 				/* global */
 				afchViews = new AFCH.Views( data );
+				/* global */
+				afchViewer = new AFCH.Viewer( afchViews, $afchWrapper );
 			} );
 
 		/* global */
@@ -357,15 +359,15 @@
 			AFCH.log( 'rendering main view...' );
 
 			// Render the base buttons view
-			$afchWrapper.html( afchViews.renderView( 'main', {
-				title: afchSubmission.shortTitle,
+			loadView( 'main', {
+				title: submission.shortTitle,
 				accept: submission.isCurrentlySubmitted,
 				decline: submission.isCurrentlySubmitted,
 				comment: submission.isCurrentlySubmitted,
 				submit: !submission.isCurrentlySubmitted,
 				version: AFCH.consts.version,
 				versionName: AFCH.consts.versionName
-			} ) );
+			} );
 
 			// Add the feedback link
 			AFCH.initFeedback( '#afchFeedback', 'article review' );
@@ -420,33 +422,39 @@
 		} );
 	}
 
+	function loadView ( name, data ) {
+		// Show the back button if we're not loading the main view
+		$( '#afchBackLink' ).toggleClass( 'hidden', name === 'main' );
+		afchViewer.loadView( name, data );
+	}
+
 	// These functions show the options before doing something
 	// to a submission.
 
 	function showAcceptOptions () {
-		$afchWrapper.html( afchViews.renderView( 'accept', {
+		loadView( 'accept', {
 			newTitle: afchSubmission.shortTitle
-		} ) );
+		} );
 		addFormSubmitHandler( handleAccept );
 	}
 
 	function showDeclineOptions () {
-		$afchWrapper.html( afchViews.renderView( 'decline', {} ) );
+		loadView( 'decline', {} );
 		addFormSubmitHandler( handleDecline );
 	}
 
 	function showCommentOptions () {
-		$afchWrapper.html( afchViews.renderView( 'comment', {} ) );
+		loadView( 'comment', {} );
 		addFormSubmitHandler( handleComment );
 	}
 
 	function showSubmitOptions () {
-		$afchWrapper.html( afchViews.renderView( 'submit', {} ) );
+		loadView( 'submit', {} );
 		addFormSubmitHandler( handleSubmit );
 	}
 
 	function showG13Options () {
-		$afchWrapper.html( afchViews.renderView( 'g13', {} ) );
+		loadView( 'g13', {} );
 		addFormSubmitHandler( handleG13 );
 	}
 

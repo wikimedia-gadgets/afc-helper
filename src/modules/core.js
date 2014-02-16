@@ -510,6 +510,33 @@
 		},
 
 		/**
+		 * Represents a specific window into an AFCH.Views object
+		 *
+		 * @param {AFCH.Views} views location where the views are gleaned
+		 * @param {jQuery} $element
+		 */
+		Viewer: function ( views, $element ) {
+			this.views = views;
+			this.$element = $element;
+
+			this.previousState = false;
+
+			this.loadView = function ( view, data ) {
+				var code = this.views.renderView( view, data );
+
+				// Update the view cache
+				this.previousState = this.$element.clone( true );
+
+				this.$element.html( code );
+			};
+
+			this.loadPrevious = function () {
+				this.$element.replaceWith( this.previousState );
+				this.$element = this.previousState;
+			};
+		},
+
+		/**
 		 * Removes a key from a given object and returns the value of the key
 		 * @param {string} key
 		 * @return {mixed}
