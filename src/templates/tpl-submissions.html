@@ -24,8 +24,10 @@
 	<div id="afchContent" class="content">
 
 		<label for="newTitle" class="afch-label">Move submission to</label>
-		<input type="text" id="newTitle" class="afch-textfield" placeholder="Target page name"
+		<input type="text" id="newTitle" class="afch-input afch-textfield" placeholder="Target page name"
 			{{#newTitle}}value="{{newTitle}}"{{/newTitle}} />
+
+		<div id="afchSubmit" class="gradient-button accept">Accept &amp; publish</div>
 
 	</div>
 </div>
@@ -36,6 +38,9 @@
 	<div id="afchFeedback"></div>
 	<div id="afchHeader" class="header">Declining...</div>
 	<div id="afchContent" class="content">
+
+		<div id="afchSubmit" class="gradient-button decline">Decline submission</div>
+
 	</div>
 </div>
 <!-- /decline -->
