@@ -366,6 +366,24 @@
 		} );
 	}
 
+	/**
+	 * Adds handler for when the accept/decline/etc form is submitted
+	 * that calls a given function and passes an object to the function
+	 * containing data from all .afch-input elements in the dom
+	 *
+	 * @param {Function} fn function to call with data
+	 */
+	function addFormSubmitHandler ( fn ) {
+		$( '#afchSubmit' ).click( function () {
+			var data = {};
+
+			$( '.afch-input' ).each( function ( _, element ) {
+				data[element.id] = $( element ).val();
+			} );
+
+			fn( data );
+		} );
+	}
 	// These functions show the options before doing something
 	// to a submission.
 
@@ -373,27 +391,30 @@
 		$afchWrapper.html( afchViews.renderView( 'accept', {
 			newTitle: afchSubmission.shortTitle
 		} ) );
-
-		return;
+		addFormSubmitHandler( handleAccept );
 	}
 
 	function showDeclineOptions () {
-		return;
+		$afchWrapper.html( afchViews.renderView( 'decline', {} ) );
+		addFormSubmitHandler( handleDecline );
 	}
 
 	function showCommentOptions () {
-		return;
+		$afchWrapper.html( afchViews.renderView( 'comment', {} ) );
+		addFormSubmitHandler( handleComment );
 	}
 
 	function showSubmitOptions () {
-		return;
+		$afchWrapper.html( afchViews.renderView( 'submit', {} ) );
+		addFormSubmitHandler( handleSubmit );
 	}
 
 	function showG13Options () {
-		return;
+		$afchWrapper.html( afchViews.renderView( 'g13', {} ) );
+		addFormSubmitHandler( handleG13 );
 	}
 
-	// The functions actually perform a given action using data passed
+	// These functions actually perform a given action using data passed
 	// in the `data` parameter.
 
 	/**
