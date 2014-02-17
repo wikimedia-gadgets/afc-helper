@@ -163,7 +163,7 @@
 		/**
 		 * Perform a specific action
 		 */
-		action: {
+		actions: {
 			/**
 			 * Gets the full wikicode content of a page
 			 * @param {string} pagename The page to get the contents of, namespace included
@@ -180,7 +180,7 @@
 					status = new AFCH.status.Element( 'Getting $1...',
 						{ '$1': $( '<a>' )
 							.attr( 'href', mw.util.getUrl( pagename ) )
-							.text( pagename )
+							.text( pagename.replace( /_/g, ' ' ) )
 						} );
 				} else {
 					status = AFCH.consts.nullstatus;
@@ -228,7 +228,7 @@
 			 *                          summary: {string} edit summary, will have the edit summary ad at the end,
 			 *                          createonly: {bool} set to true to only edit the page if it doesn't exist,
 			 *                          mode: {string} 'appendtext' or 'prependtext'; default: (replace everything)
-			 *                          patrol: {bool} by default true; set to false to not patrol the page
+			 *                          patrol: {bool} by default true; set to false to not patrol the page FIXME
 			 *                          hide: {bool} Set to true to supress logging in statusWindow
 			 *                          statusText: {string} message to show in status; default: "Editing"
 			 * @return {jQuery.Deferred} Resolves if saved with all data
@@ -244,7 +244,7 @@
 					status = new AFCH.status.Element( ( options.statusText || 'Editing' ) + ' $1...',
 						{ '$1': $( '<a>' )
 							.attr( 'href', mw.util.getUrl( pagename ) )
-							.text( pagename )
+							.text( pagename.replace( /_/g, ' ' ) )
 						} );
 				} else {
 					status = AFCH.consts.nullstatus;
@@ -254,7 +254,8 @@
 					action: 'edit',
 					text: options.contents,
 					title: pagename,
-					summary: options.summary + AFCH.prefs.summaryAd
+					summary: options.summary + AFCH.prefs.summaryAd,
+					token: AFCH.consts.editToken
 				};
 
 				if ( options.mode ) {
@@ -303,9 +304,9 @@
 			 */
 			notifyUser: function ( user, data ) {
 				var deferred = $.Deferred,
-					userPage = new mw.Title( user, 3 ); // User talk namespace
+					userTalkPage = new mw.Title( user, 3 ); // User talk namespace
 
-				AFCH.actions.editPage( userPage, {
+				AFCH.actions.editPage( userTalkPage, {
 					contents: data.message,
 					summary: data.summary,
 					mode: 'appendtext',
@@ -361,6 +362,12 @@
 				this.update = function ( html ) {
 					// First run the substutions
 					$.each( this.substitutions, function ( key, value ) {
+						// If we are passed a jQuery object, convert it
+						// to regular HTML first
+						if ( value.jquery ) {
+							value = value.wrap( '<div>' ).parent().html();
+						}
+
 						html = html.replace( key, value );
 					} );
 					// Then update the element
