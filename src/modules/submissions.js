@@ -319,6 +319,28 @@
 	};
 
 	/**
+	 * Gets the submitter, or, if no specific submitter is available,
+	 * just the last editor
+	 *
+	 * @return {$.Deferred} resolves with user
+	 */
+	AFCH.Submission.prototype.getSubmitter = function () {
+		var deferred = $.Deferred(),
+			user = this.params.u;
+
+		if ( user ) {
+			deferred.resolve( user );
+		} else {
+			this.page.getLastEditor().done( function ( user ) {
+				deferred.resolve( user );
+			} );
+		}
+
+		return deferred;
+	};
+
+
+	/**
 	 * Represents text of an AfC submission
 	 * @param {[type]} text [description]
 	 */
@@ -642,9 +664,11 @@
 		AFCH.actions.movePage( afchPage, data.newTitle )
 			.done( function () {
 				if ( data.notifyUser ) {
-					AFCH.actions.notifyUser( data.notifyUser, {
-						msg: AFCH.msg.get( 'accepted-submission',
-							{ '$1': data.newTitle, '$2': data.newClass } )
+					afchSubmission.getSubmitter().done( function ( submitter ) {
+						AFCH.actions.notifyUser( submitter, {
+							msg: AFCH.msg.get( 'accepted-submission',
+								{ '$1': data.newTitle, '$2': data.newClass } )
+						} );
 					} );
 				}
 			} )
