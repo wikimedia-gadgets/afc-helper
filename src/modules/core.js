@@ -67,7 +67,7 @@
 			// Add more constants
 			$.extend( AFCH.consts, {
 				// Edit token used in api requests
-				editToken: mw.user.tokens.get('editToken'),
+				editToken: mw.user.tokens.get( 'editToken' ),
 				// Full page name, "Wikipedia talk:Articles for creation/sandbox"
 				pagename: mw.config.get( 'wgPageName' ).replace( '_', ' ' ),
 				// Link to the current page, "/wiki/Wikipedia talk:Articles for creation/sandbox"
@@ -108,6 +108,8 @@
 			var pg = this;
 
 			this.title = new mw.Title( name );
+			this.rawTitle = this.title.getPrefixedText();
+
 			this.additionalData = {};
 
 			this.getText = function ( usecache ) {
@@ -117,13 +119,25 @@
 					deferred.resolve( pg.pageText );
 				}
 
-				AFCH.action.getPageText( pg.title.getPrefixedText(), { hide: true, moreProps: 'timestamp' } )
+				AFCH.actions.getPageText( this.rawTitle, { hide: true, moreProps: 'timestamp|user' } )
 					.done( function ( pagetext, data ) {
 						pg.pageText = pagetext;
 						// Teehee, let's use this opportunity to get some data for later
 						pg.additionalData.lastModified = new Date( data.timestamp );
+						pg.additionalData.lastEditor = data.user;
 
 						deferred.resolve( pg.pageText );
+					} );
+
+				return deferred;
+			};
+
+			this.edit = function ( options ) {
+				var deferred = $.Deferred();
+
+				AFCH.actions.editPage( this.rawTitle, options )
+					.done( function ( data ) {
+						deferred.resolve( data );
 					} );
 
 				return deferred;
@@ -137,6 +151,13 @@
 				pg.getText( true ).done( deferred.resolve( pg.additionalData.lastModified ) );
 				return deferred;
 			};
+
+			this.getLastEditor = function () {
+				var deferred = $.Deferred();
+				pg.getText( true ).done( deferred.resolve( pg.additionalData.lastEditor ) );
+				return deferred;
+			};
+
 		},
 
 		/**
