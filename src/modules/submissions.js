@@ -322,6 +322,8 @@
 	 * Gets the submitter, or, if no specific submitter is available,
 	 * just the last editor
 	 *
+	 * FIXME: get the FIRST editor??
+	 *
 	 * @return {$.Deferred} resolves with user
 	 */
 	AFCH.Submission.prototype.getSubmitter = function () {
@@ -504,7 +506,7 @@
 				title: submission.shortTitle,
 				accept: submission.isCurrentlySubmitted,
 				decline: submission.isCurrentlySubmitted,
-				comment: submission.isCurrentlySubmitted,
+				comment: true, // Comments are always okay!
 				submit: !submission.isCurrentlySubmitted,
 				version: AFCH.consts.version,
 				versionName: AFCH.consts.versionName
@@ -678,11 +680,37 @@
 	}
 
 	function handleDecline ( data ) {
-		return;
+		var text = data.afchText;
+
+		afchSubmission.setStatus( 'd', {} ); // FIXME: include decliner params/etc
+		text.updateAfcTemplates( afchSubmission.makeWikicode() );
+
+		afchPage.edit( {
+			contents: text.get(),
+			summary: 'Declining submission'
+		} );
 	}
 
 	function handleComment ( data ) {
-		return;
+		var text = data.afchText,
+			comment = data.commentText + ' ~~~~';
+
+		afchSubmission.addNewComment( { text: comment } );
+		text.updateAfcTemplates( afchSubmission.makeWikicode() );
+
+		afchPage.edit( {
+			contents: text.get(),
+			summary: 'Commenting on submission'
+		} );
+
+		if ( data.notifyUser ) {
+			afchSubmission.getSubmitter().done( function ( submitter ) {
+				AFCH.actions.notifyUser( submitter, {
+					msg: AFCH.msg.get( 'comment-on-submission',
+						{ '$1': AFCH.consts.pagename } )
+				} );
+			} );
+		}
 	}
 
 	function handleSubmit ( data ) {

@@ -47,13 +47,17 @@
 	vertical-align: top;
 }
 
-#afchSubmit {
+#afchSubmitForm {
 	text-align: center;
 	width: 30%;
 	padding: 5px;
 	margin-top: 10px;
 	margin-left: auto;
 	margin-right: 0px;
+}
+
+#afchStatus {
+	text-align: left;
 }
 
 .header {
@@ -117,6 +121,17 @@
 	background-image: -o-linear-gradient(bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.2));
 	background-image: -ms-linear-gradient(bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.2));
 	background-image: linear-gradient(bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.2));
+}
+
+div.disabled-button {
+	background-color: #DDDDDD;
+	text-decoration: none;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
 }
 
 .afch-option {

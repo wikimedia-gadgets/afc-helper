@@ -11,7 +11,7 @@
 		{{#decline}}<a id="afchDecline" class="decline afch-button gradient-button">Decline</a>{{/decline}}
 		{{#comment}}<a id="afchComment" class="comment afch-button gradient-button">Comment</a>{{/comment}}
 		{{#submit}}<a id="afchSubmit" class="submit afch-button gradient-button">Submit</a>{{/submit}}
-		<a id="afchG13" class="g13 afch-button gradient-button {{^g13}}hidden{{/g13}}">Tag for G13 deletion</a>
+		<a id="afchG13" class="g13 afch-button gradient-button {{^g13}}hidden{{/g13}}">Request G13 deletion</a>
 	</div>
 </div>
 <!-- /main -->
@@ -25,7 +25,8 @@
 		<input type="text" id="newTitle" class="afch-input afch-textfield" placeholder="Target page name"
 			{{#newTitle}}value="{{newTitle}}"{{/newTitle}} />
 
-		<div id="afchSubmit" class="gradient-button accept">Accept &amp; publish</div>
+		<div id="afchSubmitForm" data-running="Accepting submission..." data-done="Submission accepted"
+		class="gradient-button accept">Accept &amp; publish</div>
 
 	</div>
 </div>
@@ -36,7 +37,8 @@
 	<div id="afchHeader" class="header">Declining...</div>
 	<div id="afchContent" class="content">
 
-		<div id="afchSubmit" class="gradient-button decline">Decline submission</div>
+		<div id="afchSubmitForm" data-running="Decling submission..." data-done="Submission declined"
+		class="gradient-button decline">Decline submission</div>
 
 	</div>
 </div>
@@ -48,14 +50,16 @@
 	<div id="afchContent" class="content">
 
 		<textarea id="commentText" class="afch-input afch-textarea"
-			placeholder="Enter your comment about the submission using wikicode syntax..." cols="100" rows="5"></textarea>
+			placeholder="Enter your comment about the submission using wikicode syntax. Your signature will be added automatically."
+			cols="100" rows="5"></textarea>
 
     <div class="afch-option">
       <input type="checkbox" id="notifyUser" class="afch-input" {{#notifyByDefault}}checked{{/notifyByDefault}} />
       <label for="notifyUser" class="afch-label">Notify submitter</label>
     </div>
 
-		<div id="afchSubmit" class="gradient-button comment">Post comment</div>
+		<div id="afchSubmitForm" data-running="Commenting on submission..." data-done="Comment posted"
+		class="gradient-button comment">Post comment</div>
 
 	</div>
 </div>
