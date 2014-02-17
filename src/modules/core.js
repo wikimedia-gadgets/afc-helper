@@ -573,6 +573,49 @@
 			var v = object[key];
 			delete object[key];
 			return v;
+		},
+
+		/**
+		 * Given a string, returns by default a Date() object
+		 * or, if mwstyle is true, a MediaWiki-style timestamp
+		 *
+		 * If there is no match, return false
+		 *
+		 * @param {string} string string to parse
+		 * @return {Date|integer}
+		 */
+		parseForTimestamp: function ( string, mwstyle ) {
+			var exp, match, date;
+
+			exp = new RegExp( '(\\d{1,2}):(\\d{2}), (\\d{1,2}) ' +
+				'(January|February|March|April|May|June|July|August|September|October|November|December) ' +
+				'(\\d{4}) \\(UTC\\)', 'g' );
+
+			match = exp.exec( string );
+
+			if ( !match ) {
+				return false;
+			}
+
+			date = new Date();
+			date.setUTCFullYear( match[5] );
+			date.setUTCMonth( mw.config.get( 'wgMonthNames' ).indexOf( match[4] ) - 1 ); // stupid javascript
+			date.setUTCDate( match[3] );
+			date.setUTCHours( match[1] );
+			date.setUTCMinutes( match[2] );
+			date.setUTCSeconds( 0 );
+
+			// Just return the date object if mwstyle not true
+			if ( !mwstyle ) {
+				return date;
+			}
+
+			return date.getUTCFullYear() +
+				( "0" + ( date.getUTCMonth() + 1 ) ).slice( -2 ) +
+				( "0" + date.getUTCDate() ).slice( -2 ) +
+				( "0" + date.getUTCHours() ).slice( -2 ) +
+				( "0" + date.getUTCMinutes() ).slice( -2 ) +
+				( "0" + date.getUTCSeconds() ).slice( -2 );
 		}
 	} );
 
