@@ -240,9 +240,10 @@
 	/**
 	 * Sets the submission status
 	 * @param {string} newStatus status to set, 'd'|'t'|'r'|''
+	 * @param {params} optional; params to add to the template who status was set
 	 * @return {bool} success
 	 */
-	AFCH.Submission.prototype.setStatus = function ( newStatus ) {
+	AFCH.Submission.prototype.setStatus = function ( newStatus, newParams ) {
 		var relevantTemplate = this.templates[0];
 
 		if ( [ 'd', 't', 'r', '' ].indexOf( newStatus ) === -1 ) {
@@ -250,14 +251,26 @@
 			return false;
 		}
 
-		// If there are no templates on the page, generate a new one
+		if ( !newParams ) {
+			newParams = {};
+		}
+
+		// If there are no templates on the page, just generate a new one
 		// (addNewTemplate handles the reparsing)
 		if ( !relevantTemplate ) {
-			this.addNewTemplate( { status: newStatus } );
+			this.addNewTemplate( {
+					status: newStatus,
+					params: newParams
+			} );
 		} else {
-			// Just modify the top template on the stack and then reparse
-			relevantTemplate.status = s;
-			this.parseDataFromTemplates( this.templates );
+			// Just modify the template at the top of the stack
+			relevantTemplate.status = newStatus;
+
+			// Add new parameters if specified
+			$.extend( relevantTemplate.params, newParams );
+
+			// And finally reparse
+			this.sortAndParseInternalData();
 		}
 
 		return true;
