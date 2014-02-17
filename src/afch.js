@@ -37,7 +37,7 @@
 			if ( AFCH.beforeLoad() ) {
 				AFCH.load( type );
 			} else {
-				mw.notify( 'AFCH could not be loaded:' + ( AFCH.error ? AFCH.error : 'unknown error' ),
+				mw.notify( 'AFCH could not be loaded: ' + ( AFCH.error || 'unknown error' ),
 					{ title: 'AFCH error' } );
 			}
 		} );
