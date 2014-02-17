@@ -6,8 +6,9 @@
 	AFCH.log( 'submissions.js executing...' );
 
 	/**
-	 * Represents an AfC submission and its status. Call submission.parse() to
-	 * actually get the data.
+	 * Represents an AfC submission -- its status as well as comments.
+	 * Call submission.parse() to actually run the parsing process and fill
+	 * the object with useful data.
 	 *
 	 * @param {AFCH.Page} page The submission page
 	 */
@@ -36,6 +37,9 @@
 		// Holds all of the {{afc submission}} templates that still
 		// apply to the page
 		this.templates = [];
+
+		// Holds all comments on the page
+		this.comments = [];
 	};
 
 	/**
@@ -51,8 +55,8 @@
 
 			// Then get all templates and parse them
 			AFCH.parseTemplates( text ).done( function ( templates ) {
-				sub.parseDataFromTemplates( templates );
-				sub.updateAttributesAfterParse();
+				sub.loadDataFromTemplates( templates );
+				sub.sortAndParseInternalData();
 				deferred.resolve( sub );
 			} );
 
@@ -65,23 +69,42 @@
 	 * Internal function
 	 * @param {array} templates list of templates to parse
 	 */
-	AFCH.Submission.prototype.parseDataFromTemplates = function ( templates ) {
+	AFCH.Submission.prototype.loadDataFromTemplates = function ( templates ) {
 		// Represent each AfC submission template as an object.
-		var sub = this,
-			submissionTemplates = [];
+		var submissionTemplates = [],
+			commentTemplates = [];
 
 		$.each( templates, function ( _, template ) {
-			if ( template.target.toLowerCase() === 'afc submission' ) {
+			var name = template.target.toLowerCase();
+			if ( name  === 'afc submission' ) {
 				submissionTemplates.push( {
 					status: AFCH.getAndDelete( template.params, '1').toLowerCase(),
 					timestamp: +AFCH.getAndDelete( template.params, 'ts' ),
 					params: template.params
 				} );
+			} else if ( name === 'afc comment' ) {
+				commentTemplates.push( {
+					// If we can't find a timestamp, set it to unicorns, because everyone
+					// knows that unicorns always come first.
+					timestamp: +AFCH.parseForTimestamp( template.params['1'] ) || 'unicorns',
+					text: template.params['1']
+				} );
 			}
 		} );
 
-		// Sort templates by timestamp; most recent are first
-		submissionTemplates.sort( function ( a, b ) {
+		this.templates = submissionTemplates;
+		this.comments = commentTemplates;
+	};
+
+	/**
+	 * Sort the internal lists of AFC submission and Afc comment templates
+\	 */
+	AFCH.Submission.prototype.sortAndParseInternalData = function () {
+		var sub = this,
+			submissionTemplates = this.templates,
+			commentTemplates = this.comments;
+
+		function timestampSortHelper ( a, b ) {
 			// If we're passed something that's not a number --
 			// for example, {{REVISIONTIMESTAMP}} -- just sort it
 			// first and be done with it.
@@ -93,7 +116,11 @@
 
 			// Otherwise just sort normally
 			return b.timestamp - a.timestamp;
-		} );
+		}
+
+		// Sort templates by timestamp; most recent are first
+		submissionTemplates.sort( timestampSortHelper );
+		commentTemplates.sort( timestampSortHelper );
 
 		// Process the submission templates in order, from the most recent to
 		// the oldest. In the process, we remove unneeded templates (for example,
@@ -143,39 +170,21 @@
 			return true;
 		} );
 
-		this.templates = submissionTemplates;
-	};
-
-	AFCH.Submission.prototype.updateAttributesAfterParse = function () {
 		this.isCurrentlySubmitted = this.isPending || this.isUnderReview;
-		this.hasAfcTemplate = !!this.templates.length;
+		this.hasAfcTemplate = !!submissionTemplates.length;
+
+		this.templates = submissionTemplates;
+		this.comments = commentTemplates;
 	};
 
 	/**
-	 * Pass it a string of text and the old AFC submission templates will be
-	 * removed and the new ones (from makeWikicode) added to the top
-	 * @param {string} text
-	 * @return {string}
-	 */
-	AFCH.Submission.getUpdatedCodeFromText = function ( text ) {
-		// FIXME: Awful regex to remove the old submission templates
-		// This is bad. It works for most cases but has a hellish time
-		// with some double nested templates or faux nested templates (for
-		// example "{{hi|}}}" -- note the extra bracket). Ideally Parsoid
-		// would just return the raw template text as well (currently
-		// working on a patch for that, actually).
-		text = text.replace( /\{\{AFC submission(?:[^{{}}]*|({{.*?}}*))*\}\}/gi, '' );
-		text = this.makeWikicode() + '\n' + text;
-		return text;
-	};
-
-	/**
-	 * Converts the template data to a hunk of template wikicode
+	 * Converts all the data to a hunk of wikicode
 	 * @return {string}
 	 */
 	AFCH.Submission.prototype.makeWikicode = function () {
 		var output = [];
 
+		// Submission templates go first
 		$.each( this.templates, function ( _, template ) {
 			var tout = '{{AFC submission|' + template.status +
 				'|ts=' + template.timestamp;
@@ -187,6 +196,16 @@
 			tout += '}}';
 			output.push( tout );
 		} );
+
+		// Then comment templates
+		$.each( this.comments, function ( _, comment ) {
+			output.push( '{{AFC comment|1=' + comment.text + '}}' );
+		} );
+
+		// If there were comments, add a horizontal rule beneath them
+		if ( this.comments.length ) {
+			output.push( '\n----' );
+		}
 
 		return output.join( '\n' );
 	};
@@ -260,7 +279,28 @@
 		}, data ) );
 
 		// Reparse :P
-		this.parseDataFromTemplates( this.templates );
+		this.sortAndParseInternalData();
+
+		return true;
+	};
+
+	/**
+	 * Add a new comment to the beginning of this.comments
+	 * @param {object} data object with properties of template
+	 *                      - text (default: '')
+	 *                      - timestamp (if not specified, we parse text for
+	 *                                   a timestamp instead)
+	 * @return {bool} success
+	 */
+	AFCH.Submission.prototype.addNewComment = function ( data ) {
+		this.comments.unshift( $.extend( {
+			// Unicorns are explained in loadDataFromTemplates()
+			timestamp: +AFCH.parseForTimestamp( data.text ) || 'unicorns',
+			text: ''
+		}, data ) );
+
+		// Reparse :P
+		this.sortAndParseInternalData();
 
 		return true;
 	};
