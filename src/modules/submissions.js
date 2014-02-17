@@ -518,26 +518,77 @@
 
 			// $1 = article name
 			// $2 = copyright violation ('yes'/'no')
-			'declined-submission': '{{subst:Afc decline|$1|cv=$2|sig=yes}}'
+			'declined-submission': '{{subst:Afc decline|$1|cv=$2|sig=yes}}',
+
+			// FIXME: Create on-wiki template for comment notification
+			// Does one already exist??
+			'comment-on-submission': ''
+		} );
+	}
+
+	/**
+	 * Clear the viewer, set up the status log, and
+	 * then update the button text
+	 */
+	function prepareForProcessing () {
+		var submitBtn = $( '#afchSubmitForm' );
+
+		// Empty the content area except for the button...
+		$( '#afchContent' ).children().not( '#afchSubmitForm' ).remove();
+
+		// ...and set up the status log in its place
+		AFCH.status.init( '#afchContent' );
+
+		// Update the button show the `running` text
+		submitBtn
+			.text( submitBtn.data( 'running' ) )
+			.removeClass( 'gradient-button' )
+			.addClass( 'disabled-button' )
+			.off( 'click' );
+
+		// And finally, make it so when all AJAX requests are
+		// complete, the done text will be displayed
+		$( document ).ajaxStop( function () {
+			submitBtn.text( submitBtn.data( 'done' ) );
 		} );
 	}
 
 	/**
 	 * Adds handler for when the accept/decline/etc form is submitted
 	 * that calls a given function and passes an object to the function
-	 * containing data from all .afch-input elements in the dom
+	 * containing data from all .afch-input elements in the dom.
+	 *
+	 * Also sets up the viewer for the "processing" stage.
 	 *
 	 * @param {Function} fn function to call with data
 	 */
 	function addFormSubmitHandler ( fn ) {
-		$( '#afchSubmit' ).click( function () {
+		$( '#afchSubmitForm' ).click( function () {
 			var data = {};
 
-			$( '.afch-input' ).each( function ( _, element ) {
-				data[element.id] = $( element ).val();
-			} );
+			// Provide page text; use cache created
+			// after afchSubmission.parse()
+			afchPage.getText( true ).done( function ( text ) {
+				data.afchText = new AFCH.Text( text );
 
-			fn( data );
+				// Also provide the values for each afch-input element
+				$( '.afch-input' ).each( function ( _, element ) {
+					var value;
+
+					if ( element.type === 'checkbox' ) {
+						value = element.checked;
+					} else {
+						value = $( element ).val();
+					}
+
+					data[element.id] = value;
+				} );
+
+				prepareForProcessing();
+
+				// Now finally call the applicable handler
+				fn( data );
+			} );
 		} );
 	}
 
