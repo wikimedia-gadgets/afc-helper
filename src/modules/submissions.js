@@ -318,6 +318,59 @@
 		return true;
 	};
 
+	/**
+	 * Represents text of an AfC submission
+	 * @param {[type]} text [description]
+	 */
+	AFCH.Text = function ( text ) {
+		this.text = text;
+	};
+
+	AFCH.Text.prototype.get = function () {
+		return this.text;
+	};
+
+	AFCH.Text.prototype.set = function ( string ) {
+		this.text = string;
+		return this.text;
+	};
+
+	AFCH.Text.prototype.prepend = function ( string ) {
+		this.text = string + this.text;
+		return this.text;
+	};
+
+	AFCH.Text.prototype.append = function ( string ) {
+		this.text += string;
+		return this.text;
+	};
+
+	AFCH.Text.prototype.cleanUp = function () {
+		return this.text;
+	};
+
+	AFCH.Text.prototype.removeAfcTemplates = function () {
+		// FIXME: Awful regex to remove the old submission templates
+		// This is bad. It works for most cases but has a hellish time
+		// with some double nested templates or faux nested templates (for
+		// example "{{hi|}}}" -- note the extra bracket). Ideally Parsoid
+		// would just return the raw template text as well (currently
+		// working on a patch for that, actually).
+		this.text = this.text.replace( /\{\{afc submission(?:[^{{}}]*|({{.*?}}*))*\}\}/gi, '' );
+		this.text = this.text.replace( /\{\{\s*afc comment(?:\{\{[^\{\}]*\}\}|[^\}\{])*\}\}/gi, '' );
+		return this.text;
+	};
+
+	/**
+	 * Removes old submission templates/comments and then adds new ones
+	 * specified by `new`
+	 * @param {string} new
+	 */
+	AFCH.Text.prototype.updateAfcTemplates = function ( newCode ) {
+		this.removeAfcTemplates();
+		return this.prepend( newCode );
+	};
+
 	// This creates the link in the header which allows
 	// users to launch afch. When launched, the link fades
 	// away, like a unicorn.
