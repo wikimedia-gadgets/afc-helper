@@ -320,9 +320,7 @@
 
 	/**
 	 * Gets the submitter, or, if no specific submitter is available,
-	 * just the last editor
-	 *
-	 * FIXME: get the FIRST editor??
+	 * just the page creator
 	 *
 	 * @return {$.Deferred} resolves with user
 	 */
@@ -333,7 +331,7 @@
 		if ( user ) {
 			deferred.resolve( user );
 		} else {
-			this.page.getLastEditor().done( function ( user ) {
+			this.page.getCreator().done( function ( user ) {
 				deferred.resolve( user );
 			} );
 		}

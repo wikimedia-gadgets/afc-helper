@@ -148,13 +148,47 @@
 				// But that seems like a huge pain and would require some more functionality. I'm
 				// lazy. For now we just get the text first. Stupid, I know.
 				var deferred = $.Deferred();
-				pg.getText( true ).done( deferred.resolve( pg.additionalData.lastModified ) );
+				this.getText( true ).done( deferred.resolve( pg.additionalData.lastModified ) );
 				return deferred;
 			};
 
 			this.getLastEditor = function () {
 				var deferred = $.Deferred();
-				pg.getText( true ).done( deferred.resolve( pg.additionalData.lastEditor ) );
+				this.getText( true ).done( deferred.resolve( pg.additionalData.lastEditor ) );
+				return deferred;
+			};
+
+			this.getCreator = function () {
+				var request, deferred = $.Deferred();
+
+				if ( this.additionalData.creator ) {
+					deferred.resolve( this.additionalData.creator );
+				}
+
+				request = {
+					action: 'query',
+					prop: 'revisions',
+					rvprop: 'user',
+					rvdir: 'newer',
+					rvlimit: 1,
+					indexpageids: true,
+					titles: this.rawTitle
+				};
+
+				// FIXME: Handle failure more gracefully
+				AFCH.api.get( request )
+					.done( function ( data ) {
+						var rev, id = data.query.pageids[0];
+						// Sanity check, the page might not exist
+						if ( id && data.query.pages[id] ) {
+							rev = data.query.pages[id].revisions[0];
+							pg.additionalData.creator = rev.user;
+							deferred.resolve( rev.user );
+						} else {
+							deferred.reject( data );
+						}
+					} );
+
 				return deferred;
 			};
 
@@ -285,7 +319,7 @@
 			 * Deletes a page
 			 * @param  {string} pagename Page to delete
 			 * @param  {string} reason   Reason for deletion; shown in deletion log
-			 * @return {bool}            Page deleted successfully
+			 * @return {$.Deferred} Resolves with success/failure
 			 */
 			deletePage: function ( pagename, reason ) {
 				// FIXME: implement
