@@ -212,14 +212,66 @@
 
 		// Submission templates go first
 		$.each( this.templates, function ( _, template ) {
-			var tout = '{{AFC submission|' + template.status +
-				'|ts=' + template.timestamp;
+			var tout = '{{AFC submission|' + template.status,
+				paramKeys = [];
 
-			$.each( template.params, function ( key, value ) {
-				tout += '|' + key + '=' + value;
+			// FIXME: Think about if we really want this elaborate-ish
+			// positional parameter ouput, or if it would be a better
+			// idea to just make everything absolute. When we get to a point
+			// where nobody is using the actual templates and it's 100%
+			// script-based, "pretty" isn't really that important and we
+			// can scrap this. Until then, though, we can only dream...
+
+			// Make an array of the parameters
+			$.each( template.params, function ( key ) {
+				paramKeys.push( key );
 			} );
 
-			tout += '}}';
+			paramKeys.sort( function ( a, b ) {
+				var aIsNumber = !isNaN( a ),
+					bIsNumber = !isNaN( b );
+
+				// If we're passed two numerical parameters then
+				// sort them in order (1,2,3)
+				if ( aIsNumber && aIsNumber ) {
+					return ( +a ) > ( +b ) ? 1 : -1;
+				}
+
+				// A is a number, it goes first
+				if ( aIsNumber && !bIsNumber ) {
+					return -1;
+				}
+
+				// B is a number, it goes first
+				if ( !aIsNumber && bIsNumber ) {
+					return 1;
+				}
+
+				// Otherwise just leave the positions as they were
+				return 0;
+			} );
+
+			$.each( paramKeys, function ( index, key ) {
+				var value = template.params[key];
+				// If it is a numerical parameter, doesn't include
+				// `=` in the value, AND is in sequence with the other
+				// numerical parameters, we can omit the key= part
+				// (positional parameters, joyous day :/ )
+				if ( key == +key && +key % 1 === 0 &&
+					value.indexOf( '=' ) === -1 &&
+					// Parameter 2 will be the first positional parameter,
+					// since 1 is always going to be the submission status.
+					key === '2' || paramKeys[index-1] == +key-1 )
+				{
+					tout += '|' + value;
+				} else {
+					tout += '|' + key + '=' + value;
+				}
+			} );
+
+			// Finally, add the timestamp
+			tout += '|ts=' + template.timestamp + '}}';
+
 			output.push( tout );
 		} );
 
