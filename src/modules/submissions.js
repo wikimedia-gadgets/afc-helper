@@ -400,6 +400,10 @@
 		return this.text;
 	};
 
+	AFCH.Text.prototype.removeExcessNewlines = function () {
+		this.text = this.text.replace( /(?:[\t ]*(?:\r?\n|\r)){3,}/ig, '\n\n' );
+	};
+
 	AFCH.Text.prototype.removeAfcTemplates = function () {
 		// FIXME: Awful regex to remove the old submission templates
 		// This is bad. It works for most cases but has a hellish time
@@ -409,6 +413,13 @@
 		// working on a patch for that, actually).
 		this.text = this.text.replace( /\{\{afc submission(?:[^{{}}]*|({{.*?}}*))*\}\}/gi, '' );
 		this.text = this.text.replace( /\{\{\s*afc comment(?:\{\{[^\{\}]*\}\}|[^\}\{])*\}\}/gi, '' );
+
+		// Remove horizontal rules that were added by AFCH after the comments
+		this.text = this.text.replace( /^----+$/gm, '' );
+
+		// Remove excess newlines created by AFC templates
+		this.removeExcessNewlines();
+
 		return this.text;
 	};
 
@@ -419,7 +430,7 @@
 	 */
 	AFCH.Text.prototype.updateAfcTemplates = function ( newCode ) {
 		this.removeAfcTemplates();
-		return this.prepend( newCode );
+		return this.prepend( newCode + '\n\n' );
 	};
 
 	// This creates the link in the header which allows
@@ -571,9 +582,8 @@
 			// $2 = copyright violation ('yes'/'no')
 			'declined-submission': '{{subst:Afc decline|$1|cv=$2|sig=yes}}',
 
-			// FIXME: Create on-wiki template for comment notification
-			// Does one already exist??
-			'comment-on-submission': ''
+			// $1 = article name
+			'comment-on-submission': '{{subst:AFC notification|comment|article=$1}}'
 		} );
 	}
 
