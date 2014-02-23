@@ -49,14 +49,14 @@
 	<div id="afchHeader" class="header">Commenting...</div>
 	<div id="afchContent" class="content">
 
-		<textarea id="commentText" class="afch-input afch-textarea"
+		<textarea id="commentText" class="afch-input afch-textfield afch-textarea"
 			placeholder="Enter your comment about the submission using wikicode syntax. Your signature will be added automatically."
 			cols="100" rows="5"></textarea>
 
-    <div class="afch-option">
-      <input type="checkbox" id="notifyUser" class="afch-input" {{#notifyByDefault}}checked{{/notifyByDefault}} />
-      <label for="notifyUser" class="afch-label">Notify submitter</label>
-    </div>
+	<div class="afch-option">
+		<input type="checkbox" id="notifyUser" class="afch-input" {{#notifyByDefault}}checked{{/notifyByDefault}} />
+		<label for="notifyUser" class="afch-label">Notify submitter</label>
+	</div>
 
 		<div id="afchSubmitForm" data-running="Commenting on submission..." data-done="Comment posted"
 		class="gradient-button comment">Post comment</div>
