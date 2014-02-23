@@ -705,10 +705,19 @@
 		} );
 	}
 
-	function loadView ( name, data ) {
+	/**
+	 * Loads a new view
+	 * @param {string} name view to be loaded
+	 * @param {object} data data to populate the view with
+	 * @param {function} callback function to call when view is loaded
+	 */
+	function loadView ( name, data, callback ) {
 		// Show the back button if we're not loading the main view
 		$( '#afchBackLink' ).toggleClass( 'hidden', name === 'main' );
 		afchViewer.loadView( name, data );
+		if ( callback ) {
+			callback();
+		}
 	}
 
 	// These functions show the options before doing something
