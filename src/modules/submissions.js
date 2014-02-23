@@ -741,7 +741,26 @@
 	}
 
 	function showSubmitOptions () {
-		loadView( 'submit', {} );
+		var customSubmitters = [];
+
+		if ( afchSubmission.params.u ) {
+			customSubmitters.push( {
+				name: afchSubmission.params.u,
+				description: 'Most recent submitter',
+				selected: true
+			} );
+		}
+
+		loadView( 'submit', {
+			customSubmitters: customSubmitters
+		}, function () {
+			// Show the other textbox when `other` is selected in the menu
+			$( '#submitType' ).change( function () {
+				var otherSelected = $( '#submitType' ).val() === 'other';
+				$( '#submitterName' ).toggleClass( 'hidden', !otherSelected );
+			} );
+		} );
+
 		addFormSubmitHandler( handleSubmit );
 	}
 
@@ -761,12 +780,14 @@
 	 *                  - newClass
 	 */
 	function handleAccept ( data ) {
+		var text = data.afchText;
+
 		AFCH.actions.movePage( afchPage, data.newTitle )
 			.done( function () {
 				if ( data.notifyUser ) {
 					afchSubmission.getSubmitter().done( function ( submitter ) {
 						AFCH.actions.notifyUser( submitter, {
-							msg: AFCH.msg.get( 'accepted-submission',
+							message: AFCH.msg.get( 'accepted-submission',
 								{ '$1': data.newTitle, '$2': data.newClass } )
 						} );
 					} );
@@ -804,8 +825,9 @@
 		if ( data.notifyUser ) {
 			afchSubmission.getSubmitter().done( function ( submitter ) {
 				AFCH.actions.notifyUser( submitter, {
-					msg: AFCH.msg.get( 'comment-on-submission',
-						{ '$1': AFCH.consts.pagename } )
+					message: AFCH.msg.get( 'comment-on-submission',
+						{ '$1': AFCH.consts.pagename } ),
+					summary: "Notification: I've commented on [[" + AFCH.consts.pagename + "|your Articles for Creation submission]]"
 				} );
 			} );
 		}
