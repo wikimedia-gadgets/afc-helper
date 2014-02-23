@@ -35,10 +35,89 @@
 <!-- decline -->
 <div id="afchReviewPanel" class="decline">
 	<div id="afchHeader" class="header">Declining...</div>
-	<div id="afchContent" class="content">
+	<div id="afchContent" class="content centered">
+
+		<div id="declineReasonWrapper">
+			<select id="declineReason" class="afch-input text-left">
+				<option value=""></option>
+				<optgroup label="Common">
+					<option value="v">v - Submission is improperly sourced</option>
+					<option value="cv">cv - Submission is a copyright violation</option>
+					<option value="reason">custom - Enter decline reason in the box below</option>
+				</optgroup>
+				<optgroup label="Notability">
+					<option value="neo">neo - Submission is about a neologisim that does not meet notability guidelines</option>
+					<option value="web">web - Submission is about web content does not meet notability guidelines</option>
+					<option value="prof">prof - Submission is about a professor does not meet notability guidelines</option>
+					<option value="athlete">athlete - Submission is about an athlete does not meet notability guidelines</option>
+					<option value="music">music - Submission is about a musician or musical work does not meet notability guidelines</option>
+					<option value="film">film - Submission is about a film does not meet notability guidelines</option>
+					<option value="corp">corp - Submission is about a company or organization does not meet notability guidelines</option>
+					<option value="bio">bio - Submission is about a person does not meet notability guidelines</option>
+					<option value="nn">nn - Submission does not meet general notability guidelines (be more specific if possible)</option>
+				</optgroup>
+				<optgroup label="Invalid submissions">
+					<option value="blank">blank - Submission is blank</option>
+					<option value="lang">lang - Submission is not in English</option>
+					<option value="test">test - Submission appears to be a test edit</option>
+					<option value="redirect">redirect - Submission is a redirect request</option>
+				</optgroup>
+				<optgroup label="BLP &amp; vandalism">
+					<option value="van">van - Submission is vandalism, a negative unsourced BLP, or an attack page</option>
+					<option value="ilc">ilc - Submission is a BLP that does not meet minimum inline citation requirements</option>
+					<option value="blp">blp - BLP contains unsourced, possibly defamatory claims (AGF and wait for sources)</option>
+				</optgroup>
+				<optgroup label="Submission content">
+					<option value="not">not - Submission fails [[Wikipedia:What Wikipedia is not]]</option>
+					<option value="news">news - Submission appears to be a news story of a single event</option>
+					<option value="dict">dict - Submission is a dictionary definition</option>
+					<option value="plot">plot - Submission consists mostly of a plot summary</option>
+					<option value="joke">joke - Submission appears to be a joke or hoax</option>
+				</optgroup>
+				<optgroup label="Prose issues">
+					<option value="essay">essay - Submission reads like an essay</option>
+					<option value="npov">npov - Submission is not written in a formal, neutral encyclopedic tone</option>
+					<option value="adv">adv - Submission reads like an advertisement</option>
+				</optgroup>
+				<optgroup label="Duplicate articles">
+					<option value="exists">exists - Submission is duplicated by another article already in mainspace</option>
+					<option value="dup">dup - Submission is a duplicate of another existing submission</option>
+				</optgroup>
+				<optgroup label="Other">
+					<option value="context">context - Submission provides insufficient context</option>
+					<option value="mergeto">mergeto - Submission should be merged into an existing article</option>
+				</optgroup>
+			</select>
+		</div>
+
+		<div id="declineInputWrapper">
+			<div id="textfieldWrapper" class="afch-option hidden">
+				<label for="declineTextfield" class="afch-label"></label>
+				<input id="declineTextfield" type="text" class="afch-input afch-textfield" placeholder="" />
+			</div>
+
+			<textarea id="declineTextarea" class="afch-input afch-textfield afch-textarea hidden"
+				placeholder="Elaborate on your decline reason here. Provide additional suggestions to the submitter using wikicode syntax and a clear, supportive tone -- you are the voice of Wikipedia!"
+				cols="100" rows="5"></textarea>
+
+			<div id="blankWrapper" class="afch-option hidden">
+				<input type="checkbox" id="blankSubmission" class="afch-input"/>
+				<label for="blankSubmission" class="afch-label">Blank the submission</label>
+			</div>
+
+			<div id="csdWrapper" class="afch-option hidden">
+				<input type="checkbox" id="blankSubmission" class="afch-input"/>
+				<label for="csdSubmission" class="afch-label">Nominate the submission for speedy deletion</label>
+			</div>
+
+			<div id="notifyWrapper" class="afch-option hidden">
+				<input type="checkbox" id="notifyUser" class="afch-input" checked/>
+				<label for="notifyUser" class="afch-label">Notify submitter</label>
+			</div>
+		</div>
 
 		<div id="afchSubmitForm" data-running="Decling submission..." data-done="Submission declined"
-		class="gradient-button decline">Decline submission</div>
+		class="gradient-button button-centered decline hidden">Decline submission</div>
 
 	</div>
 </div>

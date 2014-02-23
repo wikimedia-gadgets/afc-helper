@@ -8,6 +8,15 @@
 .centered {
 	text-align: center;
 }
+
+.text-left {
+	text-align: left;
+}
+
+.text-right {
+	text-align: right;
+}
+
 #afch-open {
 	font-size: 0.5em;
 	padding-left: 5px;
@@ -78,6 +87,10 @@
 	padding: 10px;
 }
 
+select .afch-input {
+	vertical-align: baseline;
+}
+
 .afch-textfield {
 	-webkit-appearance: none;
 	border: 1px solid rgb(217, 217, 217);
@@ -90,11 +103,21 @@
 	margin: 0px;
 	padding: 5px;
 	vertical-align: middle;
+	width: 30%;
+	min-width: 150px;
 }
 
 .afch-textfield:focus {
 	border: 1px solid rgb(145, 145, 145);
 	outline: 0;
+}
+
+.afch-textarea {
+	height: 150px;
+	width: 50%;
+	margin-top: 5px;
+	margin-left: auto;
+	margin-right: auto;
 }
 
 .afch-label {
@@ -197,6 +220,10 @@ div.disabled-button {
 .decline {
 	background-color: #FF4136; /* red */
 	border-color: #FF4136;
+}
+
+#declineInputWrapper {
+	padding-top: 5px;
 }
 
 /* COMMENT */

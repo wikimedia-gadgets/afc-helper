@@ -731,7 +731,92 @@
 	}
 
 	function showDeclineOptions () {
-		loadView( 'decline', {} );
+		loadView( 'decline', {}, function () {
+			var pristineState = $( '#declineInputWrapper' ).html();
+
+			function updateTextfield( newPrompt, newPlaceholder ) {
+				var wrapper = $( '#textfieldWrapper' );
+
+				// Update label and placeholder
+				wrapper.find( 'label' ).text( newPrompt );
+				wrapper.find( 'input' ).attr( 'placeholder', newPlaceholder );
+
+				// And finally show the textfield
+				wrapper.removeClass( 'hidden' );
+			}
+
+			// Set up jquery.chosen for the decline reason
+			$( '#declineReason' ).chosen( {
+				placeholder_text_single: 'Select a decline reason...',
+				no_results_text: 'Whoops, no reasons matched your search. Type "custom" to add a custom rationale instead.',
+				search_contains: true,
+				inherit_select_classes: true
+			} );
+
+			// And now add the handlers for when a specific decline reason is selected
+			$( '#declineReason' ).change( function () {
+				var reason = $( '#declineReason' ).val(),
+					declineHandlers = {
+						cv: function () {
+							updateTextfield( 'Original URL', 'http://example.com/cake' );
+						},
+
+						dup: function () {
+							updateTextfield( 'Title of duplicate submission (no namespace)', 'Articles for creation/Fudge' );
+						},
+
+						mergeto: function () {
+							updateTextfield( 'Article which submission should be merged into', 'Milkshake' );
+						},
+
+						lang: function () {
+							updateTextfield( 'Language of the submission if known', 'German' );
+						},
+
+						exists: function () {
+							updateTextfield( 'Title of existing article', 'Chocolate chip cookie' );
+						},
+
+						plot: function () {
+							updateTextfield( 'Title of existing related article, if one exists', 'Charlie and the Chocolate Factory' );
+						},
+
+						van: function () {
+							$( '#blankWrapper' ).add( '#csdWrapper' )
+								.removeClass( 'hidden' )
+								.children( 'input' ).prop( 'checked', true );
+						},
+
+						blp: function () {
+							$( '#blankWrapper' )
+								.removeClass( 'hidden' )
+								.children( 'input' ).prop( 'checked', true );
+						},
+
+						// Custom decline rationale
+						reason: function () {
+							$( '#declineTextarea' )
+								.attr( 'placeholder', 'Enter your decline reason here; be clear and supportive. Use wikicode syntax ' +
+								'and link to relevant policies or pages with additional information.' );
+						}
+					};
+
+				// Reset to a pristine state :)
+				$( '#declineInputWrapper' ).html( pristineState );
+
+				// If there are special options to be displayed for this
+				// particular decline reason, load them now
+				if ( declineHandlers[reason] ) {
+					declineHandlers[reason]();
+				}
+
+				// If a reason has been specified, show the textarea, notify
+				// option, and the submit form button
+				$( '#declineTextarea' ).add( '#notifyWrapper' ).add( '#afchSubmitForm' )
+					.toggleClass( 'hidden', !reason );
+			} );
+		} );
+
 		addFormSubmitHandler( handleDecline );
 	}
 
@@ -799,15 +884,49 @@
 	}
 
 	function handleDecline ( data ) {
-		var text = data.afchText;
+		var text = data.afchText,
+			declineReason = data.declineReason,
+			newParams = {
+				'2': declineReason,
+				decliner: AFCH.consts.user,
+				declinets: '{{subst:REVISIONTIMESTAMP}}'
+			};
 
-		afchSubmission.setStatus( 'd', {} ); // FIXME: include decliner params/etc
+		// If this is a custom decline, we include the declineTextarea in the {{AFC submission}} template
+		if ( declineReason === 'reason' ) {
+			newParams['3'] = data.declineTextarea;
+		// But otherwise if addtional text has been entered we just add it as a new comment
+		} else if ( data.declineTextarea ) {
+			afchSubmission.addNewComment( { text: data.declineTextarea } );
+		}
+
+		// If a user has entered something in the declineTextfield (for example, a URL or an
+		// associated page), pass that as the third parameter
+		if ( data.declineTextfield ) {
+			newParams['3'] = data.declineTextfield;
+		}
+
+		// Now update the submission status
+		afchSubmission.setStatus( 'd', newParams );
+
 		text.updateAfcTemplates( afchSubmission.makeWikicode() );
 
 		afchPage.edit( {
 			contents: text.get(),
 			summary: 'Declining submission'
 		} );
+
+		if ( data.notifyUser ) {
+			afchSubmission.getSubmitter().done( function ( submitter ) {
+				AFCH.actions.notifyUser( submitter, {
+					message: AFCH.msg.get( 'declined-submission', {
+						'$1': AFCH.consts.pagename,
+						'$2': declineReason === 'cv' ? 'yes' : 'no'
+					} ),
+					summary: "Notification: Your [[" + AFCH.consts.pagename + "|Articles for Creation submission]] has been declined"
+				} );
+			} );
+		}
 	}
 
 	function handleComment ( data ) {
