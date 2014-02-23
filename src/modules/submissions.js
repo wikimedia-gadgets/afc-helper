@@ -19,6 +19,13 @@
 		// 'WT:Articles for creation/Foo' => 'Foo'
 		this.shortTitle = this.page.title.getMainText().match( /([^\/]+$)/ )[1];
 
+		this.resetVariables();
+	};
+
+	/**
+	 * Resets variables and lists related to the submission state
+	 */
+	AFCH.Submission.prototype.resetVariables = function () {
 		// Various submission states, set in parse()
 		this.isPending = false;
 		this.isUnderReview = false;
@@ -86,7 +93,7 @@
 				commentTemplates.push( {
 					// If we can't find a timestamp, set it to unicorns, because everyone
 					// knows that unicorns always come first.
-					timestamp: +AFCH.parseForTimestamp( template.params['1'] ) || 'unicorns',
+					timestamp: AFCH.parseForTimestamp( template.params['1'] ) || 'unicorns',
 					text: template.params['1']
 				} );
 			}
@@ -98,7 +105,7 @@
 
 	/**
 	 * Sort the internal lists of AFC submission and Afc comment templates
-\	 */
+	 */
 	AFCH.Submission.prototype.sortAndParseInternalData = function () {
 		var sub = this,
 			submissionTemplates = this.templates,
@@ -122,52 +129,71 @@
 		submissionTemplates.sort( timestampSortHelper );
 		commentTemplates.sort( timestampSortHelper );
 
+		// Reset variables related to the submisson state before re-parsing
+		this.resetVariables();
+
+		// Useful list of "what to do" in each situation.
+		var statusCases = {
+			// Declined
+			'd': function () {
+				if ( !sub.isPending && !sub.isDraft && !sub.isUnderReview ) {
+					sub.isDeclined = true;
+				}
+				return true;
+			},
+			// Draft
+			't': function () {
+				// If it's been submitted or declined, remove draft tag
+				if ( sub.isPending || sub.isDeclined || sub.isUnderReview ) {
+					return false;
+				}
+				sub.isDraft = true;
+				return true;
+			},
+			// Under review
+			'r': function () {
+				if ( !sub.isPending && !sub.isDeclined ) {
+					sub.isUnderReview = true;
+				}
+				return true;
+			},
+			// Pending
+			'': function () {
+				// Remove duplicate pending templates or a redundant
+				// pending template when the submission has already been
+				// declined / is already under review
+				if ( sub.isPending || sub.isDeclined || sub.isUnderReview ) {
+					return false;
+				}
+				sub.isPending = true;
+				sub.isDraft = false;
+				sub.isUnderReview = false;
+				return true;
+			}
+		};
+
 		// Process the submission templates in order, from the most recent to
 		// the oldest. In the process, we remove unneeded templates (for example,
 		// a draft tag when it's already been submitted) and also set various
 		// "isX" properties of the Submission.
 		submissionTemplates = $.grep( submissionTemplates, function ( template ) {
-			switch ( template.status ) {
-				// Declined
-				case 'd':
-					if ( !sub.isPending && !sub.isDraft && !sub.isUnderReview ) {
-						sub.isDeclined = true;
-					}
-					break;
-				// Draft
-				case 't':
-					// If it's been submitted or declined, remove draft tag
-					if ( sub.isPending || sub.isDeclined || sub.isUnderReview ) {
-						return false;
-					}
-					sub.isDraft = true;
-					break;
-				// Under review
-				case 'r':
-					if ( !sub.isPending && !sub.isDeclined ) {
-						sub.isUnderReview = true;
-					}
-					break;
-				// Pending
-				default:
-					// Remove duplicate pending templates or a redundant
-					// pending template when the submission has already been
-					// declined / is already under review
-					if ( sub.isPending || sub.isDeclined || sub.isUnderReview ) {
-						return false;
-					}
-					sub.isPending = true;
-					sub.isDraft = false;
-					sub.isUnderReview = false;
-					break;
+			var keepTemplate = true;
+
+			if ( statusCases[template.status] ) {
+				keepTemplate = statusCases[template.status]();
+			} else {
+				// Default pending status
+				keepTemplate = statusCases['']();
 			}
 
-			// Save the parameter data. Don't overwrite parameters
-			// that are already set, because we're going newest
-			// to oldest.
-			sub.params = $.extend( template.params, sub.params );
+			// If we're going to be keeping this template on the page,
+			// save the parameter data. Don't overwrite parameters that
+			// are already set, because we're going newest to oldest.
+			if ( keepTemplate ) {
+				sub.params = $.extend( {}, template.params, sub.params );
+			}
 
-			return true;
+			return keepTemplate;
 		} );
 
 		this.isCurrentlySubmitted = this.isPending || this.isUnderReview;
@@ -240,7 +266,7 @@
 	/**
 	 * Sets the submission status
 	 * @param {string} newStatus status to set, 'd'|'t'|'r'|''
-	 * @param {params} optional; params to add to the template who status was set
+	 * @param {params} optional; params to add to the template whose status was set
 	 * @return {bool} success
 	 */
 	AFCH.Submission.prototype.setStatus = function ( newStatus, newParams ) {
@@ -257,14 +283,20 @@
 
 		// If there are no templates on the page, just generate a new one
 		// (addNewTemplate handles the reparsing)
-		if ( !relevantTemplate ) {
+		if ( !relevantTemplate ||
+			// Same for if the top template on the stack is alrady declined;
+			// we don't want to overwrite it
+			relevantTemplate.status === 'd' )
+		{
 			this.addNewTemplate( {
 					status: newStatus,
-					params: newParams
+					params: newParams || {}
 			} );
 		} else {
-			// Just modify the template at the top of the stack
+			// Just modify the template at the top of the stack. Update its
+			// timestamp because it has been modified
 			relevantTemplate.status = newStatus;
+			relevantTemplate.timestamp = '{{subst:REVISIONTIMESTAMP}}';
 
 			// Add new parameters if specified
 			$.extend( relevantTemplate.params, newParams );
@@ -282,33 +314,30 @@
 	 *                      - status (default: '')
 	 *                      - timestamp (default: '{{subst:REVISIONTIMESTAMP}}')
 	 *                      - params (default: {})
-	 * @return {bool} success
 	 */
 	AFCH.Submission.prototype.addNewTemplate = function ( data ) {
-		this.templates.unshift( $.extend( {
+		this.templates.unshift( $.extend( /* deep */ true, {
 			status: '',
 			timestamp: '{{subst:REVISIONTIMESTAMP}}',
-			params: {}
+			params: {
+				ns: mw.config.get( 'wgNamespaceNumber' )
+			}
 		}, data ) );
 
 		// Reparse :P
 		this.sortAndParseInternalData();
-
-		return true;
 	};
 
 	/**
 	 * Add a new comment to the beginning of this.comments
 	 * @param {object} data object with properties of template
 	 *                      - text (default: '')
-	 *                      - timestamp (if not specified, we parse text for
-	 *                                   a timestamp instead)
 	 * @return {bool} success
 	 */
 	AFCH.Submission.prototype.addNewComment = function ( data ) {
 		this.comments.unshift( $.extend( {
 			// Unicorns are explained in loadDataFromTemplates()
-			timestamp: +AFCH.parseForTimestamp( data.text ) || 'unicorns',
+			timestamp: AFCH.parseForTimestamp( data.text ) || 'unicorns',
 			text: ''
 		}, data ) );
 
