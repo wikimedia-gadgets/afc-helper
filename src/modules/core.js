@@ -73,7 +73,9 @@
 				// Link to the current page, "/wiki/Wikipedia talk:Articles for creation/sandbox"
 				pagelink: mw.util.getUrl(),
 				// Used when status is disabled
-				nullstatus: { update: function () { return; } }
+				nullstatus: { update: function () { return; } },
+				// Current user
+				user: mw.user.id()
 			} );
 		},
 
@@ -337,10 +339,10 @@
 			 * @return {$.Deferred} Resolves with success/failure
 			 */
 			notifyUser: function ( user, data ) {
-				var deferred = $.Deferred,
+				var deferred = $.Deferred(),
 					userTalkPage = new mw.Title( user, 3 ); // User talk namespace
 
-				AFCH.actions.editPage( userTalkPage, {
+				AFCH.actions.editPage( userTalkPage.getPrefixedText(), {
 					contents: data.message,
 					summary: data.summary,
 					mode: 'appendtext',
@@ -644,12 +646,12 @@
 				return date;
 			}
 
-			return date.getUTCFullYear() +
+			return +( date.getUTCFullYear() +
 				( "0" + ( date.getUTCMonth() + 1 ) ).slice( -2 ) +
 				( "0" + date.getUTCDate() ).slice( -2 ) +
 				( "0" + date.getUTCHours() ).slice( -2 ) +
 				( "0" + date.getUTCMinutes() ).slice( -2 ) +
-				( "0" + date.getUTCSeconds() ).slice( -2 );
+				( "0" + date.getUTCSeconds() ).slice( -2 ) );
 		}
 	} );
 
