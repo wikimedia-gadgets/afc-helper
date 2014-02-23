@@ -68,10 +68,20 @@
 <!-- submit -->
 <div id="afchReviewPanel" class="submit">
 	<div id="afchHeader" class="header">Submitting...</div>
-	<div id="afchContent" class="content">
+	<div id="afchContent" class="content centered">
+		Submit as&nbsp;
+		<select id="submitType" class="afch-input">
+			{{#customSubmitters}}
+			<option value="{{name}}" {{#selected}}selected{{/selected}}>{{description}}</option>
+			{{/customSubmitters}}
+			<option value="creator">Page creator</option>
+			<option value="self">Yourself</option>
+			<option value="other">Someone else</option>
+		</select>
+		<input id="submitterName" type="text" class="afch-input hidden" placeholder="Username" />
 
 		<div id="afchSubmitForm" data-running="Submitting..." data-done="Submitted"
-		class="gradient-button submit">Submit</div>
+		class="gradient-button submit button-centered">Submit</div>
 
 	</div>
 </div>

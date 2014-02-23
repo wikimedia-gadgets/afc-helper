@@ -556,7 +556,7 @@
 		var submitBtn = $( '#afchSubmitForm' );
 
 		// Empty the content area except for the button...
-		$( '#afchContent' ).children().not( '#afchSubmitForm' ).remove();
+		$( '#afchContent' ).contents().not( submitBtn ).remove();
 
 		// ...and set up the status log in its place
 		AFCH.status.init( '#afchContent' );
@@ -712,7 +712,35 @@
 	}
 
 	function handleSubmit ( data ) {
-		return;
+		var text = data.afchText,
+			submitter = $.Deferred(),
+			submitType = data.submitType;
+
+		if ( submitType === 'other' ) {
+			submitter.resolve( data.submitterName );
+		} else if ( submitType === 'self' ) {
+			submitter.resolve( AFCH.consts.user );
+		} else if ( submitType === 'creator' ) {
+			afchPage.getCreator().done( function ( user ) {
+				submitter.resolve( user );
+			} );
+		} else {
+			// Custom selected submitter
+			submitter.resolve( data.submitType );
+		}
+
+		submitter.done( function ( submitter ) {
+			afchSubmission.setStatus( '', { u: submitter } );
+
+			text.updateAfcTemplates( afchSubmission.makeWikicode() );
+
+			afchPage.edit( {
+				contents: text.get(),
+				summary: 'Submitting'
+			} );
+
+		} );
+
 	}
 
 	function handleG13 ( data ) {
