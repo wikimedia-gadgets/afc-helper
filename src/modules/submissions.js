@@ -93,7 +93,7 @@
 				commentTemplates.push( {
 					// If we can't find a timestamp, set it to unicorns, because everyone
 					// knows that unicorns always come first.
-					timestamp: AFCH.parseForTimestamp( template.params['1'] ) || 'unicorns',
+					timestamp: AFCH.parseForTimestamp( template.params['1'], /* mwstyle */ true ) || 'unicorns',
 					text: template.params['1']
 				} );
 			}
@@ -135,14 +135,14 @@
 		// Useful list of "what to do" in each situation.
 		var statusCases = {
 			// Declined
-			'd': function () {
+			d: function () {
 				if ( !sub.isPending && !sub.isDraft && !sub.isUnderReview ) {
 					sub.isDeclined = true;
 				}
 				return true;
 			},
 			// Draft
-			't': function () {
+			t: function () {
 				// If it's been submitted or declined, remove draft tag
 				if ( sub.isPending || sub.isDeclined || sub.isUnderReview ) {
 					return false;
@@ -151,7 +151,7 @@
 				return true;
 			},
 			// Under review
-			'r': function () {
+			r: function () {
 				if ( !sub.isPending && !sub.isDeclined ) {
 					sub.isUnderReview = true;
 				}
@@ -342,7 +342,7 @@
 		{
 			this.addNewTemplate( {
 					status: newStatus,
-					params: newParams || {}
+					params: newParams
 			} );
 		} else {
 			// Just modify the template at the top of the stack. Update its
@@ -382,16 +382,15 @@
 
 	/**
 	 * Add a new comment to the beginning of this.comments
-	 * @param {object} data object with properties of template
-	 *                      - text (default: '')
+	 * @param {string} text comment text
 	 * @return {bool} success
 	 */
-	AFCH.Submission.prototype.addNewComment = function ( data ) {
-		this.comments.unshift( $.extend( {
+	AFCH.Submission.prototype.addNewComment = function ( text ) {
+		this.comments.unshift( {
 			// Unicorns are explained in loadDataFromTemplates()
-			timestamp: AFCH.parseForTimestamp( data.text ) || 'unicorns',
-			text: ''
-		}, data ) );
+			timestamp: AFCH.parseForTimestamp( text, /* mwstyle */ true ) || 'unicorns',
+			text: text
+		} );
 
 		// Reparse :P
 		this.sortAndParseInternalData();
@@ -589,8 +588,6 @@
 			afchSubmission.parse(),
 			loadViews
 		).then( function ( submission ) {
-			AFCH.log( 'rendering main view...' );
-
 			// Render the base buttons view
 			loadView( 'main', {
 				title: submission.shortTitle,
@@ -897,7 +894,7 @@
 			newParams['3'] = data.declineTextarea;
 		// But otherwise if addtional text has been entered we just add it as a new comment
 		} else if ( data.declineTextarea ) {
-			afchSubmission.addNewComment( { text: data.declineTextarea } );
+			afchSubmission.addNewComment( data.declineTextarea );
 		}
 
 		// If a user has entered something in the declineTextfield (for example, a URL or an
@@ -906,10 +903,13 @@
 			newParams['3'] = data.declineTextfield;
 		}
 
+		// FIXME: Handle blanking and csd-ing!
+
 		// Now update the submission status
 		afchSubmission.setStatus( 'd', newParams );
 
 		text.updateAfcTemplates( afchSubmission.makeWikicode() );
+		text.cleanUp();
 
 		afchPage.edit( {
 			contents: text.get(),
@@ -931,11 +931,12 @@
 
 	function handleComment ( data ) {
 		var text = data.afchText,
-			comment = data.commentText + ' ~~~~';
+			comment = $.trim( data.commentText ) + ' ~~~~';
 
-		afchSubmission.addNewComment( { text: comment } );
+		afchSubmission.addNewComment( comment );
 		text.updateAfcTemplates( afchSubmission.makeWikicode() );
 
+		text.cleanUp();
 		afchPage.edit( {
 			contents: text.get(),
 			summary: 'Commenting on submission'
@@ -974,6 +975,7 @@
 			afchSubmission.setStatus( '', { u: submitter } );
 
 			text.updateAfcTemplates( afchSubmission.makeWikicode() );
+			text.cleanUp();
 
 			afchPage.edit( {
 				contents: text.get(),

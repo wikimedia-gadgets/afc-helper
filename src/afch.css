@@ -103,7 +103,7 @@ select .afch-input {
 	margin: 0px;
 	padding: 5px;
 	vertical-align: middle;
-	width: 30%;
+	width: 25%;
 	min-width: 150px;
 }
 
@@ -233,10 +233,6 @@ div.disabled-button {
 	border-color: #FFDC00;
 }
 
-.comment #afchContent {
-	text-align: right;
-}
-
 #commentText {
 	height: 100px;
 	width: 60%;
@@ -244,7 +240,7 @@ div.disabled-button {
 
 /* TAG FOR G13 DELETION */
 
-.tag-g13 {
+.g13 {
 	background-color: #FF851B; /* orange */
 	border-color: #FF851B;
 }

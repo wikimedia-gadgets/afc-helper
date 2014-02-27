@@ -114,6 +114,10 @@
 
 			this.additionalData = {};
 
+			this.toString = function () {
+				return this.rawTitle;
+			};
+
 			this.getText = function ( usecache ) {
 				var deferred = $.Deferred();
 
@@ -165,6 +169,7 @@
 
 				if ( this.additionalData.creator ) {
 					deferred.resolve( this.additionalData.creator );
+					return deferred;
 				}
 
 				request = {
@@ -294,8 +299,10 @@
 					token: AFCH.consts.editToken
 				};
 
+				// Depending on mode, set appendtext=text or prependtext=text,
+				// which overrides the default text option
 				if ( options.mode ) {
-					request[options.mode] = true;
+					request[options.mode] = options.contents;
 				}
 
 				AFCH.api.post( request )
@@ -338,16 +345,16 @@
 			 *                   - hide: {bool}, default false
 			 * @return {$.Deferred} Resolves with success/failure
 			 */
-			notifyUser: function ( user, data ) {
+			notifyUser: function ( user, options ) {
 				var deferred = $.Deferred(),
 					userTalkPage = new mw.Title( user, 3 ); // User talk namespace
 
 				AFCH.actions.editPage( userTalkPage.getPrefixedText(), {
-					contents: data.message,
-					summary: data.summary,
+					contents: options.message,
+					summary: options.summary || 'Notifying user',
 					mode: 'appendtext',
 					statusText: 'Notifying',
-					hide: data.hide || false
+					hide: options.hide
 				} )
 				.done( function () {
 					deferred.resolve();
