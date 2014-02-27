@@ -69,7 +69,7 @@
 				// Load css
 				mw.loader.load( AFCH.consts.scriptpath + '?action=raw&ctype=text/css&title=MediaWiki:Gadget-afch.css', 'text/css' );
 				// Load dependencies
-				mw.loader.load( [ 'mediawiki.feedback', 'mediawiki.api', 'jquery.chosen' ] );
+				mw.loader.load( [ 'mediawiki.feedback', 'mediawiki.api', 'jquery.chosen', 'jquery.spinner' ] );
 			}
 
 			// And finally load the subscript
@@ -197,6 +197,27 @@
 				return deferred;
 			};
 
+			// FIXME: Unused, because I'm not sure if we really want the
+			// orphan tags on new accepted submissions
+			this.isOrphaned = function () {
+				var deferred = $.Deferred();
+
+				AFCH.api.get( {
+					action: 'query',
+					list: 'backlinks',
+					blnamespace: 0,
+					bllimit: 10,
+					bltitle: this.rawTitle
+				} ).done( function ( data ) {
+					// If the list has a length of zero, the page
+					// is an orphan, so resolve true
+					if ( !data.query.backlinks.length ) {
+						deferred.resolve( true );
+					} else {
+						deferred.resolve( false );
+					}
+				} );
+			};
 		},
 
 		/**
