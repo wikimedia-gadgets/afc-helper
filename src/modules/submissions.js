@@ -937,6 +937,7 @@
 		text.updateAfcTemplates( afchSubmission.makeWikicode() );
 
 		text.cleanUp();
+
 		afchPage.edit( {
 			contents: text.get(),
 			summary: 'Commenting on submission'
