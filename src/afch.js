@@ -4,7 +4,9 @@
 
 	if ( pageName.indexOf( 'Wikipedia:Articles_for_creation/' ) !== -1 ||
 		pageName.indexOf( 'Wikipedia_talk:Articles_for_creation/' ) !== -1 ||
-		pageName.indexOf( 'User:' ) !== -1 ) {
+		pageName.indexOf( 'User:' ) !== -1 ||
+		pageName.indexOf( 'Draft:' ) !== -1 )
+	{
 		type = 'submissions';
 	} else if ( pageName.indexOf( 'Wikipedia:Articles_for_creation/Redirects' ) !== -1 ) {
 		type = 'redirects';
@@ -32,11 +34,8 @@
 
 		// FIXME: Right now mw.loader.using doesn't let you load urls :(
 		$.getScript( AFCH.consts.baseurl + '/core.js' ).done( function () {
-			AFCH.log( 'core.js loaded' );
-
-			if ( AFCH.beforeLoad() ) {
-				AFCH.load( type );
-			} else {
+			var loaded = AFCH.load( type );
+			if ( !loaded ) {
 				mw.notify( 'AFCH could not be loaded: ' + ( AFCH.error || 'unknown error' ),
 					{ title: 'AFCH error' } );
 			}

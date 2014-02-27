@@ -16,7 +16,7 @@
 		 * Prepares the AFCH gadget by setting constants and checking environment
 		 * @return {bool} Whether or not all setup functions executed successfully
 		 */
-		beforeLoad: function () {
+		setup: function () {
 			// Check requirements
 			if ( 'ajax' in $.support && !$.support.ajax ) {
 				AFCH.error = 'AFCH requires AJAX';
@@ -27,16 +27,39 @@
 				AFCH.consts.beta = true;
 			}
 
+			AFCH.api = new mw.Api();
+
+			// FIXME: Add real preferences code!
+			AFCH.prefs = {
+				summaryAd: ' ([[WP:AFCHRW|afch-rewrite]] ' + AFCH.consts.version + ')'
+			};
+
+			// Add more constants
+			$.extend( AFCH.consts, {
+				// Edit token used in api requests
+				editToken: mw.user.tokens.get( 'editToken' ),
+				// Full page name, "Wikipedia talk:Articles for creation/sandbox"
+				pagename: mw.config.get( 'wgPageName' ).replace( /_/g, ' ' ),
+				// Link to the current page, "/wiki/Wikipedia talk:Articles for creation/sandbox"
+				pagelink: mw.util.getUrl(),
+				// Used when status is disabled
+				nullstatus: { update: function () { return; } },
+				// Current user
+				user: mw.user.id()
+			} );
+
 			return true;
 		},
 
 		/**
-		 * Loads the subscript
+		 * Loads the subscript and dependencies
 		 * @param {string} type Which type of script to load:
 		 *                      'redirects' or 'ffu' or 'submissions'
 		 */
 		load: function ( type ) {
-			AFCH.log( 'loading ' + type );
+			if ( !AFCH.setup() ) {
+				return false;
+			}
 
 			// FIXME: we should load hogan.js "for real", figure out how to
 			// add to ResourceLoader or something??
@@ -49,34 +72,10 @@
 				mw.loader.load( [ 'mediawiki.feedback', 'mediawiki.api', 'jquery.chosen' ] );
 			}
 
-			// Set up all the other good things
-			AFCH.afterLoad();
-
 			// And finally load the subscript
 			$.getScript( AFCH.consts.baseurl + '/' + type + '.js' );
-		},
 
-		/**
-		 * Loads a bunch of necessary thingies, like prefs and the api and constants and unicorns!
-		 */
-		afterLoad: function () {
-			// FIXME: Add real pref code
-			AFCH.prefs = {};
-			AFCH.api = new mw.Api();
-
-			// Add more constants
-			$.extend( AFCH.consts, {
-				// Edit token used in api requests
-				editToken: mw.user.tokens.get( 'editToken' ),
-				// Full page name, "Wikipedia talk:Articles for creation/sandbox"
-				pagename: mw.config.get( 'wgPageName' ).replace( '_', ' ' ),
-				// Link to the current page, "/wiki/Wikipedia talk:Articles for creation/sandbox"
-				pagelink: mw.util.getUrl(),
-				// Used when status is disabled
-				nullstatus: { update: function () { return; } },
-				// Current user
-				user: mw.user.id()
-			} );
+			return true;
 		},
 
 		/**
