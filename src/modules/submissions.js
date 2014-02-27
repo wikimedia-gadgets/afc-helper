@@ -632,11 +632,11 @@
 			AFCH.initFeedback( '#afchLeft', 'article review' );
 
 			// Set up click handlers
-			$( '#afchAccept' ).click( showAcceptOptions );
-			$( '#afchDecline' ).click( showDeclineOptions );
-			$( '#afchComment' ).click( showCommentOptions );
-			$( '#afchSubmit' ).click( showSubmitOptions );
-			$( '#afchG13' ).click( showG13Options );
+			$( '#afchAccept' ).click( function () { spinnerAndRun( showAcceptOptions ); } );
+			$( '#afchDecline' ).click( function () { spinnerAndRun( showDeclineOptions ); } );
+			$( '#afchComment' ).click( function () { spinnerAndRun( showCommentOptions ); } );
+			$( '#afchSubmit' ).click( function () { spinnerAndRun( showSubmitOptions ); } );
+			$( '#afchG13' ).click( function () { spinnerAndRun( showG13Options ); } );
 
 			// Get G13 eligibility and when known, display the button...
 			// but don't hold up the rest of the loading to do so
@@ -729,6 +729,37 @@
 				fn( data );
 			} );
 		} );
+	}
+
+	/**
+	 * Displays a spinner in the main content area and then
+	 * calls the passed function
+	 * @param {function} fn function to call when spinner has been displayed
+	 * @return {[type]} [description]
+	 */
+	function spinnerAndRun ( fn ) {
+		var $spinner, $container = $( '#afchContent' );
+
+		// Add a new spinner if one doesn't already exist
+		if ( !$container.find( '.mw-spinner' ).length ) {
+
+			$spinner = $.createSpinner( {
+				size: 'large',
+				type: 'block'
+			} )
+				// Set the spinner's dimensions equal to the viewers's dimensions so that
+				// the current scroll position is not lost when emptied
+				.css( {
+					height: $container.height(),
+					width: $container.width()
+				} );
+
+			$container.empty().append( $spinner );
+		}
+
+		if ( typeof fn === 'function' ) {
+			fn();
+		}
 	}
 
 	/**
