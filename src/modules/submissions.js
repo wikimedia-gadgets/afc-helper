@@ -447,12 +447,38 @@
 		return this.text;
 	};
 
-	AFCH.Text.prototype.cleanUp = function () {
+	AFCH.Text.prototype.cleanUp = function ( isAccept ) {
+		var text = this.text;
+
+		if ( isAccept ) {
+
+			// Uncomment cats and templates
+			text = text.replace( /\[\[:Category:/gi, '[[Category:' );
+			text = text.replace( /\{\{(tl|tlx|tlg)\|(.*?)\}\}/ig, '{{$2}}');
+
+		} else {
+
+			// Comment out cats
+			text = text.replace( /\[\[Category:/gi, '[[:Category:' );
+
+		}
+
+		// Remove html comments (<!--) that surround categories
+		text = text.replace( /<!--\s*((\[\[:{0,1}(Category:.*?)\]\]\s*)+)-->/gi, '$1');
+
+		// FIXME: Remove wizardy things
+
+		this.text = text;
+		this.removeExcessNewlines();
+
 		return this.text;
 	};
 
 	AFCH.Text.prototype.removeExcessNewlines = function () {
+		// Replace 3+ newlines with just two
 		this.text = this.text.replace( /(?:[\t ]*(?:\r?\n|\r)){3,}/ig, '\n\n' );
+		// Remove all whitespace at the top of the article
+		this.text = this.text.replace( /^\s*/, '' );
 	};
 
 	AFCH.Text.prototype.removeAfcTemplates = function () {
