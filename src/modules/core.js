@@ -94,8 +94,7 @@
 				.addClass( 'afch-feedbackLink' )
 				.click( function () {
 					feedback.launch( {
-						subject: type ? 'Feedback about ' + type : 'AFCH feedback',
-						contents: 'Replace this with your error report or feedback, positive or negative. Please be as detailed as possible!'
+						subject: '[' + AFCH.consts.version + '] ' + ( type ? 'Feedback about ' + type : 'AFCH feedback' )
 					} );
 				} )
 				.appendTo( $element );
