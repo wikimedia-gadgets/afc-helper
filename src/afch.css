@@ -73,6 +73,11 @@
 	margin-right: auto;
 }
 
+.reload-link {
+	padding-left: 5px;
+	font-size: 0.7em;
+}
+
 #afchStatus {
 	text-align: left;
 }

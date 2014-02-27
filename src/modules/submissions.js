@@ -686,9 +686,13 @@
 			.off( 'click' );
 
 		// And finally, make it so when all AJAX requests are
-		// complete, the done text will be displayed
+		// complete, the done text and a reload link will be shown
 		$( document ).ajaxStop( function () {
-			submitBtn.text( submitBtn.data( 'done' ) );
+			submitBtn.text( 'Done' )
+				.append( $( '<a>' )
+					.addClass( 'reload-link' )
+					.attr( 'href', mw.util.getUrl() )
+					.text( '(reload)' ) );
 		} );
 	}
 
