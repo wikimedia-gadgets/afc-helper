@@ -3,7 +3,10 @@
 	var $afchLaunchLink, $afch, $afchWrapper,
 		afchPage, afchSubmission, afchViews, afchViewer;
 
-	AFCH.log( 'submissions.js executing...' );
+	// Die if reviewing a nonexistent page
+	if ( mw.config.get( 'wgArticleId' ) === 0 ) {
+		return;
+	}
 
 	/**
 	 * Represents an AfC submission -- its status as well as comments.
