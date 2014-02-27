@@ -220,6 +220,29 @@ div.disabled-button {
 	border-color: #2ECC40;
 }
 
+.accept label, .accept input {
+	display: inline-block;
+}
+
+.accept label {
+	margin-top: 12px;
+	width: 15%;
+	text-align: left;
+}
+
+.accept label + .accept input {
+	width: 30%;
+	margin: 0 10% 0 4%;
+}
+
+.accept input + .accept input {
+	float: right;
+}
+
+select#lifeStatus.afch-input {
+	vertical-align: middle;
+}
+
 /* DECLINE */
 
 .decline {

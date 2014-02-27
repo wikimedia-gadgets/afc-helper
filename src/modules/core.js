@@ -218,6 +218,24 @@
 					}
 				} );
 			};
+
+			/**
+			 * Gets the associated talk page
+			 * @return {AFCH.Page}
+			 */
+			this.getTalkPage = function ( textOnly ) {
+				var title, ns = this.title.getNamespaceId();
+
+				// Odd-numbered namespaces are already talk namespaces
+				if ( ns % 2 !== 0 ) {
+					return this.title;
+				}
+
+				title = new mw.Title( this.rawTitle, ns + 1 );
+
+				return new AFCH.Page( title.getPrefixedText() );
+			};
+
 		},
 
 		/**
@@ -352,6 +370,58 @@
 			deletePage: function ( pagename, reason ) {
 				// FIXME: implement
 				return false;
+			},
+
+			/**
+			 * Moves a page
+			 * @param {string} oldTitle Page to move
+			 * @param {string} newTitle Move target
+			 * @param {string} reason Reason for moving; shown in move log
+			 * @param {object} additionalParameters https://www.mediawiki.org/wiki/API:Move#Parameters
+			 * @param {bool} hide Don't show the move in the status display
+			 * @return {$.Deferred} Resolves with success/failure
+			 */
+			movePage: function ( oldTitle, newTitle, reason, additionalParameters, hide ) {
+				var status, request, deferred = $.Deferred();
+
+				if ( !hide ) {
+					status = new AFCH.status.Element( 'Moving $1 to $2...', {
+						'$1': $( '<a>' )
+							.attr( 'href', mw.util.getUrl( oldTitle ) )
+							.text( oldTitle.replace( /_/g, ' ' ) ),
+						'$2': $( '<a>' )
+							.attr( 'href', mw.util.getUrl( newTitle ) )
+							.text( newTitle.replace( /_/g, ' ' ) )
+					} );
+				} else {
+					status = AFCH.consts.nullstatus;
+				}
+
+				request = $.extend( {
+					action: 'move',
+					from: oldTitle,
+					to: newTitle,
+					reason: reason + AFCH.prefs.summaryAd,
+					token: AFCH.consts.editToken // Move token === edit token
+				}, additionalParameters );
+
+				AFCH.api.post( request )
+					.done( function ( data ) {
+						if ( data && data.move ) {
+							status.update( 'Moved $1 to $2' );
+							deferred.resolve( data.move );
+						} else {
+							// FIXME: get detailed error info from API result??
+							status.update( 'Error moving $1 to $2: ' + JSON.stringify( data.error ) );
+							deferred.reject( data.error );
+						}
+					} )
+					.fail( function ( err ) {
+						status.update( 'Error moving $1 to $2: ' + JSON.stringify( err ) );
+						deferred.reject( err );
+					} );
+
+				return deferred;
 			},
 
 			/**

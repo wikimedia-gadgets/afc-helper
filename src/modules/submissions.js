@@ -785,10 +785,90 @@
 	// to a submission.
 
 	function showAcceptOptions () {
-		loadView( 'accept', {
-			newTitle: afchSubmission.shortTitle
+		/**
+		 * If possible, use the session storage to get the WikiProject list.
+		 * If it hasn't been cached already, load it manually and then cache
+		 */
+		function loadWikiProjectList () {
+			var deferred = $.Deferred(),
+				wikiProjects = [],
+				// This is so a new version of AFCH will invalidate the WikiProject cache
+				lsKey = 'afch-' + AFCH.consts.version + '-wikiprojects';
+
+			if ( window.localStorage && window.localStorage[lsKey] ) {
+				wikiProjects = JSON.parse( window.localStorage[lsKey] );
+				deferred.resolve( wikiProjects );
+			} else {
+				$.ajax( {
+					url: mw.config.get( 'wgServer' ) + '/w/index.php?title=User:Theo%27s_Little_Bot/afchwikiproject.js&action=raw&ctype=text/javascript',
+					dataType: 'json'
+				} ).done( function ( projectData ) {
+					$.each( projectData, function ( display, template ) {
+						wikiProjects.push( {
+							displayName: display,
+							templateName: template
+						} );
+					} );
+
+					// If possible, cache the WikiProject data!
+					if ( window.localStorage ) {
+						window.localStorage[lsKey] = JSON.stringify( wikiProjects );
+					}
+
+					deferred.resolve( wikiProjects );
+				} );
+			}
+
+			return deferred;
+		}
+
+		$.when( loadWikiProjectList() ).then( function ( wikiProjects ) {
+
+			loadView( 'accept', {
+				newTitle: afchSubmission.shortTitle,
+				hasWikiProjects: !!wikiProjects.length,
+				wikiProjects: wikiProjects
+			}, function () {
+				$( '#newAssessment' ).chosen( {
+					allow_single_deselect: true,
+					disable_search: true,
+					width: '140px',
+					placeholder_text_single: 'Click to select'
+				} );
+
+				$( '#newWikiProjects' ).chosen( {
+					allow_single_deselect: true,
+					no_results_text: 'Whoops, no WikiProjects could be found that matched your search!',
+					placeholder_text_multiple: 'Start typing to filter WikiProjects...'
+				} );
+
+				// Show bio options if Biography option checked
+				$( '#isBiography' ).change( function () {
+					$( '#bioOptionsWrapper' ).toggleClass( 'hidden', !this.checked );
+				} );
+
+				// Ask for the month/day IF the birth year has been entered
+				$( '#birthYear' ).keyup( function () {
+					$( '#birthMonthDayWrapper' ).toggleClass( 'hidden', !this.value.length );
+				} );
+
+				// Ask for the month/day IF the death year has been entered
+				$( '#deathYear' ).keyup( function () {
+					$( '#deathMonthDayWrapper' ).toggleClass( 'hidden', !this.value.length );
+				} );
+
+				// If subject is dead, show options for death details
+				$( '#lifeStatus' ).change( function () {
+					$( '#deathWrapper' ).toggleClass( 'hidden', $( this ).val() !== 'dead' );
+				} );
+
+				// FIXME: IMPLEMENT
+				// Show an error if the page title already exists in the mainspace
+			} );
+
+			addFormSubmitHandler( handleAccept );
+
 		} );
-		addFormSubmitHandler( handleAccept );
 	}
 
 	function showDeclineOptions () {
@@ -918,29 +998,116 @@
 	// These functions actually perform a given action using data passed
 	// in the `data` parameter.
 
-	/**
-	 * handleAccept
-	 * @param {object} data
-	 *                  - newTitle
-	 *                  - notifyUser
-	 *                  - newClass
-	 */
 	function handleAccept ( data ) {
-		var text = data.afchText;
+		var newText = data.afchText;
 
-		AFCH.actions.movePage( afchPage, data.newTitle )
-			.done( function () {
+		AFCH.actions.movePage( afchPage.rawTitle, data.newTitle,
+			'Moving accepted [[Wikipedia:Articles for creation|Articles for creation]] submission to mainspace' )
+			.done( function ( moveData ) {
+				var newPage = new AFCH.Page( moveData.to ),
+					talkPage = newPage.getTalkPage(),
+					recentPage = new AFCH.Page( 'Wikipedia:Articles for creation/recent' ),
+					talkText = '';
+
+				// ARTICLE
+				// -------
+
+				// Clean the page
+				newText.removeAfcTemplates();
+				newText.cleanUp( /* isAccept */ true );
+
+				// Add biography details
+				if ( data.isBiography ) {
+
+					// Persondata
+					newText.append(
+						'\n{{Persondata' +
+						'\n| NAME = ' + data.subjectName +
+						'\n| SHORT DESCRIPTION = ' + data.subjectDescription +
+						'\n| DATE OF BIRTH = ' + ( data.birthMonthDay ? data.birthMonthDay + ', ' : '' ) + data.birthYear +
+						'\n| PLACE OF BIRTH = ' + data.birthPlace +
+						'\n| DATE OF DEATH = ' + ( data.deathMonthDay ? data.deathMonthDay + ', ' : '' ) + data.deathYear +
+						'\n| PLACE OF DEATH = ' + data.deathhPlace +
+						'\n}}'
+					);
+
+					// {{subst:L}}, which generates DEFAULTSORT as well as
+					// adds the appropriate birth/death year categories
+					newText.append( '\n{{subst:L' +
+						'|1=' + data.birthYear +
+						'|2=' + data.deathYear +
+						'|3=' + data.subjectName + '}}'
+					);
+
+				}
+
+				newPage.edit( {
+					contents: newText.get(),
+					summary: 'Cleaning up accepted [[Wikipedia:Articles for creation|Articles for creation]] submission'
+				} );
+
+				// TALK PAGE
+				// ---------
+
+				// Add the AFC banner
+				talkText += '{{subst:WPAFC/article|class=' + data.newAssessment + '}}';
+
+				// Add biography banner if specified
+				// FIXME: Remove bio option from WikiProject menu to prevent duplicate selections
+				if ( data.isBiography ) {
+					talkText += ( '\n{{WikiProject Biography|living=' +
+						( data.lifeStatus !== 'unknown' ? ( data.lifeStatus === 'living' ? 'yes' : 'no' ) : '' ) +
+						'|class=' + data.newAssessment + '|listas=' + data.subjectName + '}}' );
+				}
+
+				if ( data.newAssessment === 'disambig' ) {
+					talkText += '\n{{WikiProject Disambiguation}}';
+				}
+
+				// Add WikiProjects
+				$.each( data.newWikiProjects, function ( i, project ) {
+					talkText += '\n{{' + project + '|class=' + data.newAssessment + '}}';
+				} );
+
+				talkPage.edit( {
+					contents: talkText,
+					summary: 'Placing [[Wikipedia:Articles for creation|Articles for creation]] banners'
+				} );
+
+				// NOTIFY SUBMITTER
+				// ----------------
+
 				if ( data.notifyUser ) {
 					afchSubmission.getSubmitter().done( function ( submitter ) {
 						AFCH.actions.notifyUser( submitter, {
 							message: AFCH.msg.get( 'accepted-submission',
-								{ '$1': data.newTitle, '$2': data.newClass } )
+								{ '$1': newPage, '$2': data.newClass } )
 						} );
 					} );
 				}
-			} )
-			.fail( function () {
-				return;
+
+				// AFC/RECENT
+				// ----------
+
+				$.when( recentPage.getText(), afchSubmission.getSubmitter() )
+					.then( function ( text, submitter ) {
+						var newRecentText = text,
+							matches = text.match( /{{afc contrib.*?}}\s*/gi ),
+							newTemplate = '{{afc contrib|' + data.newAssessment + '|' + newPage + '|' + submitter + '}}\n';
+
+						// Remove the older entries (at bottom of the page) if necessary
+						// to ensure we keep only 10 entries at any given point in time
+						while ( matches.length >= 10 ) {
+							newRecentText = newRecentText.replace( matches.pop(), '' );
+						}
+
+						newRecentText = newTemplate + newRecentText;
+
+						recentPage.edit( {
+							contents: newRecentText,
+							summary: 'Adding [[' + newPage + ']] to list of recent AfC creations'
+						} );
+					} );
 			} );
 	}
 
