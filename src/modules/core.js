@@ -439,7 +439,7 @@
 					userTalkPage = new mw.Title( user, 3 ); // User talk namespace
 
 				AFCH.actions.editPage( userTalkPage.getPrefixedText(), {
-					contents: options.message,
+					contents: '\n\n' + options.message,
 					summary: options.summary || 'Notifying user',
 					mode: 'appendtext',
 					statusText: 'Notifying',

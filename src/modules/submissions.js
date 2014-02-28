@@ -1081,7 +1081,7 @@
 					afchSubmission.getSubmitter().done( function ( submitter ) {
 						AFCH.actions.notifyUser( submitter, {
 							message: AFCH.msg.get( 'accepted-submission',
-								{ '$1': newPage, '$2': data.newClass } )
+								{ '$1': newPage, '$2': data.newAssessment } )
 						} );
 					} );
 				}

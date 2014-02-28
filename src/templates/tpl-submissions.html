@@ -57,14 +57,9 @@
 		</div>
 		{{/hasWikiProjects}}
 
-		<div id="notifyWrapper" class="afch-option hidden">
-			<input type="checkbox" id="notifyUser" class="afch-input" checked/>
-			<label for="notifyUser" class="afch-label">Notify submitter</label>
-		</div>
-
 		<div id="isBiographyWrapper">
 			<label for="isBiography" class="afch-label">Is the article a biography?</label>
-			<input type="checkbox" id="isBiography" />
+			<input type="checkbox" id="isBiography" class="afch-input"/>
 		</div>
 
 		<div id="bioOptionsWrapper" class="hidden">
@@ -122,6 +117,11 @@
 
 			</div>
 
+		</div>
+
+		<div id="notifyWrapper">
+			<label for="notifyUser" class="afch-label">Notify submitter</label>
+			<input type="checkbox" id="notifyUser" class="afch-input" checked/>
 		</div>
 
 		<div id="afchSubmitForm" data-running="Accepting submission..." class="gradient-button accept">Accept &amp; publish</div>
