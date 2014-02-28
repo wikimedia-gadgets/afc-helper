@@ -243,6 +243,15 @@ select#lifeStatus.afch-input {
 	vertical-align: middle;
 }
 
+#titleStatus {
+	font-size: 0.75em;
+	color: #FF4136;
+}
+
+.bad-input, .bad-input:focus {
+	border-color: #FF4136;
+}
+
 /* DECLINE */
 
 .decline {

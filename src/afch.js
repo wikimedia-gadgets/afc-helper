@@ -22,8 +22,8 @@
 		AFCH.consts = {};
 
 		// Master version data
-		AFCH.consts.version = 0.1;
-		AFCH.consts.versionName = 'Exploding Fireball';
+		AFCH.consts.version = 0.2;
+		AFCH.consts.versionName = 'Egalitarian Elephant';
 
 		// FIXME: Change when moving into production
 		AFCH.consts.beta = true;

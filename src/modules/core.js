@@ -217,6 +217,28 @@
 						deferred.resolve( false );
 					}
 				} );
+
+				return deferred;
+			};
+
+
+			this.exists = function () {
+				var deferred = $.Deferred();
+
+				AFCH.api.get( {
+					action: 'query',
+					prop: 'info',
+					titles: this.rawTitle
+				} ).done( function ( data ) {
+					// A nonexistent page will be indexed as '-1'
+					if ( data.query.pages.hasOwnProperty( '-1' ) ) {
+						deferred.resolve( false );
+					} else {
+						deferred.resolve( true );
+					}
+				} );
+
+				return deferred;
 			};
 
 			/**

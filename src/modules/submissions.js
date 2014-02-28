@@ -862,8 +862,52 @@
 					$( '#deathWrapper' ).toggleClass( 'hidden', $( this ).val() !== 'dead' );
 				} );
 
-				// FIXME: IMPLEMENT
 				// Show an error if the page title already exists in the mainspace
+				$( '#newTitle' ).keyup( function () {
+					var page,
+						$field =  $( this ),
+						$status = $( '#titleStatus' ),
+						$submitButton = $( '#afchSubmitForm' ),
+						value = $field.val();
+
+					// Reset to a pure state
+					$field.removeClass( 'bad-input' );
+					$status.text( '' );
+					$submitButton
+							.addClass( 'gradient-button' )
+							.removeClass( 'disabled-button' )
+							.text( 'Accept & publish' );
+
+					// If there is no value, die now, because otherwise mw.Title
+					// will throw an exception due to an invalid title
+					if ( !value ) {
+						return;
+					}
+
+					page = new AFCH.Page( $field.val() );
+					page.exists().done( function ( exists ) {
+						// If it doesn't exist, don't show a warning
+						if ( !exists ) {
+							return;
+						}
+
+						// Add a red border around the input field
+						$field.addClass( 'bad-input' );
+
+						// Show a warning message
+						$status.text( 'Whoops, "' + page.rawTitle + '" already exists in the mainspace.' );
+
+						// Disable the submit button and show an error in its place
+						$submitButton
+							.removeClass( 'gradient-button' )
+							.addClass( 'disabled-button' )
+							.text( 'The proposed title already exists' );
+					} );
+				} );
+
+				// Update titleStatus
+				$( '#newTitle' ).trigger( 'keyup' );
+
 			} );
 
 			addFormSubmitHandler( handleAccept );
