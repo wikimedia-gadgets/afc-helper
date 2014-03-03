@@ -299,12 +299,12 @@
 	AFCH.Submission.prototype.isG13Eligible = function () {
 		var deferred = $.Deferred();
 
-		// Not currently submitted
+		// Submission must not currently be submitted
 		if ( this.isCurrentlySubmitted ) {
 			deferred.resolve( false );
 		}
 
-		// And not been modified in 6 months
+		// And not have been modified in 6 months
 		this.page.getLastModifiedDate().done( function ( lastEdited ) {
 			var timeNow = new Date(),
 				sixMonthsAgo = new Date();
@@ -1101,7 +1101,6 @@
 				talkText += '{{subst:WPAFC/article|class=' + data.newAssessment + '}}';
 
 				// Add biography banner if specified
-				// FIXME: Remove bio option from WikiProject menu to prevent duplicate selections
 				if ( data.isBiography ) {
 					talkText += ( '\n{{WikiProject Biography|living=' +
 						( data.lifeStatus !== 'unknown' ? ( data.lifeStatus === 'living' ? 'yes' : 'no' ) : '' ) +
