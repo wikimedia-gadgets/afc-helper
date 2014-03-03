@@ -32,21 +32,24 @@
 	margin-bottom: 20px;
 }
 
+#afchTopBar {
+	position: relative;
+	width: 100%;
+	z-index: 999;
+}
+
 .top-bar-element {
 	color: #FFFFFF;
 	font-size: 1em;
-	padding: 0.5em;
 	cursor: pointer;
+	position: absolute;
+	padding: 5px;
 }
 
 #afchClose {
-	font-size: 1.2em;
-	float: right;
+	right: 0;
 	margin-top: -0.4em;
-}
-
-#afchLeft {
-	position: absolute;
+	font-size: 1.2em;
 }
 
 #afchHeader {
@@ -184,16 +187,15 @@ div.disabled-button {
 }
 
 #afchInitialHeader {
-	padding: 10px;
-	padding-bottom: 15px;
 	font-size: 25px;
 	color: #FFFFFF;
 	text-align: center;
+	margin: 10px;
+	position: relative;
 }
 
 .header-script {
 	display: block;
-	padding-bottom: 5px;
 	font-size: 15px;
 }
 

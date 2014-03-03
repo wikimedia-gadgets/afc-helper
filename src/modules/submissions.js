@@ -513,9 +513,8 @@
 		return this.prepend( newCode + '\n\n' );
 	};
 
-	// This creates the link in the header which allows
-	// users to launch afch. When launched, the link fades
-	// away, like a unicorn.
+	// This creates the link in the header which allows users to launch afch.
+	// When launched, the link fades away, like a unicorn.
 	$afchLaunchLink = $( '<span>' )
 		.attr( 'id', 'afch-open' )
 		.appendTo( '#firstHeading' )
@@ -535,33 +534,38 @@
 			.prependTo( '#mw-content-text' )
 			.append(
 				$( '<div>' )
-					.attr( 'id', 'afchLeft' )
-					.addClass( 'top-bar-element' )
+					.attr( 'id', 'afchTopBar' )
 					.append(
-						// Back link appears based on context
-						$( '<span>' )
-							.attr( 'id', 'afchBackLink' )
-							.html( '&#8592; | ' ) // back arrow
-							.addClass( 'hidden' )
-							.click( function () {
-								if ( afchViewer.loadPrevious ) {
-									afchViewer.loadPrevious();
-									$( this ).addClass( 'hidden' );
-								}
-							} )
-					),
+						// On the left, back link based on context as well as
+						// a "Give feedback!" link generated later
+						$( '<div>' )
+							.attr( 'id', 'afchLeft' )
+							.addClass( 'top-bar-element' )
+							.append(
+								// Back link appears based on context
+								$( '<span>' )
+									.attr( 'id', 'afchBackLink' )
+									.html( '&#8592; | ' ) // back arrow
+									.addClass( 'hidden' )
+									.click( function () {
+										if ( afchViewer.previousState ) {
+											afchViewer.loadPrevious();
+											$( this ).addClass( 'hidden' );
+										}
+									} )
+							),
 
-				// Include the close link in the upper right
-				$( '<div>' )
-					.attr( 'id', 'afchClose' )
-					.addClass( 'top-bar-element' )
-					.html( '&times;' )
-					.click( function () {
-						// DIE DIE DIE
-						$afch.remove();
-						// Show the launch link again
-						$afchLaunchLink.fadeIn();
-					} )
+						// On the right, a close button
+						$( '<div>' )
+							.attr( 'id', 'afchClose' )
+							.addClass( 'top-bar-element' )
+							.html( '&times;' )
+							.click( function () {
+								// DIE DIE DIE (...then show the launch link again)
+								$afch.remove();
+								$afchLaunchLink.fadeIn();
+							} )
+					)
 			);
 
 		/**
