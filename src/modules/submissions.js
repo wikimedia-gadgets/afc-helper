@@ -1110,6 +1110,9 @@
 					declineHandlers = {
 						cv: function () {
 							updateTextfield( 'Original URL', 'http://example.com/cake' );
+							$( '#blankWrapper' ).add( '#csdWrapper' )
+								.removeClass( 'hidden' )
+								.children( 'input' ).prop( 'checked', true );
 						},
 
 						dup: function () {
@@ -1160,6 +1163,15 @@
 				if ( declineHandlers[reason] ) {
 					declineHandlers[reason]();
 				}
+
+				$( '#blankSubmission' ).change( function () {
+					// If blank is not selected, then deselect CSD as well
+					if ( !this.checked ) {
+						$( '#csdSubmission' ).prop( 'checked', false );
+					}
+					// ... and just outright disable it
+					$( '#csdSubmission' ).prop( 'disabled', !this.checked );
+				} );
 
 				// If a reason has been specified, show the textarea, notify
 				// option, and the submit form button
