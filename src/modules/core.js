@@ -567,7 +567,7 @@
 					$.each( this.substitutions, function ( key, value ) {
 						// If we are passed a jQuery object, convert it to regular HTML first
 						if ( value.jquery ) {
-							value = value.wrap( '<div>' ).parent().html();
+							value = AFCH.jQueryToHtml( value );
 						}
 
 						html = html.replace( key, value );
@@ -809,7 +809,7 @@
 						.attr( 'target', '_blank' );
 
 				// Replace the wikilink with the new <a> element
-				newCode = newCode.replace( wikilinkMatch[0], newLink.wrap( '<div>' ).parent().html() );
+				newCode = newCode.replace( wikilinkMatch[0], AFCH.jQueryToHtml( newLink ) );
 
 				// Increment match
 				wikilinkMatch = wikilinkRegex.exec( wikicode );
@@ -885,6 +885,15 @@
 			$( document ).on( 'click', toggleSelector, function () {
 				toggleState( $( elementSelector ).hasClass( 'hidden' ) );
 			} );
+		},
+
+		/**
+		 * Gets the full raw HTML content of a jQuery object
+		 * @param {jQuery} $element
+		 * @return {string}
+		 */
+		jQueryToHtml: function ( $element ) {
+			return $element.wrap( '<div>' ).parent().html();
 		},
 
 		/**
