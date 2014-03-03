@@ -1029,7 +1029,8 @@
 					$( '#deathWrapper' ).toggleClass( 'hidden', $( this ).val() !== 'dead' );
 				} );
 
-				// Show an error if the page title already exists in the mainspace
+				// Show an error if the page title already exists in the mainspace,
+				// or if the title is create-protected and user is not an admin
 				$( '#newTitle' ).keyup( function () {
 					var page,
 						$field =  $( this ),
@@ -1050,25 +1051,50 @@
 					if ( !value ) {
 						return;
 					}
+					page = new AFCH.Page( value );
 
-					page = new AFCH.Page( $field.val() );
-					page.exists().done( function ( exists ) {
-						// If it doesn't exist, don't show a warning
-						if ( !exists ) {
+					AFCH.api.get( {
+						action: 'query',
+						prop: 'info',
+						inprop: 'protection',
+						titles: page.rawTitle
+					} ).done( function ( data ) {
+						var errorHtml, buttonText,
+							linkToPage = AFCH.jQueryToHtml( AFCH.makeLinkElementToPage( page.rawTitle ) );
+
+						// If the page already exists, display an error
+						if ( !data.query.pages.hasOwnProperty( '-1' ) ) {
+							errorHtml = 'Whoops, the page "' + linkToPage + '" already exists.';
+							buttonText = 'The proposed title already exists';
+						} else {
+							// If the page doesn't exist but IS create-protected and the
+							// current reviewer is not an admin, also display an error
+							// FIXME: offer one-click request unprotection?
+							$.each( data.query.pages['-1'].protection, function ( _, entry ) {
+								if ( entry.type === 'create' && entry.level === 'sysop' &&
+									$.inArray( 'sysop', mw.config.get( 'wgUserGroups' ) ) === -1 )
+								{
+									errorHtml = 'Darn it, "' + linkToPage + '" is create-protected. You will need to request unprotection before accepting.';
+									buttonText = 'The proposed title is create-protected';
+								}
+							} );
+						}
+
+						if ( !errorHtml ) {
 							return;
 						}
 
 						// Add a red border around the input field
 						$field.addClass( 'bad-input' );
 
-						// Show a warning message
-						$status.text( 'Whoops, "' + page.rawTitle + '" already exists in the mainspace.' );
+						// Show the error message
+						$status.html( errorHtml );
 
 						// Disable the submit button and show an error in its place
 						$submitButton
 							.removeClass( 'gradient-button' )
 							.addClass( 'disabled-button' )
-							.text( 'The proposed title already exists' );
+							.text( buttonText );
 					} );
 				} );
 
