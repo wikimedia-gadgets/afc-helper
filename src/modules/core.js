@@ -278,10 +278,7 @@
 
 				if ( !options.hide ) {
 					status = new AFCH.status.Element( 'Getting $1...',
-						{ '$1': $( '<a>' )
-							.attr( 'href', mw.util.getUrl( pagename ) )
-							.text( pagename.replace( /_/g, ' ' ) )
-						} );
+						{ '$1': AFCH.makeLinkElementToPage( pagename ) } );
 				} else {
 					status = AFCH.consts.nullstatus;
 				}
@@ -342,10 +339,7 @@
 
 				if ( !options.hide ) {
 					status = new AFCH.status.Element( ( options.statusText || 'Editing' ) + ' $1...',
-						{ '$1': $( '<a>' )
-							.attr( 'href', mw.util.getUrl( pagename ) )
-							.text( pagename.replace( /_/g, ' ' ) )
-						} );
+						{ '$1': AFCH.makeLinkElementToPage( pagename ) } );
 				} else {
 					status = AFCH.consts.nullstatus;
 				}
@@ -408,12 +402,8 @@
 
 				if ( !hide ) {
 					status = new AFCH.status.Element( 'Moving $1 to $2...', {
-						'$1': $( '<a>' )
-							.attr( 'href', mw.util.getUrl( oldTitle ) )
-							.text( oldTitle.replace( /_/g, ' ' ) ),
-						'$2': $( '<a>' )
-							.attr( 'href', mw.util.getUrl( newTitle ) )
-							.text( newTitle.replace( /_/g, ' ' ) )
+						'$1': AFCH.makeLinkElementToPage( oldTitle ),
+						'$2': AFCH.makeLinkElementToPage( newTitle )
 					} );
 				} else {
 					status = AFCH.consts.nullstatus;
@@ -516,8 +506,7 @@
 				this.update = function ( html ) {
 					// First run the substutions
 					$.each( this.substitutions, function ( key, value ) {
-						// If we are passed a jQuery object, convert it
-						// to regular HTML first
+						// If we are passed a jQuery object, convert it to regular HTML first
 						if ( value.jquery ) {
 							value = value.wrap( '<div>' ).parent().html();
 						}
@@ -727,6 +716,17 @@
 			var v = object[key];
 			delete object[key];
 			return v;
+		},
+
+		/**
+		 * Creates an <a> element that links to a given page
+		 * @param {string} pagename
+		 * @return {jQuery} <a> element
+		 */
+		makeLinkElementToPage: function ( pagename ) {
+			return $( '<a>' )
+				.attr( 'href', mw.util.getUrl( pagename ) )
+				.text( pagename.replace( /_/g, ' ' ) );
 		},
 
 		/**
