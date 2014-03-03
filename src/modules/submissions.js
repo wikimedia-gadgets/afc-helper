@@ -389,6 +389,12 @@
 	 * @return {bool} success
 	 */
 	AFCH.Submission.prototype.addNewComment = function ( text ) {
+		var commentText = $.trim( text );
+
+		if ( commentText.indexOf( '~~~~' ) === -1 ) {
+			commentText += ' ~~~~~';
+		}
+
 		this.comments.unshift( {
 			// Unicorns are explained in loadDataFromTemplates()
 			timestamp: AFCH.parseForTimestamp( text, /* mwstyle */ true ) || 'unicorns',
@@ -1385,10 +1391,9 @@
 	}
 
 	function handleComment ( data ) {
-		var text = data.afchText,
-			comment = $.trim( data.commentText ) + ' ~~~~';
+		var text = data.afchText;
 
-		afchSubmission.addNewComment( comment );
+		afchSubmission.addNewComment( data.commentText );
 		text.updateAfcTemplates( afchSubmission.makeWikicode() );
 
 		text.cleanUp();
