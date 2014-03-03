@@ -642,6 +642,13 @@
 			$( '#afchSubmit' ).click( function () { spinnerAndRun( showSubmitOptions ); } );
 			$( '#afchG13' ).click( function () { spinnerAndRun( showG13Options ); } );
 
+			// Load warnings about the page
+			getSubmissionWarnings().done( function ( warnings ) {
+				if ( warnings.length ) {
+					$( '#afchWarnings' ).removeClass( 'hidden' ).append( warnings );
+				}
+			} );
+
 			// Get G13 eligibility and when known, display the button...
 			// but don't hold up the rest of the loading to do so
 			afchSubmission.isG13Eligible().done( function ( eligible ) {
@@ -649,6 +656,155 @@
 			} );
 
 		} );
+	}
+
+	/**
+	 * Loads warnings about the submission
+	 * @return {jQuery}
+	 */
+	function getSubmissionWarnings() {
+		var deferred = $.Deferred(),
+			warnings = [];
+
+		function addWarning ( message, actionMessage, onAction ) {
+			var $warning = $( '<div>' )
+					.addClass( 'afch-warning' )
+					.text( message ),
+				$action = $( '<a>' )
+					.text( actionMessage || 'Edit page' )
+					.appendTo( $warning );
+
+			if ( typeof onAction === 'function' ) {
+				$action.click( onAction );
+			} else {
+				$action.attr( 'href', onAction || mw.util.getUrl( AFCH.consts.pagename, { action: 'edit' } ) );
+			}
+
+			warnings.push( $warning );
+		}
+
+		function checkReferences () {
+			var deferred = $.Deferred();
+
+			afchPage.getText( true ).done( function ( text ) {
+				var refBeginRe = /<\s*ref\s*(name\s*=|group\s*=)*\s*[^\/]*>/ig,
+					refBeginMatches = text.match( refBeginRe ) || [],
+
+					refEndRe = /<\/\s*ref\s*\>/ig,
+					refEndMatches = text.match( refEndRe )|| [],
+
+					reflistRe = /({{reflist(?:{{[^{}]*}}|[^}{])*}})|(<\s*references\s*\/?>)/i,
+					hasReflist = reflistRe.test( text ),
+
+					// FIXME: Handle multiline references?
+					malformedRefs = text.match( /<[^\/]*ref.*?>.*?<[^\/]*?ref.*?>/ig ) || [];
+
+				// Uneven (/unclosed) <ref> and </ref> tags
+				if ( refBeginMatches.length !== refEndMatches.length ) {
+					addWarning( 'The submission contains ' +
+						( refBeginMatches.length > refEndMatches.length ? 'unclosed' : 'unbalanced' ) + ' <ref> tags.' );
+				}
+
+				// <ref>1<ref> instead of <ref>1</ref> detection
+				if ( malformedRefs.length ) {
+					addWarning( 'The submission contains malformed <ref> tags.', 'View details', function () {
+						var $toggleLink = $( this ).attr( 'id', 'toggleMalformedRefs' ),
+							$warningDiv = $( this ).parent();
+							$malformedRefWrapper = $( '<div>' )
+								.attr( 'id', 'malformedRefs' )
+								.appendTo( $warningDiv );
+
+						// Show the relevant code snippets
+						$.each( malformedRefs, function ( _, ref ) {
+							$( '<div>' )
+								.addClass( 'afch-code-wrapper' )
+								.append( $( '<pre>' ).text( ref ) )
+								.appendTo( $malformedRefWrapper );
+						} );
+
+						// Now change the "View details" link to behave as a normal toggle for #malformedRefs
+						AFCH.makeToggle( '#toggleMalformedRefs', '#malformedRefs', 'Show details', 'Hide details' );
+
+						return false;
+					} );
+				}
+
+				// <ref> after {{reflist}}
+				if ( hasReflist ) {
+					if ( refBeginRe.test( text.substring( text.search( reflistRe ) ) ) ) {
+						addWarning( 'Not all of the <ref> tags are before the references list. You may not see all references.' );
+					}
+				}
+
+				// <ref> without {{reflist}}
+				if ( refBeginMatches.length && !hasReflist ) {
+					addWarning( 'The submission contains <ref> tags, but has no references list! You may not see all references.' );
+				}
+
+				deferred.resolve();
+			} );
+
+			return deferred;
+		}
+
+		function checkDeletionLog () {
+			var deferred = $.Deferred();
+
+			AFCH.api.get( {
+				action: 'query',
+				list: 'logevents',
+				leprop: 'user|timestamp|comment',
+				leaction: 'delete/delete',
+				letype: 'delete',
+				lelimit: 10,
+				letitle: afchSubmission.shortTitle
+			} ).done( function ( data ) {
+				var rawDeletions = data.query.logevents;
+
+				if ( !rawDeletions.length ) {
+					return;
+				}
+
+				addWarning( 'The page "' + afchSubmission.shortTitle + '" has been deleted ' + rawDeletions.length + ( rawDeletions.length === 10 ? '+' : '' ) +
+					' time' + ( rawDeletions.length > 1 ? 's' : '' ) + '.', 'View deletion log', function () {
+						var $toggleLink = $( this ).attr( 'id', 'toggleDeletionLog' ),
+							$warningDiv = $toggleLink.parent(),
+							deletions = [];
+
+						$.each( rawDeletions, function ( _, deletion ) {
+							deletions.push( {
+								timestamp: deletion.timestamp,
+								relativeTimestamp: AFCH.relativeTimeSince( new Date( deletion.timestamp ) ),
+								deletor: deletion.user,
+								deletorLink: mw.util.getUrl( 'User:' + deletion.user ),
+								reason: AFCH.convertWikilinksToHTML( deletion.comment )
+							} );
+						} );
+
+						$( afchViews.renderView( 'warning-deletions-table', { deletions: deletions } ) )
+							.attr( 'id', 'deletionLog' )
+							.appendTo( $warningDiv );
+
+						// ...and now convert the link into a toggle which simply hides/shows the div
+						AFCH.makeToggle( '#toggleDeletionLog', '#deletionLog', 'Show deletion log', 'Hide deletion log' );
+
+						return false;
+					} );
+
+				deferred.resolve();
+
+			} );
+
+			return deferred;
+		}
+
+		// FIXME: Implement long comment checker?
+
+		$.when( checkReferences(), checkDeletionLog() ).then( function () {
+			deferred.resolve( warnings );
+		} );
+
+		return deferred;
 	}
 
 	/**

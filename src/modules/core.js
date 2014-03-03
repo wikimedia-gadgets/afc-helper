@@ -789,6 +789,105 @@
 		},
 
 		/**
+		 * Converts [[wikilink]] -> <a>
+		 *
+		 * @param {string} wikicode
+		 * @return {string}
+		 */
+		convertWikilinksToHTML: function ( wikicode ) {
+			var newCode = wikicode,
+				wikilinkRegex = /\[\[(.*?)\s*(?:\|\s*(.*?))?\]\]/g,
+				wikilinkMatch = wikilinkRegex.exec( wikicode );
+
+			while ( wikilinkMatch ) {
+				var title = wikilinkMatch[1],
+					displayTitle = wikilinkMatch[2] || title,
+					newLink = $( '<a>' )
+						.attr( 'href', mw.util.getUrl( title ) )
+						.attr( 'title', title )
+						.text( displayTitle )
+						.attr( 'target', '_blank' );
+
+				// Replace the wikilink with the new <a> element
+				newCode = newCode.replace( wikilinkMatch[0], newLink.wrap( '<div>' ).parent().html() );
+
+				// Increment match
+				wikilinkMatch = wikilinkRegex.exec( wikicode );
+			}
+
+			return newCode;
+		},
+
+		/**
+		 * Returns the relative time that has elapsed between an oldDate and a nowDate
+		 * @param {Date} oldDate
+		 * @param {Date} nowDate optional, defaults to `new Date()`
+		 * @return {string}
+		 */
+		relativeTimeSince: function ( oldDate, nowDate ) {
+			var msPerMinute = 60 * 1000,
+				msPerHour = msPerMinute * 60,
+				msPerDay = msPerHour * 24,
+				msPerMonth = msPerDay * 30,
+				msPerYear = msPerDay * 365,
+				elapsed = ( nowDate || new Date() ) - oldDate,
+				amount, unit;
+
+			if ( elapsed < msPerMinute ) {
+				amount = Math.round( elapsed / 1000 );
+				unit = 'second';
+			} else if ( elapsed < msPerHour ) {
+				amount = Math.round( elapsed / msPerMinute );
+				unit = 'minute';
+			} else if ( elapsed < msPerDay ) {
+				amount = Math.round( elapsed / msPerHour );
+				unit = 'hour';
+			} else if ( elapsed < msPerMonth ) {
+				amount = Math.round( elapsed / msPerDay );
+				unit = 'day';
+			} else if ( elapsed < msPerYear ) {
+				amount = Math.round( elapsed / msPerMonth );
+				unit = 'month';
+			} else {
+				amount = Math.round( elapsed / msPerYear );
+				unit = 'year';
+			}
+
+			if ( amount !== 1 ) {
+				unit += 's';
+			}
+
+			return [ amount, unit, 'ago' ].join( ' ' );
+		},
+
+		/**
+		 * Converts an element into a toggle for another element
+		 * @param {string} toggleSelector When clicked, will show/hide elementSelector
+		 * @param {string} elementSelector Element(s) to be shown or hidden
+		 * @param {string} showText e.g. "Show the div"
+		 * @param {string} hideText e.g. "Hide the div"
+		 */
+		makeToggle: function ( toggleSelector, elementSelector, showText, hideText ) {
+			// Remove current click handlers
+			$( toggleSelector ).off( 'click' );
+
+			// If show is true, we make the element visible and display hideText in
+			// the toggle. Otherwise, we hide the element and display showText.
+			function toggleState ( show ) {
+				$( elementSelector ).toggleClass( 'hidden', !show );
+				$( toggleSelector ).text( show ? hideText : showText );
+			}
+
+			// Update everythign to match current state of the element
+			toggleState( $( elementSelector ).is( ':visible' ) );
+
+			// Add the new click handler
+			$( document ).on( 'click', toggleSelector, function () {
+				toggleState( $( elementSelector ).hasClass( 'hidden' ) );
+			} );
+		},
+
+		/**
 		 * Given a string, returns by default a Date() object
 		 * or, if mwstyle is true, a MediaWiki-style timestamp
 		 *

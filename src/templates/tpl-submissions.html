@@ -6,6 +6,7 @@
 		<span class="header-script">AFCH v{{version}} / {{versionName}}</span>
 		Reviewing "{{title}}"
 	</div>
+	<div id="afchWarnings" class="hidden"></div>
 	<div id="afchButtons">
 		{{#accept}}<a id="afchAccept" class="accept afch-button gradient-button">Accept</a>{{/accept}}
 		{{#decline}}<a id="afchDecline" class="decline afch-button gradient-button">Decline</a>{{/decline}}
@@ -15,6 +16,22 @@
 	</div>
 </div>
 <!-- /main -->
+
+<!-- warning-deletions-table -->
+<div class="afch-deletion-log">
+	<table>
+		{{#deletions}}
+		<tr>
+			<td class="timestamp"><span title="{{timestamp}}">{{relativeTimestamp}}</span>:</td>
+			<td class="detail">
+				<span class="reason">{{{reason}}}</span>
+				<span class="actor">(deleted by <a href="{{deletorLink}}">{{deletor}}</a>)</span>
+			</td>
+		</tr>
+		{{/deletions}}
+	</table>
+</div>
+<!-- /warning-deletions-table -->
 
 <!-- accept -->
 <div id="afchReviewPanel" class="accept">

@@ -199,6 +199,68 @@ div.disabled-button {
 	font-size: 15px;
 }
 
+#afchWarnings {
+	text-align: center;
+	background-color: #FF851B;
+	margin: 0px 10px 10px;
+	padding: 5px;
+}
+
+.afch-warning {
+	padding: 8px 0px;
+}
+
+.afch-warning > a {
+	padding-left: 2px;
+	font-size: 0.8em;
+	color: black;
+}
+
+.afch-warning > a:hover {
+	cursor: pointer;
+	text-decoration: underline;
+}
+
+.afch-warning + .afch-warning {
+	border-top: 1px solid black;
+}
+
+.afch-deletion-log {
+	background-color: white;
+	text-align: left;
+	padding: 5px;
+	margin: 10px 20px;
+	border: 1px dashed black;
+	max-height: 90px;
+	overflow: auto;
+}
+
+.afch-deletion-log td {
+	padding: 5px;
+}
+
+.afch-deletion-log .timestamp {
+	color: gray;
+	text-align: right;
+	white-space: nowrap;
+	vertical-align: top;
+}
+
+.afch-deletion-log .reason {
+	font-family: monospace, Courier;
+}
+
+.afch-deletion-log .actor {
+	color: gray;
+	font-size: 0.75em;
+	white-space: nowrap;
+}
+
+div.afch-code-wrapper > pre {
+	padding: 0.1em;
+	display: inline;
+}
+
 #afchButtons {
 	width: 100%;
 	display: table;
