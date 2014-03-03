@@ -804,7 +804,8 @@
 			return deferred;
 		}
 
-		// FIXME: Implement long comment checker?
+		// FIXME: Implement warning when submission is already under review
+		// FIXME: Implement long HTML comment checker
 
 		$.when( checkReferences(), checkDeletionLog() ).then( function () {
 			deferred.resolve( warnings );
