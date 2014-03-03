@@ -782,10 +782,14 @@
 		 * @param {string} pagename
 		 * @return {jQuery} <a> element
 		 */
-		makeLinkElementToPage: function ( pagename ) {
+		makeLinkElementToPage: function ( pagename, displayTitle ) {
+			var actualTitle = pagename.replace( /_/g, ' ' );
+
 			return $( '<a>' )
-				.attr( 'href', mw.util.getUrl( pagename ) )
-				.text( pagename.replace( /_/g, ' ' ) );
+				.attr( 'href', mw.util.getUrl( actualTitle ) )
+				.attr( 'title', actualTitle )
+				.text( displayTitle || actualTitle )
+				.attr( 'target', '_blank' );
 		},
 
 		/**
@@ -801,12 +805,8 @@
 
 			while ( wikilinkMatch ) {
 				var title = wikilinkMatch[1],
-					displayTitle = wikilinkMatch[2] || title,
-					newLink = $( '<a>' )
-						.attr( 'href', mw.util.getUrl( title ) )
-						.attr( 'title', title )
-						.text( displayTitle )
-						.attr( 'target', '_blank' );
+					displayTitle = wikilinkMatch[2],
+					newLink = AFCH.makeLinkElementToPage( title, displayTitle );
 
 				// Replace the wikilink with the new <a> element
 				newCode = newCode.replace( wikilinkMatch[0], AFCH.jQueryToHtml( newLink ) );
