@@ -1181,7 +1181,15 @@
 			newParams['3'] = data.declineTextfield;
 		}
 
-		// FIXME: Handle blanking and csd-ing!
+		// Handle submission blanking (csd as well if necessary)
+		if ( data.blankSubmission ) {
+			text.set( '{{afc cleared' + ( data.csdSubmission ? '|csd' : '' ) + '}}' );
+		}
+
+		// Copyright violations get {{db-g12}}'d as well
+		if ( declineReason === 'cv' && data.csdSubmission ) {
+			text.prepend( '{{db-g12|url=' + data.declineTextfield + '}}' );
+		}
 
 		// Now update the submission status
 		afchSubmission.setStatus( 'd', newParams );
@@ -1202,6 +1210,19 @@
 						'$2': declineReason === 'cv' ? 'yes' : 'no'
 					} ),
 					summary: "Notification: Your [[" + AFCH.consts.pagename + "|Articles for Creation submission]] has been declined"
+				} );
+			} );
+		}
+
+		// Log CSD if necessary
+		if ( data.csdSubmission ) {
+			// FIXME: Only get submitter if needed...?
+			afchSubmission.getSubmitter().done( function ( submitter ) {
+				AFCH.actions.logCSD( {
+					title: afchPage.rawTitle,
+					reason: declineReason === 'cv' ? '[[WP:G12]] ({{tl|db-copyvio}})' :
+						'{{tl|db-reason}} ([[WP:AFC|Articles for creation]])',
+					usersNotified: data.notifyUser ? [ submitter ] : []
 				} );
 			} );
 		}

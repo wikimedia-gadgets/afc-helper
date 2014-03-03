@@ -465,6 +465,65 @@
 				} );
 
 				return deferred;
+			},
+
+			/**
+			 * Logs a CSD nomination
+			 * @param {object} options
+			 *                  - title {string}
+			 *                  - reason {string}
+			 *                  - usersNotified {array} optional
+			 * @return {$.Deferred} resolves false if the page did not exist, otherwise
+			 *                      resolves/rejects with data from the edit
+			 */
+			logCSD: function ( options ) {
+				var deferred = $.Deferred(),
+					logPage = new AFCH.Page( 'User:' + mw.config.get( 'wgUserName' ) + '/' +
+						( window.Twinkle && window.Twinkle.getPref( 'speedyLogPageName' ) || 'CSD log' ) );
+
+				logPage.getText().done( function ( logText ) {
+					var status, date = new Date(),
+						headerRe = new RegExp( '^==+\\s*' + date.getUTCMonthName() + '\\s+' + date.getUTCFullYear() + '\\s*==+', 'm' ),
+						appendText = '';
+
+					// Don't edit if the page has no text
+					if ( !logText ) {
+						deferred.resolve( false );
+						return;
+					}
+
+					// Add header for new month if necessary
+					if ( !headerRe.test( logText ) ) {
+						appendText += '\n\n=== ' + date.getUTCMonthName() + ' ' + date.getUTCFullYear() + ' ===';
+					}
+
+					appendText += '\n# [[:' + options.title + ']]: ' + options.reason;
+
+					if ( options.usersNotified && options.usersNotified.length ) {
+						appendText += '; notified {{user|1=' + options.usersNotified.shift();
+
+						$.each( options.usersNotified, function( index, user ) {
+							appendText += ', {{user|1=' + user + '}}';
+						} );
+					}
+
+					appendText += ' ~~~~~\n';
+
+					logPage.edit( {
+						contents: appendText,
+						mode: 'appendtext',
+						summary: 'Logging speedy deletion nomination of [[' + options.title + ']]',
+						hide: true // We're already using a custom status element
+					} ).done( function ( data ) {
+						status.update( 'Logged speedy deletion nomination of $1' );
+						deferred.resolve( data );
+					} ).fail( function ( data ) {
+						status.update( 'Failed to log speedy deletion nomination of $1' );
+						deferred.reject( data );
+					} );
+				} );
+
+				return deferred;
 			}
 		},
 
