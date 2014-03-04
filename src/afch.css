@@ -197,6 +197,7 @@ div.disabled-button {
 .header-script {
 	display: block;
 	font-size: 15px;
+	padding-bottom: 4px;
 }
 
 #afchWarnings {
