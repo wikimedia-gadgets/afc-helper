@@ -662,7 +662,7 @@
 
 			// Sneakily use the Parsoid API which Flow has oh-so-nicely exposed
 			// for us. Hopefully they don't, y'know, suddenly remove it.
-			AFCH.api.get( {
+			AFCH.api.post( {
 				action: 'flow-parsoid-utils',
 				from: 'wikitext',
 				to: 'html',
