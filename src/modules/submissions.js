@@ -648,10 +648,15 @@
 			$( '#afchSubmit' ).click( function () { spinnerAndRun( showSubmitOptions ); } );
 			$( '#afchG13' ).click( function () { spinnerAndRun( showG13Options ); } );
 
-			// Load warnings about the page
+			// Load warnings about the page, then slide them in
 			getSubmissionWarnings().done( function ( warnings ) {
 				if ( warnings.length ) {
-					$( '#afchWarnings' ).removeClass( 'hidden' ).append( warnings );
+					// FIXME: CSS-based slide-in animation instead to avoid having
+					// to use stupid hide() + removeClass() workaround?
+					$( '#afchWarnings' )
+						.append( warnings )
+						.hide().removeClass( 'hidden' )
+						.slideDown();
 				}
 			} );
 
