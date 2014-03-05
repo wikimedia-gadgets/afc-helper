@@ -258,7 +258,7 @@
 
 				// Odd-numbered namespaces are already talk namespaces
 				if ( ns % 2 !== 0 ) {
-					return this.title;
+					return this;
 				}
 
 				title = new mw.Title( this.rawTitle, ns + 1 );

@@ -894,6 +894,12 @@
 						value = element.checked;
 					} else {
 						value = $( element ).val();
+
+						// For <select multiple> with nothing selected, jQuery returns null...
+						// convert that to an empty array so that $.each() won't explode later
+						if ( value === null ) {
+							value = [];
+						}
 					}
 
 					data[element.id] = value;
@@ -1334,7 +1340,8 @@
 					afchSubmission.getSubmitter().done( function ( submitter ) {
 						AFCH.actions.notifyUser( submitter, {
 							message: AFCH.msg.get( 'accepted-submission',
-								{ '$1': newPage, '$2': data.newAssessment } )
+								{ '$1': newPage, '$2': data.newAssessment } ),
+							summary: 'Notification: Your [[Wikipedia:Articles for creation|Articles for creation]] submission has been accepted'
 						} );
 					} );
 				}
