@@ -264,7 +264,7 @@
 					value.indexOf( '=' ) === -1 &&
 					// Parameter 2 will be the first positional parameter,
 					// since 1 is always going to be the submission status.
-					key === '2' || paramKeys[index-1] == +key-1 )
+					key === '2' || paramKeys[ index - 1 ] == +key - 1 )
 				{
 					tout += '|' + value;
 				} else {
@@ -290,7 +290,6 @@
 
 		return output.join( '\n' );
 	};
-
 
 	/**
 	 * Checks if submission is G13 eligible
@@ -428,7 +427,6 @@
 		return deferred;
 	};
 
-
 	/**
 	 * Represents text of an AfC submission
 	 * @param {[type]} text [description]
@@ -562,7 +560,6 @@
 			$( this ).fadeOut();
 			createAFCHInstance();
 		} );
-
 
 	function createAFCHInstance () {
 		/**
@@ -1523,7 +1520,7 @@
 						'$1': AFCH.consts.pagename,
 						'$2': declineReason === 'cv' ? 'yes' : 'no'
 					} ),
-					summary: "Notification: Your [[" + AFCH.consts.pagename + "|Articles for Creation submission]] has been declined"
+					summary: 'Notification: Your [[' + AFCH.consts.pagename + '|Articles for Creation submission]] has been declined'
 				} );
 			} );
 		}
@@ -1560,7 +1557,7 @@
 				AFCH.actions.notifyUser( submitter, {
 					message: AFCH.msg.get( 'comment-on-submission',
 						{ '$1': AFCH.consts.pagename } ),
-					summary: "Notification: I've commented on [[" + AFCH.consts.pagename + "|your Articles for Creation submission]]"
+					summary: 'Notification: I\'ve commented on [[' + AFCH.consts.pagename + '|your Articles for Creation submission]]'
 				} );
 			} );
 		}
