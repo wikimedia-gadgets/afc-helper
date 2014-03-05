@@ -41,6 +41,9 @@
 
 			// Add more constants
 			$.extend( AFCH.consts, {
+				// If true, the script will NOT modify actual wiki content and
+				// will instead mock all such API requests (success assumed)
+				mockItUp: false,
 				// Edit token used in api requests
 				editToken: mw.user.tokens.get( 'editToken' ),
 				// Full page name, "Wikipedia talk:Articles for creation/sandbox"
@@ -363,6 +366,12 @@
 					request[options.mode] = options.contents;
 				}
 
+				if ( AFCH.consts.mockItUp ) {
+					AFCH.log( request );
+					deferred.resolve();
+					return deferred;
+				}
+
 				AFCH.api.post( request )
 					.done( function ( data ) {
 						if ( data && data.edit && data.edit.result && data.edit.result === 'Success' ) {
@@ -421,6 +430,12 @@
 					reason: reason + AFCH.prefs.summaryAd,
 					token: AFCH.consts.editToken // Move token === edit token
 				}, additionalParameters );
+
+				if ( AFCH.consts.mockItUp ) {
+					AFCH.log( request );
+					deferred.resolve( { to: newTitle } );
+					return deferred;
+				}
 
 				AFCH.api.post( request )
 					.done( function ( data ) {
