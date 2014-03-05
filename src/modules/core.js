@@ -3,12 +3,17 @@
 	$.extend( AFCH, {
 
 		/**
-		 * Log a string to the console
-		 * @param {string} text
+		 * Log something to the console
+		 * @param {string|object} thing
 		 */
-		log: function ( text ) {
-			if ( AFCH.consts.beta ) {
-				mw.log( 'AFCH: ' + text );
+		log: function ( thing ) {
+			if ( AFCH.consts.beta && console && console.log ) {
+
+				if ( typeof thing === 'object' ) {
+					thing = JSON.stringify( thing );
+				}
+
+				console.log( 'AFCH: ' + thing );
 			}
 		},
 
