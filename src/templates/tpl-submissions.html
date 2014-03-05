@@ -74,6 +74,15 @@
 		</div>
 		{{/hasWikiProjects}}
 
+		<div id="categoryWrapper">
+			<label for="newCategories" class="afch-label">Add categories</label>
+			<select id="newCategories" class="afch-input" multiple>
+				{{#categories}}
+				<option value="{{.}}" selected>{{.}}</option>
+				{{/categories}}
+			</select>
+		</div>
+
 		<div id="isBiographyWrapper">
 			<label for="isBiography" class="afch-label">Is the article a biography?</label>
 			<input type="checkbox" id="isBiography" class="afch-input"/>

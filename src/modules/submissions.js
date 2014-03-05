@@ -519,6 +519,39 @@
 		return this.prepend( newCode + '\n\n' );
 	};
 
+	AFCH.Text.prototype.updateCategories = function ( categories ) {
+		var catIndex, match,
+			text = this.text,
+			categoryRegex = /\[\[:?Category:.*?\s*\]\]/gi,
+			newCategoryCode = '\n';
+
+		// Create the wikicode block
+		$.each( categories, function ( _, category ) {
+			newCategoryCode += '\n[[Category:' + category + ']]';
+		} );
+
+		match = categoryRegex.exec( text );
+
+		// If there are no categories currently on the page,
+		// just add the categories at the bottom
+		if ( !match ) {
+			text += newCategoryCode;
+		// If there are categories on the page, remove them all, and
+		// then add the new categories where the last category used to be
+		} else {
+			while ( match ) {
+				catIndex = match.index;
+				text = text.replace( match[0], '' );
+				match = categoryRegex.exec( text );
+			}
+
+			text = text.substring( 0, catIndex ) + newCategoryCode + text.substring( catIndex );
+		}
+
+		this.text = text;
+		return this.text;
+	};
+
 	// This creates the link in the header which allows users to launch afch.
 	// When launched, the link fades away, like a unicorn.
 	$afchLaunchLink = $( '<span>' )
@@ -1000,12 +1033,13 @@
 			return deferred;
 		}
 
-		$.when( loadWikiProjectList() ).then( function ( wikiProjects ) {
+		$.when( afchPage.getText( true ), loadWikiProjectList() ).then( function ( pageText, wikiProjects ) {
 
 			loadView( 'accept', {
 				newTitle: afchSubmission.shortTitle,
 				hasWikiProjects: !!wikiProjects.length,
-				wikiProjects: wikiProjects
+				wikiProjects: wikiProjects,
+				categories: AFCH.parseCategories( pageText, /* includeCategoryLinks */ true )
 			}, function () {
 				$( '#newAssessment' ).chosen( {
 					allow_single_deselect: true,
@@ -1015,9 +1049,73 @@
 				} );
 
 				$( '#newWikiProjects' ).chosen( {
-					allow_single_deselect: true,
 					no_results_text: 'Whoops, no WikiProjects could be found that matched your search!',
-					placeholder_text_multiple: 'Start typing to filter WikiProjects...'
+					placeholder_text_multiple: 'Start typing to filter WikiProjects...',
+					width: '350px'
+				} );
+
+				$( '#newCategories' ).chosen( {
+					no_results_text: 'Looking for matching categories...',
+					placeholder_text_multiple: 'Start typing to add categories...',
+					width: '350px'
+				} );
+
+				// Offer dynamic category suggestions!
+				// Since jquery.chosen doesn't natively support dynamic results,
+				// we sneakily inject some dynamic suggestions instead. Consider
+				// switching to something like Select2 to avoid this hackery...
+				$( '#newCategories_chzn input' ).keyup( function ( e ) {
+					var $input = $( this ),
+						prefix = $input.val(),
+						$categories = $( '#newCategories' );
+
+					// Ignore up/down keys to allow users to navigate through the suggestions,
+					// and don't show results when an empty string is provided
+					if ( [ 38, 40 ].indexOf( e.which ) !== -1 || !prefix ) {
+						return;
+					}
+
+					// First we remove leftovers from previous suggestions
+					$categories.children().not( ':selected' ).remove();
+					$categories.trigger( 'liszt:updated' );
+					$input.val( prefix );
+
+					AFCH.api.getCategoriesByPrefix( prefix ).done( function ( categories ) {
+						var currentCategories = [];
+
+						// If the input has changed since we started searching,
+						// don't show outdated results
+						if ( $input.val() !== prefix ) {
+							return;
+						}
+
+						// Make a list of all of the current categories
+						$categories.find( 'option' ).each( function () {
+							currentCategories.push( this.value );
+						} );
+
+						$.each( categories, function ( _, category ) {
+							// If the category has already been added, don't offer it as an option
+							if ( currentCategories.indexOf( category ) !== -1 ) {
+								return;
+							}
+
+							$( '<option>' )
+								.attr( 'value', category )
+								.text( category )
+								.appendTo( $categories );
+						} );
+
+						// Make chosen update suggestions
+						$categories.trigger( 'liszt:updated' );
+						$input.val( prefix );
+
+						// If we couldn't find any matching categories, apologize
+						if ( !categories.length ) {
+							$( '#newCategories_chzn li.no-results' ).text( 'No matching categories found.' );
+						}
+
+					} );
 				} );
 
 				// Show bio options if Biography option checked
@@ -1272,8 +1370,11 @@
 				// ARTICLE
 				// -------
 
-				// Clean the page
 				newText.removeAfcTemplates();
+
+				newText.updateCategories( data.newCategories );
+
+				// Clean the page
 				newText.cleanUp( /* isAccept */ true );
 
 				// Add biography details

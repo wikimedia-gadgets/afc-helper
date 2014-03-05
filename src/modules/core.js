@@ -77,7 +77,7 @@
 				// Load css
 				mw.loader.load( AFCH.consts.scriptpath + '?action=raw&ctype=text/css&title=MediaWiki:Gadget-afch.css', 'text/css' );
 				// Load dependencies
-				mw.loader.load( [ 'mediawiki.feedback', 'mediawiki.api', 'jquery.chosen', 'jquery.spinner' ] );
+				mw.loader.load( [ 'mediawiki.feedback', 'mediawiki.api', 'mediawiki.api.category', 'jquery.chosen', 'jquery.spinner' ] );
 			}
 
 			// And finally load the subscript
@@ -715,6 +715,26 @@
 			} );
 
 			return deferred;
+		},
+
+		/**
+		 * Gets the categories from a string of text
+		 * @param {string} text
+		 * @param {bool} includeCategoryLinks if true, will also include links to categories (e.g. [[:Category:Foo]])
+		 * @return {array}
+		 */
+		parseCategories: function ( text, includeCategoryLinks ) {
+			var catRegex = new RegExp( '\\[\\[' + ( includeCategoryLinks ? ':?' : '' ) + 'Category:(.*?)\\s*\\]\\]', 'gi' ),
+				match = catRegex.exec( text ),
+				categories = [];
+
+			while ( match ) {
+				// Name of each category, with first letter capitalized
+				categories.push( match[1].charAt(0).toUpperCase() + match[1].substring(1) );
+				match = catRegex.exec( text );
+			}
+
+			return categories;
 		},
 
 		/**
