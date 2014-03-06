@@ -667,8 +667,20 @@
 				decline: submission.isCurrentlySubmitted,
 				comment: true, // Comments are always okay!
 				submit: !submission.isCurrentlySubmitted,
+				alreadyUnderReview: submission.isUnderReview,
 				version: AFCH.consts.version,
 				versionName: AFCH.consts.versionName
+			} );
+
+			// Set up the extra options slide-out panel, which appears
+			// when the user hovers over the chevron
+			$( '#afchExtra' ).hover( function () {
+				$( this ).stop().animate( { width: '200px' }, 150, 'swing', function () {
+					$( '#afchExtra a' ).css( 'display', 'block' );
+				} );
+			}, function () {
+				$( this ).find( 'a' ).css( 'display', 'none' );
+				$( this ).stop().animate( { width: '11px' }, 100, 'swing' );
 			} );
 
 			// Add the feedback link to the left panel
@@ -680,6 +692,8 @@
 			$( '#afchComment' ).click( function () { spinnerAndRun( showCommentOptions ); } );
 			$( '#afchSubmit' ).click( function () { spinnerAndRun( showSubmitOptions ); } );
 			$( '#afchG13' ).click( function () { spinnerAndRun( showG13Options ); } );
+			$( '#afchClean' ).click( function () { handleCleanup(); } );
+			$( '#afchMark' ).click( function () { handleMark( /* unmark */ submission.isUnderReview ); } );
 
 			// Load warnings about the page, then slide them in
 			getSubmissionWarnings().done( function ( warnings ) {
@@ -873,19 +887,38 @@
 	/**
 	 * Clear the viewer, set up the status log, and
 	 * then update the button text
+	 * @param {string} actionTitle optional, if there is no content available and the
+	 *                             script has to load a new view, this will be its title
+	 * @param {string} actionClass optional, if there is no content available and the
+	 *                             script has to load a new view, this will be the class
+	 *                             applied to it
 	 */
-	function prepareForProcessing () {
-		var submitBtn = $( '#afchSubmitForm' );
+	function prepareForProcessing ( actionTitle, actionClass ) {
+		var $content = $( '#afchContent' ),
+			$submitBtn = $content.find( '#afchSubmitForm' );
+
+		// If we can't find a submit button or a content area, load
+		// a new temporary "processing" stage instead
+		if ( !( $submitBtn.length || $content.length ) ) {
+			loadView( 'quick-action-processing', {
+				actionTitle: actionTitle || 'Processing',
+				actionClass: actionClass || 'other-action'
+			} );
+
+			// Now update the variables
+			$content = $( '#afchContent' );
+			$submitBtn = $content.find( '#afchSubmitForm' );
+		}
 
 		// Empty the content area except for the button...
-		$( '#afchContent' ).contents().not( submitBtn ).remove();
+		$content.contents().not( $submitBtn ).remove();
 
 		// ...and set up the status log in its place
 		AFCH.status.init( '#afchContent' );
 
 		// Update the button show the `running` text
-		submitBtn
-			.text( submitBtn.data( 'running' ) )
+		$submitBtn
+			.text( $submitBtn.data( 'running' ) )
 			.removeClass( 'gradient-button' )
 			.addClass( 'disabled-button' )
 			.off( 'click' );
@@ -893,7 +926,7 @@
 		// And finally, make it so when all AJAX requests are
 		// complete, the done text and a reload link will be shown
 		$( document ).ajaxStop( function () {
-			submitBtn.text( 'Done' )
+			$submitBtn.text( 'Done' )
 				.append( $( '<a>' )
 					.addClass( 'reload-link' )
 					.attr( 'href', mw.util.getUrl() )
@@ -1597,6 +1630,48 @@
 
 		} );
 
+	}
+
+	function handleCleanup () {
+		prepareForProcessing( 'Cleaning' );
+
+		afchPage.getText( true ).done( function ( rawText ) {
+			var text = new AFCH.Text( rawText );
+
+			text.cleanUp();
+
+			afchPage.edit( {
+				contents: text.get(),
+				summary: 'Cleaning up submission'
+			} );
+		} );
+	}
+
+	function handleMark ( unmark ) {
+		var actionText = ( unmark ? 'Unmarking' : 'Marking' );
+
+		prepareForProcessing( actionText, 'mark' );
+
+		afchPage.getText( true ).done( function ( rawText ) {
+			var text = new AFCH.Text( rawText );
+
+			if ( unmark ) {
+				afchSubmission.setStatus( '', { reviewer: false, reviewerts: false } );
+			} else {
+				afchSubmission.setStatus( 'r', {
+					reviewer: AFCH.consts.user,
+					reviewerts: '{{subst:REVISIONTIMESTAMP}}'
+				} );
+			}
+
+			text.updateAfcTemplates( afchSubmission.makeWikicode() );
+			text.cleanUp();
+
+			afchPage.edit( {
+				contents: text.get(),
+				summary: actionText + ' submission as under review'
+			} );
+		} );
 	}
 
 	function handleG13 ( data ) {

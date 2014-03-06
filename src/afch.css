@@ -278,6 +278,32 @@ div.afch-code-wrapper > pre {
 	display: table-cell;
 }
 
+#afchExtra {
+	width: 11px;
+	background-color: white;
+	position: relative;
+}
+
+#afchExtra:before {
+	content: '〈';
+	position: absolute;
+	left: -8px;
+	top: 18px;
+}
+
+#afchExtra a {
+	padding-left: 18px;
+	text-align: left;
+	display: none;
+	font-size: 0.7em;
+	cursor: pointer;
+	color: black;
+}
+
+#afchExtra a:hover {
+	text-decoration: underline;
+}
+
 /* ACCEPT */
 
 .accept {
@@ -366,4 +392,18 @@ select#lifeStatus.afch-input {
 .submit {
 	background-color: #0074D9; /* blue */
 	border-color: #0074D9;
+}
+
+/* MARK/UNMARK AS UNDER REVIEW */
+
+.mark {
+	background-color: #0074D9; /* blue */
+	border-color: #0074D9;
+}
+
+/* OTHER */
+
+.other-action {
+	background-color: #FFDC00; /* yellow */
+	border-color: #FFDC00;
 }
