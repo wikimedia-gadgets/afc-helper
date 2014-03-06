@@ -226,8 +226,11 @@
 			// can scrap this. Until then, though, we can only dream...
 
 			// Make an array of the parameters
-			$.each( template.params, function ( key ) {
-				paramKeys.push( key );
+			$.each( template.params, function ( key, value ) {
+				// Parameters set to false are ignored
+				if ( value !== false ) {
+					paramKeys.push( key );
+				}
 			} );
 
 			paramKeys.sort( function ( a, b ) {
@@ -692,7 +695,7 @@
 
 			// Get G13 eligibility and when known, display the button...
 			// but don't hold up the rest of the loading to do so
-			afchSubmission.isG13Eligible().done( function ( eligible ) {
+			submission.isG13Eligible().done( function ( eligible ) {
 				$( '#afchG13' ).toggleClass( 'hidden', !eligible );
 			} );
 
