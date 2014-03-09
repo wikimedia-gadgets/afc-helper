@@ -458,25 +458,83 @@
 	};
 
 	AFCH.Text.prototype.cleanUp = function ( isAccept ) {
-		var text = this.text;
+		var text = this.text,
+			commentRegex,
+			commentsToRemove = [
+				'Please don\'t change anything and press save',
+				'After listing your sources please cite them using inline citations and place them after the information they cite. ' +
+					'Please see http://en.wikipedia.org/wiki/Wikipedia:REFB for instructions on how to add citations.',
+				'Just press the "Save page" button below without changing anything! Doing so will submit your article submission for review. ' +
+					'Once you have saved this page you will find a new yellow \'Review waiting\' box at the bottom of your submission page. ' +
+					'If you have submitted your page previously, the old pink \'Submission declined\' template or the old grey \'Draft\' template ' +
+					'will still appear at the top of your submission page, but you should ignore them. Again, please don\'t change anything ' +
+					'in this text box. Just press the \"Save page\" button below.',
+			];
 
 		if ( isAccept ) {
-
 			// Uncomment cats and templates
 			text = text.replace( /\[\[:Category:/gi, '[[Category:' );
 			text = text.replace( /\{\{(tl|tlx|tlg)\|(.*?)\}\}/ig, '{{$2}}');
 
+			// Add to the list of comments to remove
+			$.merge( commentsToRemove, [
+				'Carry on from here, and delete this comment.',
+				'Enter template purpose and instructions here.',
+				'Enter the content and\\/or code of the template here.',
+				'EDIT BELOW THIS LINE',
+				'Please leave this line alone!',
+				'Important, do not remove this line before (template|article) has been created.'
+			] );
 		} else {
-
-			// Comment out cats
+			// If not yet accepted, comment out cats
 			text = text.replace( /\[\[Category:/gi, '[[:Category:' );
-
 		}
+
+		// Assemble a master regexp and remove all now-unneeded comments (commentsToRemove)
+		commentRegex = new RegExp( '<!-{2,}\\s*(' + commentsToRemove.join( '|' ) + ')\\s*-{2,}>', 'gi' );
+		text = text.replace( commentRegex, '' );
 
 		// Remove html comments (<!--) that surround categories
 		text = text.replace( /<!--\s*((\[\[:{0,1}(Category:.*?)\]\]\s*)+)-->/gi, '$1');
 
-		// FIXME: Remove wizardy things
+		// Remove spaces/commas between <ref> tags
+		text = text.replace( /\s*(<\/\s*ref\s*\>)\s*[,]*\s*(<\s*ref\s*(name\s*=|group\s*=)*\s*[^\/]*>)[ \t]*$/gim, '$1$2' );
+
+		// Remove whitespace before <ref> tags
+		text = text.replace( /\s*(<\s*ref\s*(name\s*=|group\s*=)*\s*.*[^\/]+>)[ \t]*$/gim, '$1' );
+
+		// Move punctuation before <ref> tags
+		text = text.replace( /\s*((<\s*ref\s*(name\s*=|group\s*=)*\s*.*[\/]{1}>)|(<\s*ref\s*(name\s*=|group\s*=)*\s*[^\/]*>(?:<[^<\>]*\>|[^><])*<\/\s*ref\s*\>))[ \t]*([.!?,;:])+$/gim, '$6$1' );
+
+		// Replace {{http://example.com/foo}} with "* http://example.com/foo" (common newbie error)
+		text = text.replace( /\n\{\{(http[s]?|ftp[s]?|irc|gopher|telnet)\:\/\/(.*?)\}\}/gi, '\n* $1://$3' );
+
+		// Convert http://-style links to other wikipages to wikicode syntax
+		// FIXME: Break this out into its own core function? Will it be used elsewhere?
+		function convertExternalLinksToWikilinks ( text ) {
+			var linkRegex = /\[{1,2}(?:https?:)?\/\/(?:en.wikipedia.org\/wiki|enwp.org)\/([^\s\|\]\[]+)(?:\s|\|)?((?:\[\[[^\[\]]*\]\]|[^\]\[])*)\]{1,2}/ig,
+				linkMatch = linkRegex.exec( text ),
+				title, displayTitle, newLink;
+
+			while ( linkMatch ) {
+				title = decodeURI( linkMatch[1] ).replace( /_/g, ' ' );
+				displayTitle = decodeURI( linkMatch[2] ).replace( /_/g, ' ' );
+
+				// Don't include the displayTitle if it is equal to the title
+				if ( title !== displayTitle ) {
+					newLink = '[[' + title + '|' + displayTitle + ']]';
+				} else {
+					newLink = '[[' + title + ']]';
+				}
+
+				text = text.replace( linkMatch[0], newLink );
+				linkMatch = linkRegex.exec( text );
+			}
+
+			return text;
+		}
+
+		text = convertExternalLinksToWikilinks( text );
 
 		this.text = text;
 		this.removeExcessNewlines();
