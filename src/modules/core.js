@@ -858,14 +858,14 @@
 
 		/**
 		 * Returns the relative time that has elapsed between an oldDate and a nowDate
-		 * @param {Date|string} oldDate (if it is a string it will be assumed to be a
-		 *                               MediaWiki timestamp and converted to a Date first)
-		 * @param {Date} nowDate optional, defaults to `new Date()`
+		 * @param {Date|string} old (if it is a string it will be assumed to be a
+		 *                           MediaWiki timestamp and converted to a Date first)
+		 * @param {Date} now optional, defaults to `new Date()`
 		 * @return {string}
 		 */
-		relativeTimeSince: function ( oldDate, nowDate ) {
-			var oldDate = typeof oldDate === 'object' ? oldDate : AFCH.mwTimestampToDate( oldDate ),
-				nowDate = typeof nowDate === 'object' ? nowDate : new Date(),
+		relativeTimeSince: function ( old, now ) {
+			var oldDate = typeof old === 'object' ? old : AFCH.mwTimestampToDate( old ),
+				nowDate = typeof now === 'object' ? now : new Date(),
 				msPerMinute = 60 * 1000,
 				msPerHour = msPerMinute * 60,
 				msPerDay = msPerHour * 24,
@@ -999,7 +999,7 @@
 			}
 
 			// If invalid, return false
-			if ( date.getUTCMilliseconds() === NaN ) {
+			if ( isNaN( date.getUTCMilliseconds() ) ) {
 				return false;
 			}
 
