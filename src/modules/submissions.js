@@ -782,18 +782,27 @@
 		var deferred = $.Deferred(),
 			warnings = [];
 
+		/**
+		 * Adds a warning
+		 * @param {string} message
+		 * @param {string|bool} actionMessage set to false to hide action link
+		 * @param {function|string} onAction function to call of success, or URL to browse to
+		 */
 		function addWarning ( message, actionMessage, onAction ) {
-			var $warning = $( '<div>' )
+			var $action, $warning = $( '<div>' )
 					.addClass( 'afch-warning' )
-					.text( message ),
+					.text( message );
+
+			if ( actionMessage !== false ) {
 				$action = $( '<a>' )
 					.text( actionMessage || 'Edit page' )
 					.appendTo( $warning );
 
-			if ( typeof onAction === 'function' ) {
-				$action.click( onAction );
-			} else {
-				$action.attr( 'href', onAction || mw.util.getUrl( AFCH.consts.pagename, { action: 'edit' } ) );
+				if ( typeof onAction === 'function' ) {
+					$action.click( onAction );
+				} else {
+					$action.attr( 'href', onAction || mw.util.getUrl( AFCH.consts.pagename, { action: 'edit' } ) );
+				}
 			}
 
 			warnings.push( $warning );
@@ -890,7 +899,7 @@
 						$.each( rawDeletions, function ( _, deletion ) {
 							deletions.push( {
 								timestamp: deletion.timestamp,
-								relativeTimestamp: AFCH.relativeTimeSince( new Date( deletion.timestamp ) ),
+								relativeTimestamp: AFCH.relativeTimeSince( deletion.timestamp ),
 								deletor: deletion.user,
 								deletorLink: mw.util.getUrl( 'User:' + deletion.user ),
 								reason: AFCH.convertWikilinksToHTML( deletion.comment )
@@ -914,10 +923,17 @@
 			return deferred;
 		}
 
-		// FIXME: Implement warning when submission is already under review
+		function checkReviewState () {
+			if ( afchSubmission.isUnderReview ) {
+				addWarning( afchSubmission.params.reviewer + ( afchSubmission.params.reviewerts ?
+					' began reviewing this submission ' + AFCH.relativeTimeSince( afchSubmission.params.reviewerts ) :
+					' already began to review this submission.' ) + '.', false );
+			}
+		}
+
 		// FIXME: Implement long HTML comment checker
 
-		$.when( checkReferences(), checkDeletionLog() ).then( function () {
+		$.when( checkReferences(), checkDeletionLog(), checkReviewState() ).then( function () {
 			deferred.resolve( warnings );
 		} );
 

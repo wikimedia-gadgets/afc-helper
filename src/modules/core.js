@@ -858,17 +858,20 @@
 
 		/**
 		 * Returns the relative time that has elapsed between an oldDate and a nowDate
-		 * @param {Date} oldDate
+		 * @param {Date|string} oldDate (if it is a string it will be assumed to be a
+		 *                               MediaWiki timestamp and converted to a Date first)
 		 * @param {Date} nowDate optional, defaults to `new Date()`
 		 * @return {string}
 		 */
 		relativeTimeSince: function ( oldDate, nowDate ) {
-			var msPerMinute = 60 * 1000,
+			var oldDate = typeof oldDate === 'object' ? oldDate : AFCH.mwTimestampToDate( oldDate ),
+				nowDate = typeof nowDate === 'object' ? nowDate : new Date(),
+				msPerMinute = 60 * 1000,
 				msPerHour = msPerMinute * 60,
 				msPerDay = msPerHour * 24,
 				msPerMonth = msPerDay * 30,
 				msPerYear = msPerDay * 365,
-				elapsed = ( nowDate || new Date() ) - oldDate,
+				elapsed = nowDate - oldDate,
 				amount, unit;
 
 			if ( elapsed < msPerMinute ) {
@@ -975,6 +978,32 @@
 				( '0' + date.getUTCHours() ).slice( -2 ) +
 				( '0' + date.getUTCMinutes() ).slice( -2 ) +
 				( '0' + date.getUTCSeconds() ).slice( -2 ) );
+		},
+
+		/**
+		 * Parses a MediaWiki internal YYYYMMDDHHMMSS timestamp
+		 * @param {string} string
+		 * @return {Date|bool} if unable to parse, returns false
+		 */
+		mwTimestampToDate: function ( string ) {
+			var date, dateMatches = /(\d{4})(\d\d)(\d\d)(\d\d)(\d\d)(\d\d)/.exec( string );
+
+			// If it *isn't* actually a MediaWiki-style timestamp, pass directly to date
+			if ( dateMatches === null ) {
+				date = new Date( string );
+			// Otherwise use Date.UTC to assemble a date object using UTC time
+			} else {
+				date = new Date( Date.UTC(
+					dateMatches[1], dateMatches[2] - 1, dateMatches[3], dateMatches[4], dateMatches[5], dateMatches[6]
+				) );
+			}
+
+			// If invalid, return false
+			if ( date.getUTCMilliseconds() === NaN ) {
+				return false;
+			}
+
+			return date;
 		}
 	} );
 
