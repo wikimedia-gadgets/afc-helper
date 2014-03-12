@@ -681,7 +681,7 @@
 						.append(
 							$( '<div>' )
 								.attr( 'id', 'afchInitialHeader' )
-								.text( 'AFCH v' + AFCH.consts.version + ' / ' + AFCH.consts.versionName )
+								.text( 'Loading AFCH v' + AFCH.consts.version + ' / ' + AFCH.consts.versionName + '...' )
 						)
 				);
 
@@ -765,11 +765,12 @@
 				}
 			} );
 
+			// FIXME: Uncomment when G13 tagging functionality is created
 			// Get G13 eligibility and when known, display the button...
 			// but don't hold up the rest of the loading to do so
-			submission.isG13Eligible().done( function ( eligible ) {
-				$( '#afchG13' ).toggleClass( 'hidden', !eligible );
-			} );
+			//submission.isG13Eligible().done( function ( eligible ) {
+			//	$( '#afchG13' ).toggleClass( 'hidden', !eligible );
+			//} );
 
 		} );
 	}
