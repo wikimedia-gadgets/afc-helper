@@ -5,8 +5,8 @@
 	if ( pageName.indexOf( 'Wikipedia:Articles_for_creation/' ) !== -1 ||
 		pageName.indexOf( 'Wikipedia_talk:Articles_for_creation/' ) !== -1 ||
 		pageName.indexOf( 'User:' ) !== -1 ||
-		pageName.indexOf( 'Draft:' ) !== -1 )
-	{
+		pageName.indexOf( 'Draft:' ) !== -1
+	) {
 		type = 'submissions';
 	} else if ( pageName.indexOf( 'Wikipedia:Articles_for_creation/Redirects' ) !== -1 ) {
 		type = 'redirects';
