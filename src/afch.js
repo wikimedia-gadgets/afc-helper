@@ -22,8 +22,8 @@
 		AFCH.consts = {};
 
 		// Master version data
-		AFCH.consts.version = 0.2;
-		AFCH.consts.versionName = 'Egalitarian Elephant';
+		AFCH.consts.version = 0.3;
+		AFCH.consts.versionName = 'Excited Murmur';
 
 		// FIXME: Change when moving into production
 		AFCH.consts.beta = true;

@@ -1,7 +1,7 @@
 afch-rewrite [![Build Status](https://travis-ci.org/WPAFC/afch-rewrite.png)](https://travis-ci.org/WPAFC/afch-rewrite)
 ============
 
-**v0.2 Egalitarian Elephant**
+**v0.3 Excited Murmur**
 
 A tool for reviewing Articles for Creation submissions on the English Wikipedia, rewritten using clear, object-oriented JavaScript with a focus on killing bloat while adding value.
 
@@ -23,8 +23,9 @@ If you'd like to contribute directly to the code, that's great too! In order to 
 
 ### Version history
 
-* 0.2 Egalitarian Elephant
-* 0.1 Exploding Fireball
+* 0.3 Excited Murmur (12 March 2014)
+* 0.2 Egalitarian Elephant (27 February 2014)
+* 0.1 Exploding Fireball (4 January 2014)
 
 ### License
 
