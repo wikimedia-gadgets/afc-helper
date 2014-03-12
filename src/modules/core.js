@@ -128,6 +128,7 @@
 
 				if ( usecache && pg.pageText ) {
 					deferred.resolve( pg.pageText );
+					return deferred;
 				}
 
 				AFCH.actions.getPageText( this.rawTitle, { hide: true, moreProps: 'timestamp|user' } )
