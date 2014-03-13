@@ -556,8 +556,8 @@
 		// example "{{hi|}}}" -- note the extra bracket). Ideally Parsoid
 		// would just return the raw template text as well (currently
 		// working on a patch for that, actually).
-		this.text = this.text.replace( /\{\{afc submission(?:[^{{}}]*|({{.*?}}*))*\}\}/gi, '' );
-		this.text = this.text.replace( /\{\{\s*afc comment(?:\{\{[^\{\}]*\}\}|[^\}\{])*\}\}/gi, '' );
+		this.text = this.text.replace( /\{\{\s*afc submission\s*\|(?:[^{{}}]*|{{.*?}})*?\}\}/gi, '' );
+		this.text = this.text.replace( /\{\{\s*afc comment\s*\|(?:[^{{}}]*|{{.*?}})*?\}\}/gi, '' );
 
 		// Remove horizontal rules that were added by AFCH after the comments
 		this.text = this.text.replace( /^----+$/gm, '' );
@@ -1712,6 +1712,10 @@
 
 		afchPage.getText( true ).done( function ( rawText ) {
 			var text = new AFCH.Text( rawText );
+
+			// Even though we didn't modify them, still update the templates,
+			// because the order may have changed/been corrected
+			text.updateAfcTemplates( afchSubmission.makeWikicode() );
 
 			text.cleanUp();
 
