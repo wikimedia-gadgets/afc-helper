@@ -28,7 +28,7 @@
 				return false;
 			}
 
-			if ( AFCH.consts.baseurl.indexOf( 'MediaWiki:Gadget-afch.js' ) === -1 ) {
+			if ( AFCH.consts.baseurl.indexOf( 'MediaWiki:' + 'Gadget-afch.js' ) === -1 ) {
 				AFCH.consts.beta = true;
 			}
 
