@@ -95,7 +95,7 @@
 		 */
 		initFeedback: function ( $element, type ) {
 			var feedback = new mw.Feedback( {
-					title: new mw.Title( 'Wikipedia talk:WikiProject Articles for creation/Helper script/Feedback' ),
+					title: new mw.Title( 'Wikipedia talk:WikiProject Articles for creation/Helper script/Rewrite' ),
 					bugsLink: 'https://github.com/WPAFC/afch-rewrite/issues/new',
 					bugsListLink: 'https://github.com/WPAFC/afch-rewrite/issues?state=open'
 				} );
