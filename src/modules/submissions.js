@@ -89,7 +89,7 @@
 			if ( name  === 'afc submission' ) {
 				submissionTemplates.push( {
 					status: AFCH.getAndDelete( template.params, '1').toLowerCase(),
-					timestamp: +AFCH.getAndDelete( template.params, 'ts' ),
+					timestamp: AFCH.getAndDelete( template.params, 'ts' ),
 					params: template.params
 				} );
 			} else if ( name === 'afc comment' ) {
@@ -125,7 +125,7 @@
 			}
 
 			// Otherwise just sort normally
-			return b.timestamp - a.timestamp;
+			return +b.timestamp - +a.timestamp;
 		}
 
 		// Sort templates by timestamp; most recent are first
@@ -394,13 +394,13 @@
 		var commentText = $.trim( text );
 
 		if ( commentText.indexOf( '~~~~' ) === -1 ) {
-			commentText += ' ~~~~~';
+			commentText += ' ~~~~';
 		}
 
 		this.comments.unshift( {
 			// Unicorns are explained in loadDataFromTemplates()
-			timestamp: AFCH.parseForTimestamp( text, /* mwstyle */ true ) || 'unicorns',
-			text: text
+			timestamp: AFCH.parseForTimestamp( commentText, /* mwstyle */ true ) || 'unicorns',
+			text: commentText
 		} );
 
 		// Reparse :P
