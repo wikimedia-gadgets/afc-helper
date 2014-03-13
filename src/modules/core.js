@@ -672,10 +672,11 @@
 		/**
 		 * Use Parsoid web api to parse the given wikitext
 		 * @param {string} text Text to parse
+		 * @param {string} pageName page name for context
 		 * @param {bool} show display the request in the status list
 		 * @return {$.Deferred} Resolves with a list of parsed templates
 		 */
-		parseTemplates: function ( text, show ) {
+		parseTemplates: function ( text, pageName, show ) {
 			var deferred = $.Deferred(),
 				status = show ? new AFCH.status.Element( 'Parsing templates using Parsoid...' ) : AFCH.consts.nullstatus;
 
@@ -686,11 +687,11 @@
 				from: 'wikitext',
 				to: 'html',
 				content: text,
-				title: 'Main Page' // Teehee
+				title: pageName || 'Main Page' // Teehee
 			} ).done( function ( data ) {
 				// Use the Parsoid data-mw attributes to gather a bunch of data about
 				// the templates on the page, denoted by mw:Transclusion
-				var rawTemplates = $( data['flow-parsoid-utils'].content ).find( '[typeof="mw:Transclusion"]' ),
+				var rawTemplates = $( data['flow-parsoid-utils'].content ).find( '[typeof*="mw:Transclusion"]' ),
 					templates = [];
 
 				rawTemplates.each( function ( _, t ) {

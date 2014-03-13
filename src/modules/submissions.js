@@ -64,7 +64,7 @@
 		this.page.getText().done( function ( text ) {
 
 			// Then get all templates and parse them
-			AFCH.parseTemplates( text ).done( function ( templates ) {
+			AFCH.parseTemplates( text, sub.page.rawTitle ).done( function ( templates ) {
 				sub.loadDataFromTemplates( templates );
 				sub.sortAndParseInternalData();
 				deferred.resolve( sub );
