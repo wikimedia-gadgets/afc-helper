@@ -53,7 +53,9 @@
 				// Used when status is disabled
 				nullstatus: { update: function () { return; } },
 				// Current user
-				user: mw.user.id()
+				user: mw.user.id(),
+				// Wiki id/database name, e.g. "enwiki"
+				wikiId: mw.config.get( 'wgDBname' )
 			} );
 
 			return true;
@@ -672,7 +674,7 @@
 		/**
 		 * Use Parsoid web api to parse the given wikitext
 		 * @param {string} text Text to parse
-		 * @param {string} pageName page name for context
+		 * @param {string} pageName page name for context, defaults to Main Page
 		 * @param {bool} show display the request in the status list
 		 * @return {$.Deferred} Resolves with a list of parsed templates
 		 */
@@ -680,39 +682,44 @@
 			var deferred = $.Deferred(),
 				status = show ? new AFCH.status.Element( 'Parsing templates using Parsoid...' ) : AFCH.consts.nullstatus;
 
-			// Sneakily use the Parsoid API which Flow has oh-so-nicely exposed
-			// for us. Hopefully they don't, y'know, suddenly remove it.
-			AFCH.api.post( {
-				action: 'flow-parsoid-utils',
-				from: 'wikitext',
-				to: 'html',
-				content: text,
-				title: pageName || 'Main Page' // Teehee
-			} ).done( function ( data ) {
-				// Use the Parsoid data-mw attributes to gather a bunch of data about
-				// the templates on the page, denoted by mw:Transclusion
-				var rawTemplates = $( data['flow-parsoid-utils'].content ).find( '[typeof*="mw:Transclusion"]' ),
-					templates = [];
+			// If no context given, deal with it
+			if ( !pageName ) {
+				pageName = 'Main Page';
+			}
 
-				rawTemplates.each( function ( _, t ) {
-					// Get the data-mw attribute and then drill down through the JSON, whoopee!
-					var tdata = ( $( t ).data( 'mw' ) ).parts[0].template,
-						tmpl = { target: tdata.target.wt, params: {} };
+			$.post( '//parsoid-prod.wmflabs.org/' + AFCH.consts.wikiId + '/' + pageName, { wt: text, body: true } )
+				.done( function ( data ) {
+					// Use the Parsoid data-mw attributes to gather a bunch of data about the templates on the page,
+					// denoted by mw:Transclusion. We use both filter() AND find() so that we don't miss top-level
+					// elements, specifically the <meta> tag from NONEWSECTIONLINK which often contains submission
+					// data if the {{AFC submission}} template is located at the top of the page.
+					var $parsed = $( data ),
+						transclusionSelector = '[typeof*="mw:Transclusion"]',
+						rawTemplates = $parsed.filter( transclusionSelector ).add( $parsed.find( transclusionSelector ) ),
+						templates = [];
 
-					$.each( tdata.params, function ( k, v ) {
-						tmpl.params[k] = v.wt;
+					rawTemplates.each( function ( _, t ) {
+						// Get the data-mw attribute and then drill down through the JSON, whoopee!
+						var tdata = ( $( t ).data( 'mw' ) ).parts[0].template,
+							tmpl = { target: tdata.target.wt, params: {} };
+
+						$.each( tdata.params, function ( k, v ) {
+							tmpl.params[k] = v.wt;
+						} );
+
+						templates.push( tmpl );
 					} );
 
-					templates.push( tmpl );
-				} );
+					// Log template data for debugging purposes
+					AFCH.log( templates );
 
-				status.update( 'Templates parsed successfully!' );
-				deferred.resolve( templates );
-			} )
-			.fail( function ( err ) {
-				status.update( 'Error parsing templates: ' + JSON.stringify( err ) );
-				deferred.reject( err );
-			} );
+					status.update( 'Templates parsed successfully!' );
+					deferred.resolve( templates );
+				} )
+				.fail( function ( err ) {
+					status.update( 'Error parsing templates: ' + JSON.stringify( err ) );
+					deferred.reject( err );
+				} );
 
 			return deferred;
 		},
