@@ -284,19 +284,24 @@ div.afch-code-wrapper > pre {
 	background-color: white;
 }
 
-#afchExtra div {
+#afchExtra .extra-wrapper {
 	height: 100%;
+	width: 100%;
+	vertical-align: top;
 	position: relative;
+}
+
+#afchExtra .extra-open {
+	position: absolute;
+	left: -13px;
+	top: 15px;
+	height: 100%;
+}
+
+#afchExtra .extra-links {
 	text-align: left;
 	padding-top: 5px;
 	padding-left: 18px;
-}
-
-#afchExtra div:before {
-	content: '〈';
-	position: absolute;
-	left: -13px;
-	top: 14px;
 }
 
 #afchExtra a {
