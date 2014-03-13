@@ -51,7 +51,10 @@ header = '/* Uploaded from https://github.com/WPAFC/afch-rewrite, commit: {} ({}
 
 def uploadFile(pagename, content):
 	page = site.Pages[pagename]
+
+	# Add header and update static referencres to root directory
 	content = header + content.decode('utf-8')
+	content = content.replace('MediaWiki:Gadget-afch',root)
 
 	def stripFirstLine(text):
 		return '\n'.join(text.splitlines()[1:])
