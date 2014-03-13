@@ -21,6 +21,9 @@ If you'd like to contribute directly to the code, that's great too! In order to 
 
 **Protip for developers**: Set `AFCH.consts.mockItUp = true;` using your browser console and instead of making API requests which modify wiki content, the script will log what it *would have done* instead.
 
+### Uploading the script
+To upload the script to a wiki, use `scripts/upload.py`. Detailed instructions are included at the top of the file.
+
 ### Version history
 
 * 0.3 Excited Murmur (12 March 2014)
