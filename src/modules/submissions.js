@@ -275,8 +275,8 @@
 				}
 			} );
 
-			// Finally, add the timestamp
-			tout += '|ts=' + template.timestamp + '}}';
+			// Finally, add the timestamp and a warning about removing the template
+			tout += '|ts=' + template.timestamp + '}} <!-- Do not remove this line! -->';
 
 			output.push( tout );
 		} );
@@ -462,8 +462,9 @@
 			commentRegex,
 			commentsToRemove = [
 				'Please don\'t change anything and press save',
-				'After listing your sources please cite them using inline citations and place them after the information they cite. ' +
-					'Please see http://en.wikipedia.org/wiki/Wikipedia:REFB for instructions on how to add citations.',
+				'Carry on from here, and delete this comment.',
+				'Please leave this line alone!',
+				'Important, do not remove this line before (template|article) has been created.',
 				'Just press the "Save page" button below without changing anything! Doing so will submit your article submission for review. ' +
 					'Once you have saved this page you will find a new yellow \'Review waiting\' box at the bottom of your submission page. ' +
 					'If you have submitted your page previously, the old pink \'Submission declined\' template or the old grey \'Draft\' template ' +
@@ -478,12 +479,11 @@
 
 			// Add to the list of comments to remove
 			$.merge( commentsToRemove, [
-				'Carry on from here, and delete this comment.',
 				'Enter template purpose and instructions here.',
 				'Enter the content and\\/or code of the template here.',
 				'EDIT BELOW THIS LINE',
-				'Please leave this line alone!',
-				'Important, do not remove this line before (template|article) has been created.'
+				'After listing your sources please cite them using inline citations and place them after the information they cite. ' +
+					'Please see http://en.wikipedia.org/wiki/Wikipedia:REFB for instructions on how to add citations.',
 			] );
 		} else {
 			// If not yet accepted, comment out cats
@@ -556,7 +556,9 @@
 		// example "{{hi|}}}" -- note the extra bracket). Ideally Parsoid
 		// would just return the raw template text as well (currently
 		// working on a patch for that, actually).
-		this.text = this.text.replace( /\{\{\s*afc submission\s*\|(?:[^{{}}]*|{{.*?}})*?\}\}/gi, '' );
+		this.text = this.text.replace( new RegExp( '\\{\\{\\s*afc submission\\s*\\|(?:[^{{}}]*|{{.*?}})*?\\}\\}' +
+			// Also remove the AFCH-generated warning message, since if necessary the script will add it again
+			'( <!-- Do not remove this line! -->)?', 'gi' ), '' );
 		this.text = this.text.replace( /\{\{\s*afc comment\s*\|(?:[^{{}}]*|{{.*?}})*?\}\}/gi, '' );
 
 		// Remove horizontal rules that were added by AFCH after the comments
@@ -1495,8 +1497,8 @@
 						'\n| SHORT DESCRIPTION = ' + data.subjectDescription +
 						'\n| DATE OF BIRTH = ' + ( data.birthMonthDay ? data.birthMonthDay + ', ' : '' ) + data.birthYear +
 						'\n| PLACE OF BIRTH = ' + data.birthPlace +
-						'\n| DATE OF DEATH = ' + ( data.deathMonthDay ? data.deathMonthDay + ', ' : '' ) + data.deathYear +
-						'\n| PLACE OF DEATH = ' + data.deathhPlace +
+						'\n| DATE OF DEATH = ' + ( data.deathYear ? ( data.deathMonthDay ? data.deathMonthDay + ', ' : '' ) + data.deathYear : '' ) +
+						'\n| PLACE OF DEATH = ' + ( data.deathPlace || '' ) +
 						'\n}}'
 					);
 
@@ -1504,7 +1506,7 @@
 					// adds the appropriate birth/death year categories
 					newText.append( '\n{{subst:L' +
 						'|1=' + data.birthYear +
-						'|2=' + data.deathYear +
+						'|2=' + ( data.deathYear || '' ) +
 						'|3=' + data.subjectName + '}}'
 					);
 
