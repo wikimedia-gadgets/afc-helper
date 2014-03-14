@@ -503,7 +503,8 @@
 						( window.Twinkle && window.Twinkle.getPref( 'speedyLogPageName' ) || 'CSD log' ) );
 
 				logPage.getText().done( function ( logText ) {
-					var status, date = new Date(),
+					var status,
+						date = new Date(),
 						headerRe = new RegExp( '^==+\\s*' + date.getUTCMonthName() + '\\s+' + date.getUTCFullYear() + '\\s*==+', 'm' ),
 						appendText = '';
 
@@ -513,6 +514,10 @@
 						return;
 					}
 
+					// Create status element
+					status = new AFCH.status.Element( 'Logging speedy deletion nomination of $1...',
+						{ '$1': AFCH.makeLinkElementToPage( options.title ) } );
+
 					// Add header for new month if necessary
 					if ( !headerRe.test( logText ) ) {
 						appendText += '\n\n=== ' + date.getUTCMonthName() + ' ' + date.getUTCFullYear() + ' ===';
@@ -521,9 +526,9 @@
 					appendText += '\n# [[:' + options.title + ']]: ' + options.reason;
 
 					if ( options.usersNotified && options.usersNotified.length ) {
-						appendText += '; notified {{user|1=' + options.usersNotified.shift();
+						appendText += '; notified {{user|1=' + options.usersNotified.shift() + '}}';
 
-						$.each( options.usersNotified, function( index, user ) {
+						$.each( options.usersNotified, function( _, user ) {
 							appendText += ', {{user|1=' + user + '}}';
 						} );
 					}
