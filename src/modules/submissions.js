@@ -285,7 +285,7 @@
 
 		// Then comment templates
 		$.each( this.comments, function ( _, comment ) {
-			output.push( '{{AFC comment|1=' + comment.text + '}}' );
+			output.push( '\n{{AFC comment|1=' + comment.text + '}}' );
 		} );
 
 		// If there were comments, add a horizontal rule beneath them
@@ -954,9 +954,11 @@
 			// $2 = article class or '' if not available
 			'accepted-submission': '{{subst:Afc talk|$1|class=$2|sig=~~~~}}',
 
-			// $1 = article name
-			// $2 = copyright violation ('yes'/'no')
-			'declined-submission': '{{subst:Afc decline|$1|cv=$2|sig=yes}}',
+			// $1 = full submission title
+			// $2 = short title
+			// $3 = copyright violation ('yes'/'no')
+			'declined-submission': '== Your submission at [[Wikipedia:Articles for creation|Articles for creation]]: ' +
+				'[[$1|$2]] ({{subst:CURRENTMONTHNAME}} {{subst:CURRENTDAY}}) ==\n{{subst:Afc decline|full=$1|cv=$3|sig=yes}}',
 
 			// $1 = article name
 			'comment-on-submission': '{{subst:AFC notification|comment|article=$1}}'
@@ -1618,7 +1620,7 @@
 
 		// Copyright violations get {{db-g12}}'d as well
 		if ( declineReason === 'cv' && data.csdSubmission ) {
-			text.prepend( '{{db-g12|url=' + data.declineTextfield + '}}' );
+			text.prepend( '{{db-g12|url=' + data.declineTextfield + '}}\n' );
 		}
 
 		// Now update the submission status
@@ -1637,7 +1639,8 @@
 				AFCH.actions.notifyUser( submitter, {
 					message: AFCH.msg.get( 'declined-submission', {
 						'$1': AFCH.consts.pagename,
-						'$2': declineReason === 'cv' ? 'yes' : 'no'
+						'$2': afchSubmission.shortTitle,
+						'$3': declineReason === 'cv' ? 'yes' : 'no'
 					} ),
 					summary: 'Notification: Your [[' + AFCH.consts.pagename + '|Articles for Creation submission]] has been declined'
 				} );

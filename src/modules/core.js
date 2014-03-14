@@ -650,7 +650,11 @@
 				// Perform substitutions if necessary
 				if ( substitutions ) {
 					$.each( substitutions, function ( original, replacement ) {
-						text = text.replace( original, replacement );
+						text = text.replace(
+							// Escape the original substitution key, then make it a global regex
+							new RegExp( original.replace( /[-\/\\^$*+?.()|[\]{}]/g, '\\$&' ), 'g' ),
+							replacement
+						);
 					} );
 				}
 
