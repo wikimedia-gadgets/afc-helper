@@ -1135,7 +1135,11 @@
 
 					// If possible, cache the WikiProject data!
 					if ( window.localStorage ) {
-						window.localStorage[lsKey] = JSON.stringify( wikiProjects );
+						try {
+							window.localStorage[lsKey] = JSON.stringify( wikiProjects );
+						} catch ( e ) {
+							AFCH.log( 'Unable to cache WikiProject list: ' + e.message );
+						}
 					}
 
 					deferred.resolve( wikiProjects );
