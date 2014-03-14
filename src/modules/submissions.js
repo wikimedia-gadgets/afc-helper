@@ -523,7 +523,7 @@
 				displayTitle = decodeURI( linkMatch[2] ).replace( /_/g, ' ' );
 
 				// Don't include the displayTitle if it is equal to the title
-				if ( title !== displayTitle ) {
+				if ( displayTitle && title !== displayTitle ) {
 					newLink = '[[' + title + '|' + displayTitle + ']]';
 				} else {
 					newLink = '[[' + title + ']]';
