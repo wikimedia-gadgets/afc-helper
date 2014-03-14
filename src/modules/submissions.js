@@ -3,8 +3,10 @@
 	var $afchLaunchLink, $afch, $afchWrapper,
 		afchPage, afchSubmission, afchViews, afchViewer;
 
-	// Die if reviewing a nonexistent page
-	if ( mw.config.get( 'wgArticleId' ) === 0 ) {
+	// Die if reviewing a nonexistent page or a userjs/css page
+	if ( mw.config.get( 'wgArticleId' ) === 0 ||
+		mw.config.get( 'wgPageContentModel' ) !== 'wikitext' )
+	{
 		return;
 	}
 
