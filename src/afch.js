@@ -22,8 +22,8 @@
 		AFCH.consts = {};
 
 		// Master version data
-		AFCH.consts.version = 0.3;
-		AFCH.consts.versionName = 'Excited Murmur';
+		AFCH.consts.version = 0.4;
+		AFCH.consts.versionName = 'Rewired Robot';
 
 		// FIXME: Change when moving into production
 		AFCH.consts.beta = true;
