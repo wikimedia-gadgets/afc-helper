@@ -120,30 +120,10 @@
 			this.rawTitle = this.title.getPrefixedText();
 
 			this.additionalData = {};
+			this.hasAdditionalData = false;
 
 			this.toString = function () {
 				return this.rawTitle;
-			};
-
-			this.getText = function ( usecache ) {
-				var deferred = $.Deferred();
-
-				if ( usecache && pg.pageText ) {
-					deferred.resolve( pg.pageText );
-					return deferred;
-				}
-
-				AFCH.actions.getPageText( this.rawTitle, { hide: true, moreProps: 'timestamp|user' } )
-					.done( function ( pagetext, data ) {
-						pg.pageText = pagetext;
-						// Teehee, let's use this opportunity to get some data for later
-						pg.additionalData.lastModified = new Date( data.timestamp );
-						pg.additionalData.lastEditor = data.user;
-
-						deferred.resolve( pg.pageText );
-					} );
-
-				return deferred;
 			};
 
 			this.edit = function ( options ) {
@@ -157,18 +137,160 @@
 				return deferred;
 			};
 
-			this.getLastModifiedDate = function () {
-				// FIXME: I guess the nice thing to do would be to make an API call if necessary.
-				// But that seems like a huge pain and would require some more functionality. I'm
-				// lazy. For now we just get the text first. Stupid, I know.
+			/**
+			 * Makes an API request to get a variety of details about the current
+			 * revision of the page, which it then sets.
+			 * @param {bool} usecache if true, will resolve immediately if function has
+			 *                        run successfully before
+			 * @return {$.Deferred} resolves when data set successfully
+			 */
+			this._revisionApiRequest = function ( usecache ) {
 				var deferred = $.Deferred();
-				this.getText( true ).done( deferred.resolve( pg.additionalData.lastModified ) );
+
+				if ( usecache && pg.hasAdditionalData ) {
+					return deferred.resolve();
+				}
+
+				AFCH.actions.getPageText( this.rawTitle, {
+					hide: true,
+					moreProps: 'timestamp|user',
+					moreParameters: { rvgeneratexml: true }
+				} ).done( function ( pagetext, data ) {
+					// Set internal data
+					pg.pageText = pagetext;
+					pg.additionalData.lastModified = new Date( data.timestamp );
+					pg.additionalData.lastEditor = data.user;
+					pg.additionalData.rawTemplateModel = data.parsetree;
+
+					pg.hasAdditionalData = true;
+
+					// Resolve; it's now safe to request this data
+					deferred.resolve();
+				} );
+
+				return deferred;
+			};
+
+			/**
+			 * Gets the page text
+			 * @param {bool} usecache use cache if possible
+			 * @return {string}
+			 */
+			this.getText = function ( usecache ) {
+				var deferred = $.Deferred();
+
+				this._revisionApiRequest( usecache ).done( function () {
+					deferred.resolve( pg.pageText );
+				} );
+
+				return deferred;
+			};
+
+			/**
+			 * Gets templates on the page
+			 * @return {array} array of objects, each representing a template like
+			 *                       {
+			 *                           target: 'templateName',
+			 *                           params: { 1: 'foo', test: 'go to the {{bar}}' }
+			 *                       }
+			 */
+			this.getTemplates = function () {
+				var $templateDom, templates = [],
+					deferred = $.Deferred();
+
+				this._revisionApiRequest( true ).done( function () {
+					$templateDom = $( $.parseXML( pg.additionalData.rawTemplateModel ) ).find( 'root' );
+
+					// We only want top level templates
+					$templateDom.children( 'template' ).each( function () {
+						var $el = $( this ),
+							data = {
+								target: $el.children( 'title' ).text(),
+								params: {}
+							};
+
+						/**
+						 * Essentially, this function takes a template value DOM object, $v,
+						 * and removes all signs of XML-ishness. It does this by manipulating
+						 * the raw text and doing a few choice string replacements to change
+						 * the templates to use wikicode syntax instead. Rather than messing
+						 * with recursion and all that mess, /g is our friend...which is pefectly
+						 * satisfactory for our purposes.
+						 */
+						function parseValue( $v ) {
+							var text = AFCH.jQueryToHtml( $v );
+
+							// Convert templates to look more template-y
+							text = text.replace( /<template>/g, '{{' );
+							text = text.replace( /<\/template>/g, '}}' );
+							text = text.replace( /<part>/g, '|' );
+
+							// Now convert it back to text, removing all the rest of the XML tags
+							return $( text ).text();
+						}
+
+						$el.children( 'part' ).each( function () {
+							var $part = $( this ),
+								$name = $part.children( 'name' ),
+								// Use the name if set, or fall back to index if implicitly numbered
+								name = $name.text() || $name.attr( 'index' ),
+								value = parseValue( $part.children( 'value' ) );
+
+							data.params[name] = value;
+						} );
+
+						templates.push( data );
+					} );
+
+					deferred.resolve( templates );
+				} );
+
+				return deferred;
+			};
+
+			/**
+			 * Gets the categories from the page
+			 * @param {bool} includeCategoryLinks if true, will also include links to categories (e.g. [[:Category:Foo]])
+			 * @return {array}
+			 */
+			this.getCategories = function ( includeCategoryLinks ) {
+				var deferred = $.Deferred(),
+					text = this.pageText;
+
+				this._revisionApiRequest( true ).done( function () {
+					var catRegex = new RegExp( '\\[\\[' + ( includeCategoryLinks ? ':?' : '' ) + 'Category:(.*?)\\s*\\]\\]', 'gi' ),
+						match = catRegex.exec( text ),
+						categories = [];
+
+					while ( match ) {
+						// Name of each category, with first letter capitalized
+						categories.push( match[1].charAt(0).toUpperCase() + match[1].substring(1) );
+						match = catRegex.exec( text );
+					}
+
+					deferred.resolve( categories );
+				} );
+
+				return deferred;
+			};
+
+			this.getLastModifiedDate = function () {
+				var deferred = $.Deferred();
+
+				this._revisionApiRequest( true ).done( function () {
+					deferred.resolve( pg.additionalData.lastModified );
+				} );
+
 				return deferred;
 			};
 
 			this.getLastEditor = function () {
 				var deferred = $.Deferred();
-				this.getText( true ).done( deferred.resolve( pg.additionalData.lastEditor ) );
+
+				this._revisionApiRequest( true ).done( function () {
+					deferred.resolve( pg.additionalData.lastEditor );
+				} );
+
 				return deferred;
 			};
 
@@ -194,7 +316,6 @@
 				AFCH.api.get( request )
 					.done( function ( data ) {
 						var rev, id = data.query.pageids[0];
-						// Sanity check, the page might not exist
 						if ( id && data.query.pages[id] ) {
 							rev = data.query.pages[id].revisions[0];
 							pg.additionalData.creator = rev.user;
@@ -203,30 +324,6 @@
 							deferred.reject( data );
 						}
 					} );
-
-				return deferred;
-			};
-
-			// FIXME: Unused, because I'm not sure if we really want the
-			// orphan tags on new accepted submissions
-			this.isOrphaned = function () {
-				var deferred = $.Deferred();
-
-				AFCH.api.get( {
-					action: 'query',
-					list: 'backlinks',
-					blnamespace: 0,
-					bllimit: 10,
-					bltitle: this.rawTitle
-				} ).done( function ( data ) {
-					// If the list has a length of zero, the page
-					// is an orphan, so resolve true
-					if ( !data.query.backlinks.length ) {
-						deferred.resolve( true );
-					} else {
-						deferred.resolve( false );
-					}
-				} );
 
 				return deferred;
 			};
@@ -278,7 +375,8 @@
 			 * @param {string} pagename The page to get the contents of, namespace included
 			 * @param {object} options Object with properties:
 			 *                          hide: {bool} set to true to hide the API request in the status log
-			 *                          moreProps: {string} additional properties to request
+			 *                          moreProps: {string} additional properties to request, separated by `|`,
+			 *                          moreParameters: {object} additioanl query parameters
 			 * @return {$.Deferred} Resolves with pagetext and full data available as parameters
 			 */
 			getPageText: function ( pagename, options ) {
@@ -305,10 +403,18 @@
 					titles: pagename
 				};
 
+				$.extend( request, options.moreParameters || {} );
+
 				AFCH.api.get( request )
 					.done( function ( data ) {
 						var rev, id = data.query.pageids[0];
 						if ( id && data.query.pages ) {
+
+							// The page might not exist; resolve with false
+							if ( !data.query.pages[id].revisions.length ) {
+								deferred.resolve( false );
+							}
+
 							rev = data.query.pages[id].revisions[0];
 							deferred.resolve( rev['*'], rev );
 							status.update( 'Got $1' );
@@ -508,7 +614,7 @@
 						headerRe = new RegExp( '^==+\\s*' + date.getUTCMonthName() + '\\s+' + date.getUTCFullYear() + '\\s*==+', 'm' ),
 						appendText = '';
 
-					// Don't edit if the page has no text
+					// Don't edit if the page has doesn't exist or has no text
 					if ( !logText ) {
 						deferred.resolve( false );
 						return;
@@ -678,79 +784,6 @@
 					AFCH.msg.store[key] = value;
 				}
 			}
-		},
-
-		/**
-		 * Use Parsoid web api to parse the given wikitext
-		 * @param {string} text Text to parse
-		 * @param {string} pageName page name for context, defaults to Main Page
-		 * @param {bool} show display the request in the status list
-		 * @return {$.Deferred} Resolves with a list of parsed templates
-		 */
-		parseTemplates: function ( text, pageName, show ) {
-			var deferred = $.Deferred(),
-				status = show ? new AFCH.status.Element( 'Parsing templates using Parsoid...' ) : AFCH.consts.nullstatus;
-
-			// If no context given, deal with it
-			if ( !pageName ) {
-				pageName = 'Main Page';
-			}
-
-			$.post( '//parsoid-prod.wmflabs.org/' + AFCH.consts.wikiId + '/' + pageName, { wt: text, body: true } )
-				.done( function ( data ) {
-					// Use the Parsoid data-mw attributes to gather a bunch of data about the templates on the page,
-					// denoted by mw:Transclusion. We use both filter() AND find() so that we don't miss top-level
-					// elements, specifically the <meta> tag from NONEWSECTIONLINK which often contains submission
-					// data if the {{AFC submission}} template is located at the top of the page.
-					var $parsed = $( data ),
-						transclusionSelector = '[typeof*="mw:Transclusion"]',
-						rawTemplates = $parsed.filter( transclusionSelector ).add( $parsed.find( transclusionSelector ) ),
-						templates = [];
-
-					rawTemplates.each( function ( _, t ) {
-						// Get the data-mw attribute and then drill down through the JSON, whoopee!
-						var tdata = ( $( t ).data( 'mw' ) ).parts[0].template,
-							tmpl = { target: tdata.target.wt, params: {} };
-
-						$.each( tdata.params, function ( k, v ) {
-							tmpl.params[k] = v.wt;
-						} );
-
-						templates.push( tmpl );
-					} );
-
-					// Log template data for debugging purposes
-					AFCH.log( templates );
-
-					status.update( 'Templates parsed successfully!' );
-					deferred.resolve( templates );
-				} )
-				.fail( function ( err ) {
-					status.update( 'Error parsing templates: ' + JSON.stringify( err ) );
-					deferred.reject( err );
-				} );
-
-			return deferred;
-		},
-
-		/**
-		 * Gets the categories from a string of text
-		 * @param {string} text
-		 * @param {bool} includeCategoryLinks if true, will also include links to categories (e.g. [[:Category:Foo]])
-		 * @return {array}
-		 */
-		parseCategories: function ( text, includeCategoryLinks ) {
-			var catRegex = new RegExp( '\\[\\[' + ( includeCategoryLinks ? ':?' : '' ) + 'Category:(.*?)\\s*\\]\\]', 'gi' ),
-				match = catRegex.exec( text ),
-				categories = [];
-
-			while ( match ) {
-				// Name of each category, with first letter capitalized
-				categories.push( match[1].charAt(0).toUpperCase() + match[1].substring(1) );
-				match = catRegex.exec( text );
-			}
-
-			return categories;
 		},
 
 		/**
@@ -952,7 +985,7 @@
 		 * @return {string}
 		 */
 		jQueryToHtml: function ( $element ) {
-			return $element.wrap( '<div>' ).parent().html();
+			return $( '<div>' ).append( $element ).html();
 		},
 
 		/**

@@ -62,16 +62,13 @@
 		var sub = this,
 			deferred = $.Deferred();
 
-		// Get the page text
-		this.page.getText().done( function ( text ) {
+		this.page.getTemplates().done( function ( templates ) {
+			// Log for debugging purposes
+			AFCH.log( templates );
 
-			// Then get all templates and parse them
-			AFCH.parseTemplates( text, sub.page.rawTitle ).done( function ( templates ) {
-				sub.loadDataFromTemplates( templates );
-				sub.sortAndParseInternalData();
-				deferred.resolve( sub );
-			} );
-
+			sub.loadDataFromTemplates( templates );
+			sub.sortAndParseInternalData();
+			deferred.resolve( sub );
 		} );
 
 		return deferred;
@@ -1157,7 +1154,7 @@
 				newTitle: afchSubmission.shortTitle,
 				hasWikiProjects: !!wikiProjects.length,
 				wikiProjects: wikiProjects,
-				categories: AFCH.parseCategories( pageText, /* includeCategoryLinks */ true )
+				categories: afchPage.getCategories( /* includeCategoryLinks */ true )
 			}, function () {
 				$( '#newAssessment' ).chosen( {
 					allow_single_deselect: true,
