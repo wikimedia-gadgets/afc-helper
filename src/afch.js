@@ -2,15 +2,17 @@
 ( function ( $, mw ) {
 	var pageName = mw.config.get( 'wgPageName' ), type;
 
-	if ( pageName.indexOf( 'Wikipedia:Articles_for_creation/' ) !== -1 ||
-		pageName.indexOf( 'Wikipedia_talk:Articles_for_creation/' ) !== -1 ||
-		pageName.indexOf( 'User:' ) !== -1 ||
-		pageName.indexOf( 'Draft:' ) !== -1 )
+	// Check if we're on a page that's in AFCH scope (meaning its name begins
+	// with a certain string), and if so, set the type of subscript to be run
+	if ( pageName.indexOf( 'Wikipedia:Articles_for_creation/' ) === 0 ||
+		pageName.indexOf( 'Wikipedia_talk:Articles_for_creation/' ) === 0 ||
+		pageName.indexOf( 'User:' ) === 0 ||
+		pageName.indexOf( 'Draft:' ) === 0 )
 	{
 		type = 'submissions';
-	} else if ( pageName.indexOf( 'Wikipedia:Articles_for_creation/Redirects' ) !== -1 ) {
+	} else if ( pageName.indexOf( 'Wikipedia:Articles_for_creation/Redirects' ) === 0 ) {
 		type = 'redirects';
-	} else if ( pageName.indexOf( 'Wikipedia:Files_for_upload' ) !== -1 ) {
+	} else if ( pageName.indexOf( 'Wikipedia:Files_for_upload' ) === 0 ) {
 		type = 'ffu';
 	}
 
