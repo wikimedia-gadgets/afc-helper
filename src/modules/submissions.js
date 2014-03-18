@@ -552,13 +552,13 @@
 		// FIXME: Awful regex to remove the old submission templates
 		// This is bad. It works for most cases but has a hellish time
 		// with some double nested templates or faux nested templates (for
-		// example "{{hi|}}}" -- note the extra bracket). Ideally Parsoid
+		// example "{{hi|{ foo}}" -- note the extra bracket). Ideally Parsoid
 		// would just return the raw template text as well (currently
 		// working on a patch for that, actually).
-		this.text = this.text.replace( new RegExp( '\\{\\{\\s*afc submission\\s*\\|(?:[^{{}}]*|{{.*?}})*?\\}\\}' +
+		this.text = this.text.replace( new RegExp( '\\{\\{\\s*afc submission\\s*(?:\\||[^{{}}]*|{{.*?}})*?\\}\\}' +
 			// Also remove the AFCH-generated warning message, since if necessary the script will add it again
 			'( <!-- Do not remove this line! -->)?', 'gi' ), '' );
-		this.text = this.text.replace( /\{\{\s*afc comment\s*\|(?:[^{{}}]*|{{.*?}})*?\}\}/gi, '' );
+		this.text = this.text.replace( /\{\{\s*afc comment\s*(?:\||[^{{}}]*|{{.*?}})*?\}\}/gi, '' );
 
 		// Remove horizontal rules that were added by AFCH after the comments
 		this.text = this.text.replace( /^----+$/gm, '' );
