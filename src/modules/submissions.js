@@ -1167,9 +1167,42 @@
 				} );
 
 				$( '#newWikiProjects' ).chosen( {
-					no_results_text: 'Whoops, no WikiProjects could be found that matched your search!',
 					placeholder_text_multiple: 'Start typing to filter WikiProjects...',
+					no_results_text: 'Whoops, no WikiProjects matched in database!',
 					width: '350px'
+				} );
+
+				// Extend the chosen menu for new WikiProjects. We hackily show a
+				// "Click to manually add {{PROJECT}}" link -- sadly, jquery.chosen
+				// doesn't support this natively.
+				$( '#newWikiProjects_chzn input' ).keyup( function ( e ) {
+					var $chzn = $( '#newWikiProjects_chzn' ),
+						$input = $( this ),
+						newProject = $input.val(),
+						$noResults = $chzn.find( 'li.no-results' );
+
+					// Only show "Add {{PROJECT}}" link if there are no results
+					if ( $noResults.length ) {
+						$( '<div>' )
+							.appendTo( $noResults.empty() )
+							.text( 'Whoops, no WikiProjects matched in database! ' )
+							.append(
+								$( '<a>' )
+									.text( 'Click to manually add {{' + newProject + '}} to the page\'s WikiProject list.' )
+									.click( function () {
+										var $wikiprojects = $( '#newWikiProjects' );
+
+										$( '<option>' )
+											.attr( 'value', newProject )
+											.attr( 'selected', true )
+											.text( newProject )
+											.appendTo( $wikiprojects );
+
+										$wikiprojects.trigger( 'liszt:updated' );
+										$input.val( '' );
+									} )
+							);
+					}
 				} );
 
 				$( '#newCategories' ).chosen( {
