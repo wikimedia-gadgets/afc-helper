@@ -587,7 +587,10 @@
 
 		// Create the wikicode block
 		$.each( categories, function ( _, category ) {
-			newCategoryCode += '\n[[Category:' + category + ']]';
+			var trimmed = $.trim( category );
+			if ( trimmed ) {
+				newCategoryCode += '\n[[Category:' + trimmed + ']]';
+			}
 		} );
 
 		match = categoryRegex.exec( text );
