@@ -1173,7 +1173,6 @@
 				} );
 
 				$( '#newCategories' ).chosen( {
-					no_results_text: 'Looking for matching categories...',
 					placeholder_text_multiple: 'Start typing to add categories...',
 					width: '350px'
 				} );
@@ -1230,7 +1229,10 @@
 
 						// If we couldn't find any matching categories, apologize
 						if ( !categories.length ) {
-							$( '#newCategories_chzn li.no-results' ).text( 'No matching categories found.' );
+							$( '<li>' )
+								.text( 'No matching categories found.' )
+								.addClass( 'no-results' )
+								.appendTo( 'ul.chzn-results' );
 						}
 
 					} );
