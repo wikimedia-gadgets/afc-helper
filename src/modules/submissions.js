@@ -661,7 +661,8 @@
 								// Back link appears based on context
 								$( '<span>' )
 									.attr( 'id', 'afchBackLink' )
-									.html( '&#8592; | ' ) // back arrow
+									.html( '&#x25c0; | ' ) // back arrow
+									.attr( 'title', 'Go back' )
 									.addClass( 'hidden' )
 									.click( function () {
 										if ( afchViewer.previousState ) {

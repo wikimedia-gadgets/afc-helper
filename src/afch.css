@@ -81,6 +81,10 @@
 	font-size: 0.7em;
 }
 
+.afch-feedbackLink:hover {
+	text-decoration: underline;
+}
+
 #afchStatus {
 	list-style-position: inside;
 	text-align: left;
