@@ -233,8 +233,8 @@
 							var $part = $( this ),
 								$name = $part.children( 'name' ),
 								// Use the name if set, or fall back to index if implicitly numbered
-								name = $name.text() || $name.attr( 'index' ),
-								value = parseValue( $part.children( 'value' ) );
+								name = $.trim( $name.text() || $name.attr( 'index' ) ),
+								value = $.trim( parseValue( $part.children( 'value' ) ) );
 
 							data.params[name] = value;
 						} );
