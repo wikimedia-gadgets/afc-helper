@@ -261,6 +261,13 @@ div.disabled-button {
 div.afch-code-wrapper > pre {
 	padding: 0.1em;
 	display: inline;
+
+	/* Wrap lines */
+	white-space: pre-wrap;
+	white-space: -moz-pre-wrap;
+	white-space: -pre-wrap;
+	white-space: -o-pre-wrap;
+	word-wrap: break-word;
 }
 
 #afchButtons {

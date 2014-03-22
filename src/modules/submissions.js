@@ -841,8 +841,9 @@
 					reflistRe = /({{reflist(?:{{[^{}]*}}|[^}{])*}})|(<\s*references\s*\/?>)/i,
 					hasReflist = reflistRe.test( text ),
 
-					// FIXME: Handle multiline references?
-					malformedRefs = text.match( /<[^\/]*ref.*?>.*?<[^\/]*?ref.*?>/ig ) || [];
+					// This isn't as good as a tokenizer, and believes that <ref> foo </b> is
+					// completely correct... but it's a good intermediate level solution.
+					malformedRefs = text.match( /<\s*ref\s*[^\/]*>?<\s*[^\/]*\s*ref\s*>/ig ) || [];
 
 				// Uneven (/unclosed) <ref> and </ref> tags
 				if ( refBeginMatches.length !== refEndMatches.length ) {
