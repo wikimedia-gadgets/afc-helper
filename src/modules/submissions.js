@@ -896,6 +896,13 @@
 		function checkDeletionLog () {
 			var deferred = $.Deferred();
 
+			// Don't show deletion notices for "sandbox" to avoid useless
+			// information when reviewing user sandboxes and the like
+			if ( afchSubmission.shortTitle.toLowerCase() === 'sandbox' ) {
+				deferred.resolve();
+				return deferred;
+			}
+
 			AFCH.api.get( {
 				action: 'query',
 				list: 'logevents',
