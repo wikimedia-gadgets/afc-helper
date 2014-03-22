@@ -330,6 +330,7 @@ div.afch-code-wrapper > pre {
 	margin-top: 12px;
 	width: 15%;
 	text-align: left;
+	min-width: 150px;
 }
 
 .accept label + .accept input {
