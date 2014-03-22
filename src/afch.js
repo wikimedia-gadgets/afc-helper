@@ -24,8 +24,8 @@
 		AFCH.consts = {};
 
 		// Master version data
-		AFCH.consts.version = 0.4;
-		AFCH.consts.versionName = 'Rewired Robot';
+		AFCH.consts.version = 0.5;
+		AFCH.consts.versionName = 'Cold Moose';
 
 		// FIXME: Change when moving into production
 		AFCH.consts.beta = true;
