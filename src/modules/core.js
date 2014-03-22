@@ -1018,17 +1018,11 @@
 			date.setUTCMinutes( match[2] );
 			date.setUTCSeconds( 0 );
 
-			// Just return the date object if mwstyle not true
-			if ( !mwstyle ) {
-				return date;
+			if ( mwstyle ) {
+				return AFCH.dateToMwTimestamp( date );
 			}
 
-			return +( date.getUTCFullYear() +
-				( '0' + ( date.getUTCMonth() + 1 ) ).slice( -2 ) +
-				( '0' + date.getUTCDate() ).slice( -2 ) +
-				( '0' + date.getUTCHours() ).slice( -2 ) +
-				( '0' + date.getUTCMinutes() ).slice( -2 ) +
-				( '0' + date.getUTCSeconds() ).slice( -2 ) );
+			return date;
 		},
 
 		/**
@@ -1055,6 +1049,20 @@
 			}
 
 			return date;
+		},
+
+		/**
+		 * Converts a Date object to YYYYMMDDHHMMSS format
+		 * @param {Date} date
+		 * @return {number}
+		 */
+		dateToMwTimestamp: function ( date ) {
+			return +( date.getUTCFullYear() +
+				( '0' + ( date.getUTCMonth() + 1 ) ).slice( -2 ) +
+				( '0' + date.getUTCDate() ).slice( -2 ) +
+				( '0' + date.getUTCHours() ).slice( -2 ) +
+				( '0' + date.getUTCMinutes() ).slice( -2 ) +
+				( '0' + date.getUTCSeconds() ).slice( -2 ) );
 		}
 	} );
 

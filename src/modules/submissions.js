@@ -317,6 +317,7 @@
 		}
 
 		// And not have been modified in 6 months
+		// FIXME: Ignore bot edits?
 		this.page.getLastModifiedDate().done( function ( lastEdited ) {
 			var timeNow = new Date(),
 				sixMonthsAgo = new Date();
@@ -767,7 +768,6 @@
 			$( '#afchDecline' ).click( function () { spinnerAndRun( showDeclineOptions ); } );
 			$( '#afchComment' ).click( function () { spinnerAndRun( showCommentOptions ); } );
 			$( '#afchSubmit' ).click( function () { spinnerAndRun( showSubmitOptions ); } );
-			$( '#afchG13' ).click( function () { spinnerAndRun( showG13Options ); } );
 			$( '#afchClean' ).click( function () { handleCleanup(); } );
 			$( '#afchMark' ).click( function () { handleMark( /* unmark */ submission.isUnderReview ); } );
 
@@ -783,12 +783,13 @@
 				}
 			} );
 
-			// FIXME: Uncomment when G13 tagging functionality is created
 			// Get G13 eligibility and when known, display the button...
 			// but don't hold up the rest of the loading to do so
-			//submission.isG13Eligible().done( function ( eligible ) {
-			//	$( '#afchG13' ).toggleClass( 'hidden', !eligible );
-			//} );
+			submission.isG13Eligible().done( function ( eligible ) {
+				$( '#afchG13' )
+					.toggleClass( 'hidden', !eligible )
+					.click( function () { handleG13(); } );
+			} );
 
 		} );
 	}
@@ -975,7 +976,10 @@
 				'[[$1|$2]] ({{subst:CURRENTMONTHNAME}} {{subst:CURRENTDAY}}) ==\n{{subst:Afc decline|full=$1|cv=$3|sig=yes}}',
 
 			// $1 = article name
-			'comment-on-submission': '{{subst:AFC notification|comment|article=$1}}'
+			'comment-on-submission': '{{subst:AFC notification|comment|article=$1}}',
+
+			// $1 = article name
+			'g13-submission': '{{subst:Db-afc-notice|$1}} ~~~~'
 		} );
 	}
 
@@ -1517,11 +1521,6 @@
 		addFormSubmitHandler( handleSubmit );
 	}
 
-	function showG13Options () {
-		loadView( 'g13', {} );
-		addFormSubmitHandler( handleG13 );
-	}
-
 	// These functions actually perform a given action using data passed
 	// in the `data` parameter.
 
@@ -1815,8 +1814,58 @@
 		} );
 	}
 
-	function handleG13 ( data ) {
-		return;
+	function handleG13 () {
+		// We start getting the creator now (for notification later) because ajax is
+		// radical and handles simultaneous requests, but we don't let it delay tagging
+		var gotCreator = afchPage.getCreator();
+
+		// Update the display
+		prepareForProcessing( 'Requesting deletion' );
+
+		// Get the page text and the last modified date (cached!) and tag the page
+		$.when(
+			afchPage.getText( true ),
+			afchPage.getLastModifiedDate()
+		).then( function ( rawText, lastModified ) {
+			var text = new AFCH.Text( rawText );
+
+			// Add the deletion tag and clean up for good measure
+			text.prepend( '{{db-g13|ts=' + AFCH.dateToMwTimestamp( lastModified ) + '}}\n' );
+			text.cleanUp();
+
+			afchPage.edit( {
+				contents: text.get(),
+				summary: 'Tagging abandoned [[Wikipedia:Articles for creation|Articles for creation]] draft ' +
+					'for speedy deletion under [[WP:G13|G13]]'
+			} );
+
+			// Now notify the page creator as well as any and all previous submitters
+			$.when( gotCreator ).then( function ( creator ) {
+				var usersToNotify = [ creator ];
+
+				$.each( afchSubmission.submitters, function ( _,  submitter ) {
+					// Don't notify the same user multiple times
+					if ( usersToNotify.indexOf( submitter ) === -1 ) {
+						usersToNotify.push( submitter );
+					}
+				} );
+
+				$.each( usersToNotify, function ( _, user ) {
+					AFCH.actions.notifyUser( user, {
+						message: AFCH.msg.get( 'g13-submission',
+							{ '$1': AFCH.consts.pagename } ),
+						summary: 'Notification: [[WP:G13|G13]] speedy deletion nomination of [[' + AFCH.consts.pagename + ']]'
+					} );
+				} );
+
+				// And finally log the CSD nomination once all users have been notified
+				AFCH.actions.logCSD( {
+					title: afchPage.rawTitle,
+					reason: '[[WP:G13]] ({{tl|db-afc}})',
+					usersNotified: usersToNotify
+				} );
+			} );
+		} );
 	}
 
 }( AFCH, jQuery, mediaWiki ) );
