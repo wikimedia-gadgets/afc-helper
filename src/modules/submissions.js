@@ -362,9 +362,10 @@
 			} );
 		} else {
 			// Just modify the template at the top of the stack. Update its
-			// timestamp because it has been modified
+			// timestamp and namespace because it has been modified
 			relevantTemplate.status = newStatus;
 			relevantTemplate.timestamp = '{{subst:REVISIONTIMESTAMP}}';
+			relevantTemplate.params.ns = mw.config.get( 'wgNamespaceNumber' );
 
 			// Add new parameters if specified
 			$.extend( relevantTemplate.params, newParams );
