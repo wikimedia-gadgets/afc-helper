@@ -52,6 +52,10 @@
 
 		// Holds all comments on the page
 		this.comments = [];
+
+		// Holds all submitters currently displayed on the page
+		// (indicated by the `u` {{afc submission}} parameter)
+		this.submitters = [];
 	};
 
 	/**
@@ -189,10 +193,17 @@
 			}
 
 			// If we're going to be keeping this template on the page,
-			// save the parameter data. Don't overwrite parameters that
-			// are already set, because we're going newest to oldest.
+			// save the parameter and submitter data. When saving params,
+			// don't overwrite parameters that are already set, because
+			// we're going newest to oldest (i.e. save most recent only).
 			if ( keepTemplate ) {
+				// Save parameter data
 				sub.params = $.extend( {}, template.params, sub.params );
+
+				// Save submitter if not already listed
+				if ( sub.submitters.indexOf( template.params.u ) === -1 ) {
+					sub.submitters.push( template.params.u );
+				}
 			}
 
 			return keepTemplate;
@@ -1480,13 +1491,15 @@
 	function showSubmitOptions () {
 		var customSubmitters = [];
 
-		if ( afchSubmission.params.u ) {
+		// Iterate over the submitters and add them to the custom submitters list,
+		// displayed in the "submit as" dropdown.
+		$.each( afchSubmission.submitters, function ( index, submitter ) {
 			customSubmitters.push( {
-				name: afchSubmission.params.u,
-				description: 'Most recent submitter',
-				selected: true
+				name: submitter,
+				description: submitter + ( index === 0 ? ' (most recent submitter)' : ' (past submitter)' ),
+				selected: index === 0
 			} );
-		}
+		} );
 
 		loadView( 'submit', {
 			customSubmitters: customSubmitters
