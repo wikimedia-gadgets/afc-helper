@@ -1513,7 +1513,7 @@
 		var newText = data.afchText;
 
 		AFCH.actions.movePage( afchPage.rawTitle, data.newTitle,
-			'Moving accepted [[Wikipedia:Articles for creation|Articles for creation]] submission to mainspace' )
+			'Publishing accepted [[Wikipedia:Articles for creation|Articles for creation]] submission' )
 			.done( function ( moveData ) {
 				var newPage = new AFCH.Page( moveData.to ),
 					talkPage = newPage.getTalkPage(),
