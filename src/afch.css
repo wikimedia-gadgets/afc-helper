@@ -46,6 +46,11 @@
 	padding: 5px;
 }
 
+#afchBackLink {
+	font-size: 0.9em;
+	text-transform: uppercase;
+}
+
 #afchClose {
 	right: 0;
 	margin-top: -0.4em;

@@ -654,25 +654,19 @@
 				$( '<div>' )
 					.attr( 'id', 'afchTopBar' )
 					.append(
-						// On the left, back link based on context as well as
-						// a "Give feedback!" link generated later
-						$( '<div>' )
-							.attr( 'id', 'afchLeft' )
+						// Back link appears on the left based on context
+						$( '<span>' )
+							.attr( 'id', 'afchBackLink' )
 							.addClass( 'top-bar-element' )
-							.append(
-								// Back link appears based on context
-								$( '<span>' )
-									.attr( 'id', 'afchBackLink' )
-									.html( '&#x25c0; | ' ) // back arrow
-									.attr( 'title', 'Go back' )
-									.addClass( 'hidden' )
-									.click( function () {
-										if ( afchViewer.previousState ) {
-											afchViewer.loadPrevious();
-											$( this ).addClass( 'hidden' );
-										}
-									} )
-							),
+							.html( '&#x25c0; back to options' ) // back arrow
+							.attr( 'title', 'Go back' )
+							.addClass( 'hidden' )
+							.click( function () {
+								if ( afchViewer.previousState ) {
+									afchViewer.loadPrevious();
+									$( this ).addClass( 'hidden' );
+								}
+							} ),
 
 						// On the right, a close button
 						$( '<div>' )
@@ -764,7 +758,8 @@
 			} );
 
 			// Add the feedback link to the left panel
-			AFCH.initFeedback( '#afchLeft', 'article review' );
+			// FIXME: temporarily disabled due to styling dilemma
+			// AFCH.initFeedback( '#afchLeft', 'article review' );
 
 			// Set up click handlers
 			$( '#afchAccept' ).click( function () { spinnerAndRun( showAcceptOptions ); } );
