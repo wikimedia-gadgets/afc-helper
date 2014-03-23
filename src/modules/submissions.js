@@ -955,8 +955,17 @@
 		}
 
 		function checkReviewState () {
+			var reviewer;
+
 			if ( afchSubmission.isUnderReview ) {
-				addWarning( afchSubmission.params.reviewer + ( afchSubmission.params.reviewerts ?
+				// Use a more personal "You" if the user is the reviewer
+				if ( afchSubmission.params.reviewer === AFCH.consts.user ) {
+					reviewer = 'You';
+				} else {
+					reviewer = afchSubmission.params.reviewer;
+				}
+
+				addWarning( reviewer + ( afchSubmission.params.reviewerts ?
 					' began reviewing this submission ' + AFCH.relativeTimeSince( afchSubmission.params.reviewerts ) :
 					' already began to review this submission.' ) + '.', false );
 			}
