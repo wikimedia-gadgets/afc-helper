@@ -1487,8 +1487,8 @@
 					if ( !this.checked ) {
 						$( '#csdSubmission' ).prop( 'checked', false );
 					}
-					// ... and just outright disable it
-					$( '#csdSubmission' ).prop( 'disabled', !this.checked );
+					// ... and just outright hide it
+					$( '#csdWrapper' ).toggleClass( 'hidden', !this.checked );
 				} );
 
 				// If a reason has been specified, show the textarea, notify
