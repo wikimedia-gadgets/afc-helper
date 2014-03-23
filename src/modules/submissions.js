@@ -1068,17 +1068,30 @@
 
 				// Also provide the values for each afch-input element
 				$( '.afch-input' ).each( function ( _, element ) {
-					var value;
+					var value, allTexts,
+						$element = $( element );
 
 					if ( element.type === 'checkbox' ) {
 						value = element.checked;
 					} else {
-						value = $( element ).val();
+						value = $element.val();
 
 						// For <select multiple> with nothing selected, jQuery returns null...
 						// convert that to an empty array so that $.each() won't explode later
 						if ( value === null ) {
 							value = [];
+						}
+
+						// Also provide the full text of the selected options in <select>.
+						// Primary use for this is the edit summary in handleDecline().
+						if ( element.nodeName.toLowerCase() === 'select' ) {
+							allTexts = [];
+
+							$element.find( 'option:selected' ).each( function () {
+								allTexts.push( $( this ).text() );
+							} );
+
+							data[element.id + 'Texts'] = allTexts;
 						}
 					}
 
@@ -1696,7 +1709,9 @@
 
 		afchPage.edit( {
 			contents: text.get(),
-			summary: 'Declining submission'
+			// For the edit summary, we either grab the full summary text for the decline reason or,
+			// if it is a custom decline, just the full decline text instead.
+			summary: 'Declining submission: ' + ( declineReason !== 'reason' ? data.declineReasonTexts[0] : data.declineTextarea )
 		} );
 
 		if ( data.notifyUser ) {
