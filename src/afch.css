@@ -312,6 +312,11 @@ div.afch-code-wrapper > pre {
 	left: -13px;
 	top: 15px;
 	height: 100%;
+	cursor: pointer;
+}
+
+#afchExtra .extra-open:hover {
+	font-weight: bold;
 }
 
 #afchExtra .extra-links {

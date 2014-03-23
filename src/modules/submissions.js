@@ -734,6 +734,8 @@
 			afchSubmission.parse(),
 			loadViews
 		).then( function ( submission ) {
+			var extrasRevealed = false;
+
 			// Render the base buttons view
 			loadView( 'main', {
 				title: submission.shortTitle,
@@ -747,14 +749,22 @@
 			} );
 
 			// Set up the extra options slide-out panel, which appears
-			// when the user hovers over the chevron
-			$( '#afchExtra' ).hover( function () {
-				$( this ).stop().animate( { width: '200px' }, 150, 'swing', function () {
-					$( '#afchExtra a' ).css( 'display', 'block' );
-				} );
-			}, function () {
-				$( this ).find( 'a' ).css( 'display', 'none' );
-				$( this ).stop().animate( { width: '11px' }, 100, 'swing' );
+			// when the user click on the chevron
+			$( '#afchExtra .extra-open' ).click( function () {
+				var $extra = $( '#afchExtra' ),
+					$toggle = $( this );
+
+				if ( extrasRevealed ) {
+					$extra.find( 'a' ).hide();
+					$extra.stop().animate( { width: '11px' }, 100, 'swing', function () {
+						extrasRevealed = false;
+					} );
+				} else {
+					$extra.stop().animate( { width: '200px' }, 150, 'swing', function () {
+						$extra.find( 'a' ).css( 'display', 'block' );
+						extrasRevealed = true;
+					} );
+				}
 			} );
 
 			// Add the feedback link to the left panel
