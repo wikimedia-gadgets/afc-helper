@@ -794,7 +794,7 @@
 			// Get G13 eligibility and when known, display relevant buttons...
 			// but don't hold up the rest of the loading to do so
 			submission.isG13Eligible().done( function ( eligible ) {
-				$( '.g13-related' ).toggleClass( 'hidden', !eligible )
+				$( '.g13-related' ).toggleClass( 'hidden', !eligible );
 				$( '#afchG13' ).click( function () { handleG13(); } );
 				$( '#afchPostponeG13' ).click( function () { handlePostponeG13(); } );
 			} );
