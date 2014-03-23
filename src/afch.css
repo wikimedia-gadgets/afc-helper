@@ -420,6 +420,12 @@ select#lifeStatus.afch-input {
 	border-color: #FF851B;
 }
 
+/* POSTPONE G13 */
+.postpone-g13 {
+	background-color: #FFDC00; /* yellow */
+	border-color: #FFDC00;
+}
+
 /* SUBMIT */
 
 .submit {

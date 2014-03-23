@@ -781,12 +781,12 @@
 				}
 			} );
 
-			// Get G13 eligibility and when known, display the button...
+			// Get G13 eligibility and when known, display relevant buttons...
 			// but don't hold up the rest of the loading to do so
 			submission.isG13Eligible().done( function ( eligible ) {
-				$( '#afchG13' )
-					.toggleClass( 'hidden', !eligible )
-					.click( function () { handleG13(); } );
+				$( '.g13-related' ).toggleClass( 'hidden', !eligible )
+				$( '#afchG13' ).click( function () { handleG13(); } );
+				$( '#afchPostponeG13' ).click( function () { handlePostponeG13(); } );
 			} );
 
 		} );
@@ -1835,7 +1835,7 @@
 		var gotCreator = afchPage.getCreator();
 
 		// Update the display
-		prepareForProcessing( 'Requesting deletion' );
+		prepareForProcessing( 'Requesting', 'g13' );
 
 		// Get the page text and the last modified date (cached!) and tag the page
 		$.when(
@@ -1879,6 +1879,35 @@
 					reason: '[[WP:G13]] ({{tl|db-afc}})',
 					usersNotified: usersToNotify
 				} );
+			} );
+		} );
+	}
+
+	function handlePostponeG13 () {
+		prepareForProcessing( 'Postponing', 'postpone-g13' );
+
+		afchPage.getText( true ).done( function ( rawText ) {
+			var postponeCode, text,
+				postponeRegex = /\{\{AfC postpone G13\s*(?:\|\s*(\d*)\s*)?\}\}/ig;
+				match = postponeRegex.exec( rawText );
+
+			if ( match ) {
+				if ( match[1] !== undefined ) {
+					postponeCode = '{{AfC postpone G13|' + ( parseInt( match[1] ) + 1 ) + '}}';
+				} else {
+					postponeCode = '{{AfC postpone G13|2}}';
+				}
+				rawText = rawText.replace( match[0], postponeCode );
+			} else {
+				rawText += '\n{{AfC postpone G13}}';
+			}
+
+			text = new AFCH.Text( rawText );
+			text.cleanUp();
+
+			afchPage.edit( {
+				contents: text.get(),
+				summary: 'Postponing [[WP:G13|G13]] speedy deletion'
 			} );
 		} );
 	}
