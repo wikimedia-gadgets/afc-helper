@@ -65,8 +65,8 @@
 				summaryAd: ' ([[WP:AFCHRW|afch-rewrite]] ' + AFCH.consts.version + ')'
 			};
 
-			// Add more constants
-			$.extend( AFCH.consts, {
+			// Add more constants -- don't overwrite those already set, though
+			AFCH.consts = $.extend( {}, {
 				// If true, the script will NOT modify actual wiki content and
 				// will instead mock all such API requests (success assumed)
 				mockItUp: false,
@@ -81,10 +81,46 @@
 				// Current user
 				user: mw.user.id(),
 				// Wiki id/database name, e.g. "enwiki"
-				wikiId: mw.config.get( 'wgDBname' )
-			} );
+				wikiId: mw.config.get( 'wgDBname' ),
+				// Require users to be on whitelist to use the script
+				whitelistRequired: true,
+				// Name of the whitelist page for reviewers
+				whitelistTitle: 'Wikipedia:WikiProject Articles for creation/Participants'
+			}, AFCH.consts );
+
+			// Check whitelist if necessary, but don't delay loading of the
+			// script for users who ARE allowed; rather, just destroy the
+			// script instance when and if it finds the user is not listed
+			if ( AFCH.consts.whitelistRequired ) {
+				AFCH.checkWhitelist();
+			}
 
 			return true;
+		},
+
+		/**
+		 * Check if the current user is allowed to use the helper script;
+		 * if not, display an error and destroy AFCH
+		 */
+		checkWhitelist: function () {
+			var user = AFCH.consts.user,
+				whitelist = new AFCH.Page( AFCH.consts.whitelistTitle );
+			whitelist.getText().done( function ( text ) {
+				var userAllowed = text.indexOf( user ) !== -1;
+				if ( !userAllowed ) {
+					mw.notify(
+						$( '<div>' )
+							.append( 'AFCH could not be loaded because "' + user + '" is not listed on ' )
+							.append( AFCH.makeLinkElementToPage( whitelist.rawTitle ) )
+							.append( '. You can request access to the AfC helper script there.' ),
+						{
+							title: 'AFCH error: user not listed',
+							autoHide: false
+						}
+					);
+					AFCH.destroy();
+				}
+			} );
 		},
 
 		/**
@@ -435,10 +471,10 @@
 					.done( function ( data ) {
 						var rev, id = data.query.pageids[0];
 						if ( id && data.query.pages ) {
-
-							// The page might not exist; resolve with false
-							if ( !data.query.pages[id].revisions.length ) {
-								deferred.resolve( false );
+							// The page might not exist; resolve with an empty string
+							if ( id === '-1' ) {
+								deferred.resolve( '', {} );
+								return;
 							}
 
 							rev = data.query.pages[id].revisions[0];
