@@ -810,7 +810,6 @@
 				$( '#afchG13' ).click( function () { handleG13(); } );
 				$( '#afchPostponeG13' ).click( function () { handlePostponeG13(); } );
 			} );
-
 		} );
 	}
 
@@ -818,7 +817,7 @@
 	 * Loads warnings about the submission
 	 * @return {jQuery}
 	 */
-	function getSubmissionWarnings() {
+	function getSubmissionWarnings () {
 		var deferred = $.Deferred(),
 			warnings = [];
 
@@ -1442,7 +1441,7 @@
 		loadView( 'decline', {}, function () {
 			var pristineState = $( '#declineInputWrapper' ).html();
 
-			function updateTextfield( newPrompt, newPlaceholder ) {
+			function updateTextfield ( newPrompt, newPlaceholder ) {
 				var wrapper = $( '#textfieldWrapper' );
 
 				// Update label and placeholder
