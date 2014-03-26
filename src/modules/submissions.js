@@ -674,10 +674,8 @@
 							.attr( 'title', 'Go back' )
 							.addClass( 'hidden' )
 							.click( function () {
-								if ( afchViewer.previousState ) {
-									afchViewer.loadPrevious();
-									$( this ).addClass( 'hidden' );
-								}
+								// Reload the review panel
+								spinnerAndRun( setupReviewPanel );
 							} ),
 
 						// On the right, a close button
