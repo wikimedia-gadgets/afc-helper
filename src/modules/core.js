@@ -18,6 +18,32 @@
 		},
 
 		/**
+		 * @internal Functions called when AFCH.destroy() is run
+		 * @type {Array}
+		 */
+		_destroyFunctions: [],
+
+		/**
+		 * Add a function to run when AFCH.destroy() is run
+		 * @param {Function} fn
+		 */
+		addDestroyFunction: function ( fn ) {
+			AFCH._destroyFunctions.push( fn );
+		},
+
+		/**
+		 * Destroys all AFCH-y things. Subscripts can add custom
+		 * destroy functions by running AFCH.addDestroyFunction( fn )
+		 */
+		destroy: function () {
+			$.each( AFCH._destroyFunctions, function ( _, fn ) {
+				fn();
+			} );
+
+			window.AFCH = false;
+		},
+
+		/**
 		 * Prepares the AFCH gadget by setting constants and checking environment
 		 * @return {bool} Whether or not all setup functions executed successfully
 		 */

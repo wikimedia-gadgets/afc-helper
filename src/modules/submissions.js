@@ -643,6 +643,18 @@
 			createAFCHInstance();
 		} );
 
+	// If AFCH is destroyed via AFCH.destroy(),
+	// remove the $afch window and the launch link
+	AFCH.addDestroyFunction( function () {
+		$afchLaunchLink.fadeOut();
+
+		// The $afch window might not exist yet; make
+		// sure it does before trying to remove it :)
+		if ( $afch && $afch.jquery ) {
+			$afch.remove();
+		}
+	} );
+
 	function createAFCHInstance () {
 		/**
 		 * global; wraps ALL afch-y things
