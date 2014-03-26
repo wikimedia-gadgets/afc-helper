@@ -1380,13 +1380,17 @@
 					}
 					page = new AFCH.Page( value );
 
-					AFCH.api.get( {
-						action: 'query',
-						prop: 'info',
-						inprop: 'protection',
-						titles: page.rawTitle
-					} ).done( function ( data ) {
+					$.when(
+						AFCH.api.isBlacklisted( page ),
+						AFCH.api.get( {
+							action: 'query',
+							prop: 'info',
+							inprop: 'protection',
+							titles: page.rawTitle
+						} )
+					).then( function ( isBlacklisted, rawData ) {
 						var errorHtml, buttonText,
+							data = rawData[0], // Get just the result, not the Promise object
 							linkToPage = AFCH.jQueryToHtml( AFCH.makeLinkElementToPage( page.rawTitle ) );
 
 						// If the page already exists, display an error
@@ -1405,6 +1409,13 @@
 									buttonText = 'The proposed title is create-protected';
 								}
 							} );
+						}
+
+						// Now check the blacklist result, but if another error already exists,
+						// don't bother showing this one too
+						if ( !errorHtml && isBlacklisted !== false ) {
+							errorHtml = 'Shoot! ' + isBlacklisted.reason.replace( /\s+/g, ' ' );
+							buttonText = 'The proposed title is blacklisted';
 						}
 
 						if ( !errorHtml ) {

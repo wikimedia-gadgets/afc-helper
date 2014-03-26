@@ -141,7 +141,8 @@
 				// Load css
 				mw.loader.load( AFCH.consts.scriptpath + '?action=raw&ctype=text/css&title=MediaWiki:Gadget-afch.css', 'text/css' );
 				// Load dependencies
-				mw.loader.load( [ 'mediawiki.feedback', 'mediawiki.api', 'mediawiki.api.category', 'jquery.chosen', 'jquery.spinner' ] );
+				mw.loader.load( [ 'mediawiki.feedback', 'mediawiki.api', 'mediawiki.api.category', 'mediawiki.api.titleblacklist',
+					'jquery.chosen', 'jquery.spinner' ] );
 			}
 
 			// And finally load the subscript
