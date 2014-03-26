@@ -661,7 +661,7 @@
 		 */
 		$afch = $( '<div>' )
 			.attr( 'id', 'afch' )
-			.prependTo( '#mw-content-text' )
+			.insertBefore( '#mw-content-text' )
 			.append(
 				$( '<div>' )
 					.attr( 'id', 'afchTopBar' )
@@ -1063,7 +1063,18 @@
 				.append( $( '<a>' )
 					.addClass( 'reload-link' )
 					.attr( 'href', mw.util.getUrl() )
-					.text( '(reload)' ) );
+					.text( '(reloading...)' ) );
+
+			// Also, automagically reload the page in place
+			$( '#mw-content-text' ).load( AFCH.consts.pagelink + ' #mw-content-text', function () {
+				$( '.reload-link' ).text( '(reloaded automatically)' );
+				// Fire the hook for new page content
+				mw.hook( 'wikipage.content' ).fire( $( '#mw-content-text' ) );
+			} );
+
+			// Stop listening to ajaxStop events; otherwise these can stack up if
+			// the user goes back to perform another action, for example
+			$( document ).off( 'ajaxStop' );
 		} );
 	}
 
