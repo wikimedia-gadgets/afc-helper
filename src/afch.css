@@ -86,10 +86,6 @@
 	font-size: 0.7em;
 }
 
-.afch-feedbackLink:hover {
-	text-decoration: underline;
-}
-
 #afchStatus {
 	list-style-position: inside;
 	text-align: left;
@@ -204,10 +200,19 @@ div.disabled-button {
 	position: relative;
 }
 
-.header-script {
+#afchInitialHeader > span {
 	display: block;
 	font-size: 15px;
 	padding-bottom: 4px;
+}
+
+#afchInitialHeader .feedback-link {
+	padding-left: 5px;
+}
+
+.feedback-link:hover {
+	cursor: pointer;
+	text-decoration: underline;
 }
 
 #afchWarnings {

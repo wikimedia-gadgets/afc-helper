@@ -153,18 +153,19 @@
 
 		/**
 		 * Appends a feedback link to the given element
-		 * @param {object} $element The jQuery element to which the link should be appended
+		 * @param {string|jQuery} $element The jQuery element or selector to which the link should be appended
 		 * @param {string} type (optional) The part of AFCH that feedback is being given for, e.g. "files for upload"
+		 * @param {string} linkText (optional) Text to display in the link; by default "Give feedback!"
 		 */
-		initFeedback: function ( $element, type ) {
+		initFeedback: function ( $element, type, linkText ) {
 			var feedback = new mw.Feedback( {
 					title: new mw.Title( 'Wikipedia talk:WikiProject Articles for creation/Helper script/Rewrite' ),
 					bugsLink: 'https://github.com/WPAFC/afch-rewrite/issues/new',
 					bugsListLink: 'https://github.com/WPAFC/afch-rewrite/issues?state=open'
 				} );
 			$( '<span>' )
-				.text( 'Give feedback!' )
-				.addClass( 'afch-feedbackLink' )
+				.text( linkText || 'Give feedback!' )
+				.addClass( 'feedback-link' )
 				.click( function () {
 					feedback.launch( {
 						subject: '[' + AFCH.consts.version + '] ' + ( type ? 'Feedback about ' + type : 'AFCH feedback' )

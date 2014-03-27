@@ -777,9 +777,8 @@
 				}
 			} );
 
-			// Add the feedback link to the left panel
-			// FIXME: temporarily disabled due to styling dilemma
-			// AFCH.initFeedback( '#afchLeft', 'article review' );
+			// Add the feedback link to the header
+			AFCH.initFeedback( '#afchInitialHeader span', '[your topic here]', '(Give feedback!)' );
 
 			// Set up click handlers
 			$( '#afchAccept' ).click( function () { spinnerAndRun( showAcceptOptions ); } );
