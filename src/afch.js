@@ -24,8 +24,8 @@
 		AFCH.consts = {};
 
 		// Master version data
-		AFCH.consts.version = 0.5;
-		AFCH.consts.versionName = 'Cold Moose';
+		AFCH.consts.version = 0.6;
+		AFCH.consts.versionName = 'Dancing Turtle';
 
 		// FIXME: Change when moving into production
 		AFCH.consts.beta = true;
