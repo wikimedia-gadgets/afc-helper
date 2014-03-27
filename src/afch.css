@@ -17,6 +17,15 @@
 	text-align: right;
 }
 
+/*
+	Reset sizes. This is necessary so the new typography
+	refresh doesn't completely screw up everything.
+*/
+#afch {
+	font-size: 13px;
+	line-height: 19px;
+}
+
 #afch-open {
 	font-size: 0.5em;
 	padding-left: 5px;
