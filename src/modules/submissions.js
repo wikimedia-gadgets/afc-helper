@@ -1733,9 +1733,9 @@
 			newParams['3'] = data.declineTextfield;
 		}
 
-		// Handle submission blanking (csd as well if necessary)
+		// Handle submission blanking (csd as well if necessary...except for copyvios, handled later)
 		if ( data.blankSubmission ) {
-			text.set( '{{afc cleared' + ( data.csdSubmission ? '|csd' : '' ) + '}}' );
+			text.set( '{{afc cleared' + ( data.csdSubmission && declineReason !== 'cv' ? '|csd' : '' ) + '}}' );
 		}
 
 		// Copyright violations get {{db-g12}}'d as well
