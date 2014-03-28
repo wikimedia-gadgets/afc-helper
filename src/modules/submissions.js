@@ -477,7 +477,6 @@
 				'Carry on from here, and delete this comment.',
 				'Please leave this line alone!',
 				'Important, do not remove this line before (template|article) has been created.',
-				'== Request review at \\[\\[WP:AFC\\]\\] ==',
 				'Just press the "Save page" button below without changing anything! Doing so will submit your article submission for review. ' +
 					'Once you have saved this page you will find a new yellow \'Review waiting\' box at the bottom of your submission page. ' +
 					'If you have submitted your page previously, the old pink \'Submission declined\' template or the old grey \'Draft\' template ' +
@@ -509,6 +508,9 @@
 		// Assemble a master regexp and remove all now-unneeded comments (commentsToRemove)
 		commentRegex = new RegExp( '<!-{2,}\\s*(' + commentsToRemove.join( '|' ) + ')\\s*-{2,}>', 'gi' );
 		text = text.replace( commentRegex, '' );
+
+		// Remove initial request artifact
+		text = text.replace( /== Request review at \[\[WP:AFC\]\] ==/gi, '' );
 
 		// Remove html comments (<!--) that surround categories
 		text = text.replace( /<!--\s*((\[\[:{0,1}(Category:.*?)\]\]\s*)+)-->/gi, '$1');
