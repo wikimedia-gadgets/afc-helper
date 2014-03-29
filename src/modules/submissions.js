@@ -807,7 +807,7 @@
 			submission.isG13Eligible().done( function ( eligible ) {
 				$( '.g13-related' ).toggleClass( 'hidden', !eligible );
 				$( '#afchG13' ).click( function () { handleG13(); } );
-				$( '#afchPostponeG13' ).click( function () { handlePostponeG13(); } );
+				$( '#afchPostponeG13' ).click( function () { spinnerAndRun( showPostponeG13Options ); } );
 			} );
 		} );
 	}
@@ -1627,6 +1627,11 @@
 		addFormSubmitHandler( handleSubmit );
 	}
 
+	function showPostponeG13Options () {
+		loadView( 'postpone-g13', {} );
+		addFormSubmitHandler( handlePostponeG13 );
+	}
+
 	// These functions actually perform a given action using data passed
 	// in the `data` parameter.
 
@@ -1976,32 +1981,38 @@
 		} );
 	}
 
-	function handlePostponeG13 () {
-		prepareForProcessing( 'Postponing', 'postpone-g13' );
+	function handlePostponeG13 ( data ) {
+		var postponeCode,
+			text = data.afchText,
+			rawText = text.get(),
+			postponeRegex = /\{\{AfC postpone G13\s*(?:\|\s*(\d*)\s*)?\}\}/ig;
+			match = postponeRegex.exec( rawText );
 
-		afchPage.getText( true ).done( function ( rawText ) {
-			var postponeCode, text,
-				postponeRegex = /\{\{AfC postpone G13\s*(?:\|\s*(\d*)\s*)?\}\}/ig;
-				match = postponeRegex.exec( rawText );
-
-			if ( match ) {
-				if ( match[1] !== undefined ) {
-					postponeCode = '{{AfC postpone G13|' + ( parseInt( match[1] ) + 1 ) + '}}';
-				} else {
-					postponeCode = '{{AfC postpone G13|2}}';
-				}
-				rawText = rawText.replace( match[0], postponeCode );
+		// First add the postpone template
+		if ( match ) {
+			if ( match[1] !== undefined ) {
+				postponeCode = '{{AfC postpone G13|' + ( parseInt( match[1] ) + 1 ) + '}}';
 			} else {
-				rawText += '\n{{AfC postpone G13}}';
+				postponeCode = '{{AfC postpone G13|2}}';
 			}
+			rawText = rawText.replace( match[0], postponeCode );
+		} else {
+			rawText += '\n{{AfC postpone G13}}';
+		}
 
-			text = new AFCH.Text( rawText );
-			text.cleanUp();
+		text.set( rawText );
 
-			afchPage.edit( {
-				contents: text.get(),
-				summary: 'Postponing [[WP:G13|G13]] speedy deletion'
-			} );
+		// Then add the comment if entered
+		if ( data.commentText ) {
+			afchSubmission.addNewComment( data.commentText );
+			text.updateAfcTemplates( afchSubmission.makeWikicode() );
+		}
+
+		text.cleanUp();
+
+		afchPage.edit( {
+			contents: text.get(),
+			summary: 'Postponing [[WP:G13|G13]] speedy deletion'
 		} );
 	}
 
