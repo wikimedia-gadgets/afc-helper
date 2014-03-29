@@ -1092,8 +1092,7 @@
 		$( '#afchSubmitForm' ).click( function () {
 			var data = {};
 
-			// Provide page text; use cache created
-			// after afchSubmission.parse()
+			// Provide page text; use cache created after afchSubmission.parse()
 			afchPage.getText( true ).done( function ( text ) {
 				data.afchText = new AFCH.Text( text );
 
@@ -1491,7 +1490,39 @@
 				var reason = $( '#declineReason' ).val(),
 					declineHandlers = {
 						cv: function () {
+							var $textfieldWrapper, $addAnotherLink, $clone;
+
 							updateTextfield( 'Original URL', 'http://example.com/cake' );
+							$textfieldWrapper = $( '#textfieldWrapper' );
+
+							$clone = $textfieldWrapper.clone( true );
+
+							$addAnotherLink = $( '<span>' )
+								.text( '(add another)' )
+								.addClass( 'afch-label link' )
+								.appendTo( $textfieldWrapper )
+								.hide()
+								.click( function () {
+									// Fade out the old "add another" link
+									$( this ).fadeOut( 300, function () {
+										$( this ).remove();
+									} );
+
+									$clone
+										.find( 'input' )
+										.attr( 'id', 'copyvioUrl2' )
+										.end()
+										.find( 'label' )
+										.attr( 'for', 'copyvioUrl2' );
+
+									$clone.insertAfter( $textfieldWrapper );
+								} );
+
+							// On keyup show the "add another" link
+							$textfieldWrapper.find( 'input' ).one( 'keyup', function () {
+								$addAnotherLink.fadeIn();
+							} );
+
 							$( '#blankWrapper' ).add( '#csdWrapper' )
 								.removeClass( 'hidden' )
 								.children( 'input' ).prop( 'checked', true );
@@ -1745,7 +1776,7 @@
 
 		// Copyright violations get {{db-g12}}'d as well
 		if ( declineReason === 'cv' && data.csdSubmission ) {
-			text.prepend( '{{db-g12|url=' + data.declineTextfield + '}}\n' );
+			text.prepend( '{{db-g12|url=' + data.declineTextfield + ( data.copyvioUrl2 ? '|url2=' + data.copyvioUrl2 : '' ) + '}}\n' );
 		}
 
 		// Now update the submission status
