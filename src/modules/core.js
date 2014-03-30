@@ -504,7 +504,6 @@
 			 *                          summary: {string} edit summary, will have the edit summary ad at the end,
 			 *                          createonly: {bool} set to true to only edit the page if it doesn't exist,
 			 *                          mode: {string} 'appendtext' or 'prependtext'; default: (replace everything)
-			 *                          patrol: {bool} by default true; set to false to not patrol the page FIXME
 			 *                          hide: {bool} Set to true to supress logging in statusWindow
 			 *                          statusText: {string} message to show in status; default: "Editing"
 			 * @return {jQuery.Deferred} Resolves if saved with all data
@@ -717,6 +716,46 @@
 						status.update( 'Failed to log speedy deletion nomination of $1' );
 						deferred.reject( data );
 					} );
+				} );
+
+				return deferred;
+			},
+
+			/**
+			 * If user is allowed, marks a given recentchanges ID as patrolled
+			 * @param {string|number} rcid rcid to mark as patrolled
+			 * @param {string} title Prettier title to display. If not specified, falls back to just
+			 *                       displaying the rcid instead.
+			 * @return {$.Deferred}
+			 */
+			patrolRcid: function ( rcid, title ) {
+				var request, deferred = $.Deferred(),
+					status = new AFCH.status.Element( 'Patrolling $1...',
+						{ '$1': AFCH.makeLinkElementToPage( title ) || 'page with id #' + rcid } );
+
+				request = {
+					action: 'patrol',
+					rcid: rcid,
+					token: mw.user.tokens.get( 'patrolToken' )
+				};
+
+				if ( AFCH.consts.mockItUp ) {
+					AFCH.log( request );
+					deferred.resolve();
+					return deferred;
+				}
+
+				AFCH.api.post( request ).done( function ( data ) {
+					if ( data.patrol && data.patrol.rcid ) {
+						status.update( 'Patrolled $1' );
+						deferred.resolve( data );
+					} else {
+						status.update( 'Failed to patrol $1: ' + JSON.stringify( data.patrol ) );
+						deferred.reject( data );
+					}
+				} ).fail( function ( data ) {
+						status.update( 'Failed to patrol $1: ' + JSON.stringify( data ) );
+						deferred.reject( data );
 				} );
 
 				return deferred;

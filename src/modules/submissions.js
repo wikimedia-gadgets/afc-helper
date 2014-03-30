@@ -1241,7 +1241,10 @@
 				newTitle: afchSubmission.shortTitle,
 				hasWikiProjects: !!wikiProjects.length,
 				wikiProjects: wikiProjects,
-				categories: afchPage.getCategories( /* includeCategoryLinks */ true )
+				categories: afchPage.getCategories( /* includeCategoryLinks */ true ),
+				// Only offer to patrol the page if not already patrolled (in other words, if
+				// the "Mark as patrolled" link can be found in the DOM)
+				showPatrolOption: !!$( '.patrollink' ).length
 			}, function () {
 				$( '#newAssessment' ).chosen( {
 					allow_single_deselect: true,
@@ -1644,7 +1647,8 @@
 		AFCH.actions.movePage( afchPage.rawTitle, data.newTitle,
 			'Publishing accepted [[Wikipedia:Articles for creation|Articles for creation]] submission' )
 			.done( function ( moveData ) {
-				var newPage = new AFCH.Page( moveData.to ),
+				var $patrolLink,
+					newPage = new AFCH.Page( moveData.to ),
 					talkPage = newPage.getTalkPage(),
 					recentPage = new AFCH.Page( 'Wikipedia:Articles for creation/recent' ),
 					talkText = '';
@@ -1688,6 +1692,17 @@
 					contents: newText.get(),
 					summary: 'Cleaning up accepted [[Wikipedia:Articles for creation|Articles for creation]] submission'
 				} );
+
+				// Patrol the new page if desired
+				if ( data.patrolPage ) {
+					$patrolLink = $( '.patrollink' );
+					if ( $patrolLink.length ) {
+						AFCH.actions.patrolRcid(
+							mw.util.getParamValue( 'rcid', $patrolLink.find( 'a' ).attr( 'href' ) ),
+							newPage.rawTitle // Include the title for a prettier log message
+						);
+					}
+				}
 
 				// TALK PAGE
 				// ---------
