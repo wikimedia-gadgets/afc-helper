@@ -512,6 +512,9 @@
 		// Remove initial request artifact
 		text = text.replace( /== Request review at \[\[WP:AFC\]\] ==/gi, '' );
 
+		// Remove sandbox templates
+		text = text.replace( /\{\{(userspacedraft|userspace draft|user sandbox|Please leave this line alone \(sandbox heading\))(?:\{\{[^{}]*\}\}|[^}{])*\}\}/ig, '' );
+
 		// Remove html comments (<!--) that surround categories
 		text = text.replace( /<!--\s*((\[\[:{0,1}(Category:.*?)\]\]\s*)+)-->/gi, '$1');
 
