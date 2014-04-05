@@ -853,8 +853,12 @@
 			var deferred = $.Deferred();
 
 			afchPage.getText( true ).done( function ( text ) {
-				var refBeginRe = /<\s*ref\s*(name\s*=|group\s*=)*\s*[^\/]*>/ig,
-					refBeginMatches = text.match( refBeginRe ) || [],
+				var refBeginRe = /<\s*ref.*?\s*>/ig,
+					refBeginMatches = $.grep( text.match( refBeginRe ) || [], function ( ref ) {
+						// If the ref is closed already, we don't want it
+						// (returning true keeps the item, false removes it)
+						return ref.indexOf( '/>', ref.length - 2 ) === -1;
+					} ),
 
 					refEndRe = /<\/\s*ref\s*\>/ig,
 					refEndMatches = text.match( refEndRe )|| [],
