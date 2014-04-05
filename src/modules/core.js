@@ -70,8 +70,6 @@
 				// If true, the script will NOT modify actual wiki content and
 				// will instead mock all such API requests (success assumed)
 				mockItUp: false,
-				// Edit token used in api requests
-				editToken: mw.user.tokens.get( 'editToken' ),
 				// Full page name, "Wikipedia talk:Articles for creation/sandbox"
 				pagename: mw.config.get( 'wgPageName' ).replace( /_/g, ' ' ),
 				// Link to the current page, "/wiki/Wikipedia talk:Articles for creation/sandbox"
@@ -526,8 +524,7 @@
 					action: 'edit',
 					text: options.contents,
 					title: pagename,
-					summary: options.summary + AFCH.prefs.summaryAd,
-					token: AFCH.consts.editToken
+					summary: options.summary + AFCH.prefs.summaryAd
 				};
 
 				// Depending on mode, set appendtext=text or prependtext=text,
@@ -542,7 +539,7 @@
 					return deferred;
 				}
 
-				AFCH.api.post( request )
+				AFCH.api.postWithToken( 'edit', request )
 					.done( function ( data ) {
 						if ( data && data.edit && data.edit.result && data.edit.result === 'Success' ) {
 							deferred.resolve( data );
@@ -597,8 +594,7 @@
 					action: 'move',
 					from: oldTitle,
 					to: newTitle,
-					reason: reason + AFCH.prefs.summaryAd,
-					token: AFCH.consts.editToken // Move token === edit token
+					reason: reason + AFCH.prefs.summaryAd
 				}, additionalParameters );
 
 				if ( AFCH.consts.mockItUp ) {
@@ -607,7 +603,7 @@
 					return deferred;
 				}
 
-				AFCH.api.post( request )
+				AFCH.api.postWithToken( 'edit', request ) // Move token === edit token
 					.done( function ( data ) {
 						if ( data && data.move ) {
 							status.update( 'Moved $1 to $2' );
@@ -735,8 +731,7 @@
 
 				request = {
 					action: 'patrol',
-					rcid: rcid,
-					token: mw.user.tokens.get( 'patrolToken' )
+					rcid: rcid
 				};
 
 				if ( AFCH.consts.mockItUp ) {
@@ -745,7 +740,7 @@
 					return deferred;
 				}
 
-				AFCH.api.post( request ).done( function ( data ) {
+				AFCH.api.postWithToken( 'patrol', request ).done( function ( data ) {
 					if ( data.patrol && data.patrol.rcid ) {
 						status.update( 'Patrolled $1' );
 						deferred.resolve( data );
