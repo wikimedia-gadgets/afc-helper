@@ -1804,6 +1804,8 @@
 		// Copyright violations get {{db-g12}}'d as well
 		if ( declineReason === 'cv' && data.csdSubmission ) {
 			text.prepend( '{{db-g12|url=' + data.declineTextfield + ( data.copyvioUrl2 ? '|url2=' + data.copyvioUrl2 : '' ) + '}}\n' );
+			// Include copyvio urls in the decline template as well
+			newParams['3'] = data.declineTextfield + ( data.copyvioUrl2 ? ', ' + data.copyvioUrl2 : '' );
 		}
 
 		// Now update the submission status
