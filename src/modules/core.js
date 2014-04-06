@@ -163,7 +163,7 @@
 				} );
 			$( '<span>' )
 				.text( linkText || 'Give feedback!' )
-				.addClass( 'feedback-link' )
+				.addClass( 'feedback-link link' )
 				.click( function () {
 					feedback.launch( {
 						subject: '[' + AFCH.consts.version + '] ' + ( type ? 'Feedback about ' + type : 'AFCH feedback' )

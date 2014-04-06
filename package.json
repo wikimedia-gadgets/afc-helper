@@ -13,6 +13,11 @@
   "devDependencies": {
     "grunt": "0.4.2",
     "grunt-contrib-jshint": "0.8.0",
-    "grunt-jscs-checker": "0.4.0"
+    "grunt-jscs-checker": "0.4.0",
+    "grunt-contrib-less": "0.11.0",
+    "grunt-contrib-copy": "0.4.x",
+    "grunt-contrib-clean": "0.5.x",
+    "grunt-contrib-cssmin": "0.6.x",
+    "grunt-autoprefixer": "0.2.x"
   }
 }

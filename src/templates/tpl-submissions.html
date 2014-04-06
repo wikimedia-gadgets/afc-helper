@@ -1,25 +1,25 @@
 //<nowiki>
 
 <!-- main -->
-<div id="afchReviewPanel" class="initial">
-	<div id="afchInitialHeader">
+<div class="review-panel initial">
+	<div class="initial-header">
 		<span>AFCH v{{version}} / {{versionName}}</span>
 		Reviewing "{{title}}"
 	</div>
-	<div id="afchWarnings" class="hidden"></div>
-	<div id="afchButtons">
+	<div class="warnings hidden"></div>
+	<div class="button-wrapper">
 		{{#accept}}<a id="afchAccept" class="accept afch-button gradient-button">Accept</a>{{/accept}}
 		{{#decline}}<a id="afchDecline" class="decline afch-button gradient-button">Decline</a>{{/decline}}
 		{{#comment}}<a id="afchComment" class="comment afch-button gradient-button">Comment</a>{{/comment}}
 		{{#submit}}<a id="afchSubmit" class="submit afch-button gradient-button">Submit</a>{{/submit}}
 		<a id="afchG13" class="g13 afch-button gradient-button g13-related {{^g13}}hidden{{/g13}}">Request G13 deletion</a>
 		<a id="afchPostponeG13" class="postpone-g13 afch-button gradient-button g13-related {{^g13}}hidden{{/g13}}">Postpone G13</a>
-		<div id="afchExtra" class="afch-button">
-			<div class="extra-wrapper">
-				<div class="extra-open" title="View additional options">〈</div>
-				<div class="extra-links">
-					<a id="afchClean">Clean submission</a>
-					<a id="afchMark">
+		<div id="afchExtra" class="extra afch-button">
+			<div class="wrapper">
+				<div class="open" title="View additional options">〈</div>
+				<div class="links">
+					<a id="afchClean" class="link">Clean submission</a>
+					<a id="afchMark" class="link">
 						{{#alreadyUnderReview}}Unmark{{/alreadyUnderReview}}{{^alreadyUnderReview}}Mark{{/alreadyUnderReview}} as under review
 					</a>
 				</div>
@@ -30,7 +30,7 @@
 <!-- /main -->
 
 <!-- warning-deletions-table -->
-<div class="afch-deletion-log">
+<div class="deletion-log">
 	<table>
 		{{#deletions}}
 		<tr>
@@ -46,8 +46,8 @@
 <!-- /warning-deletions-table -->
 
 <!-- quick-action-processing -->
-<div id="afchReviewPanel" class="{{actionClass}}">
-	<div id="afchHeader" class="header">{{actionTitle}}...</div>
+<div class="review-panel {{actionClass}}">
+	<div class="header">{{actionTitle}}...</div>
 	<div id="afchContent" class="content centered">
 		<div id="afchSubmitForm" data-running="Working..." class="gradient-button button-centered {{actionClass}}">Working...</div>
 	</div>
@@ -55,8 +55,8 @@
 <!-- /quick-action-processing -->
 
 <!-- accept -->
-<div id="afchReviewPanel" class="accept">
-	<div id="afchHeader" class="header">Accepting...</div>
+<div class="review-panel accept">
+	<div class="header">Accepting...</div>
 	<div id="afchContent" class="content">
 
 		<div id="newTitleWrapper">
@@ -185,8 +185,8 @@
 <!-- /accept -->
 
 <!-- decline -->
-<div id="afchReviewPanel" class="decline">
-	<div id="afchHeader" class="header">Declining...</div>
+<div class="review-panel decline">
+	<div class="header">Declining...</div>
 	<div id="afchContent" class="content centered">
 
 		<div id="declineReasonWrapper">
@@ -275,8 +275,8 @@
 <!-- /decline -->
 
 <!-- comment -->
-<div id="afchReviewPanel" class="comment">
-	<div id="afchHeader" class="header">Commenting...</div>
+<div class="review-panel comment">
+	<div class="header">Commenting...</div>
 	<div id="afchContent" class="content centered">
 
 		<textarea id="commentText" class="afch-input afch-textfield afch-textarea"
@@ -295,8 +295,8 @@
 <!-- /comment -->
 
 <!-- submit -->
-<div id="afchReviewPanel" class="submit">
-	<div id="afchHeader" class="header">Submitting...</div>
+<div class="review-panel submit">
+	<div class="header">Submitting...</div>
 	<div id="afchContent" class="content centered">
 		Submit as&nbsp;
 		<select id="submitType" class="afch-input">
@@ -316,8 +316,8 @@
 <!-- /submit -->
 
 <!-- postpone-g13 -->
-<div id="afchReviewPanel" class="postpone-g13">
-	<div id="afchHeader" class="header">Postponing...</div>
+<div class="review-panel postpone-g13">
+	<div class="header">Postponing...</div>
 	<div id="afchContent" class="content centered">
 		<textarea id="commentText" class="afch-input afch-textfield afch-textarea"
 			placeholder="Enter your rationale for postponing deletion, which will be added to the submission as a new comment."

@@ -1,5 +1,7 @@
 """
-upload.py: upload the helper script to a wiki (requires mwclient and git)
+upload.py: build and upload the helper script to a wiki (requires mwclient
+and git, as well as grunt and the associated dependencies in package.json)
+
 (C) 2014 Theopolisme <theopolismewiki@gmail.com>
 
 Usage
@@ -24,8 +26,22 @@ import sys
 import os
 import git
 import mwclient
+import subprocess
 
+# Shortname of the wiki target
 wiki = sys.argv[1]
+
+# First, create a build
+print 'Building afch-rewrite using `grunt build`...'
+command = 'grunt build'
+process = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
+output = process.communicate()[0]
+
+if output.decode('utf-8').find('Done, without errors.') == -1:
+	print 'An error occurred during the build, so the upload was aborted.'
+	sys.exit(1)
+else:
+	print 'Build succeeded. Uploading to {}...'.format(wiki)
 
 if wiki == 'enwiki':
 	site = mwclient.Site('en.wikipedia.org')
@@ -79,16 +95,16 @@ def uploadDirectory(directory):
 			uploadSubscript(os.path.splitext(script)[0], content)
 
 # Upload afch.js
-with open('src/afch.js', 'r') as f:
+with open('build/afch.js', 'r') as f:
 	uploadFile(root + '.js', f.read())
 
 # Upload afch.css
-with open('src/afch.css', 'r') as f:
+with open('build/afch.css', 'r') as f:
 	uploadFile(root + '.css', f.read())
 
 # Now upload everything else: modules, templates, dependencies
-uploadDirectory('src/modules')
-uploadDirectory('src/templates')
+uploadDirectory('build/modules')
+uploadDirectory('build/templates')
 uploadDirectory('dependencies')
 
 print 'AFCH uploaded to {} successfully!'.format(wiki)

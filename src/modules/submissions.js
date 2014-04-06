@@ -640,7 +640,7 @@
 	// This creates the link in the header which allows users to launch afch.
 	// When launched, the link fades away, like a unicorn.
 	$afchLaunchLink = $( '<span>' )
-		.attr( 'id', 'afch-open' )
+		.addClass( 'afch-open' )
 		.appendTo( '#firstHeading' )
 		.text( 'Review submission »' )
 		.click( function () {
@@ -665,16 +665,15 @@
 		 * global; wraps ALL afch-y things
 		 */
 		$afch = $( '<div>' )
-			.attr( 'id', 'afch' )
+			.addClass( 'afch' )
 			.insertBefore( '#mw-content-text' )
 			.append(
 				$( '<div>' )
-					.attr( 'id', 'afchTopBar' )
+					.addClass( 'top-bar' )
 					.append(
 						// Back link appears on the left based on context
-						$( '<span>' )
-							.attr( 'id', 'afchBackLink' )
-							.addClass( 'top-bar-element' )
+						$( '<div>' )
+							.addClass( 'back-link' )
 							.html( '&#x25c0; back to options' ) // back arrow
 							.attr( 'title', 'Go back' )
 							.addClass( 'hidden' )
@@ -685,8 +684,7 @@
 
 						// On the right, a close button
 						$( '<div>' )
-							.attr( 'id', 'afchClose' )
-							.addClass( 'top-bar-element' )
+							.addClass( 'close-link' )
 							.html( '&times;' )
 							.click( function () {
 								// DIE DIE DIE (...then show the launch link again)
@@ -700,18 +698,18 @@
 		 * global; wrapper for specific afch panels
 		 */
 		$afchWrapper = $( '<div>' )
-			.attr( 'id', 'afchPanelWrapper' )
+			.addClass( 'panel-wrapper' )
 			.appendTo( $afch )
 			.append(
 				// Build splash panel in JavaScript rather than via
 				// a template so we don't have to wait for the
 				// HTTP request to go through
 				$( '<div>' )
-						.attr( 'id', 'afchReviewPanel' )
+						.addClass( 'review-panel' )
 						.addClass( 'splash' )
 						.append(
 							$( '<div>' )
-								.attr( 'id', 'afchInitialHeader' )
+								.addClass( 'initial-header' )
 								.text( 'Loading AFCH v' + AFCH.consts.version + ' / ' + AFCH.consts.versionName + '...' )
 						)
 				);
@@ -765,8 +763,8 @@
 
 			// Set up the extra options slide-out panel, which appears
 			// when the user click on the chevron
-			$( '#afchExtra .extra-open' ).click( function () {
-				var $extra = $( '#afchExtra' ),
+			$afch.find( '#afchExtra .open' ).click( function () {
+				var $extra = $afch.find( '#afchExtra' ),
 					$toggle = $( this );
 
 				if ( extrasRevealed ) {
@@ -783,22 +781,22 @@
 			} );
 
 			// Add the feedback link to the header
-			AFCH.initFeedback( '#afchInitialHeader span', '[your topic here]', '(Give feedback!)' );
+			AFCH.initFeedback( '.initial-header span', '[your topic here]', '(Give feedback!)' );
 
 			// Set up click handlers
-			$( '#afchAccept' ).click( function () { spinnerAndRun( showAcceptOptions ); } );
-			$( '#afchDecline' ).click( function () { spinnerAndRun( showDeclineOptions ); } );
-			$( '#afchComment' ).click( function () { spinnerAndRun( showCommentOptions ); } );
-			$( '#afchSubmit' ).click( function () { spinnerAndRun( showSubmitOptions ); } );
-			$( '#afchClean' ).click( function () { handleCleanup(); } );
-			$( '#afchMark' ).click( function () { handleMark( /* unmark */ submission.isUnderReview ); } );
+			$afch.find( '#afchAccept' ).click( function () { spinnerAndRun( showAcceptOptions ); } );
+			$afch.find( '#afchDecline' ).click( function () { spinnerAndRun( showDeclineOptions ); } );
+			$afch.find( '#afchComment' ).click( function () { spinnerAndRun( showCommentOptions ); } );
+			$afch.find( '#afchSubmit' ).click( function () { spinnerAndRun( showSubmitOptions ); } );
+			$afch.find( '#afchClean' ).click( function () { handleCleanup(); } );
+			$afch.find( '#afchMark' ).click( function () { handleMark( /* unmark */ submission.isUnderReview ); } );
 
 			// Load warnings about the page, then slide them in
 			getSubmissionWarnings().done( function ( warnings ) {
 				if ( warnings.length ) {
 					// FIXME: CSS-based slide-in animation instead to avoid having
 					// to use stupid hide() + removeClass() workaround?
-					$( '#afchWarnings' )
+					$afch.find( '.warnings' )
 						.append( warnings )
 						.hide().removeClass( 'hidden' )
 						.slideDown();
@@ -808,9 +806,9 @@
 			// Get G13 eligibility and when known, display relevant buttons...
 			// but don't hold up the rest of the loading to do so
 			submission.isG13Eligible().done( function ( eligible ) {
-				$( '.g13-related' ).toggleClass( 'hidden', !eligible );
-				$( '#afchG13' ).click( function () { handleG13(); } );
-				$( '#afchPostponeG13' ).click( function () { spinnerAndRun( showPostponeG13Options ); } );
+				$afch.find( '.g13-related' ).toggleClass( 'hidden', !eligible );
+				$afch.find( '#afchG13' ).click( function () { handleG13(); } );
+				$afch.find( '#afchPostponeG13' ).click( function () { spinnerAndRun( showPostponeG13Options ); } );
 			} );
 		} );
 	}
@@ -830,12 +828,14 @@
 		 * @param {function|string} onAction function to call of success, or URL to browse to
 		 */
 		function addWarning ( message, actionMessage, onAction ) {
-			var $action, $warning = $( '<div>' )
+			var $action,
+				$warning = $( '<div>' )
 					.addClass( 'afch-warning' )
 					.text( message );
 
 			if ( actionMessage !== false ) {
 				$action = $( '<a>' )
+					.addClass( 'link' )
 					.text( actionMessage || 'Edit page' )
 					.appendTo( $warning );
 
@@ -879,22 +879,22 @@
 				// <ref>1<ref> instead of <ref>1</ref> detection
 				if ( malformedRefs.length ) {
 					addWarning( 'The submission contains malformed <ref> tags.', 'View details', function () {
-						var $toggleLink = $( this ).attr( 'id', 'toggleMalformedRefs' ),
+						var $toggleLink = $( this ).addClass( 'malformed-refs-toggle' ),
 							$warningDiv = $( this ).parent();
 							$malformedRefWrapper = $( '<div>' )
-								.attr( 'id', 'malformedRefs' )
+								.addClass( 'malformed-refs' )
 								.appendTo( $warningDiv );
 
 						// Show the relevant code snippets
 						$.each( malformedRefs, function ( _, ref ) {
 							$( '<div>' )
-								.addClass( 'afch-code-wrapper' )
+								.addClass( 'code-wrapper' )
 								.append( $( '<pre>' ).text( ref ) )
 								.appendTo( $malformedRefWrapper );
 						} );
 
 						// Now change the "View details" link to behave as a normal toggle for #malformedRefs
-						AFCH.makeToggle( '#toggleMalformedRefs', '#malformedRefs', 'Show details', 'Hide details' );
+						AFCH.makeToggle( '.malformed-refs-toggle', '#malformedRefs', 'Show details', 'Hide details' );
 
 						return false;
 					} );
@@ -945,7 +945,7 @@
 
 				addWarning( 'The page "' + afchSubmission.shortTitle + '" has been deleted ' + rawDeletions.length + ( rawDeletions.length === 10 ? '+' : '' ) +
 					' time' + ( rawDeletions.length > 1 ? 's' : '' ) + '.', 'View deletion log', function () {
-						var $toggleLink = $( this ).attr( 'id', 'toggleDeletionLog' ),
+						var $toggleLink = $( this ).addClass( 'deletion-log-toggle' ),
 							$warningDiv = $toggleLink.parent(),
 							deletions = [];
 
@@ -960,11 +960,11 @@
 						} );
 
 						$( afchViews.renderView( 'warning-deletions-table', { deletions: deletions } ) )
-							.attr( 'id', 'deletionLog' )
+							.addClass( 'deletion-log' )
 							.appendTo( $warningDiv );
 
 						// ...and now convert the link into a toggle which simply hides/shows the div
-						AFCH.makeToggle( '#toggleDeletionLog', '#deletionLog', 'Show deletion log', 'Hide deletion log' );
+						AFCH.makeToggle( '.deletion-log-toggle', '.deletion-log', 'Show deletion log', 'Hide deletion log' );
 
 						return false;
 					} );
@@ -1035,7 +1035,7 @@
 	 *                             applied to it
 	 */
 	function prepareForProcessing ( actionTitle, actionClass ) {
-		var $content = $( '#afchContent' ),
+		var $content = $afch.find( '#afchContent' ),
 			$submitBtn = $content.find( '#afchSubmitForm' );
 
 		// If we can't find a submit button or a content area, load
@@ -1047,7 +1047,7 @@
 			} );
 
 			// Now update the variables
-			$content = $( '#afchContent' );
+			$content = $afch.find( '#afchContent' );
 			$submitBtn = $content.find( '#afchSubmitForm' );
 		}
 
@@ -1060,8 +1060,7 @@
 		// Update the button show the `running` text
 		$submitBtn
 			.text( $submitBtn.data( 'running' ) )
-			.removeClass( 'gradient-button' )
-			.addClass( 'disabled-button' )
+			.addClass( 'disabled' )
 			.off( 'click' );
 
 		// And finally, make it so when all AJAX requests are
@@ -1075,9 +1074,9 @@
 
 			// Also, automagically reload the page in place
 			$( '#mw-content-text' ).load( AFCH.consts.pagelink + ' #mw-content-text', function () {
-				$( '.reload-link' ).text( '(reloaded automatically)' );
+				$afch.find( '.reload-link' ).text( '(reloaded automatically)' );
 				// Fire the hook for new page content
-				mw.hook( 'wikipage.content' ).fire( $( '#mw-content-text' ) );
+				mw.hook( 'wikipage.content' ).fire( $afch.find( '#mw-content-text' ) );
 			} );
 
 			// Stop listening to ajaxStop events; otherwise these can stack up if
@@ -1096,7 +1095,7 @@
 	 * @param {Function} fn function to call with data
 	 */
 	function addFormSubmitHandler ( fn ) {
-		$( '#afchSubmitForm' ).click( function () {
+		$afch.find( '#afchSubmitForm' ).click( function () {
 			var data = {};
 
 			// Provide page text; use cache created after afchSubmission.parse()
@@ -1104,7 +1103,7 @@
 				data.afchText = new AFCH.Text( text );
 
 				// Also provide the values for each afch-input element
-				$( '.afch-input' ).each( function ( _, element ) {
+				$afch.find( '.afch-input' ).each( function ( _, element ) {
 					var value, allTexts,
 						$element = $( element );
 
@@ -1155,7 +1154,7 @@
 	 * @return {[type]} [description]
 	 */
 	function spinnerAndRun ( fn ) {
-		var $spinner, $container = $( '#afchContent' );
+		var $spinner, $container = $afch.find( '#afchContent' );
 
 		// Add a new spinner if one doesn't already exist
 		if ( !$container.find( '.mw-spinner' ).length ) {
@@ -1187,7 +1186,7 @@
 	 */
 	function loadView ( name, data, callback ) {
 		// Show the back button if we're not loading the main view
-		$( '#afchBackLink' ).toggleClass( 'hidden', name === 'main' );
+		$afch.find( '.back-link' ).toggleClass( 'hidden', name === 'main' );
 		afchViewer.loadView( name, data );
 		if ( callback ) {
 			callback();
@@ -1248,16 +1247,16 @@
 				categories: afchPage.getCategories( /* includeCategoryLinks */ true ),
 				// Only offer to patrol the page if not already patrolled (in other words, if
 				// the "Mark as patrolled" link can be found in the DOM)
-				showPatrolOption: !!$( '.patrollink' ).length
+				showPatrolOption: !!$afch.find( '.patrollink' ).length
 			}, function () {
-				$( '#newAssessment' ).chosen( {
+				$afch.find( '#newAssessment' ).chosen( {
 					allow_single_deselect: true,
 					disable_search: true,
 					width: '140px',
 					placeholder_text_single: 'Click to select'
 				} );
 
-				$( '#newWikiProjects' ).chosen( {
+				$afch.find( '#newWikiProjects' ).chosen( {
 					placeholder_text_multiple: 'Start typing to filter WikiProjects...',
 					no_results_text: 'Whoops, no WikiProjects matched in database!',
 					width: '350px'
@@ -1266,8 +1265,8 @@
 				// Extend the chosen menu for new WikiProjects. We hackily show a
 				// "Click to manually add {{PROJECT}}" link -- sadly, jquery.chosen
 				// doesn't support this natively.
-				$( '#newWikiProjects_chzn input' ).keyup( function ( e ) {
-					var $chzn = $( '#newWikiProjects_chzn' ),
+				$afch.find( '#newWikiProjects_chzn input' ).keyup( function ( e ) {
+					var $chzn = $afch.find( '#newWikiProjects_chzn' ),
 						$input = $( this ),
 						newProject = $input.val(),
 						$noResults = $chzn.find( 'li.no-results' );
@@ -1281,7 +1280,7 @@
 								$( '<a>' )
 									.text( 'Click to manually add {{' + newProject + '}} to the page\'s WikiProject list.' )
 									.click( function () {
-										var $wikiprojects = $( '#newWikiProjects' );
+										var $wikiprojects = $afch.find( '#newWikiProjects' );
 
 										$( '<option>' )
 											.attr( 'value', newProject )
@@ -1296,7 +1295,7 @@
 					}
 				} );
 
-				$( '#newCategories' ).chosen( {
+				$afch.find( '#newCategories' ).chosen( {
 					placeholder_text_multiple: 'Start typing to add categories...',
 					width: '350px'
 				} );
@@ -1305,10 +1304,10 @@
 				// Since jquery.chosen doesn't natively support dynamic results,
 				// we sneakily inject some dynamic suggestions instead. Consider
 				// switching to something like Select2 to avoid this hackery...
-				$( '#newCategories_chzn input' ).keyup( function ( e ) {
+				$afch.find( '#newCategories_chzn input' ).keyup( function ( e ) {
 					var $input = $( this ),
 						prefix = $input.val(),
-						$categories = $( '#newCategories' );
+						$categories = $afch.find( '#newCategories' );
 
 					// Ignore up/down keys to allow users to navigate through the suggestions,
 					// and don't show results when an empty string is provided
@@ -1363,40 +1362,39 @@
 				} );
 
 				// Show bio options if Biography option checked
-				$( '#isBiography' ).change( function () {
-					$( '#bioOptionsWrapper' ).toggleClass( 'hidden', !this.checked );
+				$afch.find( '#isBiography' ).change( function () {
+					$afch.find( '#bioOptionsWrapper' ).toggleClass( 'hidden', !this.checked );
 				} );
 
 				// Ask for the month/day IF the birth year has been entered
-				$( '#birthYear' ).keyup( function () {
-					$( '#birthMonthDayWrapper' ).toggleClass( 'hidden', !this.value.length );
+				$afch.find( '#birthYear' ).keyup( function () {
+					$afch.find( '#birthMonthDayWrapper' ).toggleClass( 'hidden', !this.value.length );
 				} );
 
 				// Ask for the month/day IF the death year has been entered
-				$( '#deathYear' ).keyup( function () {
-					$( '#deathMonthDayWrapper' ).toggleClass( 'hidden', !this.value.length );
+				$afch.find( '#deathYear' ).keyup( function () {
+					$afch.find( '#deathMonthDayWrapper' ).toggleClass( 'hidden', !this.value.length );
 				} );
 
 				// If subject is dead, show options for death details
-				$( '#lifeStatus' ).change( function () {
-					$( '#deathWrapper' ).toggleClass( 'hidden', $( this ).val() !== 'dead' );
+				$afch.find( '#lifeStatus' ).change( function () {
+					$afch.find( '#deathWrapper' ).toggleClass( 'hidden', $( this ).val() !== 'dead' );
 				} );
 
 				// Show an error if the page title already exists in the mainspace,
 				// or if the title is create-protected and user is not an admin
-				$( '#newTitle' ).keyup( function () {
+				$afch.find( '#newTitle' ).keyup( function () {
 					var page,
 						$field =  $( this ),
-						$status = $( '#titleStatus' ),
-						$submitButton = $( '#afchSubmitForm' ),
+						$status = $afch.find( '#titleStatus' ),
+						$submitButton = $afch.find( '#afchSubmitForm' ),
 						value = $field.val();
 
 					// Reset to a pure state
 					$field.removeClass( 'bad-input' );
 					$status.text( '' );
 					$submitButton
-							.addClass( 'gradient-button' )
-							.removeClass( 'disabled-button' )
+							.removeClass( 'disabled' )
 							.text( 'Accept & publish' );
 
 					// If there is no value, die now, because otherwise mw.Title
@@ -1456,14 +1454,13 @@
 
 						// Disable the submit button and show an error in its place
 						$submitButton
-							.removeClass( 'gradient-button' )
-							.addClass( 'disabled-button' )
+							.addClass( 'disabled' )
 							.text( buttonText );
 					} );
 				} );
 
 				// Update titleStatus
-				$( '#newTitle' ).trigger( 'keyup' );
+				$afch.find( '#newTitle' ).trigger( 'keyup' );
 
 			} );
 
@@ -1474,10 +1471,10 @@
 
 	function showDeclineOptions () {
 		loadView( 'decline', {}, function () {
-			var pristineState = $( '#declineInputWrapper' ).html();
+			var pristineState = $afch.find( '#declineInputWrapper' ).html();
 
 			function updateTextfield ( newPrompt, newPlaceholder ) {
-				var wrapper = $( '#textfieldWrapper' );
+				var wrapper = $afch.find( '#textfieldWrapper' );
 
 				// Update label and placeholder
 				wrapper.find( 'label' ).text( newPrompt );
@@ -1488,7 +1485,7 @@
 			}
 
 			// Set up jquery.chosen for the decline reason
-			$( '#declineReason' ).chosen( {
+			$afch.find( '#declineReason' ).chosen( {
 				placeholder_text_single: 'Select a decline reason...',
 				no_results_text: 'Whoops, no reasons matched your search. Type "custom" to add a custom rationale instead.',
 				search_contains: true,
@@ -1496,14 +1493,14 @@
 			} );
 
 			// And now add the handlers for when a specific decline reason is selected
-			$( '#declineReason' ).change( function () {
-				var reason = $( '#declineReason' ).val(),
+			$afch.find( '#declineReason' ).change( function () {
+				var reason = $afch.find( '#declineReason' ).val(),
 					declineHandlers = {
 						cv: function () {
 							var $textfieldWrapper, $addAnotherLink, $clone;
 
 							updateTextfield( 'Original URL', 'http://example.com/cake' );
-							$textfieldWrapper = $( '#textfieldWrapper' );
+							$textfieldWrapper = $afch.find( '#textfieldWrapper' );
 
 							$clone = $textfieldWrapper.clone( true );
 
@@ -1513,10 +1510,8 @@
 								.appendTo( $textfieldWrapper )
 								.hide()
 								.click( function () {
-									// Fade out the old "add another" link
-									$( this ).fadeOut( 300, function () {
-										$( this ).remove();
-									} );
+									// Remove the old "add another" link
+									$( this ).remove();
 
 									$clone
 										.find( 'input' )
@@ -1533,7 +1528,7 @@
 								$addAnotherLink.fadeIn();
 							} );
 
-							$( '#blankWrapper' ).add( '#csdWrapper' )
+							$afch.find( '#blankWrapper' ).add( '#csdWrapper' )
 								.removeClass( 'hidden' )
 								.children( 'input' ).prop( 'checked', true );
 						},
@@ -1559,27 +1554,27 @@
 						},
 
 						van: function () {
-							$( '#blankWrapper' ).add( '#csdWrapper' )
+							$afch.find( '#blankWrapper' ).add( '#csdWrapper' )
 								.removeClass( 'hidden' )
 								.children( 'input' ).prop( 'checked', true );
 						},
 
 						blp: function () {
-							$( '#blankWrapper' )
+							$afch.find( '#blankWrapper' )
 								.removeClass( 'hidden' )
 								.children( 'input' ).prop( 'checked', true );
 						},
 
 						// Custom decline rationale
 						reason: function () {
-							$( '#declineTextarea' )
+							$afch.find( '#declineTextarea' )
 								.attr( 'placeholder', 'Enter your decline reason here; be clear and supportive. Use wikicode syntax ' +
 								'and link to relevant policies or pages with additional information.' );
 						}
 					};
 
 				// Reset to a pristine state :)
-				$( '#declineInputWrapper' ).html( pristineState );
+				$afch.find( '#declineInputWrapper' ).html( pristineState );
 
 				// If there are special options to be displayed for this
 				// particular decline reason, load them now
@@ -1587,18 +1582,18 @@
 					declineHandlers[reason]();
 				}
 
-				$( '#blankSubmission' ).change( function () {
+				$afch.find( '#blankSubmission' ).change( function () {
 					// If blank is not selected, then deselect CSD as well
 					if ( !this.checked ) {
-						$( '#csdSubmission' ).prop( 'checked', false );
+						$afch.find( '#csdSubmission' ).prop( 'checked', false );
 					}
 					// ... and just outright hide it
-					$( '#csdWrapper' ).toggleClass( 'hidden', !this.checked );
+					$afch.find( '#csdWrapper' ).toggleClass( 'hidden', !this.checked );
 				} );
 
 				// If a reason has been specified, show the textarea, notify
 				// option, and the submit form button
-				$( '#declineTextarea' ).add( '#notifyWrapper' ).add( '#afchSubmitForm' )
+				$afch.find( '#declineTextarea' ).add( '#notifyWrapper' ).add( '#afchSubmitForm' )
 					.toggleClass( 'hidden', !reason );
 			} );
 		} );
@@ -1628,9 +1623,9 @@
 			customSubmitters: customSubmitters
 		}, function () {
 			// Show the other textbox when `other` is selected in the menu
-			$( '#submitType' ).change( function () {
-				var otherSelected = $( '#submitType' ).val() === 'other';
-				$( '#submitterName' ).toggleClass( 'hidden', !otherSelected );
+			$afch.find( '#submitType' ).change( function () {
+				var otherSelected = $afch.find( '#submitType' ).val() === 'other';
+				$afch.find( '#submitterName' ).toggleClass( 'hidden', !otherSelected );
 			} );
 		} );
 
@@ -1699,7 +1694,7 @@
 
 				// Patrol the new page if desired
 				if ( data.patrolPage ) {
-					$patrolLink = $( '.patrollink' );
+					$patrolLink = $afch.find( '.patrollink' );
 					if ( $patrolLink.length ) {
 						AFCH.actions.patrolRcid(
 							mw.util.getParamValue( 'rcid', $patrolLink.find( 'a' ).attr( 'href' ) ),

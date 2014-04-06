@@ -1,0 +1,393 @@
+/**
+ * Styling for submissions.js
+ */
+
+@import (reference) "general.less";
+
+/* Link that opens the review panel */
+.afch-open {
+	font-size: 0.5em;
+	padding-left: 5px;
+	line-height: 1em;
+	cursor: pointer;
+}
+
+.afch {
+	/* Reset base sizes, thanks typography refresh :P */
+	font-size: 13px;
+	line-height: 19px;
+
+	/* This mixin sets the color of the panel */
+	.ThemedPanel(@color) {
+		background-color: @color;
+		border-color: @color;
+	}
+
+	/* Constant UI elements */
+
+	.review-panel {
+		border-width: 2px;
+		border-style: solid;
+		font-family: Helvetica, sans-serif;
+		font-size: 1.2em;
+		margin-bottom: 20px;
+	}
+
+	.top-bar {
+		position: relative;
+		width: 100%;
+		z-index: 999;
+
+		div {
+			color: @white;
+			font-size: 1em;
+			cursor: pointer;
+			position: absolute;
+			padding: 5px;
+		}
+
+		.back-link {
+			font-size: 0.9em;
+			text-transform: uppercase;
+		}
+
+		.close-link {
+			right: 0;
+			margin-top: -0.4em;
+			font-size: 1.2em;
+		}
+	}
+
+	.header {
+		height: 60px;
+		line-height: 1.2em;
+		font-size: 60px;
+		color: @white;
+		font-weight: bold;
+		text-align: right;
+		text-transform: uppercase;
+		overflow: hidden;
+		vertical-align: top;
+	}
+
+	#afchSubmitForm {
+		text-align: center;
+		width: 30%;
+		padding: 5px;
+		margin-top: 10px;
+		margin-left: auto;
+		margin-right: 0px;
+
+		&.button-centered {
+			margin-left: auto;
+			margin-right: auto;
+		}
+	}
+
+	.reload-link {
+		padding-left: 5px;
+		font-size: 0.7em;
+	}
+
+	#afchStatus {
+		list-style-position: inside;
+		text-align: left;
+	}
+
+	.content {
+		background-color: @white;
+		padding: 10px;
+	}
+
+	/* Label/input styling */
+
+	.afch-option {
+		display: block;
+		padding: 5px;
+	}
+
+	.afch-label {
+		font-size: 0.75em;
+		padding: 5px;
+	}
+
+	select .afch-input {
+		vertical-align: baseline;
+	}
+
+	.afch-textfield {
+		-webkit-appearance: none;
+		border: 1px solid @lightgray;
+		border-collapse: collapse;
+		box-sizing: border-box;
+		cursor: auto;
+		display: inline-block;
+		font-size: 14px;
+		height: 30px;
+		margin: 0px;
+		padding-left: 5px;
+		vertical-align: middle;
+		width: 25%;
+		min-width: 150px;
+
+		&:focus {
+			border: 1px solid @gray;
+			outline: 0;
+		}
+	}
+
+	.afch-textarea {
+		height: 150px;
+		width: 50%;
+		margin-top: 5px;
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	/* MAIN (+SPLASH) */
+
+	.initial,
+	.splash {
+		.ThemedPanel(@sexyblack);
+	}
+
+	.initial-header {
+		font-size: 25px;
+		color: @white;
+		text-align: center;
+		margin: 10px;
+		position: relative;
+
+		> span {
+			display: block;
+			font-size: 15px;
+			padding-bottom: 4px;
+		}
+
+		.feedback-link {
+			padding-left: 5px;
+		}
+	}
+
+	.warnings {
+		text-align: center;
+		background-color: @orange;
+		margin: 0px 10px 10px;
+		padding: 5px;
+	}
+
+	.afch-warning {
+		padding: 8px 0px;
+
+		> a {
+			padding-left: 2px;
+			font-size: 0.8em;
+			color: @sexyblack;
+		}
+
+		& + .afch-warning {
+			border-top: 1px solid black;
+		}
+	}
+
+
+	.deletion-log {
+		background-color: @white;
+		text-align: left;
+		padding: 5px;
+		margin: 10px 20px;
+		border: 1px dashed black;
+		max-height: 90px;
+		overflow: auto;
+
+		td {
+			padding: 5px;
+		}
+
+		.timestamp {
+			color: @gray;
+			text-align: right;
+			white-space: nowrap;
+			vertical-align: top;
+		}
+
+		.reason {
+			font-family: monospace, Courier;
+		}
+
+		.actor {
+			color: @gray;
+			font-size: 0.75em;
+			white-space: nowrap;
+		}
+	}
+
+	div.code-wrapper > pre {
+		padding: 0.1em;
+		display: inline;
+
+		/* Wrap lines */
+		white-space: pre-wrap;
+		word-wrap: break-word;
+	}
+
+	.button-wrapper {
+		width: 100%;
+		display: table;
+		table-layout: fixed;
+	}
+
+	.afch-button {
+		vertical-align: middle;
+		line-height: 2em;
+		font-size: 1.5em;
+		color: @sexyblack;
+		text-align: center;
+		padding: 5px;
+		display: table-cell;
+	}
+
+	.extra {
+		background-color: @white;
+		height: 100%;
+		width: 11px;
+		vertical-align: top;
+
+		.wrapper {
+			position: relative;
+
+			.open {
+				position: absolute;
+				left: -13px;
+				height: 100%;
+				cursor: pointer;
+
+				&:hover {
+					font-weight: bold;
+				}
+			}
+
+			.links {
+				text-align: left;
+				padding-top: 5px;
+				padding-left: 18px;
+
+				a {
+					display: none;
+					line-height: 1em;
+					font-size: 0.7em;
+					color: @sexyblack;
+				}
+			}
+		}
+	}
+
+	/* ACCEPT */
+
+	.accept {
+		.ThemedPanel(@green);
+
+		label, input {
+			display: inline-block;
+		}
+
+		label {
+			margin-top: 12px;
+			width: 15%;
+			text-align: left;
+			min-width: 150px;
+		}
+
+		label + input {
+			width: 30%;
+		}
+
+		input + input {
+			float: right;
+		}
+
+		select#lifeStatus.afch-input {
+			vertical-align: middle;
+		}
+
+		#titleStatus {
+			font-size: 0.75em;
+			color: @red;
+		}
+
+		.bad-input, .bad-input:focus {
+			border-color: @red;
+		}
+
+		.chzn-container {
+			margin-top: 10px;
+			vertical-align: bottom;
+		}
+
+		/* Supplement jquery.chosen hackery; this is for the "manually add project" link. */
+		#newWikiProjects_chzn a {
+			cursor: pointer;
+		}
+
+		/*
+			Since we're hacking this dynamic suggestion feature into
+			jquery.chosen, we have to manually set the width of the input.
+			(see "Offer dynamic category suggestions" in submissions.js)
+		*/
+		#newCategories_chzn input {
+			width: 110% !important;
+		}
+	}
+
+
+	/* DECLINE */
+
+	.decline {
+		.ThemedPanel(@red);
+
+		#declineInputWrapper {
+			padding-top: 5px;
+		}
+	}
+
+	/* COMMENT */
+
+	.comment {
+		.ThemedPanel(@yellow);
+	}
+
+	#commentText {
+		height: 100px;
+		width: 60%;
+	}
+
+	/* TAG FOR G13 DELETION */
+
+	.g13 {
+		.ThemedPanel(@orange);
+	}
+
+	/* POSTPONE G13 */
+
+	.postpone-g13 {
+		.ThemedPanel(@yellow);
+	}
+
+	/* SUBMIT */
+
+	.submit {
+		.ThemedPanel(@blue);
+	}
+
+	/* MARK/UNMARK AS UNDER REVIEW */
+
+	.mark {
+		.ThemedPanel(@blue);
+	}
+
+	/* OTHER */
+
+	.other-action {
+		.ThemedPanel(@yellow);
+	}
+}
