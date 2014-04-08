@@ -885,6 +885,70 @@
 		},
 
 		/**
+		 * Interact with the mw.user.options data store
+		 * @type {Object}
+		 */
+		userData: {
+			/** @internal */
+			_prefix: 'userjs-afch-',
+
+			/**
+			 * @internal
+			 * This is used to cache the updated values of recently set
+			 * (through AFCH.userData.set) options, since mw.user.options.get
+			 * won't include items set after the page was first loaded.
+			 * @type {Object}
+			 */
+			_optsCache: {},
+
+			/**
+			 * Set a value in the mw.user.options data store
+			 * @param {string} key
+			 * @param {mixed} value
+			 * @return {$.Deferred} success
+			 */
+			set: function ( key, value ) {
+				var deferred = $.Deferred(),
+					fullKey = AFCH.userData._prefix + key,
+					fullValue = JSON.stringify( value );
+
+				// Update cache so AFCH.userData.get() will have updated
+				// information if the page isn't reloaded first. If for
+				// some reason the post fails...oh well...
+				AFCH.userData._optsCache[fullKey] = fullValue;
+
+				AFCH.api.postWithToken( 'options', {
+					action: 'options',
+					optionname: fullKey,
+					optionvalue: fullValue,
+				} ).done( function ( data ) {
+					deferred.resolve( data );
+				} );
+
+				return deferred;
+			},
+
+			/**
+			 * Gets a value from the mw.user.options data store
+			 * @param {string} key
+			 * @param {mixed} fallback fallback if option not present
+			 * @return {mixed} value
+			 */
+			get: function ( key, fallback ) {
+				var fullKey = AFCH.userData._prefix + key,
+					cached = AFCH.userData._optsCache[fullKey];
+
+				// Use cached value if possible, since it's more recent
+				if ( cached ) {
+					return JSON.parse( cached );
+				}
+
+				// Otherwise just use mw.user.options
+				return JSON.parse( mw.user.options.get( fullKey, JSON.stringify( fallback ) ) );
+			}
+		},
+
+		/**
 		 * Represents a series of "views", aka templateable thingamajigs.
 		 * When creating a set of views, they are loaded from a given piece of
 		 * text. Uses <hogan.js>.

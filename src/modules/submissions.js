@@ -1482,7 +1482,8 @@
 
 	function showDeclineOptions () {
 		loadView( 'decline', {}, function () {
-			var pristineState = $afch.find( '#declineInputWrapper' ).html();
+			var $reasons, $recentSection,
+				pristineState = $afch.find( '#declineInputWrapper' ).html();
 
 			function updateTextfield ( newPrompt, newPlaceholder ) {
 				var wrapper = $afch.find( '#textfieldWrapper' );
@@ -1494,6 +1495,14 @@
 				// And finally show the textfield
 				wrapper.removeClass( 'hidden' );
 			}
+
+			// Move recently used options to top of decline dropdown
+			$reasons = $afch.find( '#declineReason' );
+			$recentSection = $reasons.find( 'optgroup' ).first();
+			$.each( AFCH.userData.get( 'recently-used-declines', [] ), function ( _, rationale ) {
+				var $relevant = $reasons.find( 'option[value="' + rationale + '"]' );
+				$relevant.appendTo( $recentSection );
+			} );
 
 			// Set up jquery.chosen for the decline reason
 			$afch.find( '#declineReason' ).chosen( {
@@ -1780,13 +1789,33 @@
 	}
 
 	function handleDecline ( data ) {
-		var text = data.afchText,
+		var newRecentList,
+			text = data.afchText,
 			declineReason = data.declineReason,
 			newParams = {
 				'2': declineReason,
 				decliner: AFCH.consts.user,
 				declinets: '{{subst:REVISIONTIMESTAMP}}'
 			};
+
+		// Load the recently used declines list
+		newRecentList = AFCH.userData.get( 'recently-used-declines', [] );
+
+		// If the decline reason isn't already in the recent list...
+		if ( declineReason !== 'reason' && // Always included in list
+			newRecentList.indexOf( declineReason ) === -1 )
+		{
+			// Remove old item if necessary
+			if ( newRecentList.length > 3 ) {
+				newRecentList.shift();
+			}
+
+			// Now add the new rationale to the history
+			newRecentList.push( declineReason );
+		}
+
+		// Fianlly store the new recently-used-declines list
+		AFCH.userData.set( 'recently-used-declines', newRecentList );
 
 		// If this is a custom decline, we include the declineTextarea in the {{AFC submission}} template
 		if ( declineReason === 'reason' ) {
