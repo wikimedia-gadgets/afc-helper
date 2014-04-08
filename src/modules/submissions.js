@@ -792,7 +792,7 @@
 			} );
 
 			// Add the feedback link to the header
-			AFCH.initFeedback( '.initial-header span', '[your topic here]', '(Give feedback!)' );
+			AFCH.initFeedback( $afch.find( '.initial-header span' ), '[your topic here]', '(Give feedback!)' );
 
 			// Set up click handlers
 			$afch.find( '#afchAccept' ).click( function () { spinnerAndRun( showAcceptOptions ); } );
