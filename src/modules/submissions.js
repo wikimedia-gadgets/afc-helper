@@ -637,21 +637,32 @@
 		return this.text;
 	};
 
-	// This creates the link in the header which allows users to launch afch.
-	// When launched, the link fades away, like a unicorn.
-	$afchLaunchLink = $( '<span>' )
-		.addClass( 'afch-open' )
-		.appendTo( '#firstHeading' )
-		.text( 'Review submission »' )
+	// Add the launch link
+	$afchLaunchLink = $( mw.util.addPortletLink( 'p-cactions', '#', 'Review (AFCH)',
+		'ca-afch', 'Review submission using afch-rewrite', 's' ) );
+
+	// Mark links to old helper script as old links
+	$( '#p-cactions #ca-afcHelper > a' )
+		.append( ' (old)' )
 		.click( function () {
-			$( this ).fadeOut();
-			createAFCHInstance();
+			// FIXME remove version check when we reach 1.0
+			// Show an alert about the old version if we haven't show one before in this session
+			if ( AFCH.consts.version > 1.0 && window.sessionStorage && !window.sessionStorage['afch-old-warned'] ) {
+				window.alert( 'You\'re using an old, unsupported version of AFCH. Continue at your ' +
+					'own risk! (This warning will not appear again until your next browsing session.)' );
+				// Prevent warning until next session
+				window.sessionStorage['afch-old-warned'] = true;
+			}
 		} );
+
+	// When clicked, launch AFCH (only once to prevent serious
+	// befuddlement, both for the user and for the script...)
+	$afchLaunchLink.one( 'click', createAFCHInstance );
 
 	// If AFCH is destroyed via AFCH.destroy(),
 	// remove the $afch window and the launch link
 	AFCH.addDestroyFunction( function () {
-		$afchLaunchLink.fadeOut();
+		$afchLaunchLink.remove();
 
 		// The $afch window might not exist yet; make
 		// sure it does before trying to remove it :)
@@ -687,9 +698,9 @@
 							.addClass( 'close-link' )
 							.html( '&times;' )
 							.click( function () {
-								// DIE DIE DIE (...then show the launch link again)
+								// DIE DIE DIE (...then allow clicks on the launch link again)
 								$afch.remove();
-								$afchLaunchLink.fadeIn();
+								$afchLaunchLink.one( 'click', createAFCHInstance );
 							} )
 					)
 			);
