@@ -136,11 +136,22 @@
 			mw.loader.load( AFCH.consts.baseurl + '/hogan.js' );
 
 			if ( AFCH.consts.beta ) {
-				// Load css
+				// Load minified css
 				mw.loader.load( AFCH.consts.scriptpath + '?action=raw&ctype=text/css&title=MediaWiki:Gadget-afch.css', 'text/css' );
 				// Load dependencies
-				mw.loader.load( [ 'mediawiki.feedback', 'mediawiki.api', 'mediawiki.api.category', 'mediawiki.api.titleblacklist',
-					'jquery.chosen', 'jquery.spinner' ] );
+				mw.loader.load( [
+					// jquery resources
+					'jquery.chosen',
+					'jquery.spinner',
+
+					// mediawiki.api
+					'mediawiki.api',
+					'mediawiki.api.category',
+					'mediawiki.api.titleblacklist',
+
+					// mediawiki plugins
+					'mediawiki.feedback'
+				] );
 			}
 
 			// And finally load the subscript
