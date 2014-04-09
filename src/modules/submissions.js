@@ -639,7 +639,7 @@
 
 	// Add the launch link
 	$afchLaunchLink = $( mw.util.addPortletLink( 'p-cactions', '#', 'Review (AFCH)',
-		'ca-afch', 'Review submission using afch-rewrite', 's' ) );
+		'ca-afch', 'Review submission using afch-rewrite', 'k' ) );
 
 	// Mark links to old helper script as old links
 	$( '#p-cactions #ca-afcHelper > a' )
