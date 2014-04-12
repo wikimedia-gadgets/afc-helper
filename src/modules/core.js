@@ -552,19 +552,22 @@
 
 				AFCH.api.postWithToken( 'edit', request )
 					.done( function ( data ) {
-						var diffLink;
+						var $diffLink;
 
 						if ( data && data.edit && data.edit.result && data.edit.result === 'Success' ) {
 							deferred.resolve( data );
 
+							if ( data.edit.hasOwnProperty( 'nochange' ) ) {
+								status.update( 'No changes made to $1' );
+								return;
+							}
+
 							// Create a link to the diff of the edit
-							// FIXME: Consider showing the diff inline?
-							diffLink = AFCH.makeLinkElementToPage(
-								'Special:Diff/' + data.edit.oldrevid + '/' + data.edit.newrevid,
-								'(diff)'
+							$diffLink = AFCH.makeLinkElementToPage(
+								'Special:Diff/' + data.edit.oldrevid + '/' + data.edit.newrevid, '(diff)'
 							).addClass( 'text-smaller' );
 
-							status.update( 'Saved $1 ' + AFCH.jQueryToHtml( diffLink ) );
+							status.update( 'Saved $1 ' + AFCH.jQueryToHtml( $diffLink ) );
 						} else {
 							deferred.reject( data );
 							// FIXME: get detailed error info from API result??
