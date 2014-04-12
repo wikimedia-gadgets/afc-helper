@@ -561,10 +561,10 @@
 							// FIXME: Consider showing the diff inline?
 							diffLink = AFCH.makeLinkElementToPage(
 								'Special:Diff/' + data.edit.oldrevid + '/' + data.edit.newrevid,
-								'diff'
-							);
+								'(diff)'
+							).addClass( 'text-smaller' );
 
-							status.update( 'Saved $1 (' + AFCH.jQueryToHtml( diffLink ) + ')' );
+							status.update( 'Saved $1 ' + AFCH.jQueryToHtml( diffLink ) );
 						} else {
 							deferred.reject( data );
 							// FIXME: get detailed error info from API result??

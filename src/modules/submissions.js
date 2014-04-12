@@ -1078,14 +1078,18 @@
 		// complete, the done text and a reload link will be shown
 		$( document ).ajaxStop( function () {
 			$submitBtn.text( 'Done' )
-				.append( $( '<a>' )
-					.addClass( 'reload-link' )
-					.attr( 'href', mw.util.getUrl() )
-					.text( '(reloading...)' ) );
+				.append(
+					' ',
+					$( '<a>' )
+						.attr( 'id', 'reloadLink' )
+						.addClass( 'text-smaller' )
+						.attr( 'href', mw.util.getUrl() )
+						.text( '(reloading...)' )
+				);
 
 			// Also, automagically reload the page in place
 			$( '#mw-content-text' ).load( AFCH.consts.pagelink + ' #mw-content-text', function () {
-				$afch.find( '.reload-link' ).text( '(reloaded automatically)' );
+				$afch.find( '#reloadLink' ).text( '(reloaded automatically)' );
 				// Fire the hook for new page content
 				mw.hook( 'wikipage.content' ).fire( $afch.find( '#mw-content-text' ) );
 			} );
