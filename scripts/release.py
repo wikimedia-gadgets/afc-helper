@@ -80,7 +80,7 @@ update_file('package.json',
 	r'"version": ".*?",','"version": "{}",'.format(full_version(version)))
 
 # Commit the release
-execute_command('git add . && commit -m v{}'.format(version))
+execute_command('git add . && git commit -m "v{}"'.format(version))
 
 # Tag the new version
 execute_command('git tag v{}'.format(version))
