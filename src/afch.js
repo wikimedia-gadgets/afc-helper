@@ -24,8 +24,8 @@
 		AFCH.consts = {};
 
 		// Master version data
-		AFCH.consts.version = 0.6;
-		AFCH.consts.versionName = 'Dancing Turtle';
+		AFCH.consts.version = 0.7;
+		AFCH.consts.versionName  = 'Less is More';
 
 		// FIXME: Change when moving into production
 		AFCH.consts.beta = true;
