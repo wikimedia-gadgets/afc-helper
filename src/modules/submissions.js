@@ -953,6 +953,7 @@
 				var rawDeletions = data.query.logevents;
 
 				if ( !rawDeletions.length ) {
+					deferred.resolve();
 					return;
 				}
 
