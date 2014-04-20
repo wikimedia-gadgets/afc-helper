@@ -907,7 +907,7 @@
 						} );
 
 						// Now change the "View details" link to behave as a normal toggle for .malformed-refs
-						AFCH.makeToggle( '.malformed-refs-toggle', '.malformed-refs', 'Show details', 'Hide details' );
+						AFCH.makeToggle( '.malformed-refs-toggle', '.malformed-refs', 'View details', 'Hide details' );
 
 						return false;
 					} );
@@ -978,7 +978,7 @@
 							.appendTo( $warningDiv );
 
 						// ...and now convert the link into a toggle which simply hides/shows the div
-						AFCH.makeToggle( '.deletion-log-toggle', '.deletion-log', 'Show deletion log', 'Hide deletion log' );
+						AFCH.makeToggle( '.deletion-log-toggle', '.deletion-log', 'View deletion log', 'Hide deletion log' );
 
 						return false;
 					} );
