@@ -1007,9 +1007,52 @@
 			}
 		}
 
-		// FIXME: Implement long HTML comment checker
+		function checkLongComments () {
+			var deferred = $.Deferred();
 
-		$.when( checkReferences(), checkDeletionLog(), checkReviewState() ).then( function () {
+			afchPage.getText( true ).done( function ( text ) {
+				var longCommentRegex = /(?:<![ \r\n\t]*--)([^\-]|[\r\n]|-[^\-]){30,}(?:--[ \r\n\t]*>)?/g,
+					longCommentMatches = text.match( longCommentRegex ) || [],
+					numberOfComments = longCommentMatches.length,
+					oneComment = numberOfComments === 1;
+
+				if ( numberOfComments ) {
+					addWarning( 'The page contains ' + ( oneComment ? 'an' : '' ) + ' HTML comment' + ( oneComment ? '' : 's' ) +
+						' longer than 30 characters.', 'View comment' + ( oneComment ? '' : 's' ), function () {
+							var $toggleLink = $( this ).addClass( 'long-comment-toggle' ),
+								$warningDiv = $( this ).parent(),
+								$commentsWrapper = $( '<div>' )
+									.addClass( 'long-comments' )
+									.appendTo( $warningDiv );
+
+							// Show the relevant code snippets
+							$.each( longCommentMatches, function ( _, comment ) {
+								$( '<div>' )
+									.addClass( 'code-wrapper' )
+									.append( $( '<pre>' ).text( $.trim( comment ) ) )
+									.appendTo( $commentsWrapper );
+							} );
+
+							// Now change the "View comment" link to behave as a normal toggle for .long-comments
+							AFCH.makeToggle( '.long-comment-toggle', '.long-comments',
+								'View comment' + ( oneComment ? '' : 's' ), 'Hide comment' + ( oneComment ? '' : 's' ) );
+
+							return false;
+						} );
+				}
+
+				deferred.resolve();
+			} );
+
+			return deferred;
+		}
+
+		$.when(
+			checkReferences(),
+			checkDeletionLog(),
+			checkReviewState(),
+			checkLongComments()
+		).then( function () {
 			deferred.resolve( warnings );
 		} );
 
