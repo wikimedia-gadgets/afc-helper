@@ -906,8 +906,8 @@
 								.appendTo( $malformedRefWrapper );
 						} );
 
-						// Now change the "View details" link to behave as a normal toggle for #malformedRefs
-						AFCH.makeToggle( '.malformed-refs-toggle', '#malformedRefs', 'Show details', 'Hide details' );
+						// Now change the "View details" link to behave as a normal toggle for .malformed-refs
+						AFCH.makeToggle( '.malformed-refs-toggle', '.malformed-refs', 'Show details', 'Hide details' );
 
 						return false;
 					} );
