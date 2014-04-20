@@ -38,7 +38,8 @@ process = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
 output = process.communicate()[0]
 
 if output.decode('utf-8').find('Done, without errors.') == -1:
-	print 'An error occurred during the build, so the upload was aborted.'
+	print 'The following error occurred during the build, so the upload was aborted:'
+	print output
 	sys.exit(1)
 else:
 	print 'Build succeeded. Uploading to {}...'.format(wiki)
