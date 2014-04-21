@@ -479,9 +479,9 @@
 				'Important, do not remove this line before (template|article) has been created.',
 				'Just press the "Save page" button below without changing anything! Doing so will submit your article submission for review. ' +
 					'Once you have saved this page you will find a new yellow \'Review waiting\' box at the bottom of your submission page. ' +
-					'If you have submitted your page previously, the old pink \'Submission declined\' template or the old grey \'Draft\' template ' +
-					'will still appear at the top of your submission page, but you should ignore them. Again, please don\'t change anything ' +
-					'in this text box. Just press the \"Save page\" button below.',
+					'If you have submitted your page previously,(?: either)? the old pink \'Submission declined\' template or the old grey ' +
+					'\'Draft\' template will still appear at the top of your submission page, but you should ignore (them|it). Again, please ' +
+					'don\'t change anything in this text box. Just press the \"Save page\" button below.',
 			];
 
 		if ( isAccept ) {
