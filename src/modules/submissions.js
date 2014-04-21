@@ -1781,13 +1781,18 @@
 
 				// Add biography banner if specified
 				if ( data.isBiography ) {
+					// Ensure we don't have duplicate biography tags
+					AFCH.removeFromArray( data.newWikiProjects, 'WikiProject Biography' );
+
 					talkText += ( '\n{{WikiProject Biography|living=' +
 						( data.lifeStatus !== 'unknown' ? ( data.lifeStatus === 'living' ? 'yes' : 'no' ) : '' ) +
 						'|class=' + data.newAssessment + '|listas=' + data.subjectName + '}}' );
 				}
 
-				if ( data.newAssessment === 'disambig' ) {
-					talkText += '\n{{WikiProject Disambiguation}}';
+				if ( data.newAssessment === 'disambig' &&
+					$.inArray( 'WikiProject Disambiguation', data.newWikiProjects ) === -1 )
+				{
+					data.newWikiProjects.push( 'WikiProject Disambiguation' );
 				}
 
 				// Add WikiProjects

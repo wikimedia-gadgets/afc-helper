@@ -1058,6 +1058,19 @@
 		},
 
 		/**
+		 * Removes all occurences of a value from an array
+		 * @param {array} array
+		 * @param {mixed} value
+		 */
+		removeFromArray: function ( array, value ) {
+			var index = $.inArray( value, array );
+			while ( index !== -1 ) {
+				array.splice( index, 1 );
+				index = $.inArray( value, array );
+			}
+		},
+
+		/**
 		 * Creates an <a> element that links to a given page
 		 * @param {string} pagename
 		 * @return {jQuery} <a> element
