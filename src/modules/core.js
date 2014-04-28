@@ -704,8 +704,8 @@
 					}
 
 					// Create status element
-					status = new AFCH.status.Element( 'Logging speedy deletion nomination of $1...',
-						{ '$1': AFCH.makeLinkElementToPage( options.title ) } );
+					status = new AFCH.status.Element( 'Logging speedy deletion nomination to $1...',
+						{ '$1': AFCH.makeLinkElementToPage( logPage.rawTitle ) } );
 
 					// Add header for new month if necessary
 					if ( !headerRe.test( logText ) ) {
@@ -730,10 +730,10 @@
 						summary: 'Logging speedy deletion nomination of [[' + options.title + ']]',
 						hide: true // We're already using a custom status element
 					} ).done( function ( data ) {
-						status.update( 'Logged speedy deletion nomination of $1' );
+						status.update( 'Logged speedy deletion nomination to $1' );
 						deferred.resolve( data );
 					} ).fail( function ( data ) {
-						status.update( 'Failed to log speedy deletion nomination of $1' );
+						status.update( 'Failed to log speedy deletion nomination to $1' );
 						deferred.reject( data );
 					} );
 				} );
