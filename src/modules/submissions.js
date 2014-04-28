@@ -249,7 +249,7 @@
 
 				// If we're passed two numerical parameters then
 				// sort them in order (1,2,3)
-				if ( aIsNumber && aIsNumber ) {
+				if ( aIsNumber && bIsNumber ) {
 					return ( +a ) > ( +b ) ? 1 : -1;
 				}
 
