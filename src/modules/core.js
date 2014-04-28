@@ -298,6 +298,10 @@
 							text = text.replace( /<\/template>/g, '}}' );
 							text = text.replace( /<part>/g, '|' );
 
+							// Expand embedded tags (like <nowiki>)
+							text = text.replace( new RegExp( '<ext><name>(.*?)<\\/name>(?:<attr>.*?<\\/attr>)*' +
+								'<inner>(.*?)<\\/inner><close>(.*?)<\\/close><\\/ext>', 'g' ), '&lt;$1&gt;$2$3' );
+
 							// Now convert it back to text, removing all the rest of the XML tags
 							return $( text ).text();
 						}
