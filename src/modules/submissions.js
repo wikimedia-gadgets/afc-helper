@@ -876,7 +876,7 @@
 					refEndRe = /<\/\s*ref\s*\>/ig,
 					refEndMatches = text.match( refEndRe )|| [],
 
-					reflistRe = /({{(reflist|listaref)(?:{{[^{}]*}}|[^}{])*}})|(<\s*references\s*\/?>)/i,
+					reflistRe = /({{(reflist|listaref)(?:{{[^{}]*}}|[^}{])*}})|(<\s*references\s*\/?>)/ig,
 					hasReflist = reflistRe.test( text ),
 
 					// This isn't as good as a tokenizer, and believes that <ref> foo </b> is
@@ -915,7 +915,7 @@
 
 				// <ref> after {{reflist}}
 				if ( hasReflist ) {
-					if ( refBeginRe.test( text.substring( text.search( reflistRe ) ) ) ) {
+					if ( refBeginRe.test( text.substring( reflistRe.lastIndex ) ) ) {
 						addWarning( 'Not all of the <ref> tags are before the references list. You may not see all references.' );
 					}
 				}
