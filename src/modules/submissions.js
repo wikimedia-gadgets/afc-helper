@@ -313,7 +313,15 @@
 
 		// Submission must not currently be submitted
 		if ( this.isCurrentlySubmitted ) {
-			deferred.resolve( false );
+			return deferred.resolve( false );
+		}
+
+		// Userspace drafts and `Draft` namespace drafts must have
+		// one or more AFC submission templates to be eligible
+		if ( [ 2, 118 ].indexOf( this.page.title.getNamespaceid() ) !== -1 &&
+			this.templates.length === 0 )
+		{
+			return deferred.resolve( false );
 		}
 
 		// And not have been modified in 6 months
