@@ -506,7 +506,7 @@
 				'Enter the content and\\/or code of the template here.',
 				'EDIT BELOW THIS LINE',
 				'After listing your sources please cite them using inline citations and place them after the information they cite. ' +
-					'Please see http://en.wikipedia.org/wiki/Wikipedia:REFB for instructions on how to add citations.',
+					'Please see (http://en.wikipedia.org/wiki/Wikipedia:REFB|\\[\\[Wikipedia:REFB\\]\\]) for instructions on how to add citations.',
 			] );
 		} else {
 			// If not yet accepted, comment out cats
