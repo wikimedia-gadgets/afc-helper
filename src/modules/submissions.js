@@ -1022,8 +1022,12 @@
 		function checkLongComments () {
 			var deferred = $.Deferred();
 
-			afchPage.getText( true ).done( function ( text ) {
-				var longCommentRegex = /(?:<![ \r\n\t]*--)([^\-]|[\r\n]|-[^\-]){30,}(?:--[ \r\n\t]*>)?/g,
+			afchPage.getText( true ).done( function ( rawText ) {
+				var
+				 	// Simulate cleanUp first so that we don't warn about HTML
+				 	// comments that the script will remove anyway in the future
+					text = ( new AFCH.Text( rawText ) ).cleanUp( true ),
+					longCommentRegex = /(?:<![ \r\n\t]*--)([^\-]|[\r\n]|-[^\-]){30,}(?:--[ \r\n\t]*>)?/g,
 					longCommentMatches = text.match( longCommentRegex ) || [],
 					numberOfComments = longCommentMatches.length,
 					oneComment = numberOfComments === 1;
