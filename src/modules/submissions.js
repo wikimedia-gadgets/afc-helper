@@ -735,9 +735,13 @@
 						)
 				);
 
-		// Now set up the review panel and replace it with
-		// actually content, not just a splash screen
+		// Now set up the review panel and replace it with actual content, not just a splash screen
 		setupReviewPanel();
+
+		// If the "Review" link is clicked again, just reload the main view
+		$afchLaunchLink.click( function () {
+			spinnerAndRun( setupReviewPanel );
+		} );
 	}
 
 	function setupReviewPanel () {
