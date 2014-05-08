@@ -1090,7 +1090,9 @@
 			'comment-on-submission': '{{subst:AFC notification|comment|article=$1}}',
 
 			// $1 = article name
-			'g13-submission': '{{subst:Db-afc-notice|$1}} ~~~~'
+			'g13-submission': '{{subst:Db-afc-notice|$1}} ~~~~',
+
+			'teahouse-invite': '{{subst:Wikipedia:Teahouse/AFC invitation|sign=~~~~}}'
 		} );
 	}
 
@@ -1317,7 +1319,7 @@
 				newTitle: afchSubmission.shortTitle,
 				hasWikiProjects: !!wikiProjects.length,
 				wikiProjects: wikiProjects,
-				categories: afchPage.getCategories( /* includeCategoryLinks */ true ),
+				categories: afchPage.getCategories( /* useApi */ false, /* includeCategoryLinks */ true ),
 				// Only offer to patrol the page if not already patrolled (in other words, if
 				// the "Mark as patrolled" link can be found in the DOM)
 				showPatrolOption: !!$afch.find( '.patrollink' ).length
@@ -1925,13 +1927,45 @@
 
 		if ( data.notifyUser ) {
 			afchSubmission.getSubmitter().done( function ( submitter ) {
-				AFCH.actions.notifyUser( submitter, {
-					message: AFCH.msg.get( 'declined-submission', {
+				var userTalk = new AFCH.Page( ( new mw.Title( submitter, 3 ) ).getPrefixedText() ),
+					shouldTeahouse = data.inviteToTeahouse ? $.Deferred() : false;
+
+				// Check categories on the page to ensure that if the user has already been
+				// invited to the Teahouse, we don't invite them again.
+				if ( data.inviteToTeahouse ) {
+					userTalk.getCategories( /* useApi */ true ).done( function ( categories ) {
+						var hasTeahouseCat = false,
+							teahouseCategories = [
+								'Category:Wikipedians who have received a Teahouse invitation',
+								'Category:Wikipedians who have received a Teahouse invitation through AfC'
+							];
+
+						$.each( categories, function ( _, cat ) {
+							if ( teahouseCategories.indexOf( cat ) !== -1 ) {
+								hasTeahouseCat = true;
+								return false;
+							}
+						} );
+
+						shouldTeahouse.resolve( !hasTeahouseCat );
+					} );
+				}
+
+				$.when( shouldTeahouse ).then( function ( teahouse ) {
+					var message = AFCH.msg.get( 'declined-submission', {
 						'$1': AFCH.consts.pagename,
 						'$2': afchSubmission.shortTitle,
 						'$3': declineReason === 'cv' ? 'yes' : 'no'
-					} ),
-					summary: 'Notification: Your [[' + AFCH.consts.pagename + '|Articles for Creation submission]] has been declined'
+					} );
+
+					if ( teahouse ) {
+						message += '\n\n' + AFCH.msg.get( 'teahouse-invite' );
+					}
+
+					AFCH.actions.notifyUser( submitter, {
+						message: message,
+						summary: 'Notification: Your [[' + AFCH.consts.pagename + '|Articles for Creation submission]] has been declined'
+					} );
 				} );
 			} );
 		}

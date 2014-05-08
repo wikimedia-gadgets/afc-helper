@@ -327,12 +327,26 @@
 
 			/**
 			 * Gets the categories from the page
-			 * @param {bool} includeCategoryLinks if true, will also include links to categories (e.g. [[:Category:Foo]])
+			 * @param {bool} useApi If true, use the api to get categories, instead of parsing the page. This is
+			 *                      necessary if you need info about transcluded categories.
+			 * @param {bool} includeCategoryLinks If true, will also include links to categories (e.g. [[:Category:Foo]]).
+			 *                                    Note that if useApi is true, includeCategoryLinks must be false.
 			 * @return {array}
 			 */
-			this.getCategories = function ( includeCategoryLinks ) {
+			this.getCategories = function ( useApi, includeCategoryLinks ) {
 				var deferred = $.Deferred(),
 					text = this.pageText;
+
+				if ( useApi ) {
+					AFCH.api.getCategories( this.title ).done( function ( categories ) {
+						// The api returns mw.Title objects, so we convert them to simple
+						// strings before resolving the deferred.
+						deferred.resolve( $.map( categories, function ( cat ) {
+							return cat.getPrefixedText();
+						} ) );
+					} );
+					return deferred;
+				}
 
 				this._revisionApiRequest( true ).done( function () {
 					var catRegex = new RegExp( '\\[\\[' + ( includeCategoryLinks ? ':?' : '' ) + 'Category:(.*?)\\s*\\]\\]', 'gi' ),
