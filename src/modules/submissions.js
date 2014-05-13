@@ -1082,7 +1082,8 @@
 		AFCH.msg.set( {
 			// $1 = article name
 			// $2 = article class or '' if not available
-			'accepted-submission': '{{subst:Afc talk|$1|class=$2|sig=~~~~}}',
+			'accepted-submission': '== Your submission at [[Wikipedia:Articles for creation|Articles for creation]]: ' +
+				'[[$1]] has been accepted ==\n{{subst:Afc talk|$1|class=$2|sig=~~~~}}',
 
 			// $1 = full submission title
 			// $2 = short title
