@@ -73,7 +73,8 @@ module.exports = function ( grunt ) {
 		[ 'jshint', 'jscs' ]
 	);
 
-	grunt.registerTask( 'styling',
+	grunt.registerTask(
+		'styling',
 		'Compiles LESS files to CSS and minifies them into one file.',
 		[ 'less', 'autoprefixer', 'cssmin', 'clean:styling' ]
 	);
