@@ -22,7 +22,7 @@
 		this.page = page;
 
 		// 'WT:Articles for creation/Foo' => 'Foo'
-		this.shortTitle = this.page.title.getMainText().match( /([^\/]+$)/ )[1];
+		this.shortTitle = this.page.title.getMainText().match( /([^\/]+)\/?$/ )[1];
 
 		this.resetVariables();
 	};
