@@ -867,7 +867,9 @@
 				if ( typeof onAction === 'function' ) {
 					$action.click( onAction );
 				} else {
-					$action.attr( 'href', onAction || mw.util.getUrl( AFCH.consts.pagename, { action: 'edit' } ) );
+					$action
+						.attr( 'target', '_blank' )
+						.attr( 'href', onAction || mw.util.getUrl( AFCH.consts.pagename, { action: 'edit' } ) );
 				}
 			}
 
@@ -1010,12 +1012,13 @@
 				if ( afchSubmission.params.reviewer === AFCH.consts.user ) {
 					reviewer = 'You';
 				} else {
-					reviewer = afchSubmission.params.reviewer;
+					reviewer = afchSubmission.params.reviewer || 'Someone';
 				}
 
 				addWarning( reviewer + ( afchSubmission.params.reviewerts ?
 					' began reviewing this submission ' + AFCH.relativeTimeSince( afchSubmission.params.reviewerts ) :
-					' already began to review this submission.' ) + '.', false );
+					' already began reviewing this submission' ) + '.',
+					'View page history', mw.util.getUrl( AFCH.consts.pagename, { action: 'history' } ) );
 			}
 		}
 
