@@ -1551,7 +1551,7 @@
 
 	function showDeclineOptions () {
 		loadView( 'decline', {}, function () {
-			var $reasons, $recentSection,
+			var $reasons, $commonSection, declineCounts,
 				pristineState = $afch.find( '#declineInputWrapper' ).html();
 
 			function updateTextfield ( newPrompt, newPlaceholder ) {
@@ -1565,13 +1565,29 @@
 				wrapper.removeClass( 'hidden' );
 			}
 
-			// Move recently used options to top of decline dropdown
-			$reasons = $afch.find( '#declineReason' );
-			$recentSection = $reasons.find( 'optgroup' ).first();
-			$.each( AFCH.userData.get( 'recently-used-declines', [] ), function ( _, rationale ) {
-				var $relevant = $reasons.find( 'option[value="' + rationale + '"]' );
-				$relevant.appendTo( $recentSection );
-			} );
+			// Copy most-used options to top of decline dropdown
+
+			declineCounts = AFCH.userData.get( 'decline-counts', false );
+
+			if ( declineCounts ) {
+				declineList = $.map( declineCounts, function ( _, key ) { return key; } );
+
+				// Sort list in descending order (most-used at beginning)
+				declineList.sort( function ( a, b ) {
+					return declineCounts[b] - declineCounts[a];
+				} );
+
+				$reasons = $afch.find( '#declineReason' );
+				$commonSection = $( '<optgroup>' )
+					.attr( 'label', 'Frequently used' )
+					.insertBefore( $reasons.find( 'optgroup' ).first() );
+
+				// Show the 5 most used options
+				$.each( declineList.splice( 0, 5 ), function ( _, rationale ) {
+					var $relevant = $reasons.find( 'option[value="' + rationale + '"]' );
+					$relevant.clone( true ).appendTo( $commonSection );
+				} );
+			}
 
 			// Set up jquery.chosen for the decline reason
 			$afch.find( '#declineReason' ).chosen( {
@@ -1863,7 +1879,7 @@
 	}
 
 	function handleDecline ( data ) {
-		var newRecentList,
+		var declineCounts,
 			text = data.afchText,
 			declineReason = data.declineReason,
 			newParams = {
@@ -1872,24 +1888,16 @@
 				declinets: '{{subst:REVISIONTIMESTAMP}}'
 			};
 
-		// Load the recently used declines list
-		newRecentList = AFCH.userData.get( 'recently-used-declines', [] );
+		// Update decline counts
+		declineCounts = AFCH.userData.get( 'decline-counts', {} );
 
-		// If the decline reason isn't already in the recent list...
-		if ( declineReason !== 'reason' && // Always included in list
-			newRecentList.indexOf( declineReason ) === -1 )
-		{
-			// Remove old item if necessary
-			if ( newRecentList.length > 3 ) {
-				newRecentList.shift();
-			}
-
-			// Now add the new rationale to the history
-			newRecentList.push( declineReason );
+		if ( declineCounts[declineReason] ) {
+			declineCounts[declineReason] += 1;
+		} else {
+			declineCounts[declineReason] = 1;
 		}
 
-		// Fianlly store the new recently-used-declines list
-		AFCH.userData.set( 'recently-used-declines', newRecentList );
+		AFCH.userData.set( 'decline-counts', declineCounts );
 
 		// If this is a custom decline, we include the declineTextarea in the {{AFC submission}} template
 		if ( declineReason === 'reason' ) {
