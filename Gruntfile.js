@@ -7,7 +7,7 @@ module.exports = function ( grunt ) {
 	grunt.loadNpmTasks( 'grunt-contrib-clean' );
 	grunt.loadNpmTasks( 'grunt-contrib-cssmin' );
 	grunt.loadNpmTasks( 'grunt-autoprefixer' );
-
+	grunt.loadNpmTasks( 'grunt-exec' );
 
 	grunt.initConfig( {
 		copy: {
@@ -59,18 +59,30 @@ module.exports = function ( grunt ) {
 		},
 
 		jshint: {
-			src: [ 'src/**/*.js', 'misc/**/*.js'  ]
+			src: [ 'src/**/*.js', 'misc/**/*.js', '__tests__/**/*.js', ]
 		},
 
 		jscs: {
-			src: [ 'src/**/*.js', 'misc/**/*.js' ]
+			src: [ 'src/**/*.js', 'misc/**/*.js', '__tests__/**/*.js' ]
+		},
+
+		exec: {
+			jest: {
+				cmd: 'node_modules/.bin/jest'
+			}
 		}
 	} );
 
 	grunt.registerTask(
-		'test',
+		'teststyle',
 		'Tests files for code style and code quality.',
 		[ 'jshint', 'jscs' ]
+	);
+
+	grunt.registerTask(
+		'test',
+		'Runs unit tests as well as checks code style/quality.',
+		[ 'teststyle', 'exec:jest' ]
 	);
 
 	grunt.registerTask(

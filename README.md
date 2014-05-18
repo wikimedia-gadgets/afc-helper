@@ -15,11 +15,16 @@ Feel free to give it a run by adding `importScript('MediaWiki:Gadget-afch.js')` 
 
 ### Contributing
 
-Your contributions are welcome! Please add feature requests and bug reports as new issues.
+Your contributions are welcome! Please add feature requests and bug reports to [WT:AFCHRW](https://en.wikipedia.org/wiki/WT:AFCHRW) on enwiki to keep discussions centralized.
 
 If you'd like to contribute directly to the code, that's great too! In order to maintain great code quality, please submit significant changes using pull requests so that a consistent code style can be maintained throughout the project.
 
 **Protip for developers**: Set `AFCH.consts.mockItUp = true;` using your browser console and instead of making API requests which modify wiki content, the script will log what it *would have done* instead.
+
+### Testing
+We have unit tests! `afch-rewrite` uses [Jest](https://github.com/facebook/jest) for testing, a framework built on top of Jasmine that offers dead-simple mocking, built-in simulated DOM manipulation using [jsdom](https://github.com/tmpvar/jsdom), and more.
+
+Tests are stored in the `__tests__` directory and are run automatically on new commits via Travis.
 
 ### Uploading the script
 To upload the script to a wiki, use `scripts/upload.py`. Detailed instructions are included at the top of the file.

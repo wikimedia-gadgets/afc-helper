@@ -18,6 +18,9 @@
     "grunt-contrib-copy": "0.4.x",
     "grunt-contrib-clean": "0.5.x",
     "grunt-contrib-cssmin": "0.6.x",
-    "grunt-autoprefixer": "0.2.x"
+    "grunt-autoprefixer": "0.2.x",
+    "grunt-exec": "~0.4.5",
+    "jest-cli": "0.1.x",
+    "jquery": "~2.1.1"
   }
 }
