@@ -1752,7 +1752,8 @@
 		var newText = data.afchText;
 
 		AFCH.actions.movePage( afchPage.rawTitle, data.newTitle,
-			'Publishing accepted [[Wikipedia:Articles for creation|Articles for creation]] submission' )
+			'Publishing accepted [[Wikipedia:Articles for creation|Articles for creation]] submission',
+			{ movetalk: true } ) // Also move associated talk page if exists (e.g. `Draft_talk:`)
 			.done( function ( moveData ) {
 				var $patrolLink,
 					newPage = new AFCH.Page( moveData.to ),
@@ -1839,7 +1840,10 @@
 				} );
 
 				talkPage.edit( {
-					contents: talkText,
+					// We prepend the text so that talk page content is not removed
+					// (e.g. pages in `Draft:` namespace with discussion)
+					mode: 'prependtext',
+					contents: talkText + '\n\n',
 					summary: 'Placing [[Wikipedia:Articles for creation|Articles for creation]] banners'
 				} );
 
