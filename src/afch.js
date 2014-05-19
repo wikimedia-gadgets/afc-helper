@@ -24,7 +24,7 @@
 		AFCH.consts = {};
 
 		// Master version data
-		AFCH.consts.version = 0.7;
+		AFCH.consts.version = 0.8;
 		AFCH.consts.versionName  = 'Less is More';
 
 		// FIXME: Change when moving into production

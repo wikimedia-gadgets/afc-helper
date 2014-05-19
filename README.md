@@ -1,7 +1,7 @@
 afch-rewrite [![Build Status](https://travis-ci.org/WPAFC/afch-rewrite.png)](https://travis-ci.org/WPAFC/afch-rewrite)
 ============
 
-**v0.7 Less is More**
+**v0.8 Wandering Walrus**
 
 A tool for reviewing Articles for Creation submissions on the English Wikipedia, rewritten using clear, object-oriented JavaScript with a focus on killing bloat while adding value.
 
@@ -31,6 +31,7 @@ To upload the script to a wiki, use `scripts/upload.py`. Detailed instructions a
 
 ### Version history
 
+* 0.8 Wandering Walrus (18 May 2014)
 * 0.7 Less is More (13 April 2014)
 * 0.6 Dancing Turtle (27 March 2014)
 * 0.5 Cold Moose (21 March 2014)
