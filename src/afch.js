@@ -24,8 +24,8 @@
 		AFCH.consts = {};
 
 		// Master version data
-		AFCH.consts.version = 0.8;
-		AFCH.consts.versionName  = 'Less is More';
+		AFCH.consts.version = '0.8';
+		AFCH.consts.versionName = 'Wandering Walrus';
 
 		// FIXME: Change when moving into production
 		AFCH.consts.beta = true;

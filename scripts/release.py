@@ -59,7 +59,7 @@ version_name = raw_input('Version name > ')
 # Update src/afch.js
 
 update_file('src/afch.js',
-	r'AFCH\.consts\.version = [0-9\.]*;','AFCH.consts.version = {};'.format(version))
+	r'AFCH\.consts\.version = .*?;',"AFCH.consts.version = '{}';".format(version))
 
 update_file('src/afch.js',
 	r'AFCH\.consts\.versionName = .*?;',"AFCH.consts.versionName  = '{}';".format(version_name))
