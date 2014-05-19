@@ -9,9 +9,7 @@ Currently mainly being developed by [@theopolisme](https://github.com/theopolism
 
 ### Using
 
-On testwiki, [MediaWiki:Gadget-afch.js](https://test.wikipedia.org/wiki/MediaWiki:Gadget-afch.js) is an updated copy of the script used for development purposes.
-
-Feel free to give it a run by adding `importScript('MediaWiki:Gadget-afch.js')` to your [common.js](https://test.wikipedia.org/wiki/Special:MyPage/common.js) page there, but bear in mind that the rewrite is still alpha software.
+The script can be installed on the English Wikipedia by following the instructions at [WP:AFCHRW](https://en.wikipedia.org/wiki/Wikipedia:WikiProject_Articles_for_creation/Helper_script/Rewrite).
 
 ### Contributing
 
@@ -26,8 +24,10 @@ We have unit tests! `afch-rewrite` uses [Jest](https://github.com/facebook/jest)
 
 Tests are stored in the `__tests__` directory and are run automatically on new commits via Travis.
 
-### Uploading the script
+### Uploading and releasing the script
 To upload the script to a wiki, use `scripts/upload.py`. Detailed instructions are included at the top of the file.
+
+New versions of the script can be released through `scripts/release.py`, which automatically updates version history, inline version constants, `package.json`, etc.
 
 ### Version history
 
