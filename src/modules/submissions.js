@@ -653,21 +653,8 @@
 	// befuddlement, both for the user and for the script...)
 	$afchLaunchLink.one( 'click', createAFCHInstance );
 
-	// Wait until other JS is loaded, then mark links to the old helper script as "old"
-	$( window ).load( function () {
-		$( '#p-cactions #ca-afcHelper > a' )
-			.append( ' (old)' )
-			.click( function () {
-				// FIXME remove version check when we reach 1.0
-				// Show an alert about the old version if we haven't show one before in this session
-				if ( AFCH.consts.version >= 1.0 && window.sessionStorage && !window.sessionStorage['afch-old-warned'] ) {
-					window.alert( 'You\'re using an old, unsupported version of AFCH. Continue at your ' +
-						'own risk! (This warning will not appear again until your next browsing session.)' );
-					// Prevent warning until next session
-					window.sessionStorage['afch-old-warned'] = true;
-				}
-			} );
-	} );
+	// Mark launch link for the old helper script as "old" if present on page
+	$( '#p-cactions #ca-afcHelper > a' ).append( ' (old)' );
 
 	// If AFCH is destroyed via AFCH.destroy(),
 	// remove the $afch window and the launch link
