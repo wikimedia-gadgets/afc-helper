@@ -1,22 +1,37 @@
 //<nowiki>
 ( function ( $, mw ) {
-	var pageName = mw.config.get( 'wgPageName' ), type;
+	var subscriptToLoad = false,
+		pageName = mw.config.get( 'wgPageName' ).replace( /_/g, ' ' ),
 
-	// Check if we're on a page that's in AFCH scope (meaning its name begins
-	// with a certain string), and if so, set the type of subscript to be run
-	if ( pageName.indexOf( 'Wikipedia:Articles_for_creation/' ) === 0 ||
-		pageName.indexOf( 'Wikipedia_talk:Articles_for_creation/' ) === 0 ||
-		pageName.indexOf( 'User:' ) === 0 ||
-		pageName.indexOf( 'Draft:' ) === 0 )
-	{
-		type = 'submissions';
-	} else if ( pageName.indexOf( 'Wikipedia:Articles_for_creation/Redirects' ) === 0 ) {
-		type = 'redirects';
-	} else if ( pageName.indexOf( 'Wikipedia:Files_for_upload' ) === 0 ) {
-		type = 'ffu';
-	}
+		// `loadMap` determines which scripts should be loaded
+		// on each page. Each key is a subscript name and
+		// its value is a list of page prefixes on which it
+		// should be loaded.
 
-	if ( type ) {
+		loadMap = {
+			// `submissions.js` is for reviewing textual
+			// Articles for Creation submissions.
+			submissions: [
+				'Wikipedia:Articles for creation/',
+				'Wikipedia talk:Articles for creation/',
+				'User:',
+				'Draft:'
+			]
+		};
+
+	$.each( loadMap, function ( script, prefixes ) {
+		$.each( prefixes, function ( _, prefix ) {
+			if ( pageName.indexOf( prefix ) === 0 ) {
+				subscriptToLoad = script;
+				return false;
+			}
+		} );
+
+		// Return false and break out of the loop if already found
+		return !!subscriptToLoad;
+	} );
+
+	if ( subscriptToLoad ) {
 		// Initialize the AFCH object
 		window.AFCH = {};
 
@@ -34,9 +49,8 @@
 		AFCH.consts.baseurl = AFCH.consts.scriptpath +
 			'?action=raw&ctype=text/javascript&title=MediaWiki:Gadget-afch.js';
 
-		// FIXME: Right now mw.loader.using doesn't let you load urls :(
 		$.getScript( AFCH.consts.baseurl + '/core.js' ).done( function () {
-			var loaded = AFCH.load( type );
+			var loaded = AFCH.load( subscriptToLoad );
 			if ( !loaded ) {
 				mw.notify( 'AFCH could not be loaded: ' + ( AFCH.error || 'unknown error' ),
 					{ title: 'AFCH error' } );

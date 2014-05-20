@@ -16,6 +16,10 @@ mw.config = {
 	get: jest.genMockFunction()
 };
 
+mw.user = {
+	getName: jest.genMockFunction()
+};
+
 var basePageHtml = fs.readFileSync( './__tests__/test-frame.html' ).toString();
 
 requireScript = function ( name ) {
