@@ -77,7 +77,7 @@
 				// Used when status is disabled
 				nullstatus: { update: function () { return; } },
 				// Current user
-				user: mw.user.id(),
+				user: mw.user.getName(),
 				// Wiki id/database name, e.g. "enwiki"
 				wikiId: mw.config.get( 'wgDBname' ),
 				// Require users to be on whitelist to use the script
