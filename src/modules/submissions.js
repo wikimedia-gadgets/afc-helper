@@ -1663,8 +1663,7 @@
 						// Custom decline rationale
 						reason: function () {
 							$afch.find( '#declineTextarea' )
-								.attr( 'placeholder', 'Enter your decline reason here; be clear and supportive. Use wikicode syntax ' +
-								'and link to relevant policies or pages with additional information.' );
+								.attr( 'placeholder', 'Enter your decline reason here using wikicode syntax.' );
 						}
 					};
 
