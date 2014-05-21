@@ -204,6 +204,9 @@
 				if ( sub.submitters.indexOf( template.params.u ) === -1 ) {
 					sub.submitters.push( template.params.u );
 				}
+
+				// Will be re-added in makeWikicode() if necessary
+				delete template.params.small; // small=yes for old declines
 			}
 
 			return keepTemplate;
@@ -221,7 +224,8 @@
 	 * @return {string}
 	 */
 	AFCH.Submission.prototype.makeWikicode = function () {
-		var output = [];
+		var output = [],
+			hasDeclineTemplate = false;
 
 		// Submission templates go first
 		$.each( this.templates, function ( _, template ) {
@@ -284,6 +288,17 @@
 					tout += '|' + key + '=' + value;
 				}
 			} );
+
+			// Collapse old decline template if a newer decline
+			// template is already displayed on the page
+			if ( hasDeclineTemplate && template.status === 'd' ) {
+				tout += '|small=yes';
+			}
+
+			// So that subsequent decline templates will be collapsed
+			if ( template.status === 'd' ) {
+				hasDeclineTemplate = true;
+			}
 
 			// Finally, add the timestamp and a warning about removing the template
 			tout += '|ts=' + template.timestamp + '}} <!-- Do not remove this line! -->';
