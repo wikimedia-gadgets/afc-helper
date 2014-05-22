@@ -1141,6 +1141,10 @@
 			.text( $submitBtn.data( 'running' ) )
 			.addClass( 'disabled' )
 			.off( 'click' );
+
+		// Handler will run after the main AJAX requests complete
+		setupAjaxStopHandler();
+
 	}
 
 	/**
@@ -1232,10 +1236,6 @@
 
 				// Now finally call the applicable handler
 				fn( data );
-
-				// After starting AJAX requests in the above function, set up the
-				// ajaxStop event handler which is trigger after they finish.
-				setupAjaxStopHandler();
 			} );
 		} );
 	}
