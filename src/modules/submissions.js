@@ -1017,8 +1017,8 @@
 					reviewer = afchSubmission.params.reviewer || 'Someone';
 				}
 
-				addWarning( reviewer + ( afchSubmission.params.reviewerts ?
-					' began reviewing this submission ' + AFCH.relativeTimeSince( afchSubmission.params.reviewerts ) :
+				addWarning( reviewer + ( afchSubmission.params.reviewts ?
+					' began reviewing this submission ' + AFCH.relativeTimeSince( afchSubmission.params.reviewts ) :
 					' already began reviewing this submission' ) + '.',
 					'View page history', mw.util.getUrl( AFCH.consts.pagename, { action: 'history' } ) );
 			}
@@ -2100,11 +2100,11 @@
 			var text = new AFCH.Text( rawText );
 
 			if ( unmark ) {
-				afchSubmission.setStatus( '', { reviewer: false, reviewerts: false } );
+				afchSubmission.setStatus( '', { reviewer: false, reviewts: false } );
 			} else {
 				afchSubmission.setStatus( 'r', {
 					reviewer: AFCH.consts.user,
-					reviewerts: '{{subst:REVISIONTIMESTAMP}}'
+					reviewts: '{{subst:REVISIONTIMESTAMP}}'
 				} );
 			}
 
