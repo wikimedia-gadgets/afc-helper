@@ -1143,11 +1143,17 @@
 			.text( $submitBtn.data( 'running' ) )
 			.addClass( 'disabled' )
 			.off( 'click' );
+	}
 
-		// And finally, make it so when all AJAX requests are
-		// complete, the done text and a reload link will be shown
+	/**
+	 * Sets up the `ajaxStop` handler which runs after all ajax
+	 * requests are complete and changes the text of the button
+	 * to "Done" and auto-reloads the page.
+	 */
+	function setupAjaxStopHandler () {
 		$( document ).ajaxStop( function () {
-			$submitBtn.text( 'Done' )
+			$afch.find( '#afchSubmitForm' )
+				.text( 'Done' )
 				.append(
 					' ',
 					$( '<a>' )
@@ -1228,6 +1234,10 @@
 
 				// Now finally call the applicable handler
 				fn( data );
+
+				// After starting AJAX requests in the above function, set up the
+				// ajaxStop event handler which is trigger after they finish.
+				setupAjaxStopHandler();
 			} );
 		} );
 	}
