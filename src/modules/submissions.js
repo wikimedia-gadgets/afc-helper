@@ -384,10 +384,8 @@
 					params: newParams
 			} );
 		} else {
-			// Just modify the template at the top of the stack. Update its
-			// timestamp and namespace because it has been modified
+			// Just modify the template at the top of the stack
 			relevantTemplate.status = newStatus;
-			relevantTemplate.timestamp = '{{subst:REVISIONTIMESTAMP}}';
 			relevantTemplate.params.ns = mw.config.get( 'wgNamespaceNumber' );
 
 			// Add new parameters if specified
