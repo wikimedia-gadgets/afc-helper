@@ -3,7 +3,8 @@
 <!-- main -->
 <div class="review-panel initial">
 	<div class="initial-header">
-		<span>AFCH v<span title="{{versionName}}">{{version}}</span></span>
+		<span>AFCH v<span title="{{versionName}}">{{version}}</span>&nbsp;
+		(<span class="feedback-wrapper"></span> | <span class="preferences-wrapper"></span>)</span>
 		Reviewing "{{title}}"
 	</div>
 	<div class="warnings hidden"></div>
@@ -57,7 +58,7 @@
 <!-- accept -->
 <div class="review-panel accept">
 	<div class="header">Accepting...</div>
-	<div id="afchContent" class="content">
+	<div id="afchContent" class="content afch-form">
 
 		<div id="newTitleWrapper">
 			<label for="newTitle" class="afch-label">New title</label>

@@ -60,10 +60,9 @@
 
 			AFCH.api = new mw.Api();
 
-			// FIXME: Add real preferences code!
-			AFCH.prefs = {
-				summaryAd: ' ([[WP:AFCHRW|afch-rewrite]] ' + AFCH.consts.version + ')'
-			};
+			// Set up the preferences interface
+			AFCH.preferences = new AFCH.Preferences();
+			AFCH.prefs = AFCH.preferences.prefStore;
 
 			// Add more constants -- don't overwrite those already set, though
 			AFCH.consts = $.extend( {}, {
@@ -78,8 +77,8 @@
 				nullstatus: { update: function () { return; } },
 				// Current user
 				user: mw.user.getName(),
-				// Wiki id/database name, e.g. "enwiki"
-				wikiId: mw.config.get( 'wgDBname' ),
+				// Edit summary ad
+				summaryAd: ' ([[WP:AFCHRW|afch-rewrite]] ' + AFCH.consts.version + ')',
 				// Require users to be on whitelist to use the script
 				whitelistRequired: true,
 				// Name of the whitelist page for reviewers
@@ -143,6 +142,7 @@
 					// jquery resources
 					'jquery.chosen',
 					'jquery.spinner',
+					'jquery.ui.dialog',
 
 					// mediawiki.api
 					'mediawiki.api',
@@ -169,8 +169,8 @@
 		initFeedback: function ( $element, type, linkText ) {
 			var feedback = new mw.Feedback( {
 					title: new mw.Title( 'Wikipedia talk:WikiProject Articles for creation/Helper script/Rewrite' ),
-					bugsLink: 'https://github.com/WPAFC/afch-rewrite/issues/new',
-					bugsListLink: 'https://github.com/WPAFC/afch-rewrite/issues?state=open'
+					bugsLink: 'https://en.wikipedia.org/w/index.php?title=Wikipedia_talk:WikiProject_Articles_for_creation/Helper_script/Rewrite&action=edit&section=new',
+					bugsListLink: 'https://en.wikipedia.org/w/index.php?title=Wikipedia_talk:WikiProject_Articles_for_creation/Helper_script/Rewrite'
 				} );
 			$( '<span>' )
 				.text( linkText || 'Give feedback!' )
@@ -553,7 +553,7 @@
 					action: 'edit',
 					text: options.contents,
 					title: pagename,
-					summary: options.summary + AFCH.prefs.summaryAd
+					summary: options.summary + AFCH.consts.summaryAd
 				};
 
 				// Depending on mode, set appendtext=text or prependtext=text,
@@ -636,7 +636,7 @@
 					action: 'move',
 					from: oldTitle,
 					to: newTitle,
-					reason: reason + AFCH.prefs.summaryAd
+					reason: reason + AFCH.consts.summaryAd
 				}, additionalParameters );
 
 				if ( AFCH.consts.mockItUp ) {
@@ -708,6 +708,11 @@
 				var deferred = $.Deferred(),
 					logPage = new AFCH.Page( 'User:' + mw.config.get( 'wgUserName' ) + '/' +
 						( window.Twinkle && window.Twinkle.getPref( 'speedyLogPageName' ) || 'CSD log' ) );
+
+				// Abort if user disabled in preferences
+				if ( !AFCH.prefs.logCsd ) {
+					return;
+				}
 
 				logPage.getText().done( function ( logText ) {
 					var status,
@@ -984,9 +989,158 @@
 					return JSON.parse( cached );
 				}
 
+				// Prevent JSON.parse from exploding on the `undefined`
+				if ( !fallback ) {
+					fallback = false;
+				}
+
 				// Otherwise just use mw.user.options
 				return JSON.parse( mw.user.options.get( fullKey, JSON.stringify( fallback ) ) );
 			}
+		},
+
+		/**
+		 * AFCH.Preferences is a mechanism for accessing and altering user
+		 * preferences in regards to the script.
+		 *
+		 * Preferences are edited by the user via a jquery.ui.dialog and are
+		 * saved and persist for the user using AFCH.userData.
+		 *
+		 * Typical usage:
+		 *  AFCH.preferences = new AFCH.Preferences();
+		 *  AFCH.preferences.initLink( $( '.put-prefs-link-here' ) );
+		 *
+		 * @type {object}
+		 */
+		Preferences: function () {
+			var prefs = this;
+
+			/**
+			 * Default values for user preferences; details for each preference can be
+			 * found inline in `templates/tpl-preferences.html`.
+			 * @type {object}
+			 */
+			this.prefDefaults = {
+				autoOpen: false,
+				logCsd: true
+			};
+
+			/**
+			 * Current user's preferences
+			 * @type {object}
+			 */
+			this.prefStore = AFCH.userData.get( 'preferences', this.prefDefaults );
+
+			/**
+			 * Initializes the preferences modification dialog
+			 */
+			this.initDialog = function () {
+				var $spinner = $.createSpinner( {
+						size: 'large',
+						type: 'block'
+					} ).css( 'padding', '20px' );
+
+				if ( !this.$dialog ) {
+					// Initialize the $dialog div
+					this.$dialog = $( '<div>' );
+				}
+
+				// Until we finish lazy-loading the prefs interface,
+				// show a spinner in its place.
+				this.$dialog.empty().append( $spinner );
+
+				this.$dialog.dialog( {
+					width: 500,
+					autoOpen: false,
+					title: 'AFCH Preferences',
+					modal: true,
+					buttons: [
+						{
+							text: 'Cancel',
+							click: function () {
+								prefs.$dialog.dialog( 'close' );
+							}
+						},
+						{
+							text: 'Save preferences',
+							click: function () {
+								prefs.save();
+								prefs.$dialog.empty().append( $spinner );
+							}
+						}
+					]
+				} );
+
+				// If we've already fetched the template, render immediately
+				if ( this.views ) {
+					this.renderMain();
+				} else {
+					// Otherwise, load the template file and *then* render
+					$.ajax( {
+						type: 'GET',
+						url: AFCH.consts.baseurl + '/tpl-preferences.js',
+						dataType: 'text'
+					} ).done( function ( data ) {
+						prefs.views = new AFCH.Views( data );
+						prefs.renderMain();
+					} );
+				}
+			};
+
+			/**
+			 * Renders the main preferences menu in the $dialog
+			 */
+			this.renderMain = function () {
+				if ( !( this.views && this.$dialog ) ) {
+					return;
+				}
+
+				// Empty the dialog and render the preferences view. Provides the values of all
+				// of the preferences as variables, as well as an additional few used in other locations.
+				this.$dialog.empty().append(
+					this.views.renderView( 'preferences', $.extend( {}, this.prefStore, {
+						version: AFCH.consts.version,
+						versionName: AFCH.consts.versionName
+					} ) )
+				);
+			};
+
+			/**
+			 * Updates prefs based on data in the dialog which
+			 * is created in AFCH.preferences.init().
+			 */
+			this.save = function () {
+				// First, hide the buttons so the user won't start multiple actions
+				this.$dialog.dialog( { buttons: [] } );
+
+				// Now update the prefStore
+				$.extend( this.prefStore, AFCH.getFormValues( this.$dialog.find( '.afch-input' ) ) );
+
+				// Set the new userData value
+				AFCH.userData.set( 'preferences', this.prefStore ).done( function () {
+					// When we're done, close the dialog and notify the user
+					prefs.$dialog.dialog( 'close' );
+					mw.notify( 'AFCH: Preferences saved successfully! They will take effect when the current page is ' +
+						'reloaded or when you browse to another page.' );
+				} );
+			};
+
+			/**
+			 * Adds a link to launch the preferences modification dialog
+			 *
+			 * @param {jQuery} $element element to append the link to
+			 * @param {string} linkText text to display in the link
+			 */
+			this.initLink = function ( $element, linkText ) {
+				$( '<span>' )
+					.text( linkText || 'Update preferences' )
+					.addClass( 'preferences-link link' )
+					.appendTo( $element )
+					.click( function () {
+						prefs.initDialog();
+						prefs.$dialog.dialog( 'open' );
+					} );
+			};
 		},
 
 		/**
@@ -1080,6 +1234,56 @@
 				array.splice( index, 1 );
 				index = $.inArray( value, array );
 			}
+		},
+
+		/**
+		 * Gets the values of all elements matched by a selector, including
+		 * converting checkboxes to bools, providing textual values of select
+		 * elements, ignoring placeholder elements, and more.
+		 *
+		 * @param {jQuery} $selector elements to get values from
+		 * @return {object} object of values, with the ids as keys
+		 */
+		getFormValues: function ( $selector ) {
+			var data = {};
+
+			$selector.each( function ( _, element ) {
+				var value, allTexts,
+					$element = $( element );
+
+				if ( element.type === 'checkbox' ) {
+					value = element.checked;
+				} else {
+					value = $element.val();
+
+					// Ignore placeholder text
+					if ( value === $element.attr( 'placeholder' ) ) {
+						value = '';
+					}
+
+					// For <select multiple> with nothing selected, jQuery returns null...
+					// convert that to an empty array so that $.each() won't explode later
+					if ( value === null ) {
+						value = [];
+					}
+
+					// Also provide the full text of the selected options in <select>.
+					// Primary use for this is the edit summary in handleDecline().
+					if ( element.nodeName.toLowerCase() === 'select' ) {
+						allTexts = [];
+
+						$element.find( 'option:selected' ).each( function () {
+							allTexts.push( $( this ).text() );
+						} );
+
+						data[element.id + 'Texts'] = allTexts;
+					}
+				}
+
+				data[element.id] = value;
+			} );
+
+			return data;
 		},
 
 		/**

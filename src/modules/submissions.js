@@ -662,9 +662,13 @@
 	$afchLaunchLink = $( mw.util.addPortletLink( 'p-cactions', '#', 'Review (AFCH)',
 		'ca-afch', 'Review submission using afch-rewrite', '1' ) );
 
-	// When clicked, launch AFCH (only once to prevent serious
-	// befuddlement, both for the user and for the script...)
-	$afchLaunchLink.one( 'click', createAFCHInstance );
+	if ( AFCH.prefs.autoOpen ) {
+		// Launch the script immediately
+		createAFCHInstance();
+	} else {
+		// Otherwise, wait for a click (`one` to prevent spawning multiple panels)
+		$afchLaunchLink.one( 'click', createAFCHInstance );
+	}
 
 	// Mark launch link for the old helper script as "old" if present on page
 	$( '#p-cactions #ca-afcHelper > a' ).append( ' (old)' );
@@ -805,8 +809,9 @@
 				}
 			} );
 
-			// Add the feedback link to the header
-			AFCH.initFeedback( $afch.find( '.initial-header > span' ), '[your topic here]', '(Give feedback!)' );
+			// Add feedback and preferences links
+			AFCH.initFeedback( $afch.find( 'span.feedback-wrapper' ), '[your topic here]', 'give feedback' );
+			AFCH.preferences.initLink( $afch.find( 'span.preferences-wrapper' ), 'preferences' );
 
 			// Set up click handlers
 			$afch.find( '#afchAccept' ).click( function () { spinnerAndRun( showAcceptOptions ); } );
@@ -1196,41 +1201,7 @@
 				data.afchText = new AFCH.Text( text );
 
 				// Also provide the values for each afch-input element
-				$afch.find( '.afch-input' ).each( function ( _, element ) {
-					var value, allTexts,
-						$element = $( element );
-
-					if ( element.type === 'checkbox' ) {
-						value = element.checked;
-					} else {
-						value = $element.val();
-
-						// Ignore placeholder text
-						if ( value === $element.attr( 'placeholder' ) ) {
-							value = '';
-						}
-
-						// For <select multiple> with nothing selected, jQuery returns null...
-						// convert that to an empty array so that $.each() won't explode later
-						if ( value === null ) {
-							value = [];
-						}
-
-						// Also provide the full text of the selected options in <select>.
-						// Primary use for this is the edit summary in handleDecline().
-						if ( element.nodeName.toLowerCase() === 'select' ) {
-							allTexts = [];
-
-							$element.find( 'option:selected' ).each( function () {
-								allTexts.push( $( this ).text() );
-							} );
-
-							data[element.id + 'Texts'] = allTexts;
-						}
-					}
-
-					data[element.id] = value;
-				} );
+				$.extend( data, AFCH.getFormValues( $afch.find( '.afch-input' ) ) );
 
 				prepareForProcessing();
 
