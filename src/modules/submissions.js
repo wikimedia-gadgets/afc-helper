@@ -714,7 +714,9 @@
 							.click( function () {
 								// DIE DIE DIE (...then allow clicks on the launch link again)
 								$afch.remove();
-								$afchLaunchLink.one( 'click', createAFCHInstance );
+								$afchLaunchLink
+									.off( 'click' ) // Get rid of old handler
+									.one( 'click', createAFCHInstance );
 							} )
 					)
 			);
