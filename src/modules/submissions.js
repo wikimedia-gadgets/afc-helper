@@ -662,8 +662,11 @@
 	$afchLaunchLink = $( mw.util.addPortletLink( 'p-cactions', '#', 'Review (AFCH)',
 		'ca-afch', 'Review submission using afch-rewrite', '1' ) );
 
-	if ( AFCH.prefs.autoOpen ) {
-		// Launch the script immediately
+	if ( AFCH.prefs.autoOpen &&
+		// Don't load in userspace -- too many false positives
+		AFCH.consts.pagename.indexOf( 'User:' ) !== 0 )
+	{
+		// Launch the script immediately if preference set
 		createAFCHInstance();
 	} else {
 		// Otherwise, wait for a click (`one` to prevent spawning multiple panels)
