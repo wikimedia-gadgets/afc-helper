@@ -1022,7 +1022,8 @@
 			 */
 			this.prefDefaults = {
 				autoOpen: false,
-				logCsd: true
+				logCsd: true,
+				launchLinkPosition: 'p-cactions'
 			};
 
 			/**

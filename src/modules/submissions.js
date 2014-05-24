@@ -659,8 +659,8 @@
 	};
 
 	// Add the launch link
-	$afchLaunchLink = $( mw.util.addPortletLink( 'p-cactions', '#', 'Review (AFCH)',
-		'ca-afch', 'Review submission using afch-rewrite', '1' ) );
+	$afchLaunchLink = $( mw.util.addPortletLink( AFCH.prefs.launchLinkPosition, '#', 'Review (AFCH)',
+		'afch-launch', 'Review submission using afch-rewrite', '1' ) );
 
 	if ( AFCH.prefs.autoOpen &&
 		// Don't load in userspace -- too many false positives

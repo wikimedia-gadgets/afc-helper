@@ -10,6 +10,13 @@
 		<label for="autoOpen" class="afch-label">Automatically open the review panel on AfC submissions</label>
 		<input type="checkbox" id="autoOpen" class="afch-input" {{#autoOpen}}checked{{/autoOpen}} />
 	</div>
+	<div id="launchLinkPositionWrapper">
+		<label for="launchLinkPosition" class="afch-label">Location of "Review (AFCH)" link</label>
+		<select id="launchLinkPosition" class="afch-input">
+			<option value="p-cactions">Triangle dropdown next to the "Edit" and "History" links</option>
+			<option value="p-tb">"Tools" section on the lefthand side of the page</option>
+		</select>
+	</div>
 	<div id="logCsdWrapper">
 		<label for="logCsd" class="afch-label">Log speedy deletion nominations</label>
 		<input type="checkbox" id="logCsd" class="afch-input" {{#logCsd}}checked{{/logCsd}} />
