@@ -663,8 +663,11 @@
 		'afch-launch', 'Review submission using afch-rewrite', '1' ) );
 
 	if ( AFCH.prefs.autoOpen &&
-		// Don't load in userspace -- too many false positives
-		AFCH.consts.pagename.indexOf( 'User:' ) !== 0 )
+		// Don't autoload in userspace -- too many false positives
+		AFCH.consts.pagename.indexOf( 'User:' ) !== 0 &&
+		// Only autoload if viewing or editing the page
+		[ 'view', 'edit', null ].indexOf( AFCH.getParam( 'action' ) ) !== -1 &&
+		!AFCH.getParam( 'diff' ) && !AFCH.getParam( 'oldid' ) )
 	{
 		// Launch the script immediately if preference set
 		createAFCHInstance();

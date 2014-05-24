@@ -1492,6 +1492,20 @@
 				( '0' + date.getUTCHours() ).slice( -2 ) +
 				( '0' + date.getUTCMinutes() ).slice( -2 ) +
 				( '0' + date.getUTCSeconds() ).slice( -2 ) );
+		},
+
+		/**
+		 * Returns the value of the specified URL parameter. By default it uses
+		 * the current window's address. Optionally you can pass it a custom location.
+		 * It returns null if the parameter is not present, or an empty string if the
+		 * parameter is empty.
+		 *
+		 * @param {string} name parameter to get
+		 * @param {string} url optional; custom url to search
+		 * @return {string|null} value, or null if not present
+		 */
+		getParam: function () {
+			return mw.util.getParamValue.apply( this, arguments );
 		}
 	} );
 
