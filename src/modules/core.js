@@ -1029,7 +1029,7 @@
 			 * Current user's preferences
 			 * @type {object}
 			 */
-			this.prefStore = AFCH.userData.get( 'preferences', this.prefDefaults );
+			this.prefStore = $.extend( {}, this.prefDefaults, AFCH.userData.get( 'preferences', {} ) );
 
 			/**
 			 * Initializes the preferences modification dialog
@@ -1103,6 +1103,14 @@
 						versionName: AFCH.consts.versionName
 					} ) )
 				);
+
+				// Manually handle selecting the desired value in <select> menus
+				this.$dialog.find( 'select' ).each( function () {
+					var $select = $( this ),
+						id = $select.attr( 'id' ),
+						value = prefs.prefStore[id];
+					$select.find( 'option[value="' + value + '"]' ).prop( 'selected', true );
+				} );
 			};
 
 			/**
