@@ -67,9 +67,6 @@
 			deferred = $.Deferred();
 
 		this.page.getTemplates().done( function ( templates ) {
-			// Log for debugging purposes
-			AFCH.log( templates );
-
 			sub.loadDataFromTemplates( templates );
 			sub.sortAndParseInternalData();
 			deferred.resolve( sub );
