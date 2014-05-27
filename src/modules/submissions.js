@@ -1179,7 +1179,7 @@
 			$( '#mw-content-text' ).load( AFCH.consts.pagelink + ' #mw-content-text', function () {
 				$afch.find( '#reloadLink' ).text( '(reloaded automatically)' );
 				// Fire the hook for new page content
-				mw.hook( 'wikipage.content' ).fire( $afch.find( '#mw-content-text' ) );
+				mw.hook( 'wikipage.content' ).fire( $( '#mw-content-text' ) );
 			} );
 
 			// Stop listening to ajaxStop events; otherwise these can stack up if
