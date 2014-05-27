@@ -1101,7 +1101,8 @@
 				this.$dialog.empty().append(
 					this.views.renderView( 'preferences', $.extend( {}, this.prefStore, {
 						version: AFCH.consts.version,
-						versionName: AFCH.consts.versionName
+						versionName: AFCH.consts.versionName,
+						userAgent: window.navigator.userAgent
 					} ) )
 				);
 
