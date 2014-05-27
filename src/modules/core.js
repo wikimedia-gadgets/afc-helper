@@ -3,17 +3,15 @@
 	$.extend( AFCH, {
 
 		/**
-		 * Log something to the console
-		 * @param {string|object} thing
+		 * Log anything to the console
+		 * @param {anything} thing(s)
 		 */
-		log: function ( thing ) {
+		log: function () {
+			var args = Array.prototype.slice.call( arguments );
+
 			if ( AFCH.consts.beta && console && console.log ) {
-
-				if ( typeof thing === 'object' ) {
-					thing = JSON.stringify( thing );
-				}
-
-				console.log( 'AFCH: ' + thing );
+				args.unshift( 'AFCH:' );
+				console.log.apply( console, args );
 			}
 		},
 
