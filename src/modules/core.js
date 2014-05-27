@@ -929,7 +929,23 @@
 		},
 
 		/**
-		 * Interact with the mw.user.options data store
+		 * Store persistent data for the user. Data is stored over
+		 * several layers: window-locally, in a variable; broswer-locally,
+		 * via localStorage, and finally not-so-locally-at-all, via
+		 * mw.user.options.
+		 *
+		 * == REDUNDANCY, EXPLAINED ==
+		 * The reason for this redundancy is because of an obnoxious
+		 * little thing called caching. Ideally the script would simply
+		 * use mw.user.options, but *apparently* MediaWiki doesn't always
+		 * provide the most updated mw.user.options on page load -- in some
+		 * instances, it will provide an stale, cached version instead.
+		 * This is most certainly a MediaWiki bug, but in the meantime, we
+		 * circumvent it by adding numerous layers of redundancy to the whole
+		 * getup. In this manner, hopefully by the time we have to rely on
+		 * mw.user.options, the cache will have been invalidated and the world
+		 * won't explode. *sighs repeatedly* --Theopolisme, 26 May 2014
+		 *
 		 * @type {Object}
 		 */
 		userData: {
@@ -946,7 +962,7 @@
 			_optsCache: {},
 
 			/**
-			 * Set a value in the mw.user.options data store
+			 * Set a value in the data store
 			 * @param {string} key
 			 * @param {mixed} value
 			 * @return {$.Deferred} success
@@ -961,6 +977,12 @@
 				// some reason the post fails...oh well...
 				AFCH.userData._optsCache[fullKey] = fullValue;
 
+				// Also update localStorage cache for more redundancy.
+				// See note in AFCH.userData docs for why this is necessary.
+				if ( window.localStorage ) {
+					window.localStorage[fullKey] = fullValue;
+				}
+
 				AFCH.api.postWithToken( 'options', {
 					action: 'options',
 					optionname: fullKey,
@@ -973,27 +995,26 @@
 			},
 
 			/**
-			 * Gets a value from the mw.user.options data store
+			 * Gets a value from the data store
 			 * @param {string} key
 			 * @param {mixed} fallback fallback if option not present
 			 * @return {mixed} value
 			 */
 			get: function ( key, fallback ) {
-				var fullKey = AFCH.userData._prefix + key,
-					cached = AFCH.userData._optsCache[fullKey];
+				var value,
+					fullKey = AFCH.userData._prefix + key,
+					cachedWindow = AFCH.userData._optsCache[fullKey],
+					cachedLocal = window.localStorage && window.localStorage[fullKey];
 
-				// Use cached value if possible, since it's more recent
-				if ( cached ) {
-					return JSON.parse( cached );
+				// Use cached value if possible, see explanation in AFCH.userData docs.
+				value = cachedWindow || cachedLocal;
+
+				if ( value ) {
+					return JSON.parse( value );
 				}
 
-				// Prevent JSON.parse from exploding on the `undefined`
-				if ( !fallback ) {
-					fallback = false;
-				}
-
-				// Otherwise just use mw.user.options
-				return JSON.parse( mw.user.options.get( fullKey, JSON.stringify( fallback ) ) );
+				// Otherwise just use mw.user.options (with fallback).
+				return JSON.parse( mw.user.options.get( fullKey, JSON.stringify( fallback || false ) ) );
 			}
 		},
 
