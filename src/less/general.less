@@ -47,15 +47,18 @@ div.gradient-button, .gradient-button {
 	cursor: pointer;
 	text-decoration: none;
 	user-select: none;
+	transition: box-shadow .1s ease-in-out;
 
 	&:hover {
 		text-decoration: none;
 		background-image: linear-gradient(top, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.2));
+		box-shadow:0 1px rgba(0, 0, 0, .1), inset 0 -3px rgba(0, 0, 0, .2);
 	}
 
 	&:active {
 		color: @sexyblack;
 		background-image: linear-gradient(bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.2));
+		box-shadow: 0 1px rgba(0, 0, 0, .2);
 	}
 
 	&.disabled {
@@ -66,6 +69,7 @@ div.gradient-button, .gradient-button {
 
 		&:active, &:hover {
 			background-image: none;
+                        box-shadow: none;
 		}
 	}
 }
