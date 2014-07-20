@@ -461,6 +461,39 @@
 	};
 
 	/**
+	 * Gets the next submission in the queue (i.e. the oldest one).
+	 * @param {bool} older Whether to get the oldest pending submission instead of the newest one.
+	 * @return {$.Deferred} resolves with API call
+	 */
+	AFCH.Submission.prototype.getNextSubmission = function (older) {
+		var deferred = $.Deferred();
+
+		var request = {
+			'action': 'query',
+			'list': 'categorymembers',
+			'format': 'json',
+			'cmtitle': 'Category:Pending AfC submissions',
+			'cmnamespace': 5,
+			'cmtype': 'page',
+			'cmlimit': 1,
+			'cmsort': 'sortkey',
+			'cmdir': (older ? 'desc' : 'asc'),
+			'cmstartsortkey': 'P' + (older ? parseInt(afcHelper_submitTimestamp/100) : parseInt(afcHelper_submitTimestamp/100) + 1)
+		};
+
+		AFCH.api.get( request )
+			.done( function( data ) {
+				if ( data.query.categorymembers && data.query.categorymembers[0].title) {
+					deferred.resolve( data.query.categorymembers[0].title );
+				} else {
+					deferred.reject( data );
+				}
+			} );
+
+		return deferred;
+	};
+
+	/**
 	 * Represents text of an AfC submission
 	 * @param {[type]} text [description]
 	 */
