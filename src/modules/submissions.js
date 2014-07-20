@@ -466,7 +466,7 @@
 	 * @return {$.Deferred} resolves with API call
 	 */
 	AFCH.Submission.prototype.getNextSubmission = function (older) {
-		older = (typeof older === 'undefined' ? false : older;
+		older = (typeof older === 'undefined') ? false : older;
 		var deferred = $.Deferred();
 
 		var request = {
@@ -1212,7 +1212,7 @@
 
 			AFCH.prototype.getNextSubmission().done( function( title ) {
 				$afch.find( '#afchStatus' )
-					.append(new AFCH.status.Element( 'Continue to next submission, $1...', { '$1': AFCH.makeLinkElementToPage( pagename ) } );
+					.append(new AFCH.status.Element( 'Continue to next submission, $1...', { '$1': AFCH.makeLinkElementToPage( pagename ) } ) );
 			} );
 
 			// Also, automagically reload the page in place
