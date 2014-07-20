@@ -466,6 +466,7 @@
 	 * @return {$.Deferred} resolves with API call
 	 */
 	AFCH.Submission.prototype.getNextSubmission = function (older) {
+		older = (typeof older === 'undefined' ? false : older;
 		var deferred = $.Deferred();
 
 		var request = {
@@ -1193,7 +1194,8 @@
 	/**
 	 * Sets up the `ajaxStop` handler which runs after all ajax
 	 * requests are complete and changes the text of the button
-	 * to "Done" and auto-reloads the page.
+	 * to "Done", shows a link to the next submission and
+	 * auto-reloads the page.
 	 */
 	function setupAjaxStopHandler () {
 		$( document ).ajaxStop( function () {
@@ -1207,6 +1209,11 @@
 						.attr( 'href', mw.util.getUrl() )
 						.text( '(reloading...)' )
 				);
+
+			AFCH.prototype.getNextSubmission().done( function( title ) {
+				$afch.find( '#afchStatus' )
+					.append(new AFCH.status.Element( 'Continue to next submission, $1...', { '$1': AFCH.makeLinkElementToPage( pagename ) } );
+			} );
 
 			// Also, automagically reload the page in place
 			$( '#mw-content-text' ).load( AFCH.consts.pagelink + ' #mw-content-text', function () {
