@@ -467,9 +467,7 @@
 	 */
 	AFCH.Submission.prototype.getNextSubmission = function (older) {
 		older = (typeof older === 'undefined') ? false : older;
-		var deferred = $.Deferred();
-
-		var request = {
+		var deferred = $.Deferred(), request = {
 			'action': 'query',
 			'list': 'categorymembers',
 			'format': 'json',
@@ -479,11 +477,11 @@
 			'cmlimit': 1,
 			'cmsort': 'sortkey',
 			'cmdir': (older ? 'desc' : 'asc'),
-			'cmstartsortkey': 'P' + (older ? parseInt(afcHelper_submitTimestamp/100) : parseInt(afcHelper_submitTimestamp/100) + 1)
+			'cmstartsortkey': 'P' + (older ? parseInt( afcHelper_submitTimestamp / 100 ) : parseInt( afcHelper_submitTimestamp / 100) + 1)
 		};
 
 		AFCH.api.get( request )
-			.done( function( data ) {
+			.done( function ( data ) {
 				if ( data.query.categorymembers && data.query.categorymembers[0].title) {
 					deferred.resolve( data.query.categorymembers[0].title );
 				} else {
@@ -1210,7 +1208,7 @@
 						.text( '(reloading...)' )
 				);
 
-			AFCH.prototype.getNextSubmission().done( function( title ) {
+			AFCH.prototype.getNextSubmission().done( function ( title ) {
 				$afch.find( '#afchStatus' )
 					.append(new AFCH.status.Element( 'Continue to next submission, $1...', { '$1': AFCH.makeLinkElementToPage( pagename ) } ) );
 			} );
