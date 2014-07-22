@@ -465,24 +465,23 @@
 	 * @param {bool} older Whether to get the oldest pending submission instead of the newest one.
 	 * @return {$.Deferred} resolves with API call
 	 */
-	AFCH.Submission.prototype.getNextSubmission = function (older) {
-		older = (typeof older === 'undefined') ? false : older;
-		var deferred = $.Deferred(), request = {
-			'action': 'query',
-			'list': 'categorymembers',
-			'format': 'json',
-			'cmtitle': 'Category:Pending AfC submissions',
-			'cmnamespace': 5,
-			'cmtype': 'page',
-			'cmlimit': 1,
-			'cmsort': 'sortkey',
-			'cmdir': (older ? 'desc' : 'asc'),
-			'cmstartsortkey': 'P' + (older ? parseInt( afcHelper_submitTimestamp / 100 ) : parseInt( afcHelper_submitTimestamp / 100) + 1)
+	AFCH.Submission.prototype.getNextSubmission = function ( older ) {
+		var deferred = $.Deferred(),
+		    request = {
+			action: 'query',
+			list: 'categorymembers',
+			cmtitle: 'Category:Pending AfC submissions',
+			cmnamespace: 5,
+			cmtype: 'page',
+			cmlimit: 1,
+			cmsort: 'sortkey',
+			cmdir: older ? 'desc' : 'asc',
+			cmstartsortkey: 'P' + ( ( afchSubmission.templates.length && afchSubmission.templates[0].timestamp ) / 100 ) + ( older ? 0 : 1 )
 		};
 
 		AFCH.api.get( request )
 			.done( function ( data ) {
-				if ( data.query.categorymembers && data.query.categorymembers[0].title) {
+				if ( data.query.categorymembers && data.query.categorymembers[0].title ) {
 					deferred.resolve( data.query.categorymembers[0].title );
 				} else {
 					deferred.reject( data );
@@ -1208,9 +1207,8 @@
 						.text( '(reloading...)' )
 				);
 
-			AFCH.prototype.getNextSubmission().done( function ( title ) {
-				$afch.find( '#afchStatus' )
-					.append(new AFCH.status.Element( 'Continue to next submission, $1...', { '$1': AFCH.makeLinkElementToPage( pagename ) } ) );
+			afchSubmission.getNextSubmission().done( function ( title ) {
+				new AFCH.status.Element( 'Continue to next submission, $1 &raquo;', { '$1': AFCH.makeLinkElementToPage( pagename ) } );
 			} );
 
 			// Also, automagically reload the page in place
