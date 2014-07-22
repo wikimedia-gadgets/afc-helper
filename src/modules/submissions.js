@@ -467,7 +467,7 @@
 	 */
 	AFCH.Submission.prototype.getNextSubmission = function ( older ) {
 		var deferred = $.Deferred(),
-		    request = {
+			request = {
 			action: 'query',
 			list: 'categorymembers',
 			cmtitle: 'Category:Pending AfC submissions',
@@ -1208,7 +1208,7 @@
 				);
 
 			afchSubmission.getNextSubmission().done( function ( title ) {
-				new AFCH.status.Element( 'Continue to next submission, $1 &raquo;', { '$1': AFCH.makeLinkElementToPage( pagename ) } );
+				new AFCH.status.Element( 'Continue to next submission, $1 &raquo;', { '$1': AFCH.makeLinkElementToPage( title ) } );
 			} );
 
 			// Also, automagically reload the page in place
