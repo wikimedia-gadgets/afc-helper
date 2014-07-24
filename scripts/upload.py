@@ -28,6 +28,12 @@ import git
 import mwclient
 import subprocess
 
+# Check number of arguments
+if len(sys.argv) != 4:
+	print "Incorrect number of arguments supplied."
+	print "Usage: upload.py [site] [root] [username] [password]"
+	sys.exit(1)
+
 # Shortname of the wiki target
 wiki = sys.argv[1]
 
