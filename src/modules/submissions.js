@@ -1101,8 +1101,9 @@
 			// $1 = full submission title
 			// $2 = short title
 			// $3 = copyright violation ('yes'/'no')
+			// $4 = reason code
 			'declined-submission': '== Your submission at [[Wikipedia:Articles for creation|Articles for creation]]: ' +
-				'[[$1|$2]] ({{subst:CURRENTMONTHNAME}} {{subst:CURRENTDAY}}) ==\n{{subst:Afc decline|full=$1|cv=$3|sig=yes}}',
+				'[[$1|$2]] ({{subst:CURRENTMONTHNAME}} {{subst:CURRENTDAY}}) ==\n{{subst:Afc decline|full=$1|cv=$3|sig=yes|reason=$4}}',
 
 			// $1 = article name
 			'comment-on-submission': '{{subst:AFC notification|comment|article=$1}}',
@@ -1961,6 +1962,7 @@
 						'$1': AFCH.consts.pagename,
 						'$2': afchSubmission.shortTitle,
 						'$3': declineReason === 'cv' ? 'yes' : 'no'
+						'$4': declineReason
 					} );
 
 					if ( teahouse ) {
