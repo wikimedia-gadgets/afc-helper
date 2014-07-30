@@ -1961,7 +1961,7 @@
 					var message = AFCH.msg.get( 'declined-submission', {
 						'$1': AFCH.consts.pagename,
 						'$2': afchSubmission.shortTitle,
-						'$3': declineReason === 'cv' ? 'yes' : 'no'
+						'$3': declineReason === 'cv' ? 'yes' : 'no',
 						'$4': declineReason
 					} );
 
