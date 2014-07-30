@@ -59,7 +59,7 @@ if raw_input('Build [y/n]? ') == 'y':
 		print output
 		sys.exit(1)
 	else:
-		print 'Build succeeded. Uploading to {}...'.format(wiki)
+		print 'Build ' + ('hopefully ' if not check_output else '') + 'succeeded. Uploading to {}...'.format(wiki)
 
 if wiki == 'enwiki':
 	site = mwclient.Site('en.wikipedia.org')
@@ -82,7 +82,7 @@ try:
 	sha1 = branch.commit.hexsha
 except:
 	print repo.branches
-	branch = repo.branches[raw_input("Which branch [0 to " + str(len(repo.branches) - 1) + "]? ")]
+	branch = repo.branches[int(raw_input("Which branch [0 to " + str(len(repo.branches) - 1) + "]? "))]
 	sha1 = branch.commit.id
 
 # Prepend this to every page
