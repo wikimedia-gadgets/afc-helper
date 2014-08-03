@@ -46,19 +46,18 @@ check_output = True # Do we check the output of grunt build?
 try:
 	process = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
 	output = process.communicate()[0]
+
+	if output.decode('utf-8').find('Done, without errors.') == -1:
+		print 'The following error occurred during the build, so the upload was aborted:'
+		print output
+		sys.exit(1)
+	else:
+		print "Build succeeded!"
 except WindowsError:
 	print "WindowsError encountered. Attempting to use os.system..."
 	os.system(command)
-	
-	# There's no way to check the output of os.system
-	check_output = False
 
-if check_output and output.decode('utf-8').find('Done, without errors.') == -1:
-	print 'The following error occurred during the build, so the upload was aborted:'
-	print output
-	sys.exit(1)
-else:
-	print 'Build ' + ('hopefully ' if not check_output else '') + 'succeeded. Uploading to {}...'.format(wiki)
+print 'Uploading to {}...'.format(wiki)
 
 if wiki == 'enwiki':
 	site = mwclient.Site('en.wikipedia.org')
