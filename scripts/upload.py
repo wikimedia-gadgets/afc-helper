@@ -9,7 +9,7 @@ Usage
 
 Run from the main afch-rewrite directory:
 
->>> python scripts/upload.py [site] [root] [username] [password]
+>>> python scripts/upload.py [site] [root] [username] [password] [--force]
 
 site: enwiki or testwiki
 
@@ -18,7 +18,11 @@ root: Base page name for the script, without any file extension.
       script can be loaded from `MediaWiki:Gadget-afch.js`.
 
 username: username of account on site
+
 password: password of account on site (optional)
+
+force: Flag to indicate that grunt build should be run with --force.
+       PLEASE don't use this.
 """
 from __future__ import unicode_literals
 
@@ -41,7 +45,12 @@ wiki = sys.argv[1]
 # First, create a build
 print 'Building afch-rewrite using `grunt build`...'
 command = 'grunt build'
-check_output = True # Do we check the output of grunt build?
+
+# Should we use --force on grunt build?
+if '--force' in sys.argv:
+	print 'Forcing grunt build with --force...'
+	command = command + ' --force'
+	del sys.argv[sys.argv.index('--force')]
 	
 try:
 	process = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
