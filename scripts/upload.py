@@ -19,7 +19,7 @@ root: Base page name for the script, without any file extension.
 
 username: username of account on site
 
-password: password of account on site (optional)
+password: password of account on site (if not provided, a prompt will appear)
 
 force: Flag to indicate that grunt build should be run with --force.
        PLEASE don't use this.
@@ -34,9 +34,9 @@ import subprocess
 import getpass
 
 # Check arg length
-if(len(sys.argv) < 4):
-	print "Incorrect number of arguments supplied."
-	print "Usage: python scripts/upload.py [site] [root] [username] [password]"
+if len(sys.argv) < 4:
+	print 'Incorrect number of arguments supplied.'
+	print 'Usage: python scripts/upload.py [site] [root] [username] [password] [--force]'
 	sys.exit(1)
 
 # Shortname of the wiki target
@@ -49,13 +49,11 @@ command = 'grunt build'
 # Should we use --force on grunt build?
 if '--force' in sys.argv:
 	print 'Forcing grunt build with --force...'
-	command = command + ' --force'
-	del sys.argv[sys.argv.index('--force')]
-	
+	command += ' --force'
+
 try:
 	process = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
 	output = process.communicate()[0]
-
 	if output.decode('utf-8').find('Done, without errors.') == -1:
 		print 'The following error occurred during the build, so the upload was aborted:'
 		print output
