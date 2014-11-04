@@ -1964,7 +1964,7 @@
 						'$2': afchSubmission.shortTitle,
 						'$3': declineReason === 'cv' ? 'yes' : 'no',
 						'$4': declineReason,
-						'$5': typeof newParams['3'] != 'undefined' ? newParams['3'] : ''
+						'$5': newParams['3'] || ''
 					} );
 
 					if ( teahouse ) {
