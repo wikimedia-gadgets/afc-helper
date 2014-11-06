@@ -461,6 +461,37 @@
 	};
 
 	/**
+	 * Gets the next submission in the queue (i.e. the oldest one).
+	 * @param {bool} older Whether to get the oldest pending submission instead of the newest one.
+	 * @return {$.Deferred} resolves with API call
+	 */
+	AFCH.Submission.prototype.getNextSubmission = function ( older ) {
+		var deferred = $.Deferred(),
+			request = {
+			action: 'query',
+			list: 'categorymembers',
+			cmtitle: 'Category:Pending AfC submissions',
+			cmnamespace: 5,
+			cmtype: 'page',
+			cmlimit: 1,
+			cmsort: 'sortkey',
+			cmdir: older ? 'desc' : 'asc',
+			cmstartsortkey: 'P' + ( ( afchSubmission.templates.length && afchSubmission.templates[0].timestamp ) / 100 ) + ( older ? 0 : 1 )
+		};
+
+		AFCH.api.get( request )
+			.done( function ( data ) {
+				if ( data.query.categorymembers && data.query.categorymembers[0].title ) {
+					deferred.resolve( data.query.categorymembers[0].title );
+				} else {
+					deferred.reject( data );
+				}
+			} );
+
+		return deferred;
+	};
+
+	/**
 	 * Represents text of an AfC submission
 	 * @param {[type]} text [description]
 	 */
@@ -1162,7 +1193,8 @@
 	/**
 	 * Sets up the `ajaxStop` handler which runs after all ajax
 	 * requests are complete and changes the text of the button
-	 * to "Done" and auto-reloads the page.
+	 * to "Done", shows a link to the next submission and
+	 * auto-reloads the page.
 	 */
 	function setupAjaxStopHandler () {
 		$( document ).ajaxStop( function () {
@@ -1176,6 +1208,10 @@
 						.attr( 'href', mw.util.getUrl() )
 						.text( '(reloading...)' )
 				);
+
+			afchSubmission.getNextSubmission().done( function ( title ) {
+				new AFCH.status.Element( 'Continue to next submission, $1 &raquo;', { '$1': AFCH.makeLinkElementToPage( title ) } );
+			} );
 
 			// Also, automagically reload the page in place
 			$( '#mw-content-text' ).load( AFCH.consts.pagelink + ' #mw-content-text', function () {
