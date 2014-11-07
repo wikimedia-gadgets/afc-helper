@@ -834,7 +834,7 @@
 
 				if ( extrasRevealed ) {
 					$extra.find( 'a' ).hide();
-					$extra.stop().animate( { width: '11px' }, 100, 'swing', function () {
+					$extra.stop().animate( { width: '20px' }, 100, 'swing', function () {
 						extrasRevealed = false;
 					} );
 				} else {
