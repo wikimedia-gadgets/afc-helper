@@ -166,9 +166,9 @@
 		 */
 		initFeedback: function ( $element, type, linkText ) {
 			var feedback = new mw.Feedback( {
-					title: new mw.Title( 'Wikipedia talk:WikiProject Articles for creation/Helper script/Rewrite' ),
-					bugsLink: 'https://en.wikipedia.org/w/index.php?title=Wikipedia_talk:WikiProject_Articles_for_creation/Helper_script/Rewrite&action=edit&section=new',
-					bugsListLink: 'https://en.wikipedia.org/w/index.php?title=Wikipedia_talk:WikiProject_Articles_for_creation/Helper_script/Rewrite'
+					title: new mw.Title( 'Wikipedia talk:WikiProject Articles for creation/Helper script' ),
+					bugsLink: 'https://en.wikipedia.org/w/index.php?title=Wikipedia_talk:WikiProject_Articles_for_creation/Helper_script&action=edit&section=new',
+					bugsListLink: 'https://en.wikipedia.org/w/index.php?title=Wikipedia_talk:WikiProject_Articles_for_creation/Helper_script'
 				} );
 			$( '<span>' )
 				.text( linkText || 'Give feedback!' )
