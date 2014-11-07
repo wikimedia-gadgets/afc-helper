@@ -481,7 +481,7 @@
 
 		AFCH.api.get( request )
 			.done( function ( data ) {
-				if ( data.query.categorymembers && data.query.categorymembers[0].title ) {
+				if ( data.query.categorymembers && data.query.categorymembers.length && data.query.categorymembers[0].title ) {
 					deferred.resolve( data.query.categorymembers[0].title );
 				} else {
 					deferred.reject( data );
