@@ -838,7 +838,7 @@
 						extrasRevealed = false;
 					} );
 				} else {
-					$extra.stop().animate( { width: '200px' }, 150, 'swing', function () {
+					$extra.stop().animate( { width: '210px' }, 150, 'swing', function () {
 						$extra.find( 'a' ).css( 'display', 'block' );
 						extrasRevealed = true;
 					} );
