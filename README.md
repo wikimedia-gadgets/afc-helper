@@ -1,7 +1,7 @@
 afch-rewrite [![Build Status](https://travis-ci.org/WPAFC/afch-rewrite.png)](https://travis-ci.org/WPAFC/afch-rewrite)
 ============
 
-**v0.8 Wandering Walrus**
+**v0.9 Hatted Hamster**
 
 A tool for reviewing Articles for Creation submissions on the English Wikipedia, rewritten using clear, object-oriented JavaScript with a focus on killing bloat while adding value.
 
@@ -9,11 +9,11 @@ Currently mainly being developed by [@theopolisme](https://github.com/theopolism
 
 ### Using
 
-The script can be installed on the English Wikipedia by following the instructions at [WP:AFCHRW](https://en.wikipedia.org/wiki/Wikipedia:WikiProject_Articles_for_creation/Helper_script/Rewrite).
+The script can be installed on the English Wikipedia by following the instructions at [WP:AFCH](https://en.wikipedia.org/wiki/WP:AFCH).
 
 ### Contributing
 
-Your contributions are welcome! Please add feature requests and bug reports to [WT:AFCHRW](https://en.wikipedia.org/wiki/WT:AFCHRW) on enwiki to keep discussions centralized.
+Your contributions are welcome! Please add feature requests and bug reports to [WT:AFCH](https://en.wikipedia.org/wiki/WT:AFCH) on enwiki to keep discussions centralized.
 
 If you'd like to contribute directly to the code, that's great too! In order to maintain great code quality, please submit significant changes using pull requests so that a consistent code style can be maintained throughout the project.
 
@@ -31,6 +31,7 @@ New versions of the script can be released through `scripts/release.py`, which a
 
 ### Version history
 
+* 0.9 Hatted Hamster (8 Novemeber 2014)
 * 0.8 Wandering Walrus (18 May 2014)
 * 0.7 Less is More (13 April 2014)
 * 0.6 Dancing Turtle (27 March 2014)

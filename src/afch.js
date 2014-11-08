@@ -39,8 +39,8 @@
 		AFCH.consts = {};
 
 		// Master version data
-		AFCH.consts.version = '0.8';
-		AFCH.consts.versionName = 'Wandering Walrus';
+		AFCH.consts.version = '0.9';
+		AFCH.consts.versionName = 'Hatted Hamster';
 
 		// FIXME: Change when moving into production
 		AFCH.consts.beta = true;
