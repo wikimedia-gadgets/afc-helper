@@ -468,16 +468,16 @@
 	AFCH.Submission.prototype.getNextSubmission = function ( older ) {
 		var deferred = $.Deferred(),
 			request = {
-			action: 'query',
-			list: 'categorymembers',
-			cmtitle: 'Category:Pending AfC submissions',
-			cmnamespace: 5,
-			cmtype: 'page',
-			cmlimit: 1,
-			cmsort: 'sortkey',
-			cmdir: older ? 'desc' : 'asc',
-			cmstartsortkey: 'P' + ( ( afchSubmission.templates.length && afchSubmission.templates[0].timestamp ) / 100 ) + ( older ? 0 : 1 )
-		};
+				action: 'query',
+				list: 'categorymembers',
+				cmtitle: 'Category:Pending AfC submissions',
+				cmnamespace: 5,
+				cmtype: 'page',
+				cmlimit: 1,
+				cmsort: 'sortkey',
+				cmdir: older ? 'desc' : 'asc',
+				cmstartsortkey: 'P' + ( ( this.templates.length && this.templates[0].timestamp ) / 100 ) + ( older ? 0 : 1 )
+			};
 
 		AFCH.api.get( request )
 			.done( function ( data ) {
@@ -1472,6 +1472,18 @@
 				$afch.find( '#isBiography' ).change( function () {
 					$afch.find( '#bioOptionsWrapper' ).toggleClass( 'hidden', !this.checked );
 				} );
+
+				function prefillBiographyDetails () {
+					var titleParts;
+
+					// Prefill `LastName, FirstName` for Biography if the page title is two words and
+					// therefore probably safe to asssume in a `FirstName LastName` format.
+					titleParts = afchSubmission.shortTitle.split( ' ' );
+					if ( titleParts.length === 2 ) {
+						$afch.find( '#subjectName' ).val( titleParts[1] + ', ' + titleParts[0] );
+					}
+				}
+				prefillBiographyDetails();
 
 				// Ask for the month/day IF the birth year has been entered
 				$afch.find( '#birthYear' ).keyup( function () {
