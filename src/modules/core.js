@@ -101,13 +101,53 @@
 			var user = AFCH.consts.user,
 				whitelist = new AFCH.Page( AFCH.consts.whitelistTitle );
 			whitelist.getText().done( function ( text ) {
-				var userAllowed = text.indexOf( user ) !== -1;
+				var $howToDisable,
+					userAllowed = text.indexOf( user ) !== -1;
+
 				if ( !userAllowed ) {
+
+					// If we can detect that the gadget is currently enabled, offer a one-click "disable" link
+					if ( mw.user.options.get( 'gadget-afchelper' ) === '1' ) {
+						$howToDisable = $( '<span>' )
+							.append( 'If you wish to disable the helper script, ' )
+							.append( $( '<a>' )
+								.text( 'click here' )
+								.click( function () {
+									// Submit the API request to disable the gadget.
+									// Note: We don't use `AFCH.api` here, because AFCH has already been
+									// destroyed due to the user not being on the whitelist!
+									( new mw.Api() ).postWithToken( 'options', {
+										action: 'options',
+										change: 'gadget-afchelper=0'
+									} ).done( function ( data ) {
+										mw.notify( 'AFCH has been disabled successfully. If you wish to re-enable it in the ' +
+											'future, you can do so via your Preferences by checking "Yet Another AFC Helper Script".' );
+									} );
+								} )
+							)
+							.append( '. ' );
+
+					// Otherwise, AFCH is probably installed via common.js/skin.js -- offer links for easy access.
+					} else {
+						$howToDisable = $( '<span>' )
+							.append( 'If you wish to disable the helper script, you will need to manually ' +
+								'remove it from your ' )
+							.append( AFCH.makeLinkElementToPage( 'Special:MyPage/common.js', 'common.js' ) )
+							.append( ' or your ')
+							.append( AFCH.makeLinkElementToPage( 'Special:MyPage/skin.js', 'skin.js' ) )
+							.append( 'page. ');
+					}
+
+					// Finally, make and push the notification, then explode AFCH
 					mw.notify(
 						$( '<div>' )
 							.append( 'AFCH could not be loaded because "' + user + '" is not listed on ' )
 							.append( AFCH.makeLinkElementToPage( whitelist.rawTitle ) )
-							.append( '. You can request access to the AfC helper script there.' ),
+							.append( '. You can request access to the AfC helper script there. ' )
+							.append( $howToDisable )
+							.append( 'If you have any questions or concerns, please ' )
+							.append( AFCH.makeLinkElementToPage( 'WT:AFCH', 'get in touch' ) )
+							.append( '!' ),
 						{
 							title: 'AFCH error: user not listed',
 							autoHide: false
