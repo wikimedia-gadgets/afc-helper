@@ -1690,7 +1690,7 @@
 						},
 
 						exists: function () {
-							updateTextfield( 'Title of existing article', 'Chocolate chip cookie' );
+							updateTextfield( 'Title of existing article', mw.config.get( 'wgTitle' ).split('/').pop() );
 						},
 
 						plot: function () {
