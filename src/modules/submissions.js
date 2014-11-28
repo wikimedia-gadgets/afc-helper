@@ -88,8 +88,8 @@
 			var name = template.target.toLowerCase();
 			if ( name  === 'afc submission' ) {
 				submissionTemplates.push( {
-					status: AFCH.getAndDelete( template.params, '1').toLowerCase(),
-					timestamp: AFCH.getAndDelete( template.params, 'ts' ),
+					status: ( AFCH.getAndDelete( template.params, '1' ) || '' ).toLowerCase(),
+					timestamp: AFCH.getAndDelete( template.params, 'ts' ) || '',
 					params: template.params
 				} );
 			} else if ( name === 'afc comment' ) {
