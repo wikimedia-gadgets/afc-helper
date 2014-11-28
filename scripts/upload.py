@@ -50,6 +50,7 @@ command = 'grunt build'
 if '--force' in sys.argv:
 	print 'Forcing grunt build with --force...'
 	command += ' --force'
+	sys.argv.remove('--force')
 
 try:
 	process = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
