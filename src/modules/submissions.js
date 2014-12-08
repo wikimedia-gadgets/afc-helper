@@ -1209,9 +1209,15 @@
 						.text( '(reloading...)' )
 				);
 
-			afchSubmission.getNextSubmission().done( function ( title ) {
-				new AFCH.status.Element( 'Continue to next submission, $1 &raquo;', { '$1': AFCH.makeLinkElementToPage( title ) } );
+			new AFCH.status.Element( 'Continue to next $1, $2, or $3 &raquo;', {
+				'$1': AFCH.makeLinkElementToPage( 'Special:RandomInCategory/Pending AfC submissions', 'random submission' ),
+				'$2': AFCH.makeLinkElementToPage( 'Special:RandomInCategory/AfC pending submissions by age/0 days ago', 'GFOO submission' ),
+				'$3': AFCH.makeLinkElementToPage( 'Special:RandomInCategory/Category:AfC submissions by age/Very old', 'very old submission' )
 			} );
+
+			//afchSubmission.getNextSubmission().done( function ( title ) {
+			//	new AFCH.status.Element( 'Continue to next submission, $1 &raquo;', { '$1': AFCH.makeLinkElementToPage( title ) } );
+			//} );
 
 			// Also, automagically reload the page in place
 			$( '#mw-content-text' ).load( AFCH.consts.pagelink + ' #mw-content-text', function () {
