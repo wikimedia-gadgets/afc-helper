@@ -33,7 +33,7 @@ New versions of the script can be released through `scripts/release.py`, which a
 
 ### Version history
 
-* 0.9 Hatted Hamster (8 Novemeber 2014)
+* 0.9 Hatted Hamster (8 November 2014)
 * 0.8 Wandering Walrus (18 May 2014)
 * 0.7 Less is More (13 April 2014)
 * 0.6 Dancing Turtle (27 March 2014)
