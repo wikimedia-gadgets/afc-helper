@@ -1346,7 +1346,6 @@
 		}
 
 		$.when( afchPage.getText( true ), loadWikiProjectList() ).then( function ( pageText, wikiProjects ) {
-
 			loadView( 'accept', {
 				newTitle: afchSubmission.shortTitle,
 				hasWikiProjects: !!wikiProjects.length,
@@ -1522,69 +1521,75 @@
 						return;
 					}
 					page = new AFCH.Page( value );
+					function checkForPage(namespace, title) {
+						window.wikiPageFound = false;
+						$.when(
+							AFCH.api.isBlacklisted( page ),
+							AFCH.api.get( {
+								action: 'query',
+								prop: 'info',
+								inprop: 'protection',
+								namespace: namespace,
+								titles: title
+							} )
+						).then( function ( isBlacklisted, rawData ) {
+							var errorHtml, buttonText,
+								data = rawData[0], // Get just the result, not the Promise object
+								linkToPage = AFCH.jQueryToHtml( AFCH.makeLinkElementToPage( title ) );
 
-					$.when(
-						AFCH.api.isBlacklisted( page ),
-						AFCH.api.get( {
-							action: 'query',
-							prop: 'info',
-							inprop: 'protection',
-							titles: page.rawTitle
-						} )
-					).then( function ( isBlacklisted, rawData ) {
-						var errorHtml, buttonText,
-							data = rawData[0], // Get just the result, not the Promise object
-							linkToPage = AFCH.jQueryToHtml( AFCH.makeLinkElementToPage( page.rawTitle ) );
+							// If the page already exists, display an error
+							if ( !data.query.pages.hasOwnProperty( '-1' ) ) {
+								errorHtml = 'Whoops, the page "' + namespace + ':' + linkToPage + '" already exists.';
+								buttonText = 'The proposed title already exists';
+							} else {
+								// If the page doesn't exist but IS create-protected and the
+								// current reviewer is not an admin, also display an error
+								// FIXME: offer one-click request unprotection?
+								$.each( data.query.pages['-1'].protection, function ( _, entry ) {
+									if ( entry.type === 'create' && entry.level === 'sysop' &&
+										$.inArray( 'sysop', mw.config.get( 'wgUserGroups' ) ) === -1 )
+									{
+										errorHtml = 'Darn it, "' + linkToPage + '" is create-protected. You will need to request unprotection before accepting.';
+										buttonText = 'The proposed title is create-protected';
+									}
+								} );
+							}
 
-						// If the page already exists, display an error
-						if ( !data.query.pages.hasOwnProperty( '-1' ) ) {
-							errorHtml = 'Whoops, the page "' + linkToPage + '" already exists.';
-							buttonText = 'The proposed title already exists';
-						} else {
-							// If the page doesn't exist but IS create-protected and the
-							// current reviewer is not an admin, also display an error
-							// FIXME: offer one-click request unprotection?
-							$.each( data.query.pages['-1'].protection, function ( _, entry ) {
-								if ( entry.type === 'create' && entry.level === 'sysop' &&
-									$.inArray( 'sysop', mw.config.get( 'wgUserGroups' ) ) === -1 )
-								{
-									errorHtml = 'Darn it, "' + linkToPage + '" is create-protected. You will need to request unprotection before accepting.';
-									buttonText = 'The proposed title is create-protected';
-								}
-							} );
-						}
+							// Now check the blacklist result, but if another error already exists,
+							// don't bother showing this one too
+							if ( !errorHtml && isBlacklisted !== false ) {
+								errorHtml = 'Shoot! ' + isBlacklisted.reason.replace( /\s+/g, ' ' );
+								buttonText = 'The proposed title is blacklisted';
+							}
 
-						// Now check the blacklist result, but if another error already exists,
-						// don't bother showing this one too
-						if ( !errorHtml && isBlacklisted !== false ) {
-							errorHtml = 'Shoot! ' + isBlacklisted.reason.replace( /\s+/g, ' ' );
-							buttonText = 'The proposed title is blacklisted';
-						}
+							if ( !errorHtml ) {
+								window.wikiPageFound = false;
+								return;
+							}
 
-						if ( !errorHtml ) {
-							return;
-						}
+							// Add a red border around the input field
+							$field.addClass( 'bad-input' );
+							// Show the error message
+							$status.html( errorHtml );
 
-						// Add a red border around the input field
-						$field.addClass( 'bad-input' );
-
-						// Show the error message
-						$status.html( errorHtml );
-
-						// Disable the submit button and show an error in its place
-						$submitButton
-							.addClass( 'disabled' )
-							.text( buttonText );
+							// Disable the submit button and show an error in its place
+							$submitButton
+								.addClass( 'disabled' )
+								.text( buttonText );
+								window.wikiPageFound = true;
+								return;
+						} );
+					}
+						checkForPage('talk','Draft:' + page.rawTitle);
+						checkForPage('(main)','Draft:' + page.rawTitle);
+						checkForPage('talk',page.rawTitle );
+						checkForPage('(main)',page.rawTitle );
 					} );
+
+					// Update titleStatus
+					$afch.find( '#newTitle' ).trigger( 'keyup' );
 				} );
-
-				// Update titleStatus
-				$afch.find( '#newTitle' ).trigger( 'keyup' );
-
-			} );
-
 			addFormSubmitHandler( handleAccept );
-
 		} );
 	}
 
