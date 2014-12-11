@@ -1317,7 +1317,6 @@
 		}
 
 		$.when( afchPage.getText( true ), loadWikiProjectList() ).then( function ( pageText, wikiProjects ) {
-
 			loadView( 'accept', {
 				newTitle: afchSubmission.shortTitle,
 				hasWikiProjects: !!wikiProjects.length,
@@ -1475,6 +1474,7 @@
 				// or if the title is create-protected and user is not an admin
 				$afch.find( '#newTitle' ).keyup( function () {
 					var page,
+						linkToPage,
 						$field =  $( this ),
 						$status = $afch.find( '#titleStatus' ),
 						$submitButton = $afch.find( '#afchSubmitForm' ),
@@ -1493,6 +1493,18 @@
 						return;
 					}
 					page = new AFCH.Page( value );
+					linkToPage = AFCH.jQueryToHtml( AFCH.makeLinkElementToPage( page.rawTitle ) );
+
+					AFCH.api.get( {
+						action: 'query',
+						prop: 'info',
+						inprop: 'protection',
+						titles: 'Talk:' + page.rawTitle
+					} ).done( function ( data ) {
+						if ( !data.query.pages.hasOwnProperty( '-1' ) ) {
+							$status.html( 'The talk page for "' + linkToPage + '" exists.' );
+						}
+					} );
 
 					$.when(
 						AFCH.api.isBlacklisted( page ),
@@ -1504,8 +1516,7 @@
 						} )
 					).then( function ( isBlacklisted, rawData ) {
 						var errorHtml, buttonText,
-							data = rawData[0], // Get just the result, not the Promise object
-							linkToPage = AFCH.jQueryToHtml( AFCH.makeLinkElementToPage( page.rawTitle ) );
+							data = rawData[0]; // Get just the result, not the Promise object
 
 						// If the page already exists, display an error
 						if ( !data.query.pages.hasOwnProperty( '-1' ) ) {
@@ -1538,7 +1549,6 @@
 
 						// Add a red border around the input field
 						$field.addClass( 'bad-input' );
-
 						// Show the error message
 						$status.html( errorHtml );
 
@@ -1551,11 +1561,8 @@
 
 				// Update titleStatus
 				$afch.find( '#newTitle' ).trigger( 'keyup' );
-
 			} );
-
 			addFormSubmitHandler( handleAccept );
-
 		} );
 	}
 
