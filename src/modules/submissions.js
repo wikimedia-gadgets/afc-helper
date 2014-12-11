@@ -1585,13 +1585,12 @@
 						$submitButton
 							.addClass( 'disabled' )
 							.text( buttonText );
-							return;
 					} );
 				} );
 
-					// Update titleStatus
-					$afch.find( '#newTitle' ).trigger( 'keyup' );
-				} );
+				// Update titleStatus
+				$afch.find( '#newTitle' ).trigger( 'keyup' );
+			} );
 			addFormSubmitHandler( handleAccept );
 		} );
 	}
