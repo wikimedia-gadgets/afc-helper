@@ -1503,6 +1503,7 @@
 				// or if the title is create-protected and user is not an admin
 				$afch.find( '#newTitle' ).keyup( function () {
 					var page,
+						linkToPage,
 						$field =  $( this ),
 						$status = $afch.find( '#titleStatus' ),
 						$submitButton = $afch.find( '#afchSubmitForm' ),
@@ -1521,18 +1522,15 @@
 						return;
 					}
 					page = new AFCH.Page( value );
+					linkToPage = AFCH.jQueryToHtml( AFCH.makeLinkElementToPage( page.rawTitle ) );
 
-					var linkToPage = AFCH.jQueryToHtml( AFCH.makeLinkElementToPage( page.rawTitle ) );
-
-					$.when(
-						AFCH.api.get( {
-							action: 'query',
-							prop: 'info',
-							inprop: 'protection',
-							titles: 'Talk:' + page.rawTitle
-						} )
-					).fail( function ( rawData ) {
-						if ( !rawData[0].query.pages.hasOwnProperty( '-1' ) ) {
+					AFCH.api.get( {
+						action: 'query',
+						prop: 'info',
+						inprop: 'protection',
+						titles: 'Talk:' + page.rawTitle
+					} ).done( function ( data ) {
+						if ( !data.query.pages.hasOwnProperty( '-1' ) ) {
 							$status.html( 'The talk page for "' + linkToPage + '" exists.' );
 						}
 					} );
