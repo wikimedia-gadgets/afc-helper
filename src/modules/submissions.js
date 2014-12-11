@@ -1529,8 +1529,7 @@
 							action: 'query',
 							prop: 'info',
 							inprop: 'protection',
-							namespace: 'talk',
-							titles: page.rawTitle
+							titles: 'Talk:' + page.rawTitle
 						} )
 					).fail( function ( rawData ) {
 						if ( !rawData[0].query.pages.hasOwnProperty( '-1' ) ) {
@@ -1569,7 +1568,7 @@
 						}
 
 						// Now check the blacklist result, but if another error already exists,
-						// don't bother showin`g this one too
+						// don't bother showing this one too
 						if ( !errorHtml && isBlacklisted !== false ) {
 							errorHtml = 'Shoot! ' + isBlacklisted.reason.replace( /\s+/g, ' ' );
 							buttonText = 'The proposed title is blacklisted';
