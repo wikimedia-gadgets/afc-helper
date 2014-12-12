@@ -9,7 +9,7 @@ Usage
 
 Run from the main afch-rewrite directory:
 
->>> python scripts/upload.py [site] [root] [username] [password]
+>>> python scripts/upload.py [site] [root] [username] [password] [--force]
 
 site: enwiki or testwiki
 
@@ -18,7 +18,11 @@ root: Base page name for the script, without any file extension.
       script can be loaded from `MediaWiki:Gadget-afch.js`.
 
 username: username of account on site
-password: password of account on site
+
+password: password of account on site (if not provided, a prompt will appear)
+
+force: Flag to indicate that grunt build should be run with --force.
+       PLEASE don't use this.
 """
 from __future__ import unicode_literals
 
@@ -27,6 +31,13 @@ import os
 import git
 import mwclient
 import subprocess
+import getpass
+
+# Check arg length
+if len(sys.argv) < 4:
+	print 'Incorrect number of arguments supplied.'
+	print 'Usage: python scripts/upload.py [site] [root] [username] [password] [--force]'
+	sys.exit(1)
 
 # Shortname of the wiki target
 wiki = sys.argv[1]
@@ -34,34 +45,50 @@ wiki = sys.argv[1]
 # First, create a build
 print 'Building afch-rewrite using `grunt build`...'
 command = 'grunt build'
-process = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
-output = process.communicate()[0]
 
-if output.decode('utf-8').find('Done, without errors.') == -1:
-	print 'The following error occurred during the build, so the upload was aborted:'
-	print output
-	sys.exit(1)
-else:
-	print 'Build succeeded. Uploading to {}...'.format(wiki)
+# Should we use --force on grunt build?
+if '--force' in sys.argv:
+	print 'Forcing grunt build with --force...'
+	command += ' --force'
+	sys.argv.remove('--force')
+
+try:
+	process = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
+	output = process.communicate()[0]
+	if output.decode('utf-8').find('Done, without errors.') == -1:
+		print 'The following error occurred during the build, so the upload was aborted:'
+		print output
+		sys.exit(1)
+	else:
+		print "Build succeeded!"
+except WindowsError:
+	print "WindowsError encountered. Attempting to use os.system..."
+	os.system(command)
+
+print 'Uploading to {}...'.format(wiki)
 
 if wiki == 'enwiki':
 	site = mwclient.Site('en.wikipedia.org')
 elif wiki == 'testwiki':
 	site = mwclient.Site('test.wikipedia.org')
 else:
-	print 'Error: unrecognized wiki "{}"'.format(wiki)
+	print 'Error: unrecognized wiki "{}". Must be "enwiki" or "testwiki".'.format(wiki)
 	sys.exit(0)
 
 # Login with username and password
-site.login(sys.argv[3], sys.argv[4])
+site.login(sys.argv[3], sys.argv[4] if len(sys.argv) > 4 else getpass.getpass())
 
 # Base page name on-wiki
 root = sys.argv[2]
 
 # Get branch name and the current commit
 repo = git.Repo(os.getcwd())
-branch = repo.active_branch
-sha1 = branch.commit.hexsha
+try:
+	branch = repo.active_branch
+	sha1 = branch.commit.hexsha
+except AttributeError:
+	branch = next(x for x in repo.branches if x.name == repo.active_branch)
+	sha1 = branch.commit.id
 
 # Prepend this to every page
 header = '/* Uploaded from https://github.com/WPAFC/afch-rewrite, commit: {} ({}) */\n'.format(sha1, branch)

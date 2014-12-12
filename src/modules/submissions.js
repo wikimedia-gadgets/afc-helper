@@ -88,8 +88,8 @@
 			var name = template.target.toLowerCase();
 			if ( name  === 'afc submission' ) {
 				submissionTemplates.push( {
-					status: AFCH.getAndDelete( template.params, '1').toLowerCase(),
-					timestamp: AFCH.getAndDelete( template.params, 'ts' ),
+					status: ( AFCH.getAndDelete( template.params, '1' ) || '' ).toLowerCase(),
+					timestamp: AFCH.getAndDelete( template.params, 'ts' ) || '',
 					params: template.params
 				} );
 			} else if ( name === 'afc comment' ) {
@@ -516,7 +516,7 @@
 				'Enter the content and\\/or code of the template here.',
 				'EDIT BELOW THIS LINE',
 				'After listing your sources please cite them using inline citations and place them after the information they cite. ' +
-					'Please see (http://en.wikipedia.org/wiki/Wikipedia:REFB|\\[\\[Wikipedia:REFB\\]\\]) for instructions on how to add citations.',
+					'Please see (https?://en.wikipedia.org/wiki/Wikipedia:REFB|\\[\\[Wikipedia:REFB\\]\\]) for instructions on how to add citations.',
 			] );
 		} else {
 			// If not yet accepted, comment out cats
@@ -803,11 +803,11 @@
 
 				if ( extrasRevealed ) {
 					$extra.find( 'a' ).hide();
-					$extra.stop().animate( { width: '11px' }, 100, 'swing', function () {
+					$extra.stop().animate( { width: '20px' }, 100, 'swing', function () {
 						extrasRevealed = false;
 					} );
 				} else {
-					$extra.stop().animate( { width: '200px' }, 150, 'swing', function () {
+					$extra.stop().animate( { width: '210px' }, 150, 'swing', function () {
 						$extra.find( 'a' ).css( 'display', 'block' );
 						extrasRevealed = true;
 					} );
@@ -1101,8 +1101,10 @@
 			// $1 = full submission title
 			// $2 = short title
 			// $3 = copyright violation ('yes'/'no')
+			// $4 = decline reason code
+			// $5 = decline reason additional parameter
 			'declined-submission': '== Your submission at [[Wikipedia:Articles for creation|Articles for creation]]: ' +
-				'[[$1|$2]] ({{subst:CURRENTMONTHNAME}} {{subst:CURRENTDAY}}) ==\n{{subst:Afc decline|full=$1|cv=$3|sig=yes}}',
+				'[[$1|$2]] ({{subst:CURRENTMONTHNAME}} {{subst:CURRENTDAY}}) ==\n{{subst:Afc decline|full=$1|cv=$3|reason=$4|details=$5|sig=yes}}',
 
 			// $1 = article name
 			'comment-on-submission': '{{subst:AFC notification|comment|article=$1}}',
@@ -1160,7 +1162,8 @@
 	/**
 	 * Sets up the `ajaxStop` handler which runs after all ajax
 	 * requests are complete and changes the text of the button
-	 * to "Done" and auto-reloads the page.
+	 * to "Done", shows a link to the next submission and
+	 * auto-reloads the page.
 	 */
 	function setupAjaxStopHandler () {
 		$( document ).ajaxStop( function () {
@@ -1174,6 +1177,12 @@
 						.attr( 'href', mw.util.getUrl() )
 						.text( '(reloading...)' )
 				);
+
+			new AFCH.status.Element( 'Continue to next $1, $2, or $3 &raquo;', {
+				'$1': AFCH.makeLinkElementToPage( 'Special:RandomInCategory/Pending AfC submissions', 'random submission' ),
+				'$2': AFCH.makeLinkElementToPage( 'Special:RandomInCategory/AfC pending submissions by age/0 days ago', 'GFOO submission' ),
+				'$3': AFCH.makeLinkElementToPage( 'Special:RandomInCategory/Category:AfC submissions by age/Very old', 'very old submission' )
+			} );
 
 			// Also, automagically reload the page in place
 			$( '#mw-content-text' ).load( AFCH.consts.pagelink + ' #mw-content-text', function () {
@@ -1435,6 +1444,18 @@
 					$afch.find( '#bioOptionsWrapper' ).toggleClass( 'hidden', !this.checked );
 				} );
 
+				function prefillBiographyDetails () {
+					var titleParts;
+
+					// Prefill `LastName, FirstName` for Biography if the page title is two words and
+					// therefore probably safe to asssume in a `FirstName LastName` format.
+					titleParts = afchSubmission.shortTitle.split( ' ' );
+					if ( titleParts.length === 2 ) {
+						$afch.find( '#subjectName' ).val( titleParts[1] + ', ' + titleParts[0] );
+					}
+				}
+				prefillBiographyDetails();
+
 				// Ask for the month/day IF the birth year has been entered
 				$afch.find( '#birthYear' ).keyup( function () {
 					$afch.find( '#birthMonthDayWrapper' ).toggleClass( 'hidden', !this.value.length );
@@ -1454,6 +1475,7 @@
 				// or if the title is create-protected and user is not an admin
 				$afch.find( '#newTitle' ).keyup( function () {
 					var page,
+						linkToPage,
 						$field =  $( this ),
 						$status = $afch.find( '#titleStatus' ),
 						$submitButton = $afch.find( '#afchSubmitForm' ),
@@ -1472,6 +1494,16 @@
 						return;
 					}
 					page = new AFCH.Page( value );
+					linkToPage = AFCH.jQueryToHtml( AFCH.makeLinkElementToPage( page.rawTitle ) );
+
+					AFCH.api.get( {
+						action: 'query',
+						titles: 'Talk:' + page.rawTitle
+					} ).done( function ( data ) {
+						if ( !data.query.pages.hasOwnProperty( '-1' ) ) {
+							$status.html( 'The talk page for "' + linkToPage + '" exists.' );
+						}
+					} );
 
 					$.when(
 						AFCH.api.isBlacklisted( page ),
@@ -1483,8 +1515,7 @@
 						} )
 					).then( function ( isBlacklisted, rawData ) {
 						var errorHtml, buttonText,
-							data = rawData[0], // Get just the result, not the Promise object
-							linkToPage = AFCH.jQueryToHtml( AFCH.makeLinkElementToPage( page.rawTitle ) );
+							data = rawData[0]; // Get just the result, not the Promise object
 
 						// If the page already exists, display an error
 						if ( !data.query.pages.hasOwnProperty( '-1' ) ) {
@@ -1593,7 +1624,7 @@
 						cv: function () {
 							var $textfieldWrapper, $addAnotherLink, $clone;
 
-							updateTextfield( 'Original URL', 'http://example.com/cake' );
+							updateTextfield( 'Original URL', 'https://example.com/cake' );
 							$textfieldWrapper = $afch.find( '#textfieldWrapper' );
 
 							$clone = $textfieldWrapper.clone( true );
@@ -1960,7 +1991,9 @@
 					var message = AFCH.msg.get( 'declined-submission', {
 						'$1': AFCH.consts.pagename,
 						'$2': afchSubmission.shortTitle,
-						'$3': declineReason === 'cv' ? 'yes' : 'no'
+						'$3': declineReason === 'cv' ? 'yes' : 'no',
+						'$4': declineReason,
+						'$5': newParams['3'] || ''
 					} );
 
 					if ( teahouse ) {
