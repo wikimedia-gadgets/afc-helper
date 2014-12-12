@@ -515,6 +515,8 @@
 				'Enter template purpose and instructions here.',
 				'Enter the content and\\/or code of the template here.',
 				'EDIT BELOW THIS LINE',
+				'Metadata: see \\[\\[Wikipedia:Persondata\\]\\].',
+				'See http://en.wikipedia.org/wiki/Wikipedia:Footnotes on how to create references using\\<ref\\>\\<\\/ref\\> tags, these references will then appear here automatically',
 				'After listing your sources please cite them using inline citations and place them after the information they cite. ' +
 					'Please see (https?://en.wikipedia.org/wiki/Wikipedia:REFB|\\[\\[Wikipedia:REFB\\]\\]) for instructions on how to add citations.',
 			] );
