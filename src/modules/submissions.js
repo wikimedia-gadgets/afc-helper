@@ -1180,10 +1180,11 @@
 						.text( '(reloading...)' )
 				);
 
+			// The final 'false' parameter is so that the next draft doesn't open in a new tab.
 			new AFCH.status.Element( 'Continue to next $1, $2, or $3 &raquo;', {
-				'$1': AFCH.makeLinkElementToPage( 'Special:RandomInCategory/Pending AfC submissions', 'random submission' ),
-				'$2': AFCH.makeLinkElementToPage( 'Special:RandomInCategory/AfC pending submissions by age/0 days ago', 'GFOO submission' ),
-				'$3': AFCH.makeLinkElementToPage( 'Special:RandomInCategory/Category:AfC submissions by age/Very old', 'very old submission' )
+				'$1': AFCH.makeLinkElementToPage( 'Special:RandomInCategory/Pending AfC submissions', 'random submission', false ),
+				'$2': AFCH.makeLinkElementToPage( 'Special:RandomInCategory/AfC pending submissions by age/0 days ago', 'GFOO submission', false ),
+				'$3': AFCH.makeLinkElementToPage( 'Special:RandomInCategory/Category:AfC submissions by age/Very old', 'very old submission', false )
 			} );
 
 			// Also, automagically reload the page in place

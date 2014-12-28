@@ -1356,18 +1356,23 @@
 		},
 
 		/**
-		 * Creates an <a> element that links to a given page
-		 * @param {string} pagename
+		 * Creates an <a> element that links to a given page.
+		 * @param {string} pagename - The title of the page.
+		 * @param {string} displayTitle - What gets shown by the link.
+		 * @param {boolean} [newTab=true] - Whether to open page in a new tab.
 		 * @return {jQuery} <a> element
 		 */
-		makeLinkElementToPage: function ( pagename, displayTitle ) {
+		makeLinkElementToPage: function ( pagename, displayTitle, newTab ) {
 			var actualTitle = pagename.replace( /_/g, ' ' );
+
+			// newTab is an optional parameter.
+			newTab = ( typeof newTab === 'undefined' ) ? true : newTab;
 
 			return $( '<a>' )
 				.attr( 'href', mw.util.getUrl( actualTitle ) )
 				.attr( 'title', actualTitle )
 				.text( displayTitle || actualTitle )
-				.attr( 'target', '_blank' );
+				.attr( 'target', newTab ? '_blank' : '_self' );
 		},
 
 		/**
