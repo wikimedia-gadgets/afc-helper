@@ -61,8 +61,8 @@ try:
 		sys.exit(1)
 	else:
 		print "Build succeeded!"
-except WindowsError:
-	print "WindowsError encountered. Attempting to use os.system..."
+except OSError:
+	print "OSError encountered. Attempting to use os.system..."
 	os.system(command)
 
 print 'Uploading to {}...'.format(wiki)
