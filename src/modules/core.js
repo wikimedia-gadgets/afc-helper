@@ -1376,6 +1376,41 @@
 		},
 
 		/**
+		 * Creates an <a> element that links to a random page in the given category.
+		 * @param {string} pagename - The name of the category (without the namespace).
+		 * @param {string} displayTitle - What gets shown by the link.
+		 * @return {jQuery} <a> element
+		 */
+		makeLinkElementToCategory: function ( pagename, displayTitle ) {
+			var linkElement = AFCH.makeLinkElementToPage( 'Special:RandomInCategory/' + pagename, displayTitle, false ),
+				linkText = displayTitle || pagename.replace( /_/g, ' ' ),
+				request = {
+					action: 'query',
+					titles: 'Category:' + pagename,
+					prop: 'categoryinfo'
+				},
+				linkSpan = $( '<span>' ).append( linkElement ),
+				countSpanId = 'afch-cat-count-' + pagename
+					.toLowerCase()
+					.replace( / /g, '-' )
+					.replace( /\//g, '-' );
+
+			linkSpan.append( $( '<span>' ).attr( 'id', countSpanId ) );
+
+			AFCH.api.get( request )
+				.done( function ( data ) {
+					if ( data.query.pages ) {
+						var pageKey = Object.keys( data.query.pages )[ 0 ],
+							pagesCount = data.query.pages[ pageKey ].categoryinfo.pages;
+						AFCH.log( JSON.stringify( data ) + ' ==> ' + pagesCount );
+						$( '#' + countSpanId ).text( ' (' + pagesCount + ')' );
+					}
+				} );
+
+			return linkSpan;
+		},
+
+		/**
 		 * Converts [[wikilink]] -> <a>
 		 *
 		 * @param {string} wikicode
