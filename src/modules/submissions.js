@@ -1180,7 +1180,7 @@
 						.text( '(reloading...)' )
 				);
 
-			// The final 'false' parameter is so that the next draft doesn't open in a new tab.
+			// Show a link to the next random submissions
 			new AFCH.status.Element( 'Continue to next $1, $2, or $3 &raquo;', {
 				'$1': AFCH.makeLinkElementToCategory( 'Pending AfC submissions', 'random submission' ),
 				'$2': AFCH.makeLinkElementToCategory( 'AfC pending submissions by age/0 days ago', 'GFOO submission' ),
