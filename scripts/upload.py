@@ -76,9 +76,7 @@ else:
 	sys.exit(0)
 
 # Login with username and password
-username = sys.argv[3]
-passowrd = sys.argv[4] if len(sys.argv) > 4 else getpass.getpass('Password for ' + username + ' on ' + wiki + ": ")
-site.login(username, password)
+site.login(sys.argv[3], sys.argv[4] if len(sys.argv) > 4 else getpass.getpass())
 
 # Base page name on-wiki
 root = sys.argv[2]
