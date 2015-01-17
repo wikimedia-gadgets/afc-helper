@@ -303,7 +303,7 @@
 <div class="review-panel submit">
 	<div class="header">Submitting...</div>
 	<div id="afchContent" class="content centered">
-		Submit as&nbsp;
+		<label for="submitType" class="afch-label">Submit as</label>
 		<select id="submitType" class="afch-input">
 			{{#customSubmitters}}
 			<option value="{{name}}" {{#selected}}selected{{/selected}}>{{description}}</option>
@@ -312,7 +312,12 @@
 			<option value="self">Yourself</option>
 			<option value="other">Someone else</option>
 		</select>
-		<input type="text" id="submitterName" class="afch-input afch-textfield hidden" placeholder="Username" />
+
+		<div id="submitterNameWrapper" class="hidden">
+			<label for="submitterName" class="afch-label">Other user to submit as</label>
+			<input type="text" id="submitterName" class="afch-input afch-textfield" placeholder="Username" />
+			<div id="submitterNameStatus"></div>
+		</div>
 
 		<div id="afchSubmitForm" data-running="Submitting..." class="gradient-button button-centered submit">Submit</div>
 

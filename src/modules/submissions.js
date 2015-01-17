@@ -1751,8 +1751,56 @@
 		}, function () {
 			// Show the other textbox when `other` is selected in the menu
 			$afch.find( '#submitType' ).change( function () {
-				var otherSelected = $afch.find( '#submitType' ).val() === 'other';
-				$afch.find( '#submitterName' ).toggleClass( 'hidden', !otherSelected );
+				var isOtherSelected = $afch.find( '#submitType' ).val() === 'other';
+				$afch.find( '#submitterNameWrapper' ).toggleClass( 'hidden', !isOtherSelected );
+
+				// Show an error if there's no such user
+				$afch.find( '#submitterName' ).keyup( function () {
+					var field = $( this ),
+						status = $( '#submitterNameStatus' ),
+						submitButton = $afch.find( '#afchSubmitForm' ),
+						submitter = field.val();
+
+					// Reset form
+					field.removeClass( 'bad-input' );
+					status.text( '' );
+					submitButton
+							.removeClass( 'disabled' )
+							.text( 'Submit' );
+
+					// If there's no value, don't even try
+					if ( !submitter ) {
+						return;
+					}
+
+					// Check if the user string starts with "User:", because Template:AFC submission dies horribly if it does
+					if ( submitter.lastIndexOf( 'User:', 0 ) === 0 ) {
+						field.addClass( 'bad-input' );
+						status.html('Remove "User:" from the beginning.');
+						submitButton
+							.addClass( 'disabled' )
+							.text( 'Invalid user name' );
+						return;
+					}
+
+					// Check if there is such a user
+					AFCH.api.get( {
+						action: 'query',
+						list: 'users',
+						ususers: submitter
+					} ).done( function ( data ) {
+						if ( data.query.users[0].missing !== undefined ) {
+							field.addClass( 'bad-input' );
+							status.html('No user named "' + submitter + '".');
+							submitButton
+								.addClass( 'disabled' )
+								.text( 'No such user' );
+						}
+					} );
+				} );
+
+				// Trigger key handler
+				$afch.find( '#submitterName' ).trigger( 'keyup' );
 			} );
 		} );
 
