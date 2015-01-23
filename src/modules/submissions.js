@@ -1577,12 +1577,17 @@
 			var $reasons, $commonSection, declineCounts,
 				pristineState = $afch.find( '#declineInputWrapper' ).html();
 
-			function updateTextfield ( newPrompt, newPlaceholder ) {
+			function updateTextfield ( newPrompt, newPlaceholder, newValue ) {
 				var wrapper = $afch.find( '#textfieldWrapper' );
 
 				// Update label and placeholder
 				wrapper.find( 'label' ).text( newPrompt );
 				wrapper.find( 'input' ).attr( 'placeholder', newPlaceholder );
+
+				// Update default textfield value (perhaps)
+				if ( typeof newValue !== 'undefined' ) {
+					wrapper.find( 'input' ).val( newValue );
+				}
 
 				// And finally show the textfield
 				wrapper.removeClass( 'hidden' );
@@ -1662,7 +1667,7 @@
 						},
 
 						dup: function () {
-							updateTextfield( 'Title of duplicate submission (no namespace)', 'Articles for creation/Fudge' );
+							updateTextfield( 'Title of duplicate submission (no namespace)', 'Articles for creation/Fudge', afchSubmission.shortTitle );
 						},
 
 						mergeto: function () {
@@ -1674,7 +1679,7 @@
 						},
 
 						exists: function () {
-							updateTextfield( 'Title of existing article', 'Chocolate chip cookie' );
+							updateTextfield( 'Title of existing article', 'Chocolate chip cookie', afchSubmission.shortTitle );
 						},
 
 						plot: function () {
