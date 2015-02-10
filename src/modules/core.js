@@ -1402,7 +1402,6 @@
 					if ( data.query.pages ) {
 						var pageKey = Object.keys( data.query.pages )[ 0 ],
 							pagesCount = data.query.pages[ pageKey ].categoryinfo.pages;
-						AFCH.log( JSON.stringify( data ) + ' ==> ' + pagesCount );
 						$( '#' + countSpanId ).text( ' (' + pagesCount + ')' );
 					}
 				} );
