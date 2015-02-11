@@ -264,7 +264,7 @@
 
 				AFCH.actions.getPageText( this.rawTitle, {
 					hide: true,
-					moreProps: 'timestamp|user',
+					moreProps: 'timestamp|user|ids',
 					moreParameters: { rvgeneratexml: true }
 				} ).done( function ( pagetext, data ) {
 					// Set internal data
@@ -272,6 +272,7 @@
 					pg.additionalData.lastModified = new Date( data.timestamp );
 					pg.additionalData.lastEditor = data.user;
 					pg.additionalData.rawTemplateModel = data.parsetree;
+					pg.additionalData.revId = data.revid;
 
 					pg.hasAdditionalData = true;
 
