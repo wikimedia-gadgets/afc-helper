@@ -1370,6 +1370,7 @@
 
 			return $( '<a>' )
 				.attr( 'href', mw.util.getUrl( actualTitle ) )
+				.attr( 'id', 'afch-cat-link-' + pagename.toLowerCase().replace( / /g, '-' ).replace( /\//g, '-' ) )
 				.attr( 'title', actualTitle )
 				.text( displayTitle || actualTitle )
 				.attr( 'target', newTab ? '_blank' : '_self' );
@@ -1403,6 +1404,9 @@
 						var pageKey = Object.keys( data.query.pages )[ 0 ],
 							pagesCount = data.query.pages[ pageKey ].categoryinfo.pages;
 						$( '#' + countSpanId ).text( ' (' + pagesCount + ')' );
+
+						// Disable link if there aren't any pages
+						$( '#afch-cat-link-' + pagename.toLowerCase().replace( / /g, '-' ).replace( /\//g, '-' ) ).replaceWith( displayTitle );
 					}
 				} );
 
