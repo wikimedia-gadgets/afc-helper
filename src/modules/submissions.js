@@ -1319,13 +1319,16 @@
 			return deferred;
 		}
 
-		$.when( afchPage.getText( true ), loadWikiProjectList() ).then( function ( pageText, wikiProjects ) {
-
+		$.when(
+			afchPage.getText( true ),
+			loadWikiProjectList(),
+			afchPage.getCategories( /* useApi */ false, /* includeCategoryLinks */ true )
+		).then( function ( pageText, wikiProjects, categories ) {
 			loadView( 'accept', {
 				newTitle: afchSubmission.shortTitle,
 				hasWikiProjects: !!wikiProjects.length,
 				wikiProjects: wikiProjects,
-				categories: afchPage.getCategories( /* useApi */ false, /* includeCategoryLinks */ true ),
+				categories: categories,
 				// Only offer to patrol the page if not already patrolled (in other words, if
 				// the "Mark as patrolled" link can be found in the DOM)
 				showPatrolOption: !!$afch.find( '.patrollink' ).length
