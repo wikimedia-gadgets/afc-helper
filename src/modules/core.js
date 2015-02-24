@@ -489,7 +489,7 @@
 					return this;
 				}
 
-				title = new mw.Title( this.rawTitle, ns + 1 );
+				title = new mw.Title( this.title.getMainText(), ns + 1 );
 
 				return new AFCH.Page( title.getPrefixedText() );
 			};
