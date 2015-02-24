@@ -94,6 +94,10 @@
 		padding: 10px;
 	}
 
+	.bad-input, .bad-input:focus {
+		border-color: @red;
+	}
+
 	/* MAIN (+SPLASH) */
 
 	.initial,
@@ -248,10 +252,6 @@
 			color: @red;
 		}
 
-		.bad-input, .bad-input:focus {
-			border-color: @red;
-		}
-
 		.chzn-container {
 			margin-top: 10px;
 			vertical-align: bottom;
@@ -310,6 +310,15 @@
 
 	.submit {
 		.ThemedPanel(@blue);
+
+		select {
+			vertical-align: baseline;
+		}
+
+		.error {
+			font-size: .8em;
+			color: @red;
+		}
 	}
 
 	/* MARK/UNMARK AS UNDER REVIEW */

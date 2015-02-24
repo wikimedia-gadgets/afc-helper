@@ -1782,7 +1782,7 @@
 							.text( 'Submit' );
 
 					// If there's no value, don't even try
-					if ( !submitter ) {
+					if ( !submitter || !isOtherSelected ) {
 						return;
 					}
 
