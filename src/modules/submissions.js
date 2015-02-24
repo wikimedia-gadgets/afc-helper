@@ -1017,11 +1017,12 @@
 		}
 
 		function checkReviewState () {
-			var reviewer;
+			var reviewer, isOwnReview;
 
 			if ( afchSubmission.isUnderReview ) {
-				// Use a more personal "You" if the user is the reviewer
-				if ( afchSubmission.params.reviewer === AFCH.consts.user ) {
+				isOwnReview = afchSubmission.params.reviewer === AFCH.consts.user;
+
+				if ( isOwnReview ) {
 					reviewer = 'You';
 				} else {
 					reviewer = afchSubmission.params.reviewer || 'Someone';
@@ -1030,7 +1031,10 @@
 				addWarning( reviewer + ( afchSubmission.params.reviewts ?
 					' began reviewing this submission ' + AFCH.relativeTimeSince( afchSubmission.params.reviewts ) :
 					' already began reviewing this submission' ) + '.',
-					'View page history', mw.util.getUrl( AFCH.consts.pagename, { action: 'history' } ) );
+					isOwnReview ? 'Unmark as under review' : 'View page history',
+					isOwnReview ? function () {
+						handleMark( /* unmark */ true );
+					} : mw.util.getUrl( AFCH.consts.pagename, { action: 'history' } ) );
 			}
 		}
 
