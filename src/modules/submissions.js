@@ -198,7 +198,7 @@
 				sub.params = $.extend( {}, template.params, sub.params );
 
 				// Save submitter if not already listed
-				if ( sub.submitters.indexOf( template.params.u ) === -1 ) {
+				if ( template.params.u && sub.submitters.indexOf( template.params.u ) === -1 ) {
 					sub.submitters.push( template.params.u );
 				}
 
