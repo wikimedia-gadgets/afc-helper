@@ -1762,10 +1762,28 @@
 		loadView( 'submit', {
 			customSubmitters: customSubmitters
 		}, function () {
+
+			// Reset the status indicators for the username & errors
+			function resetStatus () {
+				$afch.find( '#submitterName' ).removeClass( 'bad-input' );
+				$afch.find( '#submitterNameStatus' ).text( '' );
+				$afch.find( '#afchSubmitForm' )
+					.removeClass( 'disabled' )
+					.text( 'Submit' );
+			}
+
 			// Show the other textbox when `other` is selected in the menu
 			$afch.find( '#submitType' ).change( function () {
 				var isOtherSelected = $afch.find( '#submitType' ).val() === 'other';
-				$afch.find( '#submitterNameWrapper' ).toggleClass( 'hidden', !isOtherSelected );
+
+				if ( isOtherSelected ) {
+					$afch.find( '#submitterNameWrapper' ).removeClass( 'hidden' );
+					$afch.find( '#submitterName' ).trigger( 'keyup' );
+				} else {
+					$afch.find( '#submitterNameWrapper' ).addClass( 'hidden' );
+				}
+
+				resetStatus();
 
 				// Show an error if there's no such user
 				$afch.find( '#submitterName' ).keyup( function () {
@@ -1775,11 +1793,7 @@
 						submitter = field.val();
 
 					// Reset form
-					field.removeClass( 'bad-input' );
-					status.text( '' );
-					submitButton
-							.removeClass( 'disabled' )
-							.text( 'Submit' );
+					resetStatus();
 
 					// If there's no value, don't even try
 					if ( !submitter || !isOtherSelected ) {
@@ -1789,7 +1803,7 @@
 					// Check if the user string starts with "User:", because Template:AFC submission dies horribly if it does
 					if ( submitter.lastIndexOf( 'User:', 0 ) === 0 ) {
 						field.addClass( 'bad-input' );
-						status.html('Remove "User:" from the beginning.');
+						status.text( 'Remove "User:" from the beginning.' );
 						submitButton
 							.addClass( 'disabled' )
 							.text( 'Invalid user name' );
@@ -1804,16 +1818,13 @@
 					} ).done( function ( data ) {
 						if ( data.query.users[0].missing !== undefined ) {
 							field.addClass( 'bad-input' );
-							status.html('No user named "' + submitter + '".');
+							status.text( 'No user named "' + submitter + '".' );
 							submitButton
 								.addClass( 'disabled' )
 								.text( 'No such user' );
 						}
 					} );
 				} );
-
-				// Trigger key handler
-				$afch.find( '#submitterName' ).trigger( 'keyup' );
 			} );
 		} );
 
