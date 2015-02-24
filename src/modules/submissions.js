@@ -1628,6 +1628,7 @@
 			// And now add the handlers for when a specific decline reason is selected
 			$afch.find( '#declineReason' ).change( function () {
 				var reason = $afch.find( '#declineReason' ).val(),
+					candidateDupeName = ( afchSubmission.shortTitle !== 'sandbox' ) ? afchSubmission.shortTitle : '',
 					declineHandlers = {
 						cv: function () {
 							var $textfieldWrapper, $addAnotherLink, $clone;
@@ -1667,11 +1668,11 @@
 						},
 
 						dup: function () {
-							updateTextfield( 'Title of duplicate submission (no namespace)', 'Articles for creation/Fudge', afchSubmission.shortTitle );
+							updateTextfield( 'Title of duplicate submission (no namespace)', 'Articles for creation/Fudge', candidateDupeName );
 						},
 
 						mergeto: function () {
-							updateTextfield( 'Article which submission should be merged into', 'Milkshake' );
+							updateTextfield( 'Article which submission should be merged into', 'Milkshake', candidateDupeName );
 						},
 
 						lang: function () {
@@ -1679,11 +1680,11 @@
 						},
 
 						exists: function () {
-							updateTextfield( 'Title of existing article', 'Chocolate chip cookie', afchSubmission.shortTitle );
+							updateTextfield( 'Title of existing article', 'Chocolate chip cookie', candidateDupeName );
 						},
 
 						plot: function () {
-							updateTextfield( 'Title of existing related article, if one exists', 'Charlie and the Chocolate Factory' );
+							updateTextfield( 'Title of existing related article, if one exists', 'Charlie and the Chocolate Factory', candidateDupeName );
 						},
 
 						van: function () {
