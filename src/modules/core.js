@@ -771,7 +771,7 @@
 					if ( options.usersNotified && options.usersNotified.length ) {
 						appendText += '; notified {{user|1=' + options.usersNotified.shift() + '}}';
 
-						$.each( options.usersNotified, function( _, user ) {
+						$.each( options.usersNotified, function ( _, user ) {
 							appendText += ', {{user|1=' + user + '}}';
 						} );
 					}
