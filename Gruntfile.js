@@ -4,6 +4,7 @@ module.exports = function ( grunt ) {
 	grunt.loadNpmTasks( 'grunt-jscs-checker' );
 	grunt.loadNpmTasks( 'grunt-contrib-less' );
 	grunt.loadNpmTasks( 'grunt-contrib-copy');
+	grunt.loadNpmTasks('grunt-contrib-concat');
 	grunt.loadNpmTasks( 'grunt-contrib-clean' );
 	grunt.loadNpmTasks( 'grunt-contrib-cssmin' );
 	grunt.loadNpmTasks( 'grunt-autoprefixer' );
@@ -16,6 +17,17 @@ module.exports = function ( grunt ) {
 				cwd: 'src',
 				src: [ '**', '!less/*' ],
 				dest: 'build'
+			}
+		},
+
+		concat: {
+			options: {
+				separator: ';',
+			},
+			dependencies: {
+				files: {
+					'build/modules/core.js': [ 'dependencies/*.js', 'build/modules/core.js' ]
+				}
 			}
 		},
 
@@ -94,7 +106,7 @@ module.exports = function ( grunt ) {
 	grunt.registerTask(
 		'build',
 		'Tests files, moves them to the /build directory, and minifies CSS.',
-		[ 'clean:build', 'test', 'copy', 'styling' ]
+		[ 'clean:build', 'test', 'copy', 'concat:dependencies', 'styling' ]
 	);
 
 	grunt.registerTask( 'default', [ 'build' ] );

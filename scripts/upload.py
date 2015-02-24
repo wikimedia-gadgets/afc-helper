@@ -130,9 +130,8 @@ with open('build/afch.js', 'r') as f:
 with open('build/afch.css', 'r') as f:
 	uploadFile(root + '.css', f.read())
 
-# Now upload everything else: modules, templates, dependencies
+# Now upload everything else: modules, templates
 uploadDirectory('build/modules')
 uploadDirectory('build/templates')
-uploadDirectory('dependencies')
 
 print 'AFCH uploaded to {} successfully!'.format(wiki)

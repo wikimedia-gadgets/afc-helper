@@ -168,10 +168,6 @@
 				return false;
 			}
 
-			// FIXME: we should load hogan.js "for real", figure out how to
-			// add to ResourceLoader or something??
-			mw.loader.load( AFCH.consts.baseurl + '/hogan.js' );
-
 			if ( AFCH.consts.beta ) {
 				// Load minified css
 				mw.loader.load( AFCH.consts.scriptpath + '?action=raw&ctype=text/css&title=MediaWiki:Gadget-afch.css', 'text/css' );

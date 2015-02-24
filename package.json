@@ -12,14 +12,15 @@
   "dependencies": {},
   "devDependencies": {
     "grunt": "0.4.2",
-    "grunt-contrib-jshint": "0.8.0",
-    "grunt-jscs": "1.5.x",
-    "grunt-contrib-less": "0.11.0",
-    "grunt-contrib-copy": "0.4.x",
-    "grunt-contrib-clean": "0.5.x",
-    "grunt-contrib-cssmin": "0.6.x",
     "grunt-autoprefixer": "0.2.x",
+    "grunt-contrib-clean": "0.5.x",
+    "grunt-contrib-concat": "^0.5.1",
+    "grunt-contrib-copy": "0.4.x",
+    "grunt-contrib-cssmin": "0.6.x",
+    "grunt-contrib-jshint": "0.8.0",
+    "grunt-contrib-less": "0.11.0",
     "grunt-exec": "~0.4.5",
+    "grunt-jscs": "1.5.x",
     "jest-cli": "0.1.x",
     "jquery": "~2.1.1"
   }
