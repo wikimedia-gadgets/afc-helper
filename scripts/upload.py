@@ -43,14 +43,14 @@ if len(sys.argv) < 4:
 wiki = sys.argv[1]
 
 # First, create a build
-print 'Building afch-rewrite using `grunt build`...'
 command = 'grunt build'
 
 # Should we use --force on grunt build?
 if '--force' in sys.argv:
-	print 'Forcing grunt build with --force...'
 	command += ' --force'
 	sys.argv.remove('--force')
+
+print 'Building afch-rewrite using `{}`...'.format(command)
 
 try:
 	process = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
