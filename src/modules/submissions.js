@@ -1907,7 +1907,7 @@
 				// ---------
 
 				// Add the AFC banner
-				talkText += '{{subst:WPAFC/article|class=' + data.newAssessment + '}}';
+				talkText += '{{subst:WPAFC/article|class=' + data.newAssessment + ( afchPage.additionalData.revId ? '|oldid=' + afchPage.additionalData.revId : '' ) + '}}';
 
 				// Add biography banner if specified
 				if ( data.isBiography ) {
