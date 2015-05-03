@@ -376,9 +376,9 @@
 					AFCH.api.getCategories( this.title ).done( function ( categories ) {
 						// The api returns mw.Title objects, so we convert them to simple
 						// strings before resolving the deferred.
-						deferred.resolve( $.map( categories, function ( cat ) {
+						deferred.resolve( categories ? $.map( categories, function ( cat ) {
 							return cat.getPrefixedText();
-						} ) );
+						} ) : [] );
 					} );
 					return deferred;
 				}
