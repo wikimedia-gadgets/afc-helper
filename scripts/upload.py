@@ -116,8 +116,8 @@ def uploadSubscript(scriptName, content):
 def uploadDirectory(directory):
 	files = os.listdir(directory)
 	for script in files:
-		# Skip hidden files
-		if not script.startswith('.'):
+		# Skip hidden files and Emacs spam
+		if not script.startswith('.') and not script.endswith('~'):
 			with open(directory + '/' + script, 'r') as f:
 				content = f.read()
 			uploadSubscript(os.path.splitext(script)[0], content)
