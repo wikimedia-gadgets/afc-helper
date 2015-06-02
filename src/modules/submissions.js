@@ -1865,18 +1865,6 @@
 				// Add biography details
 				if ( data.isBiography ) {
 
-					// Persondata
-					newText.append(
-						'\n{{Persondata' +
-						'\n| NAME = ' + data.subjectName +
-						'\n| SHORT DESCRIPTION = ' + data.subjectDescription +
-						'\n| DATE OF BIRTH = ' + ( data.birthMonthDay ? data.birthMonthDay + ', ' : '' ) + data.birthYear +
-						'\n| PLACE OF BIRTH = ' + data.birthPlace +
-						'\n| DATE OF DEATH = ' + ( data.deathYear ? ( data.deathMonthDay ? data.deathMonthDay + ', ' : '' ) + data.deathYear : '' ) +
-						'\n| PLACE OF DEATH = ' + ( data.deathPlace || '' ) +
-						'\n}}'
-					);
-
 					// {{subst:L}}, which generates DEFAULTSORT as well as
 					// adds the appropriate birth/death year categories
 					newText.append( '\n{{subst:L' +
