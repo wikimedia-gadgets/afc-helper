@@ -76,7 +76,8 @@ else:
 	sys.exit(0)
 
 # Login with username and password
-site.login(sys.argv[3], sys.argv[4] if len(sys.argv) > 4 else getpass.getpass())
+passwd = lambda: getpass.getpass('Password for {} on {}: '.format(sys.argv[3], wiki))
+site.login(sys.argv[3], sys.argv[4] if len(sys.argv) > 4 else passwd())
 
 # Base page name on-wiki
 root = sys.argv[2]
