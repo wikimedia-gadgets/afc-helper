@@ -278,7 +278,7 @@
 					value.indexOf( '=' ) === -1 &&
 					// Parameter 2 will be the first positional parameter,
 					// since 1 is always going to be the submission status.
-					key === '2' || paramKeys[ index - 1 ] == +key - 1 )
+					( key === '2' || paramKeys[ index - 1 ] == +key - 1 ) )
 				{
 					tout += '|' + value;
 				} else {
