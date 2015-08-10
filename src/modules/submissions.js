@@ -2258,7 +2258,7 @@
 			}
 			rawText = rawText.replace( match[0], postponeCode );
 		} else {
-			rawText += '\n{{AfC postpone G13}}';
+			rawText += '\n{{AfC postpone G13|1}}';
 		}
 
 		text.set( rawText );
