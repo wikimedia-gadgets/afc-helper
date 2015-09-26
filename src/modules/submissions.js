@@ -902,7 +902,7 @@
 					refEndRe = /<\/\s*ref\s*\>/ig,
 					refEndMatches = text.match( refEndRe )|| [],
 
-					reflistRe = /({{(reflist|listaref)(?:{{[^{}]*}}|[^}{])*}})|(<\s*references\s*\/?>)/ig,
+					reflistRe = /({{(ref(erence)?(\s|-)?list|listaref|refs|footnote|reference|referencias)(?:{{[^{}]*}}|[^}{])*}})|(<\s*references\s*\/?>)/ig,
 					hasReflist = reflistRe.test( text ),
 
 					// This isn't as good as a tokenizer, and believes that <ref> foo </b> is
