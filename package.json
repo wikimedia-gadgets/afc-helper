@@ -23,5 +23,6 @@
     "grunt-jscs": "1.5.x",
     "jest-cli": "git://github.com/facebook/jest#0.5.x",
     "jquery": "~2.1.1"
-  }
+  },
+  "license": "GPL-3.0"
 }
