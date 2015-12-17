@@ -817,7 +817,8 @@
 			} );
 
 			// Add feedback and preferences links
-			AFCH.initFeedback( $afch.find( 'span.feedback-wrapper' ), '[your topic here]', 'give feedback' );
+			// FIXME: Feedback temporarily disabled due to https://github.com/WPAFC/afch-rewrite/issues/71
+			// AFCH.initFeedback( $afch.find( 'span.feedback-wrapper' ), '[your topic here]', 'give feedback' );
 			AFCH.preferences.initLink( $afch.find( 'span.preferences-wrapper' ), 'preferences' );
 
 			// Set up click handlers
