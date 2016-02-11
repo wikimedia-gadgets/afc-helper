@@ -718,7 +718,8 @@
 					summary: options.summary || 'Notifying user',
 					mode: 'appendtext',
 					statusText: 'Notifying',
-					hide: options.hide
+					hide: options.hide,
+					watchlist: 'nochange'
 				} )
 				.done( function () {
 					deferred.resolve();
