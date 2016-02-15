@@ -1732,10 +1732,43 @@
 					$afch.find( '#csdWrapper' ).toggleClass( 'hidden', !this.checked );
 				} );
 
+				// If the user wants a preview, show it
+				if ( $( '#declineTextareaPreviewTrigger' ).text() == '(hide preview)' ) {
+					$( '#declineTextareaPreview' )
+						.empty()
+						.append( $.createSpinner( {
+							size: 'large',
+							type: 'block'
+						} ).css( 'padding', '20px' ) );
+					AFCH.getReason( reason ).done( function ( html ) {
+						$( '#declineTextareaPreview' ).html( html );
+					} );
+				}
+
 				// If a reason has been specified, show the textarea, notify
 				// option, and the submit form button
 				$afch.find( '#declineTextarea' ).add( '#notifyWrapper' ).add( '#afchSubmitForm' )
 					.toggleClass( 'hidden', !reason );
+			} );
+
+			// Attach the preview event listener
+			$afch.find( '#declineTextareaPreviewTrigger' ).click( function () {
+				var reason = $afch.find( '#declineReason' ).val();
+				if ( this.textContent == '(preview)' && reason ) {
+					$( '#declineTextareaPreview' )
+						.empty()
+						.append( $.createSpinner( {
+							size: 'large',
+							type: 'block'
+						} ).css( 'padding', '20px' ) );
+					AFCH.getReason( reason ).done( function ( html ) {
+						$( '#declineTextareaPreview' ).html( html );
+					} );
+					this.textContent = '(hide preview)';
+				} else {
+					$( '#declineTextareaPreview' ).empty();
+					this.textContent = '(preview)';
+				}
 			} );
 		} );
 
