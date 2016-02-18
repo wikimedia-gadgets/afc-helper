@@ -5,8 +5,6 @@ afch-rewrite [![Build Status](https://travis-ci.org/WPAFC/afch-rewrite.png)](htt
 
 A tool for reviewing Articles for Creation submissions on the English Wikipedia, rewritten using clear, object-oriented JavaScript with a focus on killing bloat while adding value.
 
-Currently mainly being developed by [@theopolisme](https://github.com/theopolisme).
-
 ### Using
 
 The script can be installed on the English Wikipedia by following the instructions at [WP:AFCH](https://en.wikipedia.org/wiki/WP:AFCH).
