@@ -1606,7 +1606,28 @@
 		 */
 		getParam: function () {
 			return mw.util.getParamValue.apply( this, arguments );
+		},
+
+		/**
+		 * Given a code for an AfC decline reason (e.g. "v"), returns some HTML code
+		 * describing the reason.
+		 *
+		 * @param {string} code an AfC decline reason code
+		 * @return {$.Deferred} Resolves with the requested HTML
+		 */
+		getReason: function ( code ) {
+			var deferred = $.Deferred();
+
+			$.post( 'https://en.wikipedia.org/api/rest_v1/transform/wikitext/to/html',
+				'wikitext={{AFC submission/comments|' + code + '}}&body_only=true',
+				function ( data ) {
+					deferred.resolve( data );
+				}
+			);
+
+			return deferred;
 		}
+
 	} );
 
 }( AFCH, jQuery, mediaWiki ) );
