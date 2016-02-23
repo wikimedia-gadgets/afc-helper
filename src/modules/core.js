@@ -711,11 +711,10 @@
 			 */
 			notifyUser: function ( user, options ) {
 				var deferred = $.Deferred(),
-					userTalkPage = new mw.Title( user, 3 ), // User talk namespace
-					userTalkPageExists = userTalkPage.exists();
+					userTalkPage = new mw.Title( user, 3 ); // User talk namespace
 
 				AFCH.actions.editPage( userTalkPage.getPrefixedText(), {
-					contents: ( userTalkPageExists ? '' : '{{Talk header}}' ) + '\n\n' + options.message,
+					contents: '\n\n' + options.message,
 					summary: options.summary || 'Notifying user',
 					mode: 'appendtext',
 					statusText: 'Notifying',
