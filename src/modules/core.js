@@ -711,21 +711,22 @@
 			 */
 			notifyUser: function ( user, options ) {
 				var deferred = $.Deferred(),
-					userTalkPage = new mw.Title( user, 3 ), // User talk namespace
-					userTalkPageExists = userTalkPage.exists();
+					userTalkPage = new AFCH.Page( new mw.Title( user, 3 ).getPrefixedText() ); // 3 = user talk namespace
 
-				AFCH.actions.editPage( userTalkPage.getPrefixedText(), {
-					contents: ( userTalkPageExists ? '' : '{{Talk header}}' ) + '\n\n' + options.message,
-					summary: options.summary || 'Notifying user',
-					mode: 'appendtext',
-					statusText: 'Notifying',
-					hide: options.hide
-				} )
-				.done( function () {
-					deferred.resolve();
-				} )
-				.fail( function () {
-					deferred.reject();
+				userTalkPage.exists().done( function ( exists ) {
+					userTalkPage.edit( {
+						contents: ( exists ? '' : '{{Talk header}}' ) + '\n\n' + options.message,
+						summary: options.summary || 'Notifying user',
+						mode: 'appendtext',
+						statusText: 'Notifying',
+						hide: options.hide
+					} )
+					.done( function () {
+						deferred.resolve();
+					} )
+					.fail( function () {
+						deferred.reject();
+					} );
 				} );
 
 				return deferred;
