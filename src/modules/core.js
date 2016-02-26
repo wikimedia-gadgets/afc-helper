@@ -624,12 +624,12 @@
 						} else {
 							deferred.reject( data );
 							// FIXME: get detailed error info from API result??
-							status.update( 'Error saving $1: ' + JSON.stringify( data ) );
+							status.update( 'Error while saving $1: ' + JSON.stringify( data ) );
 						}
 					} )
 					.fail( function ( err ) {
 						deferred.reject( err );
-						status.update( 'Error saving $1: ' + JSON.stringify( err ) );
+						status.update( 'Error while saving $1: ' + JSON.stringify( err ) );
 					} );
 
 				return deferred;
