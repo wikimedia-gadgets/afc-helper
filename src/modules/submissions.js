@@ -1638,6 +1638,7 @@
 			$afch.find( '#declineReason' ).change( function () {
 				var reason = $afch.find( '#declineReason' ).val(),
 					candidateDupeName = ( afchSubmission.shortTitle !== 'sandbox' ) ? afchSubmission.shortTitle : '',
+					prevDeclineComment = $afch.find( '#declineTextarea' ).val(),
 					declineHandlers = {
 						cv: function () {
 							var $textfieldWrapper, $addAnotherLink, $clone;
@@ -1723,6 +1724,9 @@
 				if ( declineHandlers[reason] ) {
 					declineHandlers[reason]();
 				}
+
+				// Preserve the custom comment text
+				$afch.find( '#declineTextarea' ).val( prevDeclineComment );
 
 				$afch.find( '#blankSubmission' ).change( function () {
 					// If blank is not selected, then deselect CSD as well
