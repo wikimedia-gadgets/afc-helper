@@ -1675,6 +1675,20 @@
 							$afch.find( '#blankWrapper' ).add( '#csdWrapper' )
 								.removeClass( 'hidden' )
 								.children( 'input' ).prop( 'checked', true );
+
+							// Check if there's an OTRS notice
+							new AFCH.Page( 'Draft talk:' + afchSubmission.shortTitle ).getText( /* usecache */ true ).done( function ( text ) {
+								if ( /ConfirmationOTRS/.test( text ) ) {
+								$afch.find( '#declineInputWrapper' ).append(
+									$( '<div>' )
+										.addClass( 'warnings' )
+										.css( {
+											'max-width': '50%',
+											margin: '0px auto'
+										} )
+										.text( 'This draft has an OTRS template on the talk page. Verify that the copyright violation isn\'t covered by the template before marking this draft as a copyright violation.' ) );
+								}
+							} );
 						},
 
 						dup: function () {
