@@ -105,7 +105,7 @@ def uploadFile(pagename, content):
 		return '\n'.join(text.splitlines()[1:])
 
 	# Only update the page if its contents have changed (excluding the header)
-	if stripFirstLine(content) != stripFirstLine(page.edit()):
+	if stripFirstLine(content) != stripFirstLine(page.text()):
 		print 'Uploading to {}'.format(pagename)
 		page.save(content, 'Updating AFCH: {} @ {}'.format(branch, sha1[:6]))
 	else:
