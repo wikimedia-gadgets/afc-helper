@@ -513,6 +513,17 @@
 			// Add to the list of comments to remove
 			$.merge( commentsToRemove, [
 				'Enter template purpose and instructions here.',
+				'will not display if birth\\_date is entered',
+				'\\{\\{disappeared date and age\\|YYYY\\|MM\\|DD\\|YYYY\\|MM\\|DD\\}\\} \\(disappeared date then birth date\\)',
+				'\\{\\{death date and age\\|YYYY\\|MM\\|DD\\|YYYY\\|MM\\|DD\\}\\} \\(death date then birth date\\)',
+				'\\{\\{coord\\|LAT\\|LONG\\|type\\:landmark\\|display\\=inline\\}\\}',
+				'Ethnicity should be supported with a citation from a reliable source',
+				'Net worth should be supported with a citation from a reliable source',
+				'\\{\\{height\\|cm\\=X\\}\\} OR \\{\\{height\\|ft\\=X\\|in\\=Y\\}\\}',
+				'\\{\\{convert\\|X\\|kg\\|lb\\|0\\|abbr\\=on\\}\\} or \\{\\{convert\\|X\\|lb\\|kg\\|0\\|abbr\\=on\\}\\}',
+				'Religion should be supported with a citation from a reliable source',
+				'Denomination should be supported with a citation from a reliable source',
+				'Criminality parameters should be supported with citations from reliable sources',
 				'Enter the content and\\/or code of the template here.',
 				'EDIT BELOW THIS LINE',
 				'Metadata: see \\[\\[Wikipedia:Persondata\\]\\].',
