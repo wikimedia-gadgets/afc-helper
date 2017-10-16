@@ -1190,7 +1190,7 @@
 			new AFCH.status.Element( 'Continue to next $1, $2, or $3 &raquo;', {
 				'$1': AFCH.makeLinkElementToCategory( 'Pending AfC submissions', 'random submission' ),
 				'$2': AFCH.makeLinkElementToCategory( 'AfC pending submissions by age/0 days ago', 'GFOO submission' ),
-				'$3': AFCH.makeLinkElementToCategory( 'AfC submissions by age/Very old', 'very old submission' )
+				'$3': AFCH.makeLinkElementToCategory( 'AfC pending submissions by age/Very old', 'very old submission' )
 			} );
 
 			// Also, automagically reload the page in place
