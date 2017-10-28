@@ -1672,9 +1672,8 @@
 								$addAnotherLink.fadeIn();
 							} );
 
-							$afch.find( '#blankWrapper' ).add( '#csdWrapper' )
-								.removeClass( 'hidden' )
-								.children( 'input' ).prop( 'checked', true );
+							$afch.add( '#csdWrapper' )
+								.removeClass( 'hidden' );
 
 							// Check if there's an OTRS notice
 							new AFCH.Page( 'Draft talk:' + afchSubmission.shortTitle ).getText( /* usecache */ true ).done( function ( text ) {
@@ -1711,18 +1710,6 @@
 							updateTextfield( 'Title of existing related article, if one exists', 'Charlie and the Chocolate Factory', candidateDupeName );
 						},
 
-						van: function () {
-							$afch.find( '#blankWrapper' ).add( '#csdWrapper' )
-								.removeClass( 'hidden' )
-								.children( 'input' ).prop( 'checked', true );
-						},
-
-						blp: function () {
-							$afch.find( '#blankWrapper' )
-								.removeClass( 'hidden' )
-								.children( 'input' ).prop( 'checked', true );
-						},
-
 						// Custom decline rationale
 						reason: function () {
 							$afch.find( '#declineTextarea' )
@@ -1741,15 +1728,6 @@
 
 				// Preserve the custom comment text
 				$afch.find( '#declineTextarea' ).val( prevDeclineComment );
-
-				$afch.find( '#blankSubmission' ).change( function () {
-					// If blank is not selected, then deselect CSD as well
-					if ( !this.checked ) {
-						$afch.find( '#csdSubmission' ).prop( 'checked', false );
-					}
-					// ... and just outright hide it
-					$afch.find( '#csdWrapper' ).toggleClass( 'hidden', !this.checked );
-				} );
 
 				// If the user wants a preview, show it
 				if ( $( '#declineTextareaPreviewTrigger' ).text() == '(hide preview)' ) {
@@ -2050,11 +2028,6 @@
 		// associated page), pass that as the third parameter
 		if ( data.declineTextfield ) {
 			newParams['3'] = data.declineTextfield;
-		}
-
-		// Handle submission blanking (csd as well if necessary...except for copyvios, handled later)
-		if ( data.blankSubmission ) {
-			text.set( '{{afc cleared' + ( data.csdSubmission && declineReason !== 'cv' ? '|csd' : '' ) + '}}' );
 		}
 
 		// Copyright violations get {{db-g12}}'d as well
