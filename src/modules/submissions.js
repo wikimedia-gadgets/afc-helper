@@ -892,7 +892,7 @@
 		function checkReferences () {
 			var deferred = $.Deferred();
 
-			afchPage.getText( true ).done( function ( text ) {
+			afchPage.getText( false ).done( function ( text ) {
 				var refBeginRe = /<\s*ref.*?\s*>/ig,
 					refBeginMatches = $.grep( text.match( refBeginRe ) || [], function ( ref ) {
 						// If the ref is closed already, we don't want it
@@ -1042,7 +1042,7 @@
 		function checkLongComments () {
 			var deferred = $.Deferred();
 
-			afchPage.getText( true ).done( function ( rawText ) {
+			afchPage.getText( false ).done( function ( rawText ) {
 				var
 					// Simulate cleanUp first so that we don't warn about HTML
 					// comments that the script will remove anyway in the future
@@ -1220,7 +1220,7 @@
 			var data = {};
 
 			// Provide page text; use cache created after afchSubmission.parse()
-			afchPage.getText( true ).done( function ( text ) {
+			afchPage.getText( false ).done( function ( text ) {
 				data.afchText = new AFCH.Text( text );
 
 				// Also provide the values for each afch-input element
@@ -1326,7 +1326,7 @@
 		}
 
 		$.when(
-			afchPage.getText( true ),
+			afchPage.getText( false ),
 			loadWikiProjectList(),
 			afchPage.getCategories( /* useApi */ false, /* includeCategoryLinks */ true )
 		).then( function ( pageText, wikiProjects, categories ) {
@@ -1676,7 +1676,7 @@
 								.removeClass( 'hidden' );
 
 							// Check if there's an OTRS notice
-							new AFCH.Page( 'Draft talk:' + afchSubmission.shortTitle ).getText( /* usecache */ true ).done( function ( text ) {
+							new AFCH.Page( 'Draft talk:' + afchSubmission.shortTitle ).getText( /* usecache */ false ).done( function ( text ) {
 								if ( /ConfirmationOTRS/.test( text ) ) {
 								$afch.find( '#declineInputWrapper' ).append(
 									$( '<div>' )
@@ -2172,7 +2172,7 @@
 	function handleCleanup () {
 		prepareForProcessing( 'Cleaning' );
 
-		afchPage.getText( true ).done( function ( rawText ) {
+		afchPage.getText( false ).done( function ( rawText ) {
 			var text = new AFCH.Text( rawText );
 
 			// Even though we didn't modify them, still update the templates,
@@ -2193,7 +2193,7 @@
 
 		prepareForProcessing( actionText, 'mark' );
 
-		afchPage.getText( true ).done( function ( rawText ) {
+		afchPage.getText( false ).done( function ( rawText ) {
 			var text = new AFCH.Text( rawText );
 
 			if ( unmark ) {
@@ -2225,7 +2225,7 @@
 
 		// Get the page text and the last modified date (cached!) and tag the page
 		$.when(
-			afchPage.getText( true ),
+			afchPage.getText( false ),
 			afchPage.getLastModifiedDate()
 		).then( function ( rawText, lastModified ) {
 			var text = new AFCH.Text( rawText );
