@@ -1394,7 +1394,7 @@
 				// Since jquery.chosen doesn't natively support dynamic results,
 				// we sneakily inject some dynamic suggestions instead. Consider
 				// switching to something like Select2 to avoid this hackery...
-				$afch.find( '#newCategories_chzn input' ).keyup( function ( e ) {
+				$afch.find( '#newCategories_chosen input' ).keyup( function ( e ) {
 					var $input = $( this ),
 						prefix = $input.val(),
 						$categories = $afch.find( '#newCategories' );
@@ -1438,6 +1438,7 @@
 
 						// Make chosen update suggestions
 						$categories.trigger( 'liszt:updated' );
+						$categories.trigger( 'chosen:updated' );
 						$input.val( prefix );
 
 						// If we couldn't find any matching categories, apologize
