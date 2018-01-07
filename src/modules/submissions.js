@@ -1405,13 +1405,14 @@
 						return;
 					}
 
-					// First we remove leftovers from previous suggestions
-					$categories.children().not( ':selected' ).remove();
-					$categories.trigger( 'liszt:updated' );
-					$input.val( prefix );
+					// The worst hack. Because Chosen keeps messing with the
+					// width of the text box, keep on resetting it to 100%
+					$input.css( 'width', '100%' );
 
 					AFCH.api.getCategoriesByPrefix( prefix ).done( function ( categories ) {
-						var currentCategories = [];
+
+						// Reset the text box width again
+						$input.css( 'width', '100%' );
 
 						// If the input has changed since we started searching,
 						// don't show outdated results
@@ -1419,36 +1420,23 @@
 							return;
 						}
 
-						// Make a list of all of the current categories
-						$categories.find( 'option' ).each( function () {
-							currentCategories.push( this.value );
-						} );
+						// Clear existing suggestions
+						$categories.children().not( ':selected' ).remove();
 
+						// Now, add the new suggestions
 						$.each( categories, function ( _, category ) {
-							// If the category has already been added, don't offer it as an option
-							if ( currentCategories.indexOf( category ) !== -1 ) {
-								return;
-							}
-
 							$( '<option>' )
 								.attr( 'value', category )
 								.text( category )
 								.appendTo( $categories );
 						} );
 
-						// Make chosen update suggestions
+						// We've changed the <select>, now tell Chosen to
+						// rebuild the visible list
 						$categories.trigger( 'liszt:updated' );
 						$categories.trigger( 'chosen:updated' );
 						$input.val( prefix );
-
-						// If we couldn't find any matching categories, apologize
-						if ( !categories.length ) {
-							$( '<li>' )
-								.text( 'No matching categories found.' )
-								.addClass( 'no-results' )
-								.appendTo( 'ul.chzn-results' );
-						}
-
+						$input.css( 'width', '100%' );
 					} );
 				} );
 
