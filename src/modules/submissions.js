@@ -1408,11 +1408,13 @@
 					// The worst hack. Because Chosen keeps messing with the
 					// width of the text box, keep on resetting it to 100%
 					$input.css( 'width', '100%' );
+					$input.parent().css( 'width', '100%' );
 
 					AFCH.api.getCategoriesByPrefix( prefix ).done( function ( categories ) {
 
 						// Reset the text box width again
 						$input.css( 'width', '100%' );
+						$input.parent().css( 'width', '100%' );
 
 						// If the input has changed since we started searching,
 						// don't show outdated results
@@ -1437,6 +1439,7 @@
 						$categories.trigger( 'chosen:updated' );
 						$input.val( prefix );
 						$input.css( 'width', '100%' );
+						$input.parent().css( 'width', '100%' );
 					} );
 				} );
 
