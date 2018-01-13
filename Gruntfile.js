@@ -60,11 +60,11 @@ module.exports = function ( grunt ) {
 		},
 
 		jshint: {
-			src: [ 'src/**/*.js', 'misc/**/*.js', '__tests__/**/*.js', ]
+			src: [ 'src/**/*.js', 'contrib/**/*.js', '__tests__/**/*.js', ]
 		},
 
 		jscs: {
-			src: [ 'src/**/*.js', 'misc/**/*.js', '__tests__/**/*.js' ]
+			src: [ 'src/**/*.js', 'contrib/**/*.js', '__tests__/**/*.js' ]
 		},
 
 		exec: {
