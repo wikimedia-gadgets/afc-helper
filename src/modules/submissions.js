@@ -762,16 +762,11 @@
 				url: AFCH.consts.baseurl + '/tpl-submissions.js',
 				dataType: 'text'
 			} ).done( function ( data ) {
-				/* global */
 				afchViews = new AFCH.Views( data );
-				/* global */
 				afchViewer = new AFCH.Viewer( afchViews, $afchWrapper );
 			} );
 
-		/* global */
 		afchPage = new AFCH.Page( AFCH.consts.pagename );
-
-		/* global */
 		afchSubmission = new AFCH.Submission( afchPage );
 
 		// Set up messages for later
