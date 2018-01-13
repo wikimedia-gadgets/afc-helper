@@ -1,15 +1,21 @@
 {
   "name": "afch-rewrite",
   "version": "0.9.0",
+  "description": "A tool for reviewing Articles for Creation submissions on the English Wikipedia.",
   "homepage": "https://github.com/WPAFC/afch-rewrite",
+  "bugs": {
+    "url": "https://github.com/WPAFC/afch-rewrite/issues"
+  },
+  "license": "GPL-3.0",
   "repository": {
     "type": "git",
-    "url": "git://github.com/WPAFC/afch-rewrite"
+    "url": "https://github.com/WPAFC/afch-rewrite/npm.git"
   },
   "scripts": {
     "test": "grunt test"
   },
-  "dependencies": {},
+  "dependencies": {
+  },
   "devDependencies": {
     "grunt": "0.4.2",
     "grunt-autoprefixer": "0.2.x",
@@ -23,6 +29,5 @@
     "grunt-jscs": "1.5.x",
     "jest-cli": "git://github.com/facebook/jest#0.5.x",
     "jquery": "~2.1.1"
-  },
-  "license": "GPL-3.0"
+  }
 }
