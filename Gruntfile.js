@@ -55,16 +55,12 @@ module.exports = function ( grunt ) {
 			build: {
 				files: {
 					'build/afch.css': [ 'build/**/*.css' ]
-		    	}
-		    }
+				}
+			}
 		},
 
-		jshint: {
-			src: [ 'src/**/*.js', 'contrib/**/*.js', '__tests__/**/*.js', ]
-		},
-
-		jscs: {
-			src: [ 'src/**/*.js', 'contrib/**/*.js', '__tests__/**/*.js' ]
+		eslint: {
+			target: [ 'src/**/*.js', 'contrib/**/*.js', '__tests__/**/*.js', 'Gruntfile.js' ]
 		},
 
 		exec: {
@@ -79,15 +75,14 @@ module.exports = function ( grunt ) {
 	grunt.loadNpmTasks( 'grunt-contrib-concat' );
 	grunt.loadNpmTasks( 'grunt-contrib-copy' );
 	grunt.loadNpmTasks( 'grunt-contrib-cssmin' );
-	grunt.loadNpmTasks( 'grunt-contrib-jshint' );
 	grunt.loadNpmTasks( 'grunt-contrib-less' );
+	grunt.loadNpmTasks( 'grunt-eslint' );
 	grunt.loadNpmTasks( 'grunt-exec' );
-	grunt.loadNpmTasks( 'grunt-jscs' );
 
 	grunt.registerTask(
 		'teststyle',
 		'Tests files for code style and code quality.',
-		[ 'jshint', 'jscs' ]
+		[ 'eslint' ]
 	);
 
 	grunt.registerTask(
