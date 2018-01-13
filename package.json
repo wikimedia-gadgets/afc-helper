@@ -15,6 +15,7 @@
     "test": "grunt test"
   },
   "dependencies": {
+    "hogan.js": "^3.0.2"
   },
   "devDependencies": {
     "eslint": "^4.15.0",
