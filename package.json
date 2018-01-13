@@ -17,16 +17,17 @@
   "dependencies": {
   },
   "devDependencies": {
+    "eslint": "^4.15.0",
+    "eslint-config-wikimedia": "^0.5.0",
     "grunt": "^1.0.1",
     "grunt-autoprefixer": "^3.0.4",
     "grunt-contrib-clean": "^1.1.0",
     "grunt-contrib-concat": "^1.0.1",
     "grunt-contrib-copy": "^1.0.0",
     "grunt-contrib-cssmin": "^2.2.1",
-    "grunt-contrib-jshint": "^1.1.0",
     "grunt-contrib-less": "^1.4.1",
+    "grunt-eslint": "^20.1.0",
     "grunt-exec": "^3.0.0",
-    "grunt-jscs": "^3.0.1",
     "jest-cli": "^12.1.1",
     "jquery": "^3.2.1"
   }

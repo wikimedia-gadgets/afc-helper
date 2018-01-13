@@ -1,0 +1,34 @@
+{
+	"extends": "wikimedia",
+	"env": {
+		"browser": true,
+		"jquery": true
+	},
+	"globals": {
+		"AFCH": true,
+		"Hogan": false,
+		"importScript": false,
+		"mediaWiki": true,
+		"mw": true,
+		"OO": false
+	},
+	"rules": {
+		"camelcase": 0,
+		"eqeqeq": 0,
+		"no-console": 0,
+		"no-global-assign": 0,
+		"no-implicit-globals": 0,
+		"no-native-reassign": 0,
+		"no-new": 0,
+		"no-undef": 0,
+		"no-underscore-dangle": 0,
+		"no-unused-vars": 0,
+		"no-use-before-define": 0,
+		"no-useless-concat": 0,
+		"no-useless-escape": 0,
+		"one-var": 0,
+		"spaced-comment": 0,
+		"valid-jsdoc": 0,
+		"vars-on-top": 0
+	}
+}
