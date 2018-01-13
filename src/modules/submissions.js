@@ -1740,8 +1740,11 @@
 							size: 'large',
 							type: 'block'
 						} ).css( 'padding', '20px' ) );
-					AFCH.getReason( reason ).done( function ( html ) {
-						$( '#declineTextareaPreview' ).html( html );
+					var reasonDeferreds = reason.map( AFCH.getReason );
+					$.when.apply( $, reasonDeferreds ).then( function ( a, b ) {
+						$( '#declineTextareaPreview' )
+							.html( Array.prototype.slice.call( arguments )
+									.join( '<hr />' ) );
 					} );
 					this.textContent = '(hide preview)';
 				} else {
