@@ -191,7 +191,7 @@
 	<div id="afchContent" class="content centered">
 
 		<div id="declineReasonWrapper">
-			<select id="declineReason" class="afch-input text-left">
+			<select id="declineReason" class="afch-input text-left" multiple="multiple">
 				<option value=""></option>
 				<optgroup label="Notability">
 					<option value="neo">neo - Submission is about a neologisim not yet shown to meet notability guidelines</option>
@@ -247,6 +247,18 @@
 			<div id="textfieldWrapper" class="afch-option hidden">
 				<label for="declineTextfield" class="afch-label"></label>
 				<input id="declineTextfield" type="text" class="afch-input afch-textfield" placeholder="" />
+			</div>
+
+			<div id="textfieldWrapper2" class="afch-option hidden">
+				<label for="declineTextfield2" class="afch-label"></label>
+				<input id="declineTextfield2" type="text" class="afch-input afch-textfield" placeholder="" />
+			</div>
+
+			<div id="cvUrlWrapper" class="afch-option hidden">
+				<label for="cvUrlTextarea" class="afch-label">Original URLs (one per line)</label>
+				<textarea id="cvUrlTextarea" class="afch-input afch-textfield afch-textarea"
+					placeholder="Enter original URLs here, one per line."
+					cols="110" rows="3"></textarea>
 			</div>
 
 			<textarea id="declineTextarea" class="afch-input afch-textfield afch-textarea"

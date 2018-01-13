@@ -1105,9 +1105,11 @@
 			// $3 = copyright violation ('yes'/'no')
 			// $4 = decline reason code
 			// $5 = decline reason additional parameter
-			// $6 = additional comment
+			// $6 = second decline reason code
+			// $7 = additional parameter for second decline reason
+			// $8 = additional comment
 			'declined-submission': '== Your submission at [[Wikipedia:Articles for creation|Articles for creation]]: ' +
-				'[[$1|$2]] ({{subst:CURRENTMONTHNAME}} {{subst:CURRENTDAY}}) ==\n{{subst:Afc decline|full=$1|cv=$3|reason=$4|details=$5|comment=$6|sig=yes}}',
+				'[[$1|$2]] ({{subst:CURRENTMONTHNAME}} {{subst:CURRENTDAY}}) ==\n{{subst:Afc decline|full=$1|cv=$3|reason=$4|details=$5|reason2=$6|details2=$7|comment=$8|sig=yes}}',
 
 			// $1 = article name
 			'comment-on-submission': '{{subst:AFC notification|comment|article=$1}}',
@@ -1573,8 +1575,11 @@
 			var $reasons, $commonSection, declineCounts,
 				pristineState = $afch.find( '#declineInputWrapper' ).html();
 
-			function updateTextfield ( newPrompt, newPlaceholder, newValue ) {
-				var wrapper = $afch.find( '#textfieldWrapper' );
+			// pos is either 1 or 2, based on whether the chosen reason that
+			// is triggering this update is first or second in the multi-select
+			// control
+			function updateTextfield ( newPrompt, newPlaceholder, newValue, pos ) {
+				var wrapper = $afch.find( '#textfieldWrapper' + ( pos === 2 ? '2' : '' ) );
 
 				// Update label and placeholder
 				wrapper.find( 'label' ).text( newPrompt );
@@ -1618,7 +1623,8 @@
 				placeholder_text_single: 'Select a decline reason...',
 				no_results_text: 'Whoops, no reasons matched your search. Type "custom" to add a custom rationale instead.',
 				search_contains: true,
-				inherit_select_classes: true
+				inherit_select_classes: true,
+				max_selected_options: 2
 			} );
 
 			// And now add the handlers for when a specific decline reason is selected
@@ -1627,40 +1633,26 @@
 					candidateDupeName = ( afchSubmission.shortTitle !== 'sandbox' ) ? afchSubmission.shortTitle : '',
 					prevDeclineComment = $afch.find( '#declineTextarea' ).val(),
 					declineHandlers = {
-						cv: function () {
-							var $textfieldWrapper, $addAnotherLink, $clone;
+						cv: function ( pos ) {
+							$afch.find( '#cvUrlWrapper' ).removeClass( 'hidden' );
+							$afch.add( '#csdWrapper' ).removeClass( 'hidden' );
 
-							updateTextfield( 'Original URL', 'https://example.com/cake' );
-							$textfieldWrapper = $afch.find( '#textfieldWrapper' );
-
-							$clone = $textfieldWrapper.clone( true );
-
-							$addAnotherLink = $( '<span>' )
-								.text( '(add another)' )
-								.addClass( 'afch-label link' )
-								.appendTo( $textfieldWrapper )
-								.hide()
-								.click( function () {
-									// Remove the old "add another" link
-									$( this ).remove();
-
-									$clone
-										.find( 'input' )
-										.attr( 'id', 'copyvioUrl2' )
-										.end()
-										.find( 'label' )
-										.attr( 'for', 'copyvioUrl2' );
-
-									$clone.insertAfter( $textfieldWrapper );
-								} );
-
-							// On keyup show the "add another" link
-							$textfieldWrapper.find( 'input' ).one( 'keyup', function () {
-								$addAnotherLink.fadeIn();
+							$afch.find( '#cvUrlTextarea' ).keyup( function () {
+								var text = $( this ).val(),
+									numUrls = text ? text.split( '\n' ).length : 0,
+									submitButton = $afch.find( '#afchSubmitForm' );
+								if ( 1 <= numUrls && numUrls <= 3 ) {
+									$( this ).removeClass( 'bad-input' );
+									submitButton
+										.removeClass( 'disabled' )
+										.text( 'Decline submission' );
+								} else {
+									$( this ).addClass( 'bad-input' );
+									submitButton
+										.addClass( 'disabled' )
+										.text( 'Please enter between one and three URLs!' );
+								}
 							} );
-
-							$afch.add( '#csdWrapper' )
-								.removeClass( 'hidden' );
 
 							// Check if there's an OTRS notice
 							new AFCH.Page( 'Draft talk:' + afchSubmission.shortTitle ).getText( /* usecache */ false ).done( function ( text ) {
@@ -1677,24 +1669,24 @@
 							} );
 						},
 
-						dup: function () {
-							updateTextfield( 'Title of duplicate submission (no namespace)', 'Articles for creation/Fudge', candidateDupeName );
+						dup: function ( pos ) {
+							updateTextfield( 'Title of duplicate submission (no namespace)', 'Articles for creation/Fudge', candidateDupeName, pos );
 						},
 
-						mergeto: function () {
-							updateTextfield( 'Article which submission should be merged into', 'Milkshake', candidateDupeName );
+						mergeto: function ( pos ) {
+							updateTextfield( 'Article which submission should be merged into', 'Milkshake', candidateDupeName, pos );
 						},
 
-						lang: function () {
-							updateTextfield( 'Language of the submission if known', 'German' );
+						lang: function ( pos ) {
+							updateTextfield( 'Language of the submission if known', 'German', pos );
 						},
 
-						exists: function () {
-							updateTextfield( 'Title of existing article', 'Chocolate chip cookie', candidateDupeName );
+						exists: function ( pos ) {
+							updateTextfield( 'Title of existing article', 'Chocolate chip cookie', candidateDupeName, pos );
 						},
 
-						plot: function () {
-							updateTextfield( 'Title of existing related article, if one exists', 'Charlie and the Chocolate Factory', candidateDupeName );
+						plot: function ( pos ) {
+							updateTextfield( 'Title of existing related article, if one exists', 'Charlie and the Chocolate Factory', candidateDupeName, pos );
 						},
 
 						// Custom decline rationale
@@ -1707,10 +1699,13 @@
 				// Reset to a pristine state :)
 				$afch.find( '#declineInputWrapper' ).html( pristineState );
 
-				// If there are special options to be displayed for this
+				// If there are special options to be displayed for each
 				// particular decline reason, load them now
-				if ( declineHandlers[reason] ) {
-					declineHandlers[reason]();
+				if ( declineHandlers[reason[0]] ) {
+					declineHandlers[reason[0]](1);
+				}
+				if ( declineHandlers[reason[1]] ) {
+					declineHandlers[reason[1]](2);
 				}
 
 				// Preserve the custom comment text
@@ -1733,7 +1728,7 @@
 				// option, and the submit form button
 				$afch.find( '#declineTextarea' ).add( '#notifyWrapper' ).add( '#afchSubmitForm' )
 					.toggleClass( 'hidden', !reason );
-			} );
+			} ); // End change handler for the reason select box
 
 			// Attach the preview event listener
 			$afch.find( '#declineTextareaPreviewTrigger' ).click( function () {
@@ -1985,43 +1980,72 @@
 	function handleDecline ( data ) {
 		var declineCounts,
 			text = data.afchText,
-			declineReason = data.declineReason,
+			declineReason = data.declineReason[0],
+			declineReason2 = data.declineReason.length > 1 ? data.declineReason[1] : null,
 			newParams = {
 				'2': declineReason,
 				decliner: AFCH.consts.user,
 				declinets: '{{subst:REVISIONTIMESTAMP}}'
 			};
 
+		// If there's a second reason, add it to the params
+		if ( declineReason2 ) {
+			newParams.reason2 = declineReason2;
+		}
+
 		// Update decline counts
 		declineCounts = AFCH.userData.get( 'decline-counts', {} );
 
-		if ( declineCounts[declineReason] ) {
-			declineCounts[declineReason] += 1;
-		} else {
-			declineCounts[declineReason] = 1;
+		declineCounts[declineReason] = ( declineCounts[declineReason] || 1 ) + 1;
+		if ( declineReason2 ) {
+			declineCounts[declineReason2] = ( declineCounts[declineReason2] || 1 ) + 1;
 		}
 
 		AFCH.userData.set( 'decline-counts', declineCounts );
 
-		// If this is a custom decline, we include the declineTextarea in the {{AFC submission}} template
+		// If the first reason is a custom decline, we include the declineTextarea in the {{AFC submission}} template
 		if ( declineReason === 'reason' ) {
 			newParams['3'] = data.declineTextarea;
-		// But otherwise if addtional text has been entered we just add it as a new comment
+		} else if ( declineReason2 === 'reason' ) {
+			newParams.details2 = data.declineTextarea;
 		} else if ( data.declineTextarea ) {
+
+			// But otherwise if addtional text has been entered we just add it as a new comment
 			afchSubmission.addNewComment( data.declineTextarea );
 		}
 
 		// If a user has entered something in the declineTextfield (for example, a URL or an
-		// associated page), pass that as the third parameter
+		// associated page), pass that as the third parameter...
 		if ( data.declineTextfield ) {
 			newParams['3'] = data.declineTextfield;
 		}
 
+		// ...and do the same with the second decline text field
+		if ( data.declineTextfield2 ) {
+			newParams.details2 = data.declineTextfield2;
+		}
+
 		// Copyright violations get {{db-g12}}'d as well
-		if ( declineReason === 'cv' && data.csdSubmission ) {
-			text.prepend( '{{db-g12|url=' + data.declineTextfield + ( data.copyvioUrl2 ? '|url2=' + data.copyvioUrl2 : '' ) + ( afchPage.additionalData.revId ? '|oldid=' + afchPage.additionalData.revId : '' ) + '}}\n' );
-			// Include copyvio urls in the decline template as well
-			newParams['3'] = data.declineTextfield + ( data.copyvioUrl2 ? ', ' + data.copyvioUrl2 : '' );
+		if ( ( declineReason === 'cv' || declineReason2 === 'cv' ) && data.csdSubmission ) {
+			var cvUrls = data.cvUrlTextarea.split( '\n' ).slice( 0, 3 ),
+				urlParam = '';
+
+			// Build url param for db-g12 template
+			urlParam = cvUrls[0];
+			if ( cvUrls.length > 1 ) {
+				urlParam += '|url2=' + cvUrls[1];
+				if ( cvUrls.length > 2 ) {
+					urlParam += '|url3=' + cvUrls[2];
+				}
+			}
+			text.prepend( '{{db-g12|url=' + urlParam + ( afchPage.additionalData.revId ? '|oldid=' + afchPage.additionalData.revId : '' ) + '}}\n' );
+
+			// Include the URLs in the decline template
+			if ( declineReason === 'cv' ) {
+				newParams['3'] = cvUrls.join( ', ' );
+			} else {
+				newParams.details2 = cvUrls.join( ', ' );
+			}
 		}
 
 		// Now update the submission status
@@ -2030,11 +2054,28 @@
 		text.updateAfcTemplates( afchSubmission.makeWikicode() );
 		text.cleanUp();
 
+		// Build edit summary
+		var editSummary = 'Declining submission: ';
+		if ( declineReason === 'reason' ) {
+
+			// If this is a custom decline, use the text in the edit summary
+			editSummary += data.declineTextarea;
+		} else {
+			editSummary += data.declineReasonTexts[0];
+		}
+
+		if ( declineReason2 ) {
+			editSummary += ' and ';
+			if ( declineReason2 === 'reason' ) {
+				editSummary += data.declineTextarea;
+			} else {
+				editSummary += data.declineReasonTexts[1];
+			}
+		}
+
 		afchPage.edit( {
 			contents: text.get(),
-			// For the edit summary, we either grab the full summary text for the decline reason or,
-			// if it is a custom decline, just the full decline text instead.
-			summary: 'Declining submission: ' + ( declineReason !== 'reason' ? data.declineReasonTexts[0] : data.declineTextarea )
+			summary: editSummary
 		} );
 
 		if ( data.notifyUser ) {
@@ -2067,10 +2108,14 @@
 					var message = AFCH.msg.get( 'declined-submission', {
 						'$1': AFCH.consts.pagename,
 						'$2': afchSubmission.shortTitle,
-						'$3': declineReason === 'cv' ? 'yes' : 'no',
+						'$3': ( declineReason === 'cv' || declineReason2 === 'cv' ) ?
+							'yes' : 'no',
 						'$4': declineReason,
 						'$5': newParams['3'] || '',
-						'$6': declineReason === 'reason' ? '' : data.declineTextarea
+						'$6': declineReason2 || '',
+						'$7': newParams.details2 || '',
+						'$8': ( declineReason === 'reason' || declineReason2 === 'reason' ) ?
+							'' : data.declineTextarea
 					} );
 
 					if ( teahouse ) {
