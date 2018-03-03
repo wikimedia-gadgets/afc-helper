@@ -1289,7 +1289,7 @@
 			var deferred = $.Deferred(),
 				wikiProjects = [],
 				// This is so a new version of AFCH will invalidate the WikiProject cache
-				lsKey = 'afch-' + AFCH.consts.version + '-wikiprojects';
+				lsKey = 'afch-' + AFCH.consts.version + '-wikiprojects-1';
 
 			if ( window.localStorage && window.localStorage[lsKey] ) {
 				wikiProjects = JSON.parse( window.localStorage[lsKey] );
