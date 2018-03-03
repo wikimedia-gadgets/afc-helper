@@ -2058,11 +2058,17 @@
 		text.cleanUp();
 
 		// Build edit summary
-		var editSummary = 'Declining submission: ';
+		var editSummary = 'Declining submission: ',
+			lengthLimit = declineReason2 ? 120 : 180;
 		if ( declineReason === 'reason' ) {
 
 			// If this is a custom decline, use the text in the edit summary
-			editSummary += data.declineTextarea;
+			editSummary += data.declineTextarea.substring( 0, lengthLimit );
+
+			// If we had to trunucate, indicate that
+			if ( data.declineTextarea.length > lengthLimit ) {
+				editSummary += '...';
+			}
 		} else {
 			editSummary += data.declineReasonTexts[0];
 		}
@@ -2070,7 +2076,10 @@
 		if ( declineReason2 ) {
 			editSummary += ' and ';
 			if ( declineReason2 === 'reason' ) {
-				editSummary += data.declineTextarea;
+				editSummary += data.declineTextarea.substring( 0, lengthLimit );
+				if ( data.declineTextarea.length > lengthLimit ) {
+					editSummary += '...';
+				}
 			} else {
 				editSummary += data.declineReasonTexts[1];
 			}
