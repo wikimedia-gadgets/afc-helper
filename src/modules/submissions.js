@@ -5,8 +5,7 @@
 
 	// Die if reviewing a nonexistent page or a userjs/css page
 	if ( mw.config.get( 'wgArticleId' ) === 0 ||
-		mw.config.get( 'wgPageContentModel' ) !== 'wikitext' )
-	{
+		mw.config.get( 'wgPageContentModel' ) !== 'wikitext' ) {
 		return;
 	}
 
@@ -22,7 +21,7 @@
 		this.page = page;
 
 		// 'WT:Articles for creation/Foo' => 'Foo'
-		this.shortTitle = this.page.title.getMainText().match( /([^\/]+)\/?$/ )[1];
+		this.shortTitle = this.page.title.getMainText().match( /([^\/]+)\/?$/ )[ 1 ];
 
 		this.resetVariables();
 	};
@@ -86,7 +85,7 @@
 
 		$.each( templates, function ( _, template ) {
 			var name = template.target.toLowerCase();
-			if ( name  === 'afc submission' ) {
+			if ( name === 'afc submission' ) {
 				submissionTemplates.push( {
 					status: ( AFCH.getAndDelete( template.params, '1' ) || '' ).toLowerCase(),
 					timestamp: AFCH.getAndDelete( template.params, 'ts' ) || '',
@@ -96,8 +95,8 @@
 				commentTemplates.push( {
 					// If we can't find a timestamp, set it to unicorns, because everyone
 					// knows that unicorns always come first.
-					timestamp: AFCH.parseForTimestamp( template.params['1'], /* mwstyle */ true ) || 'unicorns',
-					text: template.params['1']
+					timestamp: AFCH.parseForTimestamp( template.params[ '1' ], /* mwstyle */ true ) || 'unicorns',
+					text: template.params[ '1' ]
 				} );
 			}
 		} );
@@ -114,7 +113,7 @@
 			submissionTemplates = this.templates,
 			commentTemplates = this.comments;
 
-		function timestampSortHelper ( a, b ) {
+		function timestampSortHelper( a, b ) {
 			// If we're passed something that's not a number --
 			// for example, {{REVISIONTIMESTAMP}} -- just sort it
 			// first and be done with it.
@@ -182,11 +181,11 @@
 		submissionTemplates = $.grep( submissionTemplates, function ( template ) {
 			var keepTemplate = true;
 
-			if ( statusCases[template.status] ) {
-				keepTemplate = statusCases[template.status]();
+			if ( statusCases[ template.status ] ) {
+				keepTemplate = statusCases[ template.status ]();
 			} else {
 				// Default pending status
-				keepTemplate = statusCases['']();
+				keepTemplate = statusCases[ '' ]();
 			}
 
 			// If we're going to be keeping this template on the page,
@@ -269,7 +268,7 @@
 			} );
 
 			$.each( paramKeys, function ( index, key ) {
-				var value = template.params[key];
+				var value = template.params[ key ];
 				// If it is a numerical parameter, doesn't include
 				// `=` in the value, AND is in sequence with the other
 				// numerical parameters, we can omit the key= part
@@ -278,8 +277,7 @@
 					value.indexOf( '=' ) === -1 &&
 					// Parameter 2 will be the first positional parameter,
 					// since 1 is always going to be the submission status.
-					( key === '2' || paramKeys[ index - 1 ] == +key - 1 ) )
-				{
+					( key === '2' || paramKeys[ index - 1 ] == +key - 1 ) ) {
 					tout += '|' + value;
 				} else {
 					tout += '|' + key + '=' + value;
@@ -331,8 +329,7 @@
 		// Userspace drafts and `Draft` namespace drafts must have
 		// one or more AFC submission templates to be eligible
 		if ( [ 2, 118 ].indexOf( this.page.title.getNamespaceId() ) !== -1 &&
-			this.templates.length === 0 )
-		{
+			this.templates.length === 0 ) {
 			return deferred.resolve( false );
 		}
 
@@ -358,7 +355,7 @@
 	 * @return {bool} success
 	 */
 	AFCH.Submission.prototype.setStatus = function ( newStatus, newParams ) {
-		var relevantTemplate = this.templates[0];
+		var relevantTemplate = this.templates[ 0 ];
 
 		if ( [ 'd', 't', 'r', '' ].indexOf( newStatus ) === -1 ) {
 			// Unrecognized status
@@ -374,11 +371,10 @@
 		if ( !relevantTemplate ||
 			// Same for if the top template on the stack is alrady declined;
 			// we don't want to overwrite it
-			relevantTemplate.status === 'd' )
-		{
+			relevantTemplate.status === 'd' ) {
 			this.addNewTemplate( {
-					status: newStatus,
-					params: newParams
+				status: newStatus,
+				params: newParams
 			} );
 		} else {
 			// Just modify the template at the top of the stack
@@ -499,13 +495,13 @@
 					'Once you have saved this page you will find a new yellow \'Review waiting\' box at the bottom of your submission page. ' +
 					'If you have submitted your page previously,(?: either)? the old pink \'Submission declined\' template or the old grey ' +
 					'\'Draft\' template will still appear at the top of your submission page, but you should ignore (them|it). Again, please ' +
-					'don\'t change anything in this text box. Just press the \"Save page\" button below.',
+					'don\'t change anything in this text box. Just press the \"Save page\" button below.'
 			];
 
 		if ( isAccept ) {
 			// Uncomment cats and templates
 			text = text.replace( /\[\[:Category:/gi, '[[Category:' );
-			text = text.replace( /\{\{(tl|tlx|tlg)\|(.*?)\}\}/ig, '{{$2}}');
+			text = text.replace( /\{\{(tl|tlx|tlg)\|(.*?)\}\}/ig, '{{$2}}' );
 
 			// Strip the AFC G13 postponement template
 			text = text.replace( /\{\{AfC postpone G13(?:\|\d*)?\}\}\n*/gi, '' );
@@ -518,7 +514,7 @@
 				'Metadata: see \\[\\[Wikipedia:Persondata\\]\\].',
 				'See http://en.wikipedia.org/wiki/Wikipedia:Footnotes on how to create references using\\<ref\\>\\<\\/ref\\> tags, these references will then appear here automatically',
 				'After listing your sources please cite them using inline citations and place them after the information they cite. ' +
-					'Please see (https?://en.wikipedia.org/wiki/Wikipedia:REFB|\\[\\[Wikipedia:REFB\\]\\]) for instructions on how to add citations.',
+					'Please see (https?://en.wikipedia.org/wiki/Wikipedia:REFB|\\[\\[Wikipedia:REFB\\]\\]) for instructions on how to add citations.'
 			] );
 		} else {
 			// If not yet accepted, comment out cats
@@ -536,7 +532,7 @@
 		text = text.replace( /\{\{(userspacedraft|userspace draft|user sandbox|Please leave this line alone \(sandbox heading\))(?:\{\{[^{}]*\}\}|[^}{])*\}\}/ig, '' );
 
 		// Remove html comments (<!--) that surround categories
-		text = text.replace( /<!--\s*((\[\[:{0,1}(Category:.*?)\]\]\s*)+)-->/gi, '$1');
+		text = text.replace( /<!--\s*((\[\[:{0,1}(Category:.*?)\]\]\s*)+)-->/gi, '$1' );
 
 		// Remove spaces/commas between <ref> tags
 		text = text.replace( /\s*(<\/\s*ref\s*\>)\s*[,]*\s*(<\s*ref\s*(name\s*=|group\s*=)*\s*[^\/]*>)[ \t]*$/gim, '$1$2' );
@@ -552,14 +548,14 @@
 
 		// Convert http://-style links to other wikipages to wikicode syntax
 		// FIXME: Break this out into its own core function? Will it be used elsewhere?
-		function convertExternalLinksToWikilinks ( text ) {
+		function convertExternalLinksToWikilinks( text ) {
 			var linkRegex = /\[{1,2}(?:https?:)?\/\/(?:en.wikipedia.org\/wiki|enwp.org)\/([^\s\|\]\[]+)(?:\s|\|)?((?:\[\[[^\[\]]*\]\]|[^\]\[])*)\]{1,2}/ig,
 				linkMatch = linkRegex.exec( text ),
 				title, displayTitle, newLink;
 
 			while ( linkMatch ) {
-				title = decodeURI( linkMatch[1] ).replace( /_/g, ' ' );
-				displayTitle = decodeURI( linkMatch[2] ).replace( /_/g, ' ' );
+				title = decodeURI( linkMatch[ 1 ] ).replace( /_/g, ' ' );
+				displayTitle = decodeURI( linkMatch[ 2 ] ).replace( /_/g, ' ' );
 
 				// Don't include the displayTitle if it is equal to the title
 				if ( displayTitle && title !== displayTitle ) {
@@ -568,7 +564,7 @@
 					newLink = '[[' + title + ']]';
 				}
 
-				text = text.replace( linkMatch[0], newLink );
+				text = text.replace( linkMatch[ 0 ], newLink );
 				linkMatch = linkRegex.exec( text );
 			}
 
@@ -646,7 +642,7 @@
 		} else {
 			while ( match ) {
 				catIndex = match.index;
-				text = text.replace( match[0], '' );
+				text = text.replace( match[ 0 ], '' );
 				match = categoryRegex.exec( text );
 			}
 
@@ -666,8 +662,7 @@
 		AFCH.consts.pagename.indexOf( 'User:' ) !== 0 &&
 		// Only autoload if viewing or editing the page
 		[ 'view', 'edit', null ].indexOf( AFCH.getParam( 'action' ) ) !== -1 &&
-		!AFCH.getParam( 'diff' ) && !AFCH.getParam( 'oldid' ) )
-	{
+		!AFCH.getParam( 'diff' ) && !AFCH.getParam( 'oldid' ) ) {
 		// Launch the script immediately if preference set
 		createAFCHInstance();
 	} else {
@@ -690,7 +685,7 @@
 		}
 	} );
 
-	function createAFCHInstance () {
+	function createAFCHInstance() {
 		/**
 		 * global; wraps ALL afch-y things
 		 */
@@ -737,14 +732,14 @@
 				// a template so we don't have to wait for the
 				// HTTP request to go through
 				$( '<div>' )
-						.addClass( 'review-panel' )
-						.addClass( 'splash' )
-						.append(
-							$( '<div>' )
-								.addClass( 'initial-header' )
-								.text( 'Loading AFCH v' + AFCH.consts.version + '...' )
-						)
-				);
+					.addClass( 'review-panel' )
+					.addClass( 'splash' )
+					.append(
+						$( '<div>' )
+							.addClass( 'initial-header' )
+							.text( 'Loading AFCH v' + AFCH.consts.version + '...' )
+					)
+			);
 
 		// Now set up the review panel and replace it with actual content, not just a splash screen
 		setupReviewPanel();
@@ -755,16 +750,16 @@
 		} );
 	}
 
-	function setupReviewPanel () {
+	function setupReviewPanel() {
 		// Store this to a variable so we can wait for its success
 		var loadViews = $.ajax( {
-				type: 'GET',
-				url: AFCH.consts.baseurl + '/tpl-submissions.js',
-				dataType: 'text'
-			} ).done( function ( data ) {
-				afchViews = new AFCH.Views( data );
-				afchViewer = new AFCH.Viewer( afchViews, $afchWrapper );
-			} );
+			type: 'GET',
+			url: AFCH.consts.baseurl + '/tpl-submissions.js',
+			dataType: 'text'
+		} ).done( function ( data ) {
+			afchViews = new AFCH.Views( data );
+			afchViewer = new AFCH.Viewer( afchViews, $afchWrapper );
+		} );
 
 		afchPage = new AFCH.Page( AFCH.consts.pagename );
 		afchSubmission = new AFCH.Submission( afchPage );
@@ -850,7 +845,7 @@
 	 * Loads warnings about the submission
 	 * @return {jQuery}
 	 */
-	function getSubmissionWarnings () {
+	function getSubmissionWarnings() {
 		var deferred = $.Deferred(),
 			warnings = [];
 
@@ -860,7 +855,7 @@
 		 * @param {string|bool} actionMessage set to false to hide action link
 		 * @param {function|string} onAction function to call of success, or URL to browse to
 		 */
-		function addWarning ( message, actionMessage, onAction ) {
+		function addWarning( message, actionMessage, onAction ) {
 			var $action,
 				$warning = $( '<div>' )
 					.addClass( 'afch-warning' )
@@ -884,7 +879,7 @@
 			warnings.push( $warning );
 		}
 
-		function checkReferences () {
+		function checkReferences() {
 			var deferred = $.Deferred();
 
 			afchPage.getText( false ).done( function ( text ) {
@@ -896,7 +891,7 @@
 					} ),
 
 					refEndRe = /<\/\s*ref\s*\>/ig,
-					refEndMatches = text.match( refEndRe )|| [],
+					refEndMatches = text.match( refEndRe ) || [],
 
 					reflistRe = /({{(ref(erence)?(\s|-)?list|listaref|refs|footnote|reference|referencias)(?:{{[^{}]*}}|[^}{])*}})|(<\s*references\s*\/?>)/ig,
 					hasReflist = reflistRe.test( text ),
@@ -916,9 +911,9 @@
 					addWarning( 'The submission contains malformed <ref> tags.', 'View details', function () {
 						var $toggleLink = $( this ).addClass( 'malformed-refs-toggle' ),
 							$warningDiv = $( this ).parent();
-							$malformedRefWrapper = $( '<div>' )
-								.addClass( 'malformed-refs' )
-								.appendTo( $warningDiv );
+						$malformedRefWrapper = $( '<div>' )
+							.addClass( 'malformed-refs' )
+							.appendTo( $warningDiv );
 
 						// Show the relevant code snippets
 						$.each( malformedRefs, function ( _, ref ) {
@@ -953,7 +948,7 @@
 			return deferred;
 		}
 
-		function checkDeletionLog () {
+		function checkDeletionLog() {
 			var deferred = $.Deferred();
 
 			// Don't show deletion notices for "sandbox" to avoid useless
@@ -981,29 +976,29 @@
 
 				addWarning( 'The page "' + afchSubmission.shortTitle + '" has been deleted ' + rawDeletions.length + ( rawDeletions.length === 10 ? '+' : '' ) +
 					' time' + ( rawDeletions.length > 1 ? 's' : '' ) + '.', 'View deletion log', function () {
-						var $toggleLink = $( this ).addClass( 'deletion-log-toggle' ),
-							$warningDiv = $toggleLink.parent(),
-							deletions = [];
+					var $toggleLink = $( this ).addClass( 'deletion-log-toggle' ),
+						$warningDiv = $toggleLink.parent(),
+						deletions = [];
 
-						$.each( rawDeletions, function ( _, deletion ) {
-							deletions.push( {
-								timestamp: deletion.timestamp,
-								relativeTimestamp: AFCH.relativeTimeSince( deletion.timestamp ),
-								deletor: deletion.user,
-								deletorLink: mw.util.getUrl( 'User:' + deletion.user ),
-								reason: AFCH.convertWikilinksToHTML( deletion.comment )
-							} );
+					$.each( rawDeletions, function ( _, deletion ) {
+						deletions.push( {
+							timestamp: deletion.timestamp,
+							relativeTimestamp: AFCH.relativeTimeSince( deletion.timestamp ),
+							deletor: deletion.user,
+							deletorLink: mw.util.getUrl( 'User:' + deletion.user ),
+							reason: AFCH.convertWikilinksToHTML( deletion.comment )
 						} );
-
-						$( afchViews.renderView( 'warning-deletions-table', { deletions: deletions } ) )
-							.addClass( 'deletion-log' )
-							.appendTo( $warningDiv );
-
-						// ...and now convert the link into a toggle which simply hides/shows the div
-						AFCH.makeToggle( '.deletion-log-toggle', '.deletion-log', 'View deletion log', 'Hide deletion log' );
-
-						return false;
 					} );
+
+					$( afchViews.renderView( 'warning-deletions-table', { deletions: deletions } ) )
+						.addClass( 'deletion-log' )
+						.appendTo( $warningDiv );
+
+					// ...and now convert the link into a toggle which simply hides/shows the div
+					AFCH.makeToggle( '.deletion-log-toggle', '.deletion-log', 'View deletion log', 'Hide deletion log' );
+
+					return false;
+				} );
 
 				deferred.resolve();
 
@@ -1012,7 +1007,7 @@
 			return deferred;
 		}
 
-		function checkReviewState () {
+		function checkReviewState() {
 			var reviewer, isOwnReview;
 
 			if ( afchSubmission.isUnderReview ) {
@@ -1027,14 +1022,14 @@
 				addWarning( reviewer + ( afchSubmission.params.reviewts ?
 					' began reviewing this submission ' + AFCH.relativeTimeSince( afchSubmission.params.reviewts ) :
 					' already began reviewing this submission' ) + '.',
-					isOwnReview ? 'Unmark as under review' : 'View page history',
-					isOwnReview ? function () {
-						handleMark( /* unmark */ true );
-					} : mw.util.getUrl( AFCH.consts.pagename, { action: 'history' } ) );
+				isOwnReview ? 'Unmark as under review' : 'View page history',
+				isOwnReview ? function () {
+					handleMark( /* unmark */ true );
+				} : mw.util.getUrl( AFCH.consts.pagename, { action: 'history' } ) );
 			}
 		}
 
-		function checkLongComments () {
+		function checkLongComments() {
 			var deferred = $.Deferred();
 
 			afchPage.getText( false ).done( function ( rawText ) {
@@ -1050,26 +1045,26 @@
 				if ( numberOfComments ) {
 					addWarning( 'The page contains ' + ( oneComment ? 'an' : '' ) + ' HTML comment' + ( oneComment ? '' : 's' ) +
 						' longer than 30 characters.', 'View comment' + ( oneComment ? '' : 's' ), function () {
-							var $toggleLink = $( this ).addClass( 'long-comment-toggle' ),
-								$warningDiv = $( this ).parent(),
-								$commentsWrapper = $( '<div>' )
-									.addClass( 'long-comments' )
-									.appendTo( $warningDiv );
+						var $toggleLink = $( this ).addClass( 'long-comment-toggle' ),
+							$warningDiv = $( this ).parent(),
+							$commentsWrapper = $( '<div>' )
+								.addClass( 'long-comments' )
+								.appendTo( $warningDiv );
 
 							// Show the relevant code snippets
-							$.each( longCommentMatches, function ( _, comment ) {
-								$( '<div>' )
-									.addClass( 'code-wrapper' )
-									.append( $( '<pre>' ).text( $.trim( comment ) ) )
-									.appendTo( $commentsWrapper );
-							} );
-
-							// Now change the "View comment" link to behave as a normal toggle for .long-comments
-							AFCH.makeToggle( '.long-comment-toggle', '.long-comments',
-								'View comment' + ( oneComment ? '' : 's' ), 'Hide comment' + ( oneComment ? '' : 's' ) );
-
-							return false;
+						$.each( longCommentMatches, function ( _, comment ) {
+							$( '<div>' )
+								.addClass( 'code-wrapper' )
+								.append( $( '<pre>' ).text( $.trim( comment ) ) )
+								.appendTo( $commentsWrapper );
 						} );
+
+						// Now change the "View comment" link to behave as a normal toggle for .long-comments
+						AFCH.makeToggle( '.long-comment-toggle', '.long-comments',
+							'View comment' + ( oneComment ? '' : 's' ), 'Hide comment' + ( oneComment ? '' : 's' ) );
+
+						return false;
+					} );
 				}
 
 				deferred.resolve();
@@ -1093,7 +1088,7 @@
 	/**
 	 * Stores useful strings to AFCH.msg
 	 */
-	function setMessages () {
+	function setMessages() {
 		AFCH.msg.set( {
 			// $1 = article name
 			// $2 = article class or '' if not available
@@ -1130,7 +1125,7 @@
 	 *                             script has to load a new view, this will be the class
 	 *                             applied to it
 	 */
-	function prepareForProcessing ( actionTitle, actionClass ) {
+	function prepareForProcessing( actionTitle, actionClass ) {
 		var $content = $afch.find( '#afchContent' ),
 			$submitBtn = $content.find( '#afchSubmitForm' );
 
@@ -1170,7 +1165,7 @@
 	 * to "Done", shows a link to the next submission and
 	 * auto-reloads the page.
 	 */
-	function setupAjaxStopHandler () {
+	function setupAjaxStopHandler() {
 		$( document ).ajaxStop( function () {
 			$afch.find( '#afchSubmitForm' )
 				.text( 'Done' )
@@ -1185,9 +1180,9 @@
 
 			// Show a link to the next random submissions
 			new AFCH.status.Element( 'Continue to next $1, $2, or $3 &raquo;', {
-				'$1': AFCH.makeLinkElementToCategory( 'Pending AfC submissions', 'random submission' ),
-				'$2': AFCH.makeLinkElementToCategory( 'AfC pending submissions by age/0 days ago', 'GFOO submission' ),
-				'$3': AFCH.makeLinkElementToCategory( 'AfC pending submissions by age/Very old', 'very old submission' )
+				$1: AFCH.makeLinkElementToCategory( 'Pending AfC submissions', 'random submission' ),
+				$2: AFCH.makeLinkElementToCategory( 'AfC pending submissions by age/0 days ago', 'GFOO submission' ),
+				$3: AFCH.makeLinkElementToCategory( 'AfC pending submissions by age/Very old', 'very old submission' )
 			} );
 
 			// Also, automagically reload the page in place
@@ -1212,7 +1207,7 @@
 	 *
 	 * @param {Function} fn function to call with data
 	 */
-	function addFormSubmitHandler ( fn ) {
+	function addFormSubmitHandler( fn ) {
 		$afch.find( '#afchSubmitForm' ).click( function () {
 			var data = {};
 
@@ -1237,7 +1232,7 @@
 	 * @param {function} fn function to call when spinner has been displayed
 	 * @return {[type]} [description]
 	 */
-	function spinnerAndRun ( fn ) {
+	function spinnerAndRun( fn ) {
 		var $spinner, $container = $afch.find( '#afchContent' );
 
 		// Add a new spinner if one doesn't already exist
@@ -1268,7 +1263,7 @@
 	 * @param {object} data data to populate the view with
 	 * @param {function} callback function to call when view is loaded
 	 */
-	function loadView ( name, data, callback ) {
+	function loadView( name, data, callback ) {
 		// Show the back button if we're not loading the main view
 		$afch.find( '.back-link' ).toggleClass( 'hidden', name === 'main' );
 		afchViewer.loadView( name, data );
@@ -1280,19 +1275,19 @@
 	// These functions show the options before doing something
 	// to a submission.
 
-	function showAcceptOptions () {
+	function showAcceptOptions() {
 		/**
 		 * If possible, use the session storage to get the WikiProject list.
 		 * If it hasn't been cached already, load it manually and then cache
 		 */
-		function loadWikiProjectList () {
+		function loadWikiProjectList() {
 			var deferred = $.Deferred(),
 				wikiProjects = [],
 				// This is so a new version of AFCH will invalidate the WikiProject cache
 				lsKey = 'afch-' + AFCH.consts.version + '-wikiprojects-1';
 
-			if ( window.localStorage && window.localStorage[lsKey] ) {
-				wikiProjects = JSON.parse( window.localStorage[lsKey] );
+			if ( window.localStorage && window.localStorage[ lsKey ] ) {
+				wikiProjects = JSON.parse( window.localStorage[ lsKey ] );
 				deferred.resolve( wikiProjects );
 			} else {
 				$.ajax( {
@@ -1309,7 +1304,7 @@
 					// If possible, cache the WikiProject data!
 					if ( window.localStorage ) {
 						try {
-							window.localStorage[lsKey] = JSON.stringify( wikiProjects );
+							window.localStorage[ lsKey ] = JSON.stringify( wikiProjects );
 						} catch ( e ) {
 							AFCH.log( 'Unable to cache WikiProject list: ' + e.message );
 						}
@@ -1445,14 +1440,14 @@
 					$afch.find( '#bioOptionsWrapper' ).toggleClass( 'hidden', !this.checked );
 				} );
 
-				function prefillBiographyDetails () {
+				function prefillBiographyDetails() {
 					var titleParts;
 
 					// Prefill `LastName, FirstName` for Biography if the page title is two words and
 					// therefore probably safe to asssume in a `FirstName LastName` format.
 					titleParts = afchSubmission.shortTitle.split( ' ' );
 					if ( titleParts.length === 2 ) {
-						$afch.find( '#subjectName' ).val( titleParts[1] + ', ' + titleParts[0] );
+						$afch.find( '#subjectName' ).val( titleParts[ 1 ] + ', ' + titleParts[ 0 ] );
 					}
 				}
 				prefillBiographyDetails();
@@ -1477,7 +1472,7 @@
 				$afch.find( '#newTitle' ).keyup( function () {
 					var page,
 						linkToPage,
-						$field =  $( this ),
+						$field = $( this ),
 						$status = $afch.find( '#titleStatus' ),
 						$submitButton = $afch.find( '#afchSubmitForm' ),
 						value = $field.val();
@@ -1486,8 +1481,8 @@
 					$field.removeClass( 'bad-input' );
 					$status.text( '' );
 					$submitButton
-							.removeClass( 'disabled' )
-							.text( 'Accept & publish' );
+						.removeClass( 'disabled' )
+						.text( 'Accept & publish' );
 
 					// If there is no value, die now, because otherwise mw.Title
 					// will throw an exception due to an invalid title
@@ -1516,7 +1511,7 @@
 						} )
 					).then( function ( isBlacklisted, rawData ) {
 						var errorHtml, buttonText,
-							data = rawData[0]; // Get just the result, not the Promise object
+							data = rawData[ 0 ]; // Get just the result, not the Promise object
 
 						// If the page already exists, display an error
 						if ( !data.query.pages.hasOwnProperty( '-1' ) ) {
@@ -1526,10 +1521,9 @@
 							// If the page doesn't exist but IS create-protected and the
 							// current reviewer is not an admin, also display an error
 							// FIXME: offer one-click request unprotection?
-							$.each( data.query.pages['-1'].protection, function ( _, entry ) {
+							$.each( data.query.pages[ '-1' ].protection, function ( _, entry ) {
 								if ( entry.type === 'create' && entry.level === 'sysop' &&
-									$.inArray( 'sysop', mw.config.get( 'wgUserGroups' ) ) === -1 )
-								{
+									$.inArray( 'sysop', mw.config.get( 'wgUserGroups' ) ) === -1 ) {
 									errorHtml = 'Darn it, "' + linkToPage + '" is create-protected. You will need to request unprotection before accepting.';
 									buttonText = 'The proposed title is create-protected';
 								}
@@ -1570,7 +1564,7 @@
 		} );
 	}
 
-	function showDeclineOptions () {
+	function showDeclineOptions() {
 		loadView( 'decline', {}, function () {
 			var $reasons, $commonSection, declineCounts,
 				pristineState = $afch.find( '#declineInputWrapper' ).html();
@@ -1578,7 +1572,7 @@
 			// pos is either 1 or 2, based on whether the chosen reason that
 			// is triggering this update is first or second in the multi-select
 			// control
-			function updateTextfield ( newPrompt, newPlaceholder, newValue, pos ) {
+			function updateTextfield( newPrompt, newPlaceholder, newValue, pos ) {
 				var wrapper = $afch.find( '#textfieldWrapper' + ( pos === 2 ? '2' : '' ) );
 
 				// Update label and placeholder
@@ -1603,7 +1597,7 @@
 
 				// Sort list in descending order (most-used at beginning)
 				declineList.sort( function ( a, b ) {
-					return declineCounts[b] - declineCounts[a];
+					return declineCounts[ b ] - declineCounts[ a ];
 				} );
 
 				$reasons = $afch.find( '#declineReason' );
@@ -1641,7 +1635,7 @@
 								var text = $( this ).val(),
 									numUrls = text ? text.split( '\n' ).length : 0,
 									submitButton = $afch.find( '#afchSubmitForm' );
-								if ( 1 <= numUrls && numUrls <= 3 ) {
+								if ( numUrls >= 1 && numUrls <= 3 ) {
 									$( this ).removeClass( 'bad-input' );
 									submitButton
 										.removeClass( 'disabled' )
@@ -1657,14 +1651,14 @@
 							// Check if there's an OTRS notice
 							new AFCH.Page( 'Draft talk:' + afchSubmission.shortTitle ).getText( /* usecache */ false ).done( function ( text ) {
 								if ( /ConfirmationOTRS/.test( text ) ) {
-								$afch.find( '#declineInputWrapper' ).append(
-									$( '<div>' )
-										.addClass( 'warnings' )
-										.css( {
-											'max-width': '50%',
-											margin: '0px auto'
-										} )
-										.text( 'This draft has an OTRS template on the talk page. Verify that the copyright violation isn\'t covered by the template before marking this draft as a copyright violation.' ) );
+									$afch.find( '#declineInputWrapper' ).append(
+										$( '<div>' )
+											.addClass( 'warnings' )
+											.css( {
+												'max-width': '50%',
+												margin: '0px auto'
+											} )
+											.text( 'This draft has an OTRS template on the talk page. Verify that the copyright violation isn\'t covered by the template before marking this draft as a copyright violation.' ) );
 								}
 							} );
 						},
@@ -1701,11 +1695,11 @@
 
 				// If there are special options to be displayed for each
 				// particular decline reason, load them now
-				if ( declineHandlers[reason[0]] ) {
-					declineHandlers[reason[0]](1);
+				if ( declineHandlers[ reason[ 0 ] ] ) {
+					declineHandlers[ reason[ 0 ] ]( 1 );
 				}
-				if ( declineHandlers[reason[1]] ) {
-					declineHandlers[reason[1]](2);
+				if ( declineHandlers[ reason[ 1 ] ] ) {
+					declineHandlers[ reason[ 1 ] ]( 2 );
 				}
 
 				// Preserve the custom comment text
@@ -1744,7 +1738,7 @@
 					$.when.apply( $, reasonDeferreds ).then( function ( a, b ) {
 						$( '#declineTextareaPreview' )
 							.html( Array.prototype.slice.call( arguments )
-									.join( '<hr />' ) );
+								.join( '<hr />' ) );
 					} );
 					this.textContent = '(hide preview)';
 				} else {
@@ -1757,12 +1751,12 @@
 		addFormSubmitHandler( handleDecline );
 	}
 
-	function showCommentOptions () {
+	function showCommentOptions() {
 		loadView( 'comment', {} );
 		addFormSubmitHandler( handleComment );
 	}
 
-	function showSubmitOptions () {
+	function showSubmitOptions() {
 		var customSubmitters = [];
 
 		// Iterate over the submitters and add them to the custom submitters list,
@@ -1780,7 +1774,7 @@
 		}, function () {
 
 			// Reset the status indicators for the username & errors
-			function resetStatus () {
+			function resetStatus() {
 				$afch.find( '#submitterName' ).removeClass( 'bad-input' );
 				$afch.find( '#submitterNameStatus' ).text( '' );
 				$afch.find( '#afchSubmitForm' )
@@ -1832,7 +1826,7 @@
 						list: 'users',
 						ususers: submitter
 					} ).done( function ( data ) {
-						if ( data.query.users[0].missing !== undefined ) {
+						if ( data.query.users[ 0 ].missing !== undefined ) {
 							field.addClass( 'bad-input' );
 							status.text( 'No user named "' + submitter + '".' );
 							submitButton
@@ -1847,7 +1841,7 @@
 		addFormSubmitHandler( handleSubmit );
 	}
 
-	function showPostponeG13Options () {
+	function showPostponeG13Options() {
 		loadView( 'postpone-g13', {} );
 		addFormSubmitHandler( handlePostponeG13 );
 	}
@@ -1855,7 +1849,7 @@
 	// These functions actually perform a given action using data passed
 	// in the `data` parameter.
 
-	function handleAccept ( data ) {
+	function handleAccept( data ) {
 		var newText = data.afchText;
 
 		AFCH.actions.movePage( afchPage.rawTitle, data.newTitle,
@@ -1924,8 +1918,7 @@
 				}
 
 				if ( data.newAssessment === 'disambig' &&
-					$.inArray( 'WikiProject Disambiguation', data.newWikiProjects ) === -1 )
-				{
+					$.inArray( 'WikiProject Disambiguation', data.newWikiProjects ) === -1 ) {
 					data.newWikiProjects.push( 'WikiProject Disambiguation' );
 				}
 
@@ -1949,7 +1942,7 @@
 					afchSubmission.getSubmitter().done( function ( submitter ) {
 						AFCH.actions.notifyUser( submitter, {
 							message: AFCH.msg.get( 'accepted-submission',
-								{ '$1': newPage, '$2': data.newAssessment } ),
+								{ $1: newPage, $2: data.newAssessment } ),
 							summary: 'Notification: Your [[Wikipedia:Articles for creation|Articles for creation]] submission has been accepted'
 						} );
 					} );
@@ -1980,13 +1973,13 @@
 			} );
 	}
 
-	function handleDecline ( data ) {
+	function handleDecline( data ) {
 		var declineCounts,
 			text = data.afchText,
-			declineReason = data.declineReason[0],
-			declineReason2 = data.declineReason.length > 1 ? data.declineReason[1] : null,
+			declineReason = data.declineReason[ 0 ],
+			declineReason2 = data.declineReason.length > 1 ? data.declineReason[ 1 ] : null,
 			newParams = {
-				'2': declineReason,
+				2: declineReason,
 				decliner: AFCH.consts.user,
 				declinets: '{{subst:REVISIONTIMESTAMP}}'
 			};
@@ -1999,16 +1992,16 @@
 		// Update decline counts
 		declineCounts = AFCH.userData.get( 'decline-counts', {} );
 
-		declineCounts[declineReason] = ( declineCounts[declineReason] || 1 ) + 1;
+		declineCounts[ declineReason ] = ( declineCounts[ declineReason ] || 1 ) + 1;
 		if ( declineReason2 ) {
-			declineCounts[declineReason2] = ( declineCounts[declineReason2] || 1 ) + 1;
+			declineCounts[ declineReason2 ] = ( declineCounts[ declineReason2 ] || 1 ) + 1;
 		}
 
 		AFCH.userData.set( 'decline-counts', declineCounts );
 
 		// If the first reason is a custom decline, we include the declineTextarea in the {{AFC submission}} template
 		if ( declineReason === 'reason' ) {
-			newParams['3'] = data.declineTextarea;
+			newParams[ '3' ] = data.declineTextarea;
 		} else if ( declineReason2 === 'reason' ) {
 			newParams.details2 = data.declineTextarea;
 		} else if ( data.declineTextarea ) {
@@ -2020,7 +2013,7 @@
 		// If a user has entered something in the declineTextfield (for example, a URL or an
 		// associated page), pass that as the third parameter...
 		if ( data.declineTextfield ) {
-			newParams['3'] = data.declineTextfield;
+			newParams[ '3' ] = data.declineTextfield;
 		}
 
 		// ...and do the same with the second decline text field
@@ -2034,18 +2027,18 @@
 				urlParam = '';
 
 			// Build url param for db-g12 template
-			urlParam = cvUrls[0];
+			urlParam = cvUrls[ 0 ];
 			if ( cvUrls.length > 1 ) {
-				urlParam += '|url2=' + cvUrls[1];
+				urlParam += '|url2=' + cvUrls[ 1 ];
 				if ( cvUrls.length > 2 ) {
-					urlParam += '|url3=' + cvUrls[2];
+					urlParam += '|url3=' + cvUrls[ 2 ];
 				}
 			}
 			text.prepend( '{{db-g12|url=' + urlParam + ( afchPage.additionalData.revId ? '|oldid=' + afchPage.additionalData.revId : '' ) + '}}\n' );
 
 			// Include the URLs in the decline template
 			if ( declineReason === 'cv' ) {
-				newParams['3'] = cvUrls.join( ', ' );
+				newParams[ '3' ] = cvUrls.join( ', ' );
 			} else {
 				newParams.details2 = cvUrls.join( ', ' );
 			}
@@ -2070,7 +2063,7 @@
 				editSummary += '...';
 			}
 		} else {
-			editSummary += data.declineReasonTexts[0];
+			editSummary += data.declineReasonTexts[ 0 ];
 		}
 
 		if ( declineReason2 ) {
@@ -2081,7 +2074,7 @@
 					editSummary += '...';
 				}
 			} else {
-				editSummary += data.declineReasonTexts[1];
+				editSummary += data.declineReasonTexts[ 1 ];
 			}
 		}
 
@@ -2118,15 +2111,15 @@
 
 				$.when( shouldTeahouse ).then( function ( teahouse ) {
 					var message = AFCH.msg.get( 'declined-submission', {
-						'$1': AFCH.consts.pagename,
-						'$2': afchSubmission.shortTitle,
-						'$3': ( declineReason === 'cv' || declineReason2 === 'cv' ) ?
+						$1: AFCH.consts.pagename,
+						$2: afchSubmission.shortTitle,
+						$3: ( declineReason === 'cv' || declineReason2 === 'cv' ) ?
 							'yes' : 'no',
-						'$4': declineReason,
-						'$5': newParams['3'] || '',
-						'$6': declineReason2 || '',
-						'$7': newParams.details2 || '',
-						'$8': ( declineReason === 'reason' || declineReason2 === 'reason' ) ?
+						$4: declineReason,
+						$5: newParams[ '3' ] || '',
+						$6: declineReason2 || '',
+						$7: newParams.details2 || '',
+						$8: ( declineReason === 'reason' || declineReason2 === 'reason' ) ?
 							'' : data.declineTextarea
 					} );
 
@@ -2156,7 +2149,7 @@
 		}
 	}
 
-	function handleComment ( data ) {
+	function handleComment( data ) {
 		var text = data.afchText;
 
 		afchSubmission.addNewComment( data.commentText );
@@ -2173,14 +2166,14 @@
 			afchSubmission.getSubmitter().done( function ( submitter ) {
 				AFCH.actions.notifyUser( submitter, {
 					message: AFCH.msg.get( 'comment-on-submission',
-						{ '$1': AFCH.consts.pagename } ),
+						{ $1: AFCH.consts.pagename } ),
 					summary: 'Notification: I\'ve commented on [[' + AFCH.consts.pagename + '|your Articles for Creation submission]]'
 				} );
 			} );
 		}
 	}
 
-	function handleSubmit ( data ) {
+	function handleSubmit( data ) {
 		var text = data.afchText,
 			submitter = $.Deferred(),
 			submitType = data.submitType;
@@ -2213,7 +2206,7 @@
 
 	}
 
-	function handleCleanup () {
+	function handleCleanup() {
 		prepareForProcessing( 'Cleaning' );
 
 		afchPage.getText( false ).done( function ( rawText ) {
@@ -2232,7 +2225,7 @@
 		} );
 	}
 
-	function handleMark ( unmark ) {
+	function handleMark( unmark ) {
 		var actionText = ( unmark ? 'Unmarking' : 'Marking' );
 
 		prepareForProcessing( actionText, 'mark' );
@@ -2259,7 +2252,7 @@
 		} );
 	}
 
-	function handleG13 () {
+	function handleG13() {
 		// We start getting the creator now (for notification later) because ajax is
 		// radical and handles simultaneous requests, but we don't let it delay tagging
 		var gotCreator = afchPage.getCreator();
@@ -2288,7 +2281,7 @@
 			$.when( gotCreator ).then( function ( creator ) {
 				var usersToNotify = [ creator ];
 
-				$.each( afchSubmission.submitters, function ( _,  submitter ) {
+				$.each( afchSubmission.submitters, function ( _, submitter ) {
 					// Don't notify the same user multiple times
 					if ( usersToNotify.indexOf( submitter ) === -1 ) {
 						usersToNotify.push( submitter );
@@ -2298,7 +2291,7 @@
 				$.each( usersToNotify, function ( _, user ) {
 					AFCH.actions.notifyUser( user, {
 						message: AFCH.msg.get( 'g13-submission',
-							{ '$1': AFCH.consts.pagename } ),
+							{ $1: AFCH.consts.pagename } ),
 						summary: 'Notification: [[WP:G13|G13]] speedy deletion nomination of [[' + AFCH.consts.pagename + ']]'
 					} );
 				} );
@@ -2313,21 +2306,21 @@
 		} );
 	}
 
-	function handlePostponeG13 ( data ) {
+	function handlePostponeG13( data ) {
 		var postponeCode,
 			text = data.afchText,
 			rawText = text.get(),
 			postponeRegex = /\{\{AfC postpone G13\s*(?:\|\s*(\d*)\s*)?\}\}/ig;
-			match = postponeRegex.exec( rawText );
+		match = postponeRegex.exec( rawText );
 
 		// First add the postpone template
 		if ( match ) {
-			if ( match[1] !== undefined ) {
-				postponeCode = '{{AfC postpone G13|' + ( parseInt( match[1] ) + 1 ) + '}}';
+			if ( match[ 1 ] !== undefined ) {
+				postponeCode = '{{AfC postpone G13|' + ( parseInt( match[ 1 ] ) + 1 ) + '}}';
 			} else {
 				postponeCode = '{{AfC postpone G13|2}}';
 			}
-			rawText = rawText.replace( match[0], postponeCode );
+			rawText = rawText.replace( match[ 0 ], postponeCode );
 		} else {
 			rawText += '\n{{AfC postpone G13|1}}';
 		}

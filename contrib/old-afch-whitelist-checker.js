@@ -4,7 +4,7 @@
 	mw.loader.using( [ 'mediawiki.api', 'mediawiki.notify' ], function () {
 		var whitelistTitle = 'Wikipedia:WikiProject Articles for creation/Participants';
 
-		function showNotListedError ( user ) {
+		function showNotListedError( user ) {
 			mw.notify(
 				$( '<div>' )
 					.append( 'AFCH could not be loaded because "' + user + '" is not listed on ' )
@@ -23,7 +23,7 @@
 			);
 		}
 
-		function destroyOldAfch () {
+		function destroyOldAfch() {
 			// Remove review link
 			$( '#ca-afcHelper' ).remove();
 
@@ -36,11 +36,11 @@
 
 			// Disable the global init functions
 			window.afcHelper_init = function () { return false; };
-			window.afcHelper_redirect_init  = function () { return false; };
-			window.afcHelper_ffu_init  = function () { return false; };
+			window.afcHelper_redirect_init = function () { return false; };
+			window.afcHelper_ffu_init = function () { return false; };
 		}
 
-		function getText ( pageTitle ) {
+		function getText( pageTitle ) {
 			var deferred = $.Deferred();
 
 			// Use afch-rewrite `AFCH.Page` if possible to utilize cache
@@ -54,16 +54,16 @@
 				prop: 'revisions',
 				rvprop: 'content',
 				indexpageids: true,
-				titles:  pageTitle
+				titles: pageTitle
 			} ).done( function ( data ) {
-				var id = data.query.pageids[0];
-				deferred.resolve( data.query.pages[id].revisions[0]['*'] );
+				var id = data.query.pageids[ 0 ];
+				deferred.resolve( data.query.pages[ id ].revisions[ 0 ][ '*' ] );
 			} );
 
 			return deferred;
 		}
 
-		function checkWhitelist () {
+		function checkWhitelist() {
 			getText( whitelistTitle ).done( function ( text ) {
 				var userName = mw.user.id(),
 					userAllowed = text.indexOf( userName ) !== -1;

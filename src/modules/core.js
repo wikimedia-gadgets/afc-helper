@@ -133,9 +133,9 @@
 							.append( 'If you wish to disable the helper script, you will need to manually ' +
 								'remove it from your ' )
 							.append( AFCH.makeLinkElementToPage( 'Special:MyPage/common.js', 'common.js' ) )
-							.append( ' or your ')
+							.append( ' or your ' )
 							.append( AFCH.makeLinkElementToPage( 'Special:MyPage/skin.js', 'skin.js' ) )
-							.append( 'page. ');
+							.append( 'page. ' );
 					}
 
 					// Finally, make and push the notification, then explode AFCH
@@ -202,10 +202,10 @@
 		 */
 		initFeedback: function ( $element, type, linkText ) {
 			var feedback = new mw.Feedback( {
-					title: new mw.Title( 'Wikipedia talk:WikiProject Articles for creation/Helper script' ),
-					bugsLink: 'https://en.wikipedia.org/w/index.php?title=Wikipedia_talk:WikiProject_Articles_for_creation/Helper_script&action=edit&section=new',
-					bugsListLink: 'https://en.wikipedia.org/w/index.php?title=Wikipedia_talk:WikiProject_Articles_for_creation/Helper_script'
-				} );
+				title: new mw.Title( 'Wikipedia talk:WikiProject Articles for creation/Helper script' ),
+				bugsLink: 'https://en.wikipedia.org/w/index.php?title=Wikipedia_talk:WikiProject_Articles_for_creation/Helper_script&action=edit&section=new',
+				bugsListLink: 'https://en.wikipedia.org/w/index.php?title=Wikipedia_talk:WikiProject_Articles_for_creation/Helper_script'
+			} );
 			$( '<span>' )
 				.text( linkText || 'Give feedback!' )
 				.addClass( 'feedback-link link' )
@@ -348,7 +348,7 @@
 								name = $.trim( $name.text() || $name.attr( 'index' ) ),
 								value = $.trim( parseValue( $part.children( 'value' ) ) );
 
-							data.params[name] = value;
+							data.params[ name ] = value;
 						} );
 
 						templates.push( data );
@@ -390,7 +390,7 @@
 
 					while ( match ) {
 						// Name of each category, with first letter capitalized
-						categories.push( match[1].charAt(0).toUpperCase() + match[1].substring(1) );
+						categories.push( match[ 1 ].charAt( 0 ).toUpperCase() + match[ 1 ].substring( 1 ) );
 						match = catRegex.exec( text );
 					}
 
@@ -441,9 +441,9 @@
 				// FIXME: Handle failure more gracefully
 				AFCH.api.get( request )
 					.done( function ( data ) {
-						var rev, id = data.query.pageids[0];
-						if ( id && data.query.pages[id] ) {
-							rev = data.query.pages[id].revisions[0];
+						var rev, id = data.query.pageids[ 0 ];
+						if ( id && data.query.pages[ id ] ) {
+							rev = data.query.pages[ id ].revisions[ 0 ];
 							pg.additionalData.creator = rev.user;
 							deferred.resolve( rev.user );
 						} else {
@@ -511,7 +511,7 @@
 
 				if ( !options.hide ) {
 					status = new AFCH.status.Element( 'Getting $1...',
-						{ '$1': AFCH.makeLinkElementToPage( pagename ) } );
+						{ $1: AFCH.makeLinkElementToPage( pagename ) } );
 				} else {
 					status = AFCH.consts.nullstatus;
 				}
@@ -533,7 +533,7 @@
 
 				AFCH.api.get( request )
 					.done( function ( data ) {
-						var rev, id = data.query.pageids[0];
+						var rev, id = data.query.pageids[ 0 ];
 						if ( id && data.query.pages ) {
 							// The page might not exist; resolve with an empty string
 							if ( id === '-1' ) {
@@ -541,8 +541,8 @@
 								return;
 							}
 
-							rev = data.query.pages[id].revisions[0];
-							deferred.resolve( rev['*'], rev );
+							rev = data.query.pages[ id ].revisions[ 0 ];
+							deferred.resolve( rev[ '*' ], rev );
 							status.update( 'Got $1' );
 						} else {
 							deferred.reject( data );
@@ -579,7 +579,7 @@
 
 				if ( !options.hide ) {
 					status = new AFCH.status.Element( ( options.statusText || 'Editing' ) + ' $1...',
-						{ '$1': AFCH.makeLinkElementToPage( pagename ) } );
+						{ $1: AFCH.makeLinkElementToPage( pagename ) } );
 				} else {
 					status = AFCH.consts.nullstatus;
 				}
@@ -594,7 +594,7 @@
 				// Depending on mode, set appendtext=text or prependtext=text,
 				// which overrides the default text option
 				if ( options.mode ) {
-					request[options.mode] = options.contents;
+					request[ options.mode ] = options.contents;
 				}
 
 				if ( AFCH.consts.mockItUp ) {
@@ -660,8 +660,8 @@
 
 				if ( !hide ) {
 					status = new AFCH.status.Element( 'Moving $1 to $2...', {
-						'$1': AFCH.makeLinkElementToPage( oldTitle ),
-						'$2': AFCH.makeLinkElementToPage( newTitle )
+						$1: AFCH.makeLinkElementToPage( oldTitle ),
+						$2: AFCH.makeLinkElementToPage( newTitle )
 					} );
 				} else {
 					status = AFCH.consts.nullstatus;
@@ -721,12 +721,12 @@
 						statusText: 'Notifying',
 						hide: options.hide
 					} )
-					.done( function () {
-						deferred.resolve();
-					} )
-					.fail( function () {
-						deferred.reject();
-					} );
+						.done( function () {
+							deferred.resolve();
+						} )
+						.fail( function () {
+							deferred.reject();
+						} );
 				} );
 
 				return deferred;
@@ -805,7 +805,7 @@
 			patrolRcid: function ( rcid, title ) {
 				var request, deferred = $.Deferred(),
 					status = new AFCH.status.Element( 'Patrolling $1...',
-						{ '$1': AFCH.makeLinkElementToPage( title ) || 'page with id #' + rcid } );
+						{ $1: AFCH.makeLinkElementToPage( title ) || 'page with id #' + rcid } );
 
 				request = {
 					action: 'patrol',
@@ -827,8 +827,8 @@
 						deferred.reject( data );
 					}
 				} ).fail( function ( data ) {
-						status.update( 'Failed to patrol $1: ' + JSON.stringify( data ) );
-						deferred.reject( data );
+					status.update( 'Failed to patrol $1: ' + JSON.stringify( data ) );
+					deferred.reject( data );
 				} );
 
 				return deferred;
@@ -902,9 +902,9 @@
 				}
 
 				if ( !substitutions ) {
-					substitutions = { '$1': AFCH.consts.pagelink };
+					substitutions = { $1: AFCH.consts.pagelink };
 				} else {
-					substitutions = $.extend( {}, { '$1': AFCH.consts.pagelink }, substitutions );
+					substitutions = $.extend( {}, { $1: AFCH.consts.pagelink }, substitutions );
 				}
 
 				this.substitutions = substitutions;
@@ -937,7 +937,7 @@
 			 * @return {string} Message value
 			 */
 			get: function ( key, substitutions ) {
-				var text = AFCH.msg.store[key] || '<' + key + '>';
+				var text = AFCH.msg.store[ key ] || '<' + key + '>';
 
 				// Perform substitutions if necessary
 				if ( substitutions ) {
@@ -962,7 +962,7 @@
 				if ( typeof key === 'object' ) {
 					$.extend( AFCH.msg.store, key );
 				} else {
-					AFCH.msg.store[key] = value;
+					AFCH.msg.store[ key ] = value;
 				}
 			}
 		},
@@ -1014,18 +1014,18 @@
 				// Update cache so AFCH.userData.get() will have updated
 				// information if the page isn't reloaded first. If for
 				// some reason the post fails...oh well...
-				AFCH.userData._optsCache[fullKey] = fullValue;
+				AFCH.userData._optsCache[ fullKey ] = fullValue;
 
 				// Also update localStorage cache for more redundancy.
 				// See note in AFCH.userData docs for why this is necessary.
 				if ( window.localStorage ) {
-					window.localStorage[fullKey] = fullValue;
+					window.localStorage[ fullKey ] = fullValue;
 				}
 
 				AFCH.api.postWithToken( 'options', {
 					action: 'options',
 					optionname: fullKey,
-					optionvalue: fullValue,
+					optionvalue: fullValue
 				} ).done( function ( data ) {
 					deferred.resolve( data );
 				} );
@@ -1042,8 +1042,8 @@
 			get: function ( key, fallback ) {
 				var value,
 					fullKey = AFCH.userData._prefix + key,
-					cachedWindow = AFCH.userData._optsCache[fullKey],
-					cachedLocal = window.localStorage && window.localStorage[fullKey];
+					cachedWindow = AFCH.userData._optsCache[ fullKey ],
+					cachedLocal = window.localStorage && window.localStorage[ fullKey ];
 
 				// Use cached value if possible, see explanation in AFCH.userData docs.
 				value = cachedWindow || cachedLocal;
@@ -1095,9 +1095,9 @@
 			 */
 			this.initDialog = function () {
 				var $spinner = $.createSpinner( {
-						size: 'large',
-						type: 'block'
-					} ).css( 'padding', '20px' );
+					size: 'large',
+					type: 'block'
+				} ).css( 'padding', '20px' );
 
 				if ( !this.$dialog ) {
 					// Initialize the $dialog div
@@ -1168,7 +1168,7 @@
 				this.$dialog.find( 'select' ).each( function () {
 					var $select = $( this ),
 						id = $select.attr( 'id' ),
-						value = prefs.prefStore[id];
+						value = prefs.prefStore[ id ];
 					$select.find( 'option[value="' + value + '"]' ).prop( 'selected', true );
 				} );
 			};
@@ -1225,11 +1225,11 @@
 			this.views = {};
 
 			this.setView = function ( name, content ) {
-				this.views[name] = content;
+				this.views[ name ] = content;
 			};
 
 			this.renderView = function ( name, data ) {
-				var view = this.views[name],
+				var view = this.views[ name ],
 					template = Hogan.compile( view );
 
 				return template.render( data );
@@ -1240,8 +1240,8 @@
 					match = viewRegex.exec( src );
 
 				while ( match !== null ) {
-					var key = match[1],
-						content = match[2];
+					var key = match[ 1 ],
+						content = match[ 2 ];
 
 					this.setView( key, content );
 
@@ -1286,8 +1286,8 @@
 		 * @return {mixed}
 		 */
 		getAndDelete: function ( object, key ) {
-			var v = object[key];
-			delete object[key];
+			var v = object[ key ];
+			delete object[ key ];
 			return v;
 		},
 
@@ -1344,11 +1344,11 @@
 							allTexts.push( $( this ).text() );
 						} );
 
-						data[element.id + 'Texts'] = allTexts;
+						data[ element.id + 'Texts' ] = allTexts;
 					}
 				}
 
-				data[element.id] = value;
+				data[ element.id ] = value;
 			} );
 
 			return data;
@@ -1424,12 +1424,12 @@
 				wikilinkMatch = wikilinkRegex.exec( wikicode );
 
 			while ( wikilinkMatch ) {
-				var title = wikilinkMatch[1],
-					displayTitle = wikilinkMatch[2],
+				var title = wikilinkMatch[ 1 ],
+					displayTitle = wikilinkMatch[ 2 ],
 					newLink = AFCH.makeLinkElementToPage( title, displayTitle );
 
 				// Replace the wikilink with the new <a> element
-				newCode = newCode.replace( wikilinkMatch[0], AFCH.jQueryToHtml( newLink ) );
+				newCode = newCode.replace( wikilinkMatch[ 0 ], AFCH.jQueryToHtml( newLink ) );
 
 				// Increment match
 				wikilinkMatch = wikilinkRegex.exec( wikicode );
@@ -1496,7 +1496,7 @@
 
 			// If show is true, we make the element visible and display hideText in
 			// the toggle. Otherwise, we hide the element and display showText.
-			function toggleState ( show ) {
+			function toggleState( show ) {
 				$( elementSelector ).toggleClass( 'hidden', !show );
 				$( toggleSelector ).text( show ? hideText : showText );
 			}
@@ -1542,11 +1542,11 @@
 			}
 
 			date = new Date();
-			date.setUTCFullYear( match[5] );
-			date.setUTCMonth( mw.config.get( 'wgMonthNames' ).indexOf( match[4] ) - 1 ); // stupid javascript
-			date.setUTCDate( match[3] );
-			date.setUTCHours( match[1] );
-			date.setUTCMinutes( match[2] );
+			date.setUTCFullYear( match[ 5 ] );
+			date.setUTCMonth( mw.config.get( 'wgMonthNames' ).indexOf( match[ 4 ] ) - 1 ); // stupid javascript
+			date.setUTCDate( match[ 3 ] );
+			date.setUTCHours( match[ 1 ] );
+			date.setUTCMinutes( match[ 2 ] );
 			date.setUTCSeconds( 0 );
 
 			if ( mwstyle ) {
@@ -1570,7 +1570,7 @@
 			// Otherwise use Date.UTC to assemble a date object using UTC time
 			} else {
 				date = new Date( Date.UTC(
-					dateMatches[1], dateMatches[2] - 1, dateMatches[3], dateMatches[4], dateMatches[5], dateMatches[6]
+					dateMatches[ 1 ], dateMatches[ 2 ] - 1, dateMatches[ 3 ], dateMatches[ 4 ], dateMatches[ 5 ], dateMatches[ 6 ]
 				) );
 			}
 
