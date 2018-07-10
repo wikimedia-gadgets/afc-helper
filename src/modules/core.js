@@ -102,7 +102,7 @@
 				whitelist = new AFCH.Page( AFCH.consts.whitelistTitle );
 			whitelist.getText().done( function ( text ) {
 				var $howToDisable,
-					userAllowed = text.indexOf( user ) !== -1;
+					userAllowed = ( new RegExp( '\|\s*' + user + '\s*}' ).test( text );
 
 				if ( !userAllowed ) {
 
