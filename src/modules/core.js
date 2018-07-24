@@ -778,7 +778,7 @@
 						} );
 					}
 
-					appendText += ' ~~~~~\n';
+					appendText += ' ~~'+'~~'+'~\n';
 
 					logPage.edit( {
 						contents: appendText,
