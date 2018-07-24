@@ -101,8 +101,14 @@
 			var user = AFCH.consts.user,
 				whitelist = new AFCH.Page( AFCH.consts.whitelistTitle );
 			whitelist.getText().done( function ( text ) {
+
+				// sanitizedUser is user, but escaped for use in the regex.
+				// Otherwise a user named ... would always be able to use
+				// the script, so long as there was a user whose name was
+				// three characters long on the list!
 				var $howToDisable,
-					userAllowed = ( new RegExp( '\\|\\s*' + user + '\\s*}' ) ).test( text );
+					sanitizedUser = user.replace( /[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&' ),
+					userAllowed = ( new RegExp( '\\|\\s*' + sanitizedUser + '\\s*}' ) ).test( text );
 
 				if ( !userAllowed ) {
 
@@ -778,7 +784,7 @@
 						} );
 					}
 
-					appendText += ' ~~'+'~~'+'~\n';
+					appendText += ' ~~' + '~~' + '~\n';
 
 					logPage.edit( {
 						contents: appendText,

@@ -1093,7 +1093,7 @@
 			// $1 = article name
 			// $2 = article class or '' if not available
 			'accepted-submission': '== Your submission at [[Wikipedia:Articles for creation|Articles for creation]]: ' +
-				'[[$1]] has been accepted ==\n{{subst:Afc talk|$1|class=$2|sig=~~'+'~~}}',
+				'[[$1]] has been accepted ==\n{{subst:Afc talk|$1|class=$2|sig=~~' + '~~}}',
 
 			// $1 = full submission title
 			// $2 = short title
@@ -1110,9 +1110,9 @@
 			'comment-on-submission': '{{subst:AFC notification|comment|article=$1}}',
 
 			// $1 = article name
-			'g13-submission': '{{subst:Db-afc-notice|$1}} ~~'+'~~',
+			'g13-submission': '{{subst:Db-afc-notice|$1}} ~~' + '~~',
 
-			'teahouse-invite': '{{subst:Wikipedia:Teahouse/AFC invitation|sign=~~'+'~~}}'
+			'teahouse-invite': '{{subst:Wikipedia:Teahouse/AFC invitation|sign=~~' + '~~}}'
 		} );
 	}
 
