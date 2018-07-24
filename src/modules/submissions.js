@@ -369,7 +369,7 @@
 		// If there are no templates on the page, just generate a new one
 		// (addNewTemplate handles the reparsing)
 		if ( !relevantTemplate ||
-			// Same for if the top template on the stack is alrady declined;
+			// Same for if the top template on the stack is already declined;
 			// we don't want to overwrite it
 			relevantTemplate.status === 'd' ) {
 			this.addNewTemplate( {
