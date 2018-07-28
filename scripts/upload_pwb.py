@@ -88,7 +88,6 @@ header = '/* Uploaded from https://github.com/WPAFC/afch-rewrite, commit: {} ({}
 
 def uploadFile(pagename, content):
 	page = pywikibot.Page(site, title=pagename)
-	content = page.get()
 
 	# Add header and update static referencres to root directory
 	content = header + content
