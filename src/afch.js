@@ -31,13 +31,6 @@
 		return !!subscriptToLoad;
 	} );
 
-	// Special case: don't initialize submissions.js on
-	// Wikipedia:Articles for creation/Redirects, since that
-	// isn't a draft
-	if ( pageName === 'Wikipedia:Articles for creation/Redirects' ) {
-		subscriptToLoad = null;
-	}
-
 	if ( subscriptToLoad ) {
 		// Initialize the AFCH object
 		window.AFCH = {};
