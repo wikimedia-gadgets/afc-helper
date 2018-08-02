@@ -190,6 +190,14 @@
 	<div class="header">Declining...</div>
 	<div id="afchContent" class="content centered">
 
+		<fieldset id="declineRejectWrapper" class="radioContainer afch-input" name="declineReject">
+			<input type="radio" id="declineRejectDecline" name="declineReject" value="decline" checked />
+			<label for="declineRejectDecline"><b>Decline</b> (for later improvement &amp; resubmission)</label>
+			&emsp;
+			<input type="radio" id="declineRejectReject" name="declineReject" value="reject" />
+			<label for="declineRejectReject"><b>Reject</b> (unsuitable topic; no option to resubmit)</label>
+		</fieldset>
+
 		<div id="declineReasonWrapper">
 			<select id="declineReason" class="afch-input text-left" multiple="multiple">
 				<option value=""></option>
@@ -239,8 +247,19 @@
 					<option value="mergeto">mergeto - Submission should be merged into an existing article</option>
 				</optgroup>
 			</select>
-			<a id="declineTextareaPreviewTrigger" class="link" role="button">(preview)</a>
-			<div id="declineTextareaPreview"></div>
+		</div>
+
+		<div id="rejectReasonWrapper" class="hidden">
+			<select id="rejectReason" class="afch-input text-left" multiple="multiple">
+				<option value=""></option>
+				<option value="n">n - Topic is not notable</option>
+				<option value="e">e - Topic is contrary to the purpose of Wikipedia</option>
+			</select>
+		</div>
+
+		<div id="previewWrapper">
+			<a id="previewTrigger" class="link" role="button">(preview)</a>
+			<div id="previewContainer"></div>
 		</div>
 
 		<div id="declineInputWrapper">
@@ -281,6 +300,8 @@
 				</div>
 			</div>
 		</div>
+
+		<div id="rejectInputWrapper" class="hidden">asdf</div>
 
 		<div id="afchSubmitForm" data-running="Declining submission..." class="gradient-button button-centered decline hidden">Decline submission</div>
 

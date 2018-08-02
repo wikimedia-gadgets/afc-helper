@@ -264,7 +264,7 @@
 		}
 
 		/*
-			Since we're hacking this dynamic suggestion feature into
+			Since we are hacking this dynamic suggestion feature into
 			jquery.chosen, we have to manually set the width of the input.
 			(see "Offer dynamic category suggestions" in submissions.js)
 		*/
@@ -283,11 +283,11 @@
 			padding-top: 5px;
 		}
 
-		#declineTextareaPreviewTrigger {
+		#previewTrigger {
 			font-size: 80%;
 		}
 
-		#declineTextareaPreview {
+		#previewContainer {
 			border: thin dotted gray;
 			width: 50%;
 			margin: 0.5em auto;
@@ -295,8 +295,15 @@
 			padding: 0 0.5em;
 		}
 
-		#declineTextareaPreview:empty {
+		#previewContainer:empty {
 			display: none;
+		}
+
+		#declineRejectWrapper{
+			font-size: 120%;
+			padding: 0;
+			border: 0;
+			margin: 0 0 .5em 0;
 		}
 	}
 

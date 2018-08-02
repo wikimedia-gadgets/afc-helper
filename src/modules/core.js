@@ -1315,6 +1315,10 @@
 		 * converting checkboxes to bools, providing textual values of select
 		 * elements, ignoring placeholder elements, and more.
 		 *
+		 * For a radio button group, pass in the container element, which must
+		 * be a fieldset with the appropriate "name" attribute. Its id will
+		 * be used as the key in the data object.
+		 *
 		 * @param {jQuery} $selector elements to get values from
 		 * @return {object} object of values, with the ids as keys
 		 */
@@ -1327,6 +1331,8 @@
 
 				if ( element.type === 'checkbox' ) {
 					value = element.checked;
+				} else if ( element.type === 'fieldset' ) {
+					value = $element.find( ':checked' ).val();
 				} else {
 					value = $element.val();
 

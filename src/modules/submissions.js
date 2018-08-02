@@ -1621,6 +1621,18 @@
 				max_selected_options: 2
 			} );
 
+			// Set up jquery.chosen for the reject reason
+			$afch.find( '#rejectReason' ).chosen( {
+				placeholder_text_single: 'Select a reject reason...',
+				search_contains: true,
+				inherit_select_classes: true,
+				max_selected_options: 2
+			} );
+
+			// rejectReason starts off hidden by default, which makes the _chosen div
+			// display at 0px wide for some reason. We must manually fix this.
+			$afch.find( '#rejectReason_chosen' ).css( 'width', '350px' );
+
 			// And now add the handlers for when a specific decline reason is selected
 			$afch.find( '#declineReason' ).change( function () {
 				var reason = $afch.find( '#declineReason' ).val(),
@@ -1706,15 +1718,15 @@
 				$afch.find( '#declineTextarea' ).val( prevDeclineComment );
 
 				// If the user wants a preview, show it
-				if ( $( '#declineTextareaPreviewTrigger' ).text() == '(hide preview)' ) {
-					$( '#declineTextareaPreview' )
+				if ( $( '#previewTrigger' ).text() == '(hide preview)' ) {
+					$( '#previewContainer' )
 						.empty()
 						.append( $.createSpinner( {
 							size: 'large',
 							type: 'block'
 						} ).css( 'padding', '20px' ) );
 					AFCH.getReason( reason ).done( function ( html ) {
-						$( '#declineTextareaPreview' ).html( html );
+						$( '#previewContainer' ).html( html );
 					} );
 				}
 
@@ -1725,10 +1737,10 @@
 			} ); // End change handler for the reason select box
 
 			// Attach the preview event listener
-			$afch.find( '#declineTextareaPreviewTrigger' ).click( function () {
+			$afch.find( '#previewTrigger' ).click( function () {
 				var reason = $afch.find( '#declineReason' ).val();
 				if ( this.textContent == '(preview)' && reason ) {
-					$( '#declineTextareaPreview' )
+					$( '#previewContainer' )
 						.empty()
 						.append( $.createSpinner( {
 							size: 'large',
@@ -1736,17 +1748,26 @@
 						} ).css( 'padding', '20px' ) );
 					var reasonDeferreds = reason.map( AFCH.getReason );
 					$.when.apply( $, reasonDeferreds ).then( function ( a, b ) {
-						$( '#declineTextareaPreview' )
+						$( '#previewContainer' )
 							.html( Array.prototype.slice.call( arguments )
 								.join( '<hr />' ) );
 					} );
 					this.textContent = '(hide preview)';
 				} else {
-					$( '#declineTextareaPreview' ).empty();
+					$( '#previewContainer' ).empty();
 					this.textContent = '(preview)';
 				}
 			} );
-		} );
+
+			// Attach the decline vs reject radio button listener
+			$afch.find( 'input[type=radio][name=declineReject]' ).click( function () {
+				var declineOrReject = $afch.find( 'input[name=declineReject]:checked' ).val();
+				$afch.find( '#declineReasonWrapper' ).toggleClass( 'hidden', declineOrReject === 'reject' );
+				$afch.find( '#rejectReasonWrapper' ).toggleClass( 'hidden', declineOrReject === 'decline' );
+				$afch.find( '#declineInputWrapper' ).toggleClass( 'hidden', declineOrReject === 'reject' );
+				$afch.find( '#rejectInputWrapper' ).toggleClass( 'hidden', declineOrReject === 'decline' );
+			} );
+		} ); // End loadView callback
 
 		addFormSubmitHandler( handleDecline );
 	}
