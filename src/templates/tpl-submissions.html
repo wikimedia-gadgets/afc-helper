@@ -247,6 +247,11 @@
 					<option value="mergeto">mergeto - Submission should be merged into an existing article</option>
 				</optgroup>
 			</select>
+
+			<div id="previewWrapper">
+				<a id="previewTrigger" class="link" role="button">(preview)</a>
+				<div id="previewContainer"></div>
+			</div>
 		</div>
 
 		<div id="rejectReasonWrapper" class="hidden">
@@ -257,10 +262,6 @@
 			</select>
 		</div>
 
-		<div id="previewWrapper">
-			<a id="previewTrigger" class="link" role="button">(preview)</a>
-			<div id="previewContainer"></div>
-		</div>
 
 		<div id="declineInputWrapper">
 			<div id="textfieldWrapper" class="afch-option hidden">
@@ -288,20 +289,24 @@
 				<input type="checkbox" id="csdSubmission" class="afch-input"/>
 				<label for="csdSubmission" class="afch-label">Nominate the submission for speedy deletion</label>
 			</div>
-
-			<div id="notifyWrapper" class="hidden">
-				<div class="afch-option">
-					<input type="checkbox" id="notifyUser" class="afch-input" checked/>
-					<label for="notifyUser" class="afch-label">Notify submitter</label>
-				</div>
-				<div class="afch-option">
-					<input type="checkbox" id="inviteToTeahouse" class="afch-input" checked/>
-					<label for="inviteToTeahouse" class="afch-label">Invite submitter to Teahouse <small>(if they haven't been invited yet)</small></label>
-				</div>
-			</div>
 		</div>
 
-		<div id="rejectInputWrapper" class="hidden">asdf</div>
+		<div id="rejectInputWrapper" class="hidden">
+			<textarea id="rejectTextarea" class="afch-input afch-textfield afch-textarea"
+				placeholder="Elaborate on your reject reason here using wikicode syntax."
+				cols="100" rows="5"></textarea>
+		</div>
+
+		<div id="notifyWrapper" class="hidden">
+			<div class="afch-option">
+				<input type="checkbox" id="notifyUser" class="afch-input" checked/>
+				<label for="notifyUser" class="afch-label">Notify submitter</label>
+			</div>
+			<div class="afch-option">
+				<input type="checkbox" id="inviteToTeahouse" class="afch-input" checked/>
+				<label for="inviteToTeahouse" class="afch-label">Invite submitter to Teahouse <small>(if they haven't been invited yet)</small></label>
+			</div>
+		</div>
 
 		<div id="afchSubmitForm" data-running="Declining submission..." class="gradient-button button-centered decline hidden">Decline submission</div>
 

@@ -1089,10 +1089,11 @@
 	 * Stores useful strings to AFCH.msg
 	 */
 	function setMessages() {
+		var headerBegin = '== Your submission at [[Wikipedia:Articles for creation|Articles for creation]]: ';
 		AFCH.msg.set( {
 			// $1 = article name
 			// $2 = article class or '' if not available
-			'accepted-submission': '== Your submission at [[Wikipedia:Articles for creation|Articles for creation]]: ' +
+			'accepted-submission': headerBegin +
 				'[[$1]] has been accepted ==\n{{subst:Afc talk|$1|class=$2|sig=~~' + '~~}}',
 
 			// $1 = full submission title
@@ -1103,8 +1104,18 @@
 			// $6 = second decline reason code
 			// $7 = additional parameter for second decline reason
 			// $8 = additional comment
-			'declined-submission': '== Your submission at [[Wikipedia:Articles for creation|Articles for creation]]: ' +
+			'declined-submission': headerBegin +
 				'[[$1|$2]] ({{subst:CURRENTMONTHNAME}} {{subst:CURRENTDAY}}) ==\n{{subst:Afc decline|full=$1|cv=$3|reason=$4|details=$5|reason2=$6|details2=$7|comment=$8|sig=yes}}',
+
+			// $1 = full submission title
+			// $2 = short title
+			// $3 = reject reason code ('e' or 'n')
+			// $4 = reject reason details (blank for now)
+			// $5 = second reject reason code
+			// $6 = second reject reason details
+			// $7 = comment by reviewer
+			'rejected-submission': headerBegin +
+				'[[$1|$2]] ({{subst:CURRENTMONTHNAME}} {{subst:CURRENTDAY}}) ==\n{{subst:Afc reject|full=$1|reason=$3|details=$4|reason2=$5|details2=$6|comment=$7|sig=yes}}',
 
 			// $1 = article name
 			'comment-on-submission': '{{subst:AFC notification|comment|article=$1}}',
@@ -1734,7 +1745,17 @@
 				// option, and the submit form button
 				$afch.find( '#declineTextarea' ).add( '#notifyWrapper' ).add( '#afchSubmitForm' )
 					.toggleClass( 'hidden', !reason );
-			} ); // End change handler for the reason select box
+			} ); // End change handler for the decline reason select box
+
+			// And the the handlers for when a specific REJECT reason is selected
+			$afch.find( '#rejectReason' ).change( function () {
+				var reason = $afch.find( '#rejectReason' ).val();
+
+				// If a reason has been specified, show the textarea, notify
+				// option, and the submit form button
+				$afch.find( '#rejectTextarea' ).add( '#notifyWrapper' ).add( '#afchSubmitForm' )
+					.toggleClass( 'hidden', !reason );
+			} ); // End change handler for the reject reason select box
 
 			// Attach the preview event listener
 			$afch.find( '#previewTrigger' ).click( function () {
@@ -1995,19 +2016,29 @@
 	}
 
 	function handleDecline( data ) {
+		console.log( data );
 		var declineCounts,
+			isDecline = data.declineRejectWrapper === 'decline', // true=decline, false=reject
 			text = data.afchText,
 			declineReason = data.declineReason[ 0 ],
 			declineReason2 = data.declineReason.length > 1 ? data.declineReason[ 1 ] : null,
 			newParams = {
-				2: declineReason,
 				decliner: AFCH.consts.user,
 				declinets: '{{subst:REVISIONTIMESTAMP}}'
 			};
 
-		// If there's a second reason, add it to the params
-		if ( declineReason2 ) {
-			newParams.reason2 = declineReason2;
+		if ( isDecline ) {
+			newParams[ '2' ] = declineReason;
+
+			// If there's a second reason, add it to the params
+			if ( declineReason2 ) {
+				newParams.reason2 = declineReason2;
+			}
+		} else {
+			newParams[ '2' ] = data.rejectReason[ 0 ];
+			if ( data.rejectReason[ 1 ] ) {
+				newParams.reason2 = data.rejectReason[ 1 ];
+			}
 		}
 
 		// Update decline counts
@@ -2065,6 +2096,10 @@
 			}
 		}
 
+		if ( !isDecline ) {
+			newParams.reject = 'yes';
+		}
+
 		// Now update the submission status
 		afchSubmission.setStatus( 'd', newParams );
 
@@ -2072,9 +2107,9 @@
 		text.cleanUp();
 
 		// Build edit summary
-		var editSummary = 'Declining submission: ',
+		var editSummary = ( isDecline ? 'Declining' : 'Rejecting' ) + ' submission: ',
 			lengthLimit = declineReason2 ? 120 : 180;
-		if ( declineReason === 'reason' ) {
+		if ( !isDecline || ( declineReason === 'reason' ) ) {
 
 			// If this is a custom decline, use the text in the edit summary
 			editSummary += data.declineTextarea.substring( 0, lengthLimit );
@@ -2084,7 +2119,7 @@
 				editSummary += '...';
 			}
 		} else {
-			editSummary += data.declineReasonTexts[ 0 ];
+			editSummary += isDecline ? data.declineReasonTexts[ 0 ] : data.rejectReasonTexts[ 0 ];
 		}
 
 		if ( declineReason2 ) {
@@ -2131,18 +2166,31 @@
 				}
 
 				$.when( shouldTeahouse ).then( function ( teahouse ) {
-					var message = AFCH.msg.get( 'declined-submission', {
-						$1: AFCH.consts.pagename,
-						$2: afchSubmission.shortTitle,
-						$3: ( declineReason === 'cv' || declineReason2 === 'cv' ) ?
-							'yes' : 'no',
-						$4: declineReason,
-						$5: newParams[ '3' ] || '',
-						$6: declineReason2 || '',
-						$7: newParams.details2 || '',
-						$8: ( declineReason === 'reason' || declineReason2 === 'reason' ) ?
-							'' : data.declineTextarea
-					} );
+					var message;
+					if ( isDecline ) {
+						message = AFCH.msg.get( 'declined-submission', {
+							$1: AFCH.consts.pagename,
+							$2: afchSubmission.shortTitle,
+							$3: ( declineReason === 'cv' || declineReason2 === 'cv' ) ?
+								'yes' : 'no',
+							$4: declineReason,
+							$5: newParams[ '3' ] || '',
+							$6: declineReason2 || '',
+							$7: newParams.details2 || '',
+							$8: ( declineReason === 'reason' || declineReason2 === 'reason' ) ?
+								'' : data.declineTextarea
+						} );
+					} else {
+						message = AFCH.msg.get( 'rejected-submission', {
+							$1: AFCH.consts.pagename,
+							$2: afchSubmission.shortTitle,
+							$3: data.rejectReason[ 0 ],
+							$4: '',
+							$5: data.rejectReason[ 1 ] || '',
+							$6: '',
+							$7: data.rejectTextarea
+						} );
+					}
 
 					if ( teahouse ) {
 						message += '\n\n' + AFCH.msg.get( 'teahouse-invite' );
