@@ -2073,6 +2073,11 @@
 			newParams.details2 = data.declineTextfield2;
 		}
 
+		// If we're rejecting, any text in the text area is a comment
+		if ( data.rejectTextarea ) {
+			afchSubmission.addNewComment( data.rejectTextarea );
+		}
+
 		// Copyright violations get {{db-g12}}'d as well
 		if ( ( declineReason === 'cv' || declineReason2 === 'cv' ) && data.csdSubmission ) {
 			var cvUrls = data.cvUrlTextarea.split( '\n' ).slice( 0, 3 ),
@@ -2109,7 +2114,7 @@
 		// Build edit summary
 		var editSummary = ( isDecline ? 'Declining' : 'Rejecting' ) + ' submission: ',
 			lengthLimit = declineReason2 ? 120 : 180;
-		if ( !isDecline || ( declineReason === 'reason' ) ) {
+		if ( declineReason === 'reason' ) {
 
 			// If this is a custom decline, use the text in the edit summary
 			editSummary += data.declineTextarea.substring( 0, lengthLimit );
@@ -2198,7 +2203,7 @@
 
 					AFCH.actions.notifyUser( submitter, {
 						message: message,
-						summary: 'Notification: Your [[' + AFCH.consts.pagename + '|Articles for Creation submission]] has been declined'
+						summary: 'Notification: Your [[' + AFCH.consts.pagename + '|Articles for Creation submission]] has been ' + isDecline ? 'declined' : 'rejected'
 					} );
 				} );
 			} );
