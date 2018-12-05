@@ -62,7 +62,7 @@ update_file('src/afch.js',
 	r'AFCH\.consts\.version = .*?;',"AFCH.consts.version = '{}';".format(version))
 
 update_file('src/afch.js',
-	r'AFCH\.consts\.versionName = .*?;',"AFCH.consts.versionName  = '{}';".format(version_name))
+	r'AFCH\.consts\.versionName = .*?;',"AFCH.consts.versionName = '{}';".format(version_name))
 
 # Update README.md
 
