@@ -47,14 +47,14 @@ with open('README.md') as f:
 	text = f.read()
 	current_version = re.search(r'\n\*\*v(.*?)\*\*',text).group(1)
 
-print "Ready to release AFCH (current version: {})...".format(current_version)
+print("Ready to release AFCH (current version: {})...".format(current_version))
 
 if execute_command('git diff') != '':
-	print '** There are other uncommited changes in your working branch.'
-	print '** If you continue, these changes will be commited in the release commit.'
+	print('** There are other uncommited changes in your working branch.')
+	print('** If you continue, these changes will be commited in the release commit.')
 
-version = float(raw_input('Version number > '))
-version_name = raw_input('Version name > ')
+version = input('Version number > ')
+version_name = input('Version name > ')
 
 # Update src/afch.js
 
