@@ -40,7 +40,7 @@
 
 		// Master version data
 		AFCH.consts.version = '0.9.1';
-		AFCH.consts.versionName  = 'Imperial Ibex';
+		AFCH.consts.versionName = 'Imperial Ibex';
 
 		// FIXME: Change when moving into production
 		AFCH.consts.beta = true;
