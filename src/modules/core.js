@@ -186,8 +186,6 @@
 
 					// mediawiki.api
 					'mediawiki.api',
-					'mediawiki.api.category',
-					'mediawiki.api.titleblacklist',
 
 					// mediawiki plugins
 					'mediawiki.feedback'
