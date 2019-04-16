@@ -326,9 +326,9 @@
 			return deferred.resolve( false );
 		}
 
-		// Userspace drafts and `Draft` namespace drafts must have
+		// Userspace drafts must have
 		// one or more AFC submission templates to be eligible
-		if ( [ 2, 118 ].indexOf( this.page.title.getNamespaceId() ) !== -1 &&
+		if ( this.page.title.getNamespaceId() == 2 &&
 			this.templates.length === 0 ) {
 			return deferred.resolve( false );
 		}
