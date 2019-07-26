@@ -2056,7 +2056,7 @@
 			newParams[ '3' ] = data.declineTextarea;
 		} else if ( declineReason2 === 'reason' ) {
 			newParams.details2 = data.declineTextarea;
-		} else if ( data.declineTextarea ) {
+		} else if ( isDecline && data.declineTextarea ) {
 
 			// But otherwise if addtional text has been entered we just add it as a new comment
 			afchSubmission.addNewComment( data.declineTextarea );
@@ -2074,7 +2074,7 @@
 		}
 
 		// If we're rejecting, any text in the text area is a comment
-		if ( data.rejectTextarea ) {
+		if ( !isDecline && data.rejectTextarea ) {
 			afchSubmission.addNewComment( data.rejectTextarea );
 		}
 
