@@ -596,7 +596,9 @@
 		this.text = this.text.replace( new RegExp( '\\{\\{\\s*afc submission\\s*(?:\\||[^{{}}]*|{{.*?}})*?\\}\\}' +
 			// Also remove the AFCH-generated warning message, since if necessary the script will add it again
 			'( <!-- Do not remove this line! -->)?', 'gi' ), '' );
-		this.text = this.text.replace( /\{\{\s*afc comment\s*(?:\||[^{{}}]*|{{.*?}})*?\}\}/gi, '' );
+
+		// Nastiest hack of all time. As above, Parsoid would be great. Gotta wire it up asynchronously first, though.
+		this.text = this.text.replace( /\{\{\s*afc comment.+?\(UTC\)\}\}/gi, '' );
 
 		// Remove horizontal rules that were added by AFCH after the comments
 		this.text = this.text.replace( /^----+$/gm, '' );
