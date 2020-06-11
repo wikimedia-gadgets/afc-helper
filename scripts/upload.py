@@ -1,6 +1,6 @@
 """
-upload.py: build and upload the helper script to a wiki (requires pywikibot
-and git, as well as grunt and the associated dependencies in package.json)
+upload.py: build and upload the helper script to a wiki (requires git and either
+mwclient or pywikibot, as well as grunt and the associated dependencies in package.json)
 
 (C) 2014 Theopolisme <theopolismewiki@gmail.com>
 Modified for Pywikibot by Enterprisey
@@ -10,30 +10,44 @@ Usage
 
 Run this script from the main afch-rewrite directory using Python 3:
 
->>> python scripts/upload.py [site] [root] [--force]
+>>> python scripts/upload.py SITE ROOT [--force] [--mwclient USERNAME]
 
-site: en or test
+SITE: en or test
 
-root: Base page name for the script, without any file extension.  For example,
+ROOT: Base page name for the script, without any file extension.  For example,
 if "MediaWiki:Gadget-afch" was specified the script can be loaded from
 `MediaWiki:Gadget-afch.js`.
 
 force: Flag to indicate that grunt build should be run with --force.
 PLEASE don't use this.
+
+mwclient: Flag to indicate that mwclient should be used instead of Pywikibot.
 """
 from __future__ import unicode_literals
 
+import argparse
 import sys
 import os
 import git
-import pywikibot
 import subprocess
 
 # Check arg length
 if len(sys.argv) < 2:
 	print('Incorrect number of arguments supplied.')
-	print('Usage: python scripts/upload.py [site] [root] [--force]')
+	print('Usage: python scripts/upload.py SITE ROOT [--force] [--mwclient USERNAME]')
 	sys.exit(1)
+
+using_mwclient = '--mwclient' in sys.argv
+if using_mwclient:
+	import mwclient
+	username_index = sys.argv.index('--mwclient') + 1
+	username = sys.argv[username_index]
+	del sys.argv[username_index]
+	sys.argv.remove('--mwclient')
+
+	import getpass
+else:
+	import pywikibot
 
 # Shortname of the wiki target
 wiki = sys.argv[1]
@@ -67,9 +81,41 @@ except OSError:
 
 print('Uploading to {}...'.format(wiki))
 
-site = pywikibot.Site(wiki, "wikipedia")
-site.login()
-print('Logged in as {}.'.format(site.user()))
+# Utility function used in setPageText
+def stripFirstLine(text):
+	return '\n'.join(text.splitlines()[1:])
+
+if using_mwclient:
+	if wiki == 'en':
+		server_name = 'en.wikipedia.org'
+	else:
+		server_name = 'test.wikipedia.org'
+	site = mwclient.Site(server_name)
+	site.login(username, getpass.getpass('Password for {} on {}: '.format(username, server_name)))
+	print('Logged in as {}.'.format(site.username))
+
+	def setPageText(title, text, summary):
+		page = site.Pages[title]
+		# Only update the page if its contents have changed (excluding the header)
+		if stripFirstLine(page.text()) != stripFirstLine(text):
+			print('Uploading to {}'.format(title))
+			page.save(text, summary=summary)
+		else:
+			print('Skipping {}, no changes made'.format(title))
+else:
+	site = pywikibot.Site(wiki, "wikipedia")
+	site.login()
+	print('Logged in as {}.'.format(site.user()))
+
+	def setPageText(title, text, summary):
+		page = pywikibot.Page(site, title=title)
+		# Only update the page if its contents have changed (excluding the header)
+		if stripFirstLine(page.get()) != stripFirstLine(text):
+			print('Uploading to {}'.format(title))
+			page.text = text
+			page.save(summary=summary)
+		else:
+			print('Skipping {}, no changes made'.format(title))
 
 # Base page name on-wiki
 root = sys.argv[2]
@@ -87,22 +133,12 @@ except AttributeError:
 header = '/* Uploaded from https://github.com/WPAFC/afch-rewrite, commit: {} ({}) */\n'.format(sha1, branch)
 
 def uploadFile(pagename, content):
-	page = pywikibot.Page(site, title=pagename)
 
 	# Add header and update static referencres to root directory
 	content = header + content
 	content = content.replace('MediaWiki:Gadget-afch',root)
 
-	def stripFirstLine(text):
-		return '\n'.join(text.splitlines()[1:])
-
-	# Only update the page if its contents have changed (excluding the header)
-	if stripFirstLine(content) != stripFirstLine(page.get()):
-		print('Uploading to {}'.format(pagename))
-		page.text = content
-		page.save(summary='Updating AFCH: {} @ {}'.format(branch, sha1[:6]))
-	else:
-		print('Skipping {}, no changes made'.format(pagename))
+	setPageText(pagename, content, 'Updating AFCH: {} @ {}'.format(branch, sha1[:6]))
 
 def uploadSubscript(scriptName, content):
 	uploadFile(root + '.js/' + scriptName + '.js', content)
