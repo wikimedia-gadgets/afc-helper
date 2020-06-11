@@ -1515,16 +1515,24 @@
 					} );
 
 					$.when(
-						AFCH.api.isBlacklisted( page ),
+						AFCH.api.get( {
+							action: 'titleblacklist',
+							tbtitle: page.rawTitle,
+							tbaction: 'create',
+							tbnooverride: true
+						} ),
 						AFCH.api.get( {
 							action: 'query',
 							prop: 'info',
 							inprop: 'protection',
 							titles: page.rawTitle
 						} )
-					).then( function ( isBlacklisted, rawData ) {
-						var errorHtml, buttonText,
-							data = rawData[ 0 ]; // Get just the result, not the Promise object
+					).then( function ( rawBlacklistResult, rawData ) {
+						var errorHtml, buttonText;
+
+						// Get just the result, not the Promise object
+						var blacklistResult = rawBlacklistResult[ 0 ],
+							data = rawData[ 0 ];
 
 						// If the page already exists, display an error
 						if ( !data.query.pages.hasOwnProperty( '-1' ) ) {
@@ -1545,8 +1553,9 @@
 
 						// Now check the blacklist result, but if another error already exists,
 						// don't bother showing this one too
-						if ( !errorHtml && isBlacklisted !== false ) {
-							errorHtml = 'Shoot! ' + isBlacklisted.reason.replace( /\s+/g, ' ' );
+						blacklistResult = blacklistResult.titleblacklist;
+						if ( !errorHtml && blacklistResult.result === 'blacklisted' ) {
+							errorHtml = 'Shoot! ' + blacklistResult.reason.replace( /\s+/g, ' ' );
 							buttonText = 'The proposed title is blacklisted';
 						}
 
