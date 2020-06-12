@@ -1324,6 +1324,8 @@
 					}
 
 					deferred.resolve( wikiProjects );
+				} ).fail( function ( jqxhr, textStatus, errorThrown ) {
+					console.error( 'Could not parse WikiProject list: ', textStatus, errorThrown );
 				} );
 			}
 
