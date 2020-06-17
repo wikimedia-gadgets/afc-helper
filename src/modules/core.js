@@ -759,7 +759,8 @@
 				logPage.getText().done( function ( logText ) {
 					var status,
 						date = new Date(),
-						headerRe = new RegExp( '^==+\\s*' + date.getUTCMonthName() + '\\s+' + date.getUTCFullYear() + '\\s*==+', 'm' ),
+						monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+						headerRe = new RegExp( '^==+\\s*' + monthNames[date.getMonth()] + '\\s+' + date.getUTCFullYear() + '\\s*==+', 'm' ),
 						appendText = '';
 
 					// Don't edit if the page has doesn't exist or has no text
@@ -770,7 +771,7 @@
 
 					// Add header for new month if necessary
 					if ( !headerRe.test( logText ) ) {
-						appendText += '\n\n=== ' + date.getUTCMonthName() + ' ' + date.getUTCFullYear() + ' ===';
+						appendText += '\n\n=== ' + monthNames[date.getMonth()] + ' ' + date.getUTCFullYear() + ' ===';
 					}
 
 					appendText += '\n# [[:' + options.title + ']]: ' + options.reason;
