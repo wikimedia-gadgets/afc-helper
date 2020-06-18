@@ -759,7 +759,7 @@
 				logPage.getText().done( function ( logText ) {
 					var status,
 						date = new Date(),
-						monthNames = [ 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'] ,
+						monthNames = [ 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December' ],
 						headerRe = new RegExp( '^==+\\s*' + monthNames[ date.getMonth() ] + '\\s+' + date.getUTCFullYear() + '\\s*==+', 'm' ),
 						appendText = '';
 
