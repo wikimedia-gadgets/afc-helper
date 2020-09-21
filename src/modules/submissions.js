@@ -506,6 +506,9 @@
 			// Strip the AFC G13 postponement template
 			text = text.replace( /\{\{AfC postpone G13(?:\|\d*)?\}\}\n*/gi, '' );
 
+			// Remove draft topics template
+			text = text.replace( /\{\{[Dd]raft topics\|(.*?)\}\}\n?/g, '' );
+
 			// Add to the list of comments to remove
 			$.merge( commentsToRemove, [
 				'Enter template purpose and instructions here.',
