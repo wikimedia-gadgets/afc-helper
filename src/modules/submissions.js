@@ -507,7 +507,10 @@
 			text = text.replace( /\{\{AfC postpone G13(?:\|\d*)?\}\}\n*/gi, '' );
 
 			// Remove draft topics template
-			text = text.replace( /\{\{[Dd]raft topics\|(.*?)\}\}\n?/g, '' );
+			text = text.replace( /\{\{draft topics\|(.*?)\}\}\n?/ig, '' );
+
+			// Remove drafts moved from mainspace template
+			text = text.replace( /\{\{Drafts moved from mainspace\|(.*?)\}\}\n?/ig, '' );
 
 			// Add to the list of comments to remove
 			$.merge( commentsToRemove, [
