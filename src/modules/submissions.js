@@ -1225,8 +1225,10 @@
 	 * Also sets up the viewer for the "processing" stage.
 	 *
 	 * @param {Function} fn function to call with data
+	 * @param {object} extraData more data to pass; will be inserted
+	 *                           into the data passed to `fn`
 	 */
-	function addFormSubmitHandler( fn ) {
+	function addFormSubmitHandler( fn, extraData ) {
 		$afch.find( '#afchSubmitForm' ).click( function () {
 			var data = {};
 
@@ -1236,6 +1238,9 @@
 
 				// Also provide the values for each afch-input element
 				$.extend( data, AFCH.getFormValues( $afch.find( '.afch-input' ) ) );
+
+				// Also provide extra data
+				$.extend( data, extraData );
 
 				prepareForProcessing();
 
@@ -1338,15 +1343,105 @@
 			return deferred;
 		}
 
+		var existingWikiProjectsPromise = $.when(
+			loadWikiProjectList(),
+			new AFCH.Page( 'Draft talk:' + afchSubmission.shortTitle ).getTemplates()
+		).then( function ( wikiProjects, templates ) {
+			var templateNames = templates.map( function ( template ) {
+				return template.target.trim().toLowerCase();
+			} );
+
+			// Turn the WikiProject list into an Object to make lookups faster
+			var wikiProjectMap = {};
+			for ( var projIdx = 0; projIdx < wikiProjects.length; projIdx++ ) {
+				wikiProjectMap[ wikiProjects[ projIdx ].templateName.toLowerCase() ] = {
+					displayName: wikiProjects[ projIdx ].displayName,
+					templateName: wikiProjects[ projIdx ].templateName,
+					alreadyOnPage: false
+				};
+			}
+
+			var alreadyHasWPBio = false;
+
+			if ( templates.length === 0 ) {
+				return {
+					alreadyHasWPBio: alreadyHasWPBio,
+					wikiProjectMap: wikiProjectMap
+				};
+			}
+
+			var otherTemplates = [];
+			for ( var tplIdx = 0; tplIdx < templateNames.length; tplIdx++ ) {
+				if ( wikiProjectMap.hasOwnProperty( templateNames[ tplIdx ] ) ) {
+					wikiProjectMap[ templateNames[ tplIdx ] ].alreadyOnPage = true;
+				} else if ( templateNames[ tplIdx ] === 'wikiproject biography' ) {
+					alreadyHasWPBio = true;
+				} else {
+					otherTemplates.push( templateNames[ tplIdx ] );
+				}
+			}
+
+			// If any templates weren't in the WikiProject map, check if they were redirects
+			if ( otherTemplates.length > 0 ) {
+				var titles = otherTemplates.map( function ( n ) { return 'Template:' + n; } ).join( '|' );
+				return AFCH.api.get( {
+					action: 'query',
+					titles: titles,
+					redirects: 'true'
+				} ).then( function ( data ) {
+					var existingWPBioTemplateName = null;
+					if ( data.query && data.query.redirects && data.query.redirects.length > 0 ) {
+						var redirs = data.query.redirects;
+						for ( var redirIdx = 0; redirIdx < redirs.length; redirIdx++ ) {
+							var redir = redirs[ redirIdx ].to.substring( 'Template:'.length ).toLowerCase();
+							var originalName = redirs[ redirIdx ].from.substring( 'Template:'.length );
+							if ( wikiProjectMap.hasOwnProperty( redir ) ) {
+								wikiProjectMap[ redir ].alreadyOnPage = true;
+								wikiProjectMap[ redir ].realTemplateName = originalName;
+							} else if ( redir === 'wikiproject biography' ) {
+								alreadyHasWPBio = true;
+								existingWPBioTemplateName = originalName;
+							}
+						}
+					}
+					return {
+						alreadyHasWPBio: alreadyHasWPBio,
+						wikiProjectMap: wikiProjectMap,
+						existingWPBioTemplateName: existingWPBioTemplateName
+					};
+				} );
+			} else {
+				return {
+					alreadyHasWPBio: alreadyHasWPBio,
+					wikiProjectMap: wikiProjectMap
+				};
+			}
+		} );
+
 		$.when(
 			afchPage.getText( false ),
-			loadWikiProjectList(),
+			existingWikiProjectsPromise,
 			afchPage.getCategories( /* useApi */ false, /* includeCategoryLinks */ true )
-		).then( function ( pageText, wikiProjects, categories ) {
+		).then( function ( pageText, existingWikiProjectsResult, categories ) {
+			var alreadyHasWPBio = existingWikiProjectsResult.alreadyHasWPBio,
+				wikiProjectMap = existingWikiProjectsResult.wikiProjectMap,
+				existingWPBioTemplateName = existingWikiProjectsResult.existingWPBioTemplateName;
+			var existingWikiProjects = []; // already on draft's talk page
+			$.each( wikiProjectMap, function ( lowercaseTemplateName, obj ) {
+				if ( obj.alreadyOnPage ) {
+					existingWikiProjects.push( obj );
+				}
+			} );
+			var hasWikiProjects = Object.keys( wikiProjectMap ).length > 0;
+			if ( !hasWikiProjects ) {
+				mw.notify( 'Could not load WikiProject list!' );
+			}
+			var wikiProjectObjs = Object.keys( wikiProjectMap ).map( function ( key ) { return wikiProjectMap[ key ]; } );
+
 			loadView( 'accept', {
 				newTitle: afchSubmission.shortTitle,
-				hasWikiProjects: !!wikiProjects.length,
-				wikiProjects: wikiProjects,
+				hasWikiProjects: hasWikiProjects,
+				wikiProjects: wikiProjectObjs,
 				categories: categories,
 				// Only offer to patrol the page if not already patrolled (in other words, if
 				// the "Mark as patrolled" link can be found in the DOM)
@@ -1460,6 +1555,9 @@
 				$afch.find( '#isBiography' ).change( function () {
 					$afch.find( '#bioOptionsWrapper' ).toggleClass( 'hidden', !this.checked );
 				} );
+				if ( alreadyHasWPBio ) {
+					$afch.find( '#isBiography' ).prop( 'checked', true ).trigger( 'change' );
+				}
 
 				function prefillBiographyDetails() {
 					var titleParts;
@@ -1589,7 +1687,11 @@
 
 			} );
 
-			addFormSubmitHandler( handleAccept );
+			addFormSubmitHandler( handleAccept, {
+				existingWikiProjects: existingWikiProjects,
+				alreadyHasWPBio: alreadyHasWPBio,
+				existingWPBioTemplateName: existingWPBioTemplateName
+			} );
 
 		} );
 	}
@@ -1920,8 +2022,7 @@
 				var $patrolLink,
 					newPage = new AFCH.Page( moveData.to ),
 					talkPage = newPage.getTalkPage(),
-					recentPage = new AFCH.Page( 'Wikipedia:Articles for creation/recent' ),
-					talkText = '';
+					recentPage = new AFCH.Page( 'Wikipedia:Articles for creation/recent' );
 
 				// ARTICLE
 				// -------
@@ -1965,35 +2066,72 @@
 				// TALK PAGE
 				// ---------
 
-				// Add the AFC banner
-				talkText += '{{subst:WPAFC/article|class=' + data.newAssessment + ( afchPage.additionalData.revId ? '|oldid=' + afchPage.additionalData.revId : '' ) + '}}';
+				talkPage.getText().done( function ( talkText ) {
+					var talkTextPrefix = '';
 
-				// Add biography banner if specified
-				if ( data.isBiography ) {
-					// Ensure we don't have duplicate biography tags
-					AFCH.removeFromArray( data.newWikiProjects, 'WikiProject Biography' );
+					// Add the AFC banner
+					talkTextPrefix += '{{subst:WPAFC/article|class=' + data.newAssessment +
+						( afchPage.additionalData.revId ? '|oldid=' + afchPage.additionalData.revId : '' ) + '}}';
 
-					talkText += ( '\n{{WikiProject Biography|living=' +
-						( data.lifeStatus !== 'unknown' ? ( data.lifeStatus === 'living' ? 'yes' : 'no' ) : '' ) +
-						'|class=' + data.newAssessment + '|listas=' + data.subjectName + '}}' );
-				}
+					// Add biography banner if specified
+					if ( data.isBiography ) {
+						// Ensure we don't have duplicate biography tags
+						AFCH.removeFromArray( data.newWikiProjects, 'WikiProject Biography' );
 
-				if ( data.newAssessment === 'disambig' &&
-					$.inArray( 'WikiProject Disambiguation', data.newWikiProjects ) === -1 ) {
-					data.newWikiProjects.push( 'WikiProject Disambiguation' );
-				}
+						talkTextPrefix += ( '\n{{WikiProject Biography|living=' +
+							( data.lifeStatus !== 'unknown' ? ( data.lifeStatus === 'living' ? 'yes' : 'no' ) : '' ) +
+							'|class=' + data.newAssessment + '|listas=' + data.subjectName + '}}' );
+					}
 
-				// Add WikiProjects
-				$.each( data.newWikiProjects, function ( i, project ) {
-					talkText += '\n{{' + project + '|class=' + data.newAssessment + '}}';
-				} );
+					if ( data.newAssessment === 'disambig' &&
+						$.inArray( 'WikiProject Disambiguation', data.newWikiProjects ) === -1 ) {
+						data.newWikiProjects.push( 'WikiProject Disambiguation' );
+					}
 
-				talkPage.edit( {
+					// Add and remove WikiProjects
+					var wikiProjectsToAdd = data.newWikiProjects.filter( function ( newTemplateName ) {
+						return !data.existingWikiProjects.some( function ( existingTplObj ) {
+							return existingTplObj.templateName === newTemplateName;
+						} );
+					} );
+					var wikiProjectsToRemove = data.existingWikiProjects.filter( function ( existingTplObj ) {
+						return !data.newWikiProjects.some( function ( newTemplateName ) {
+							return existingTplObj.templateName === newTemplateName;
+						} );
+					} ).map( function ( templateObj ) {
+						return templateObj.realTemplateName || templateObj.templateName;
+					} );
+					if ( data.alreadyHasWPBio && !data.isBiography ) {
+						wikiProjectsToRemove.push( data.existingWPBioTemplateName || 'wikiproject biography' );
+					}
+
+					$.each( wikiProjectsToAdd, function ( _index, templateName ) {
+						talkTextPrefix += '\n{{' + templateName + '|class=' + data.newAssessment + '}}';
+					} );
+					$.each( wikiProjectsToRemove, function ( _index, templateName ) {
+						// Regex from https://stackoverflow.com/a/5306111/1757964
+						var sanitizedTemplateName = templateName.replace( /[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&' );
+						talkText = talkText.replace( new RegExp( '\\n?\\{\\{\\s*' + sanitizedTemplateName + '\\s*.+?\\}\\}', 'is' ), '' );
+					} );
+
 					// We prepend the text so that talk page content is not removed
 					// (e.g. pages in `Draft:` namespace with discussion)
-					mode: 'prependtext',
-					contents: talkText + '\n\n',
-					summary: 'Placing [[Wikipedia:Articles for creation|Articles for creation]] banners'
+					talkText = talkTextPrefix + '\n\n' + talkText;
+
+					var summary = 'Placing [[Wikipedia:Articles for creation|Articles for creation]] banners';
+					if ( wikiProjectsToAdd.length > 0 ) {
+						summary += ', adding ' + wikiProjectsToAdd.length +
+							' WikiProject banner' + ( ( wikiProjectsToAdd.length === 1 ) ? '' : 's' );
+					}
+					if ( wikiProjectsToRemove.length > 0 ) {
+						summary += ', removing ' + wikiProjectsToRemove.length +
+							' WikiProject banner' + ( ( wikiProjectsToRemove.length === 1 ) ? '' : 's' );
+					}
+
+					talkPage.edit( {
+						contents: talkText,
+						summary: summary
+					} );
 				} );
 
 				// NOTIFY SUBMITTER
@@ -2035,7 +2173,6 @@
 	}
 
 	function handleDecline( data ) {
-		console.log( data );
 		var declineCounts,
 			isDecline = data.declineRejectWrapper === 'decline', // true=decline, false=reject
 			text = data.afchText,

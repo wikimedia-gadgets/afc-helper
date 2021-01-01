@@ -69,7 +69,7 @@ print('Building afch-rewrite using `{}`...'.format(command))
 try:
 	process = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
 	output = process.communicate()[0]
-	if b'Done.' not in output:
+	if b'Done' not in output:
 		print('The following error occurred during the build, so the upload was aborted:')
 		print(output)
 		sys.exit(1)

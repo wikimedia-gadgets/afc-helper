@@ -90,7 +90,7 @@
 			<label for="newWikiProjects" class="afch-label">Add WikiProjects</label>
 			<select id="newWikiProjects" class="afch-input" multiple>
 				{{#wikiProjects}}
-				<option value="{{templateName}}">{{displayName}}</option>
+				<option value="{{templateName}}" {{#alreadyOnPage}} selected {{/alreadyOnPage}}>{{displayName}}</option>
 				{{/wikiProjects}}
 			</select>
 		</div>

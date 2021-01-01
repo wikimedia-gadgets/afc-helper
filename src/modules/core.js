@@ -565,6 +565,7 @@
 
 			/**
 			 * Modifies a page's content
+			 * TODO the property name "contents" is quite silly, because people used to the MediaWiki API are gonna write "text"
 			 * @param {string} pagename The page to be modified, namespace included
 			 * @param {object} options Object with properties:
 			 *                          contents: {string} the text to add to/replace the page,
