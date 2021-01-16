@@ -11,9 +11,9 @@ The script can be installed on the English Wikipedia by following the instructio
 
 ### Contributing
 
-*Looking for detailed instructions about how to contribute to the afch-rewrite source code? Check out the [Getting Started](https://github.com/WPAFC/afch-rewrite/wiki/Getting-started) article on the wiki!*
+*Looking for detailed instructions about how to contribute to afch-rewrite? Check out the [Contributing](https://en.wikipedia.org/wiki/Wikipedia:WikiProject_Articles_for_creation/Helper_script/Contributing) page on Wikipedia!*
 
-Your contributions are welcome! Please add feature requests and bug reports to [WT:AFCH](https://en.wikipedia.org/wiki/WT:AFCH) on enwiki to keep discussions centralized.
+Your contributions are welcome! Please add feature requests and bug reports to [WT:AFCH](https://en.wikipedia.org/wiki/WT:AFCH) on enwiki to keep discussions centralized; GitHub also works.
 
 If you'd like to contribute directly to the code, that's great too! In order to maintain great code quality, please submit significant changes using pull requests so that a consistent code style can be maintained throughout the project.
 
