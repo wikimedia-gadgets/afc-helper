@@ -1816,7 +1816,7 @@
 						},
 
 						lang: function ( pos ) {
-							updateTextfield( 'Language of the submission if known', 'German', pos );
+							updateTextfield( 'Language of the submission if known', 'German', '', pos );
 						},
 
 						exists: function ( pos ) {
