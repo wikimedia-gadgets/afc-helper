@@ -519,8 +519,8 @@
 				'EDIT BELOW THIS LINE',
 				'Metadata: see \\[\\[Wikipedia:Persondata\\]\\].',
 				'See http://en.wikipedia.org/wiki/Wikipedia:Footnotes on how to create references using\\<ref\\>\\<\\/ref\\> tags, these references will then appear here automatically',
-				'After listing your sources please cite them using inline citations and place them after the information they cite. ' +
-					'Please see (https?://en.wikipedia.org/wiki/Wikipedia:REFB|\\[\\[Wikipedia:REFB\\]\\]) for instructions on how to add citations.'
+				'(After listing your sources please cite them using inline citations and place them after the information they cite.|Inline citations added to your article will automatically display here.) ' +
+					'(Please see|See) ((https?://)?en.wikipedia.org/wiki/(Wikipedia|WP):REFB|\\[\\[Wikipedia:REFB\\]\\]) for instructions on how to add citations.'
 			] );
 		} else {
 			// If not yet accepted, comment out cats
