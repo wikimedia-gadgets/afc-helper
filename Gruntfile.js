@@ -65,7 +65,7 @@ module.exports = function ( grunt ) {
 
 		exec: {
 			jest: {
-				cmd: 'sh -c "./node_modules/.bin/jest"'
+				cmd: './"node_modules/.bin/jest"'
 			}
 		}
 	} );
