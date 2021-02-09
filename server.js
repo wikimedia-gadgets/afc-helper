@@ -15,6 +15,11 @@ console.log(`Serving AFCH at https://localhost:${port} (Ctrl+C to stop). To inst
 
 https.createServer(options, function (req, res) {
 	const reqUrl = new URL(req.url, `http://${req.headers.host}`);
+	if((!reqUrl.searchParams.has("ctype")) || (!reqUrl.searchParams.has("title"))) {
+		res.writeHead(400);
+		res.end("Parameters 'ctype' and/or 'title' not present.");
+		return;
+	}
 	res.writeHead(200, {
 		"Content-Type": reqUrl.searchParams.get("ctype"),
 		"Access-Control-Allow-Origin": "*",
