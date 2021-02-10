@@ -79,7 +79,7 @@
 				summaryAd: ' ([[WP:AFCH|AFCH]] ' + AFCH.consts.version + ')',
 				// Require users to be on whitelist to use the script
 				// Testwiki users don't need to be on it
-				whitelistRequired: mw.config.get( "wgDBname" ) !== "testwiki",
+				whitelistRequired: mw.config.get( 'wgDBname' ) !== 'testwiki',
 				// Name of the whitelist page for reviewers
 				whitelistTitle: 'Wikipedia:WikiProject Articles for creation/Participants'
 			}, AFCH.consts );
