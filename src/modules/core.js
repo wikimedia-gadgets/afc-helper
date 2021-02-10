@@ -78,7 +78,8 @@
 				// Edit summary ad
 				summaryAd: ' ([[WP:AFCH|AFCH]] ' + AFCH.consts.version + ')',
 				// Require users to be on whitelist to use the script
-				whitelistRequired: true,
+				// Testwiki users don't need to be on it
+				whitelistRequired: mw.config.get( "wgDBname" ) !== "testwiki",
 				// Name of the whitelist page for reviewers
 				whitelistTitle: 'Wikipedia:WikiProject Articles for creation/Participants'
 			}, AFCH.consts );
@@ -1243,7 +1244,7 @@
 			};
 
 			this.loadFromSrc = function ( src ) {
-				var viewRegex = /<!--\s(.*?)\s-->\n([\s\S]*?)<!--\s\/(.*?)\s-->/g,
+				var viewRegex = /<!--\s(.*?)\s-->\r?\n([\s\S]*?)<!--\s\/(.*?)\s-->/g,
 					match = viewRegex.exec( src );
 
 				while ( match !== null ) {
