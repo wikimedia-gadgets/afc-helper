@@ -4,3 +4,12 @@ build
 */#*.*#
 *.swp
 package-lock.json
+localhost.crt
+localhost.ext
+localhost.csr
+localhost.key
+myCA.key
+myCA.pem
+myCA.srl
+
+
