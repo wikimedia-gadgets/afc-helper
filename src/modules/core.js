@@ -1244,7 +1244,7 @@
 			};
 
 			this.loadFromSrc = function ( src ) {
-				var viewRegex = /<!--\s(.*?)\s-->\n([\s\S]*?)<!--\s\/(.*?)\s-->/g,
+				var viewRegex = /<!--\s(.*?)\s-->\r?\n([\s\S]*?)<!--\s\/(.*?)\s-->/g,
 					match = viewRegex.exec( src );
 
 				while ( match !== null ) {
