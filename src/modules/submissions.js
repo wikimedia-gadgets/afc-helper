@@ -499,6 +499,8 @@
 			];
 
 		if ( isAccept ) {
+			// Remove Draft article templates
+			text = text.replace( /\{\{Draft(?: article(?:\|(?:subject=)?foo)?|\|(?:subject=)?foo)?\}\}/gi, '' );
 			// Uncomment cats and templates
 			text = text.replace( /\[\[:Category:/gi, '[[Category:' );
 			text = text.replace( /\{\{(tl|tlx|tlg)\|(.*?)\}\}/ig, '{{$2}}' );
