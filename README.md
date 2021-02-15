@@ -17,8 +17,6 @@ Your contributions are welcome! Please add feature requests and bug reports to [
 
 If you'd like to contribute directly to the code, that's great too! In order to maintain great code quality, please submit significant changes using pull requests so that a consistent code style can be maintained throughout the project.
 
-To serve the script locally for development, use `npm start` (after first running `npm install`) and follow the instructions. The [Contributing](https://en.wikipedia.org/wiki/Wikipedia:WikiProject_Articles_for_creation/Helper_script/Contributing) page has more details if you get stuck.
-
 **Protip for developers**: Set `AFCH.consts.mockItUp = true;` using your browser console and instead of making API requests which modify wiki content, the script will log what it *would have done* instead.
 
 ### Testing

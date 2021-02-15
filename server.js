@@ -1,48 +1,17 @@
 // Serves the script from localhost for development purposes.
 
-(async function() {
-
 const https = require('https');
 const fs = require('fs');
 
 const argv = require('minimist')(process.argv);
 
-const readline = require('readline');
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout
-});
-
-// https://stackoverflow.com/a/46700053
-function readLine(message) {
-  return new Promise((resolve, reject) => {
-    rl.question(message, (answer) => {
-      resolve(answer);
-    });
-  });
-}
-
-// find the certs
-const DEFAULT_CERT_FILE = 'certificates/localhost.crt';
-if (!argv.cert && !fs.existsSync(DEFAULT_CERT_FILE)) {
-	console.log('1');
-	const answer = (await readLine(`Certificate file not found at ${DEFAULT_CERT_FILE}. Generate one [Y/n]? (if unsure, choose yes)`)).toLowerCase() || 'y';
-	if (answer === 'yes' || answer === 'y' || answer === 'true') {
-		console.log('You will be asked for a passphrase. You will not have to use it after this script is done. It must be 4 or more characters long. You will have to enter it 3 more times after this.');
-		require('child_process').execSync('npm run generate-certificates', { "encoding": "utf-8" });
-	}
-}
-
-const keyFile = argv.key || 'certificates/localhost.key';
-const certFile = argv.cert || 'certificates/localhost.crt';
-
 const options = {
-	key: fs.readFileSync(keyFile),
-	cert: fs.readFileSync(certFile)
+	key: fs.readFileSync(argv.key || 'key.pem'),
+	cert: fs.readFileSync(argv.cert || 'cert.pem')
 };
 
 const port = process.env.PORT || argv.port || 4444;
-console.log(`Serving AFCH at https://localhost:${port} (Ctrl+C to stop). To install: open Wikipedia (English, Test, or whatever), navigate to "Special:MyPage/common.js", edit/create it, and add this on a new line (if it's not there yet):\n\n  mw.loader.load('https://localhost:${port}?ctype=text/javascript&title=afch-dev.js', 'text/javascript');`);
+console.log(`Serving AFCH at https://localhost:${port} (Ctrl+C to stop). To install: open Wikipedia (English, Test, or whatever), navigate to "Special:MyPage/common.js", edit/create it, and add this on a new line (if it's not there yet):\n\n  mw.loader.load('https://localhost:${port}?ctype=text/javascript&title=afch-dev.js', 'text/javascript' );`);
 
 https.createServer(options, function (req, res) {
 	const reqUrl = new URL(req.url, `http://${req.headers.host}`);
@@ -84,5 +53,3 @@ https.createServer(options, function (req, res) {
 	);
 	res.end(content);
 }).listen(port);
-
-})();
