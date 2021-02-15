@@ -4,8 +4,6 @@ const child_process = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
-const prompt = require('prompt-sync')({'sigint': false});
-
 const is_windows = process.platform === 'win32';
 const possible_winpty = is_windows ? 'winpty ' : '';
 
@@ -22,18 +20,21 @@ if (!fs.existsSync(CERTS_PATH)){
 // Generate private key
 console.log('You will be asked for a passphrase. You will not have to use it after this script is done. It must be 4 or more characters long. You will have to enter it 3 more times after this.');
 const ca_key = path.join(CERTS_PATH, 'myCA.key');
-child_process.execSync(`${possible_winpty}openssl genrsa -des3 -out ${ca_key} 2048`);
+console.log(child_process.spawnSync(`${possible_winpty}openssl genrsa -des3 -out ${ca_key} 2048`, { "encoding": "utf-8", "stdio": "pipe" }));
 
 // Generate root certificate
 const ca_cert = path.join(CERTS_PATH, 'myCA.pem');
-child_process.execSync(`${possible_winpty}openssl req -x509 -new -nodes -key ${ca_key} -sha256 -days 825 -out ${ca_cert}`, {
+child_process.spawnSync(`${possible_winpty}openssl req -x509 -new -nodes -key ${ca_key} -sha256 -days 825 -out ${ca_cert}`, {
 	"encoding": "utf-8",
+	"stdio": "inherit",
 
 	// Meaning of input: default answers to country name, state/province,
 	// locality, org name, org unit name; common name is localhost; default
 	// answer to email address
 	"input": "\n\n\n\n\nlocalhost\n\n"
 });
+
+process.exit(1);
 
 // Create CA-signed Certs
 
@@ -51,7 +52,7 @@ child_process.execSync(`openssl req -new -key ${cert_key} -out ${cert_sign_req}`
 	// Meaning of input: same as "meaning as input" above, with additional
 	// default answers to challenge password and company name.
 	"input": "\n\n\n\n\nlocalhost\n\n\n\n"
-})
+});
 
 // Create a config file for the extensions
 const cert_ext = path.join(CERTS_PATH, DOMAIN + '.ext');
@@ -64,7 +65,7 @@ DNS.1 = ${DOMAIN}`);
 
 // Create the signed certificate
 const cert = path.join(CERTS_PATH, DOMAIN + '.crt');
-child_process.execSync(`openssl x509 -req -in ${cert_sign_req} -CA ${ca_cert} -CAkey ${ca_key} -CAcreateserial -out ${cert} -days 825 -sha256 -extfile ${cert_ext}`);
+child_process.execSync(`openssl x509 -req -in ${cert_sign_req} -CA ${ca_cert} -CAkey ${ca_key} -CAcreateserial -out ${cert} -days 825 -sha256 -extfile ${cert_ext}`, { encoding: "utf-8" });
 
 console.log(`
 

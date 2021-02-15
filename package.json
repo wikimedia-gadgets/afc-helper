@@ -19,6 +19,7 @@
     "hogan.js": "^3.0.2"
   },
   "devDependencies": {
+    "deasync": "^0.1.21",
     "eslint": "^4.15.0",
     "eslint-config-wikimedia": "^0.5.0",
     "grunt": "^1.0.1",
@@ -32,7 +33,6 @@
     "grunt-exec": "^3.0.0",
     "jest-cli": "^12.1.1",
     "jquery": "^3.2.1",
-    "minimist": "^1.2.5",
-    "prompt-sync": "^4.2.0"
+    "minimist": "^1.2.5"
   }
 }
