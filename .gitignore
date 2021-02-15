@@ -4,3 +4,4 @@ build
 */#*.*#
 *.swp
 package-lock.json
+certificates/
