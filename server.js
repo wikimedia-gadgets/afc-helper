@@ -5,10 +5,26 @@ const fs = require('fs');
 
 const argv = require('minimist')(process.argv);
 
+// find the certs
+const DEFAULT_CERT_FILE = 'certificates/localhost.crt';
+if (!argv.cert && !fs.existsSync(DEFAULT_CERT_FILE)) {
+	console.error(`Error! Certificate file not found at ${DEFAULT_CERT_FILE}. You probably should run "npm run generate-certificates" (no quotes).`);
+	process.exit(0);
+}
+
+const keyFile = argv.key || 'certificates/localhost.key';
+const certFile = argv.cert || 'certificates/localhost.crt';
+
 const options = {
 	key: fs.readFileSync(argv.key || 'key.pem'),
 	cert: fs.readFileSync(argv.cert || 'cert.pem')
 };
+
+// check that the main file exists
+if (!fs.existsSync("build/afch.js")) {
+	console.error("Error! Could not find the file build/afch.js. You probably should run \"grunt build\" (no quotes).");
+	process.exit(0);
+}
 
 const port = process.env.PORT || argv.port || 4444;
 console.log(`Serving AFCH at https://localhost:${port} (Ctrl+C to stop). To install: open Wikipedia (English, Test, or whatever), navigate to "Special:MyPage/common.js", edit/create it, and add this on a new line (if it's not there yet):\n\n  mw.loader.load('https://localhost:${port}?ctype=text/javascript&title=afch-dev.js', 'text/javascript' );`);
