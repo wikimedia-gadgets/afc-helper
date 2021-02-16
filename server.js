@@ -16,8 +16,8 @@ const keyFile = argv.key || 'certificates/localhost.key';
 const certFile = argv.cert || 'certificates/localhost.crt';
 
 const options = {
-	key: fs.readFileSync(argv.key || 'key.pem'),
-	cert: fs.readFileSync(argv.cert || 'cert.pem')
+	key: fs.readFileSync(keyFile),
+	cert: fs.readFileSync(certFile)
 };
 
 // check that the main file exists
