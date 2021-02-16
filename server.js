@@ -27,7 +27,11 @@ if (!fs.existsSync("build/afch.js")) {
 }
 
 const port = process.env.PORT || argv.port || 4444;
-console.log(`Serving AFCH at https://localhost:${port} (Ctrl+C to stop). To install: open Wikipedia (English, Test, or whatever), navigate to "Special:MyPage/common.js", edit/create it, and add this on a new line (if it's not there yet):\n\n  mw.loader.load('https://localhost:${port}?ctype=text/javascript&title=afch-dev.js', 'text/javascript' );`);
+console.log(`Serving AFCH at https://localhost:${port} (Ctrl+C to stop). To install: open Wikipedia (English, Test, or whatever), navigate to "Special:MyPage/common.js", edit/create it, and add this on a new line (if it's not there yet):
+
+  mw.loader.load('https://localhost:${port}?ctype=text/javascript&title=afch-dev.js', 'text/javascript' );
+
+Reminder: you MUST run "grunt build" (no quotes) after you change the code to update the script.`);
 
 https.createServer(options, function (req, res) {
 	const reqUrl = new URL(req.url, `http://${req.headers.host}`);
