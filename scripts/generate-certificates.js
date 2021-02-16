@@ -18,23 +18,17 @@ if (!fs.existsSync(CERTS_PATH)){
 // Become a Certificate Authority
 
 // Generate private key
-console.log('You will be asked for a passphrase. You will not have to use it after this script is done. It must be 4 or more characters long. You will have to enter it 3 more times after this.');
+console.log('You will be asked for a passphrase. You will not have to use it after this script is done. It must be 4 or more characters long. You will have to enter it four times in total.');
 const ca_key = path.join(CERTS_PATH, 'myCA.key');
-console.log(child_process.spawnSync(`${possible_winpty}openssl genrsa -des3 -out ${ca_key} 2048`, { "encoding": "utf-8", "stdio": "pipe" }));
+child_process.execSync(`${possible_winpty}openssl genrsa -des3 -out ${ca_key} 2048`, { 'encoding': 'utf-8', 'stdio': 'inherit' });
 
 // Generate root certificate
 const ca_cert = path.join(CERTS_PATH, 'myCA.pem');
-child_process.spawnSync(`${possible_winpty}openssl req -x509 -new -nodes -key ${ca_key} -sha256 -days 825 -out ${ca_cert}`, {
+const subj = "//C=GB/C=GB/ST=Some-State/L=Test/O=Test/CN=localhost";
+child_process.execSync(`${possible_winpty}openssl req -x509 -new -nodes -key ${ca_key} -sha256 -days 825 -out ${ca_cert} -subj '${subj}'`, {
 	"encoding": "utf-8",
-	"stdio": "inherit",
-
-	// Meaning of input: default answers to country name, state/province,
-	// locality, org name, org unit name; common name is localhost; default
-	// answer to email address
-	"input": "\n\n\n\n\nlocalhost\n\n"
+	"stdio": "inherit"
 });
-
-process.exit(1);
 
 // Create CA-signed Certs
 
@@ -42,16 +36,13 @@ const DOMAIN = 'localhost';
 
 // Generate a private key
 const cert_key = path.join(CERTS_PATH, DOMAIN + '.key');
-child_process.execSync(`openssl genrsa -out ${cert_key} 2048`);
+child_process.execSync(`openssl genrsa -out ${cert_key} 2048`, { "encoding": "utf-8" });
 
 // Create a certificate-signing request
 const cert_sign_req = path.join(CERTS_PATH, DOMAIN + '.csr');
-child_process.execSync(`openssl req -new -key ${cert_key} -out ${cert_sign_req}`, {
+child_process.execSync(`${possible_winpty}openssl req -new -key ${cert_key} -out ${cert_sign_req} -subj '${subj}'`, {
 	"encoding": "utf-8",
-
-	// Meaning of input: same as "meaning as input" above, with additional
-	// default answers to challenge password and company name.
-	"input": "\n\n\n\n\nlocalhost\n\n\n\n"
+	'stdio': 'inherit'
 });
 
 // Create a config file for the extensions
@@ -65,7 +56,7 @@ DNS.1 = ${DOMAIN}`);
 
 // Create the signed certificate
 const cert = path.join(CERTS_PATH, DOMAIN + '.crt');
-child_process.execSync(`openssl x509 -req -in ${cert_sign_req} -CA ${ca_cert} -CAkey ${ca_key} -CAcreateserial -out ${cert} -days 825 -sha256 -extfile ${cert_ext}`, { encoding: "utf-8" });
+child_process.execSync(`${possible_winpty}openssl x509 -req -in ${cert_sign_req} -CA ${ca_cert} -CAkey ${ca_key} -CAcreateserial -out ${cert} -days 825 -sha256 -extfile ${cert_ext}`, { encoding: "utf-8", stdio: 'inherit' });
 
 console.log(`
 
