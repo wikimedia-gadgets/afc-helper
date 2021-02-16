@@ -12,7 +12,8 @@
     "url": "https://github.com/WPAFC/afch-rewrite/npm.git"
   },
   "scripts": {
-    "test": "grunt test"
+    "test": "grunt test",
+    "generate-certificates": "node scripts/generate-certificates.js"
   },
   "dependencies": {
     "hogan.js": "^3.0.2"
