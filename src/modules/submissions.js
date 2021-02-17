@@ -500,8 +500,7 @@
 
 		if ( isAccept ) {
 			// Remove Draft categories
-			text = text.replace( /\{\{Draft categories\|/gi, '' );
-			text = text.replace( /\n\}\}/gi, '' );
+			text = text.replace( /\{\{Draft categories\||\n\}\}/gi, '' );
 			// Remove Draft article templates
 			text = text.replace( /\{\{Draft(?!\|\s*text\s*=)(?: article(?!\|\s*text\s*=)(?:\|(?:subject=)?[^\|]+)?|\|(?:subject=)?[^\|]+)?\}\}/gi, '' );
 			// Uncomment cats and templates
