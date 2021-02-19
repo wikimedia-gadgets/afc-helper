@@ -27,7 +27,7 @@ if (!fs.existsSync("build/afch.js")) {
 }
 
 const port = process.env.PORT || argv.port || 4444;
-console.log(`Serving AFCH at https://localhost:${port} (Ctrl+C to stop). To install: open Wikipedia (English, Test, or whatever), navigate to "Special:MyPage/common.js", edit/create it, and add this on a new line (if it's not there yet):
+console.log(`Serving AFCH at https://localhost:${port} (Ctrl+C to stop). To install: https://test.wikipedia.org/w/index.php?title=Special:MyPage/common.js&action=edit (logging in if you get an error) and add this on a new line if it's not there yet:
 
   mw.loader.load('https://localhost:${port}?ctype=text/javascript&title=afch-dev.js', 'text/javascript' );
 
