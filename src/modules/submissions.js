@@ -499,10 +499,15 @@
 			];
 
 		if ( isAccept ) {
-			// Remove Draft categories
-			text = text.replace( /\{\{Draft categories\|\n*((?:\n*\[\[Category:\w+\]\]\n*)+)\n*\}\}/gi, '$1' );
-			// Remove Draft article templates
+			// Remove {{Draft categories}}
+			text = text.replace( /\{\{Draft categories\s*\|((?:\n*\[\[Category:[ \S]+\]\]\n*)*)\n*\}\}/gi, '$1' );
+
+			// Remove {{Draft article}} (and {{Draft}}).
+			// Not removed if the |text= parameter is present, which could contain
+			// arbitrary wikitext and therefore makes the end of the template harder
+			// to detect
 			text = text.replace( /\{\{Draft(?!\|\s*text\s*=)(?: article(?!\|\s*text\s*=)(?:\|(?:subject=)?[^\|]+)?|\|(?:subject=)?[^\|]+)?\}\}/gi, '' );
+
 			// Uncomment cats and templates
 			text = text.replace( /\[\[:Category:/gi, '[[Category:' );
 			text = text.replace( /\{\{(tl|tlx|tlg)\|(.*?)\}\}/ig, '{{$2}}' );
