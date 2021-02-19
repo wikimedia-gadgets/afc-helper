@@ -500,7 +500,7 @@
 
 		if ( isAccept ) {
 			// Remove {{Draft categories}}
-			text = text.replace( /\{\{Draft categories\s*\|((?:\n*\[\[:?Category:[ \S]+\]\]\n*)*)\n*\}\}/gi, '$1' );
+			text = text.replace( /\{\{Draft categories\s*\|((?:\s*\[\[:?Category:[ \S]+?\]\]\s*)*)\s*\}\}/gi, '$1' );
 
 			// Remove {{Draft article}} (and {{Draft}}).
 			// Not removed if the |text= parameter is present, which could contain
@@ -635,9 +635,13 @@
 	};
 
 	AFCH.Text.prototype.updateCategories = function ( categories ) {
+		// There's no "g" flag in categoryRegex, because we use it
+		// to delete its matches in a loop. If it were global, then
+		// it would internally keep track of lsatIndex - then given
+		// two adjacent categories, only the first would get deleted
 		var catIndex, match,
 			text = this.text,
-			categoryRegex = /\[\[:?Category:.*?\s*\]\]/gi,
+			categoryRegex = /\[\[:?Category:.*?\s*\]\]/i,
 			newCategoryCode = '\n';
 
 		// Create the wikicode block
