@@ -2131,7 +2131,7 @@
 					// (e.g. pages in `Draft:` namespace with discussion)
 					talkText = talkTextPrefix + '\n\n' + talkText;
 
-					var summary = 'Placing [[Wikipedia:Articles for creation|Articles for creation]] banners';
+					var summary = 'Placing [[Wikipedia:Articles for creation|Articles for creation]] banner';
 					if ( wikiProjectsToAdd.length > 0 ) {
 						summary += ', adding ' + wikiProjectsToAdd.length +
 							' WikiProject banner' + ( ( wikiProjectsToAdd.length === 1 ) ? '' : 's' );
