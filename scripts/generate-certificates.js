@@ -60,7 +60,7 @@ child_process.execSync(`${possible_winpty}openssl x509 -req -in ${cert_sign_req}
 
 console.log(`
 
-Root CA certificate written to ${cert}. Please install it as a trusted root certificate in your browser.
+Root CA certificate written to ${cert}. Please install the CA certificate, ${ca_cert}, as a trusted root certificate in your browser.
 * For Chrome, you can try menu > Preferences > Privacy and security (tab on left) > Security > scroll > Manage certificates > Trusted Root Certification Authorities > Import..., and then select the file at ${ca_cert}, then confirm.
 * For Firefox, you can try menu > Preferences > Privacy & Security > scroll all the way down > Security > Certificates > View Certificates... > Authorities (rightmost tab) > Import... , and then select the file at ${ca_cert}, then confirm.
 * You may have to search the Internet for the instructions for your browser version.
