@@ -500,8 +500,7 @@
 
 		if ( isAccept ) {
 			// Remove Draft categories
-			text = text.replace( /\{\{Draft categories\|/gi, '' );
-			text = text.replace( /\n\}\}/gi, '' );
+			text = text.replace( /\{\{Draft categories\|\n*((?:\n*\[\[Category:\w+\]\]\n*)+)\n*\}\}/gi, '$1' );
 			// Remove Draft article templates
 			text = text.replace( /\{\{Draft(?!\|\s*text\s*=)(?: article(?!\|\s*text\s*=)(?:\|(?:subject=)?[^\|]+)?|\|(?:subject=)?[^\|]+)?\}\}/gi, '' );
 			// Uncomment cats and templates
@@ -529,9 +528,14 @@
 			] );
 		} else {
 			// If not yet accepted, comment out cats
-			text = text.replace( /\[\[Category:/gi, '[[:Category:' );
+			text = text.replace( /\[\[Category:(.*?\s*)\]\]/gi, function call( _, category ) {
+				var res = getDraftArticlesSubcats( category );
+				// if ( !res.includes( category ) ) {
+				if ( !res ) {
+					return '[[:Category:';
+				}
+			} );
 		}
-
 		// Assemble a master regexp and remove all now-unneeded comments (commentsToRemove)
 		commentRegex = new RegExp( '<!-{2,}\\s*(' + commentsToRemove.join( '|' ) + ')\\s*-{2,}>', 'gi' );
 		text = text.replace( commentRegex, '' );
@@ -638,12 +642,19 @@
 
 		// Create the wikicode block
 		$.each( categories, function ( _, category ) {
-			var trimmed = $.trim( category );
-			if ( trimmed ) {
-				newCategoryCode += '\n[[Category:' + trimmed + ']]';
+			console.log( category );
+			var res = getDraftArticlesSubcats( category );
+			// if ( res.includes( category ) ) {
+			if ( res ) {
+				return;
+			} else {
+				var trimmed = $.trim( category );
+				if ( trimmed ) {
+					newCategoryCode += '\n[[Category:' + trimmed + ']]';
+				}
 			}
 		} );
-
+		console.log( newCategoryCode );
 		match = categoryRegex.exec( text );
 
 		// If there are no categories currently on the page,
@@ -697,7 +708,16 @@
 			$afch.remove();
 		}
 	} );
-
+	// var temp = [];
+	function getDraftArticlesSubcats( category ) {
+		if ( /Drafts about.*\s*/.test( category ) ) {
+			// if ( !temp.contains( category ) ) {
+			// 	temp.push( category );
+			// }
+			return true;
+		}
+		return false;
+	}
 	function createAFCHInstance() {
 		/**
 		 * global; wraps ALL afch-y things
