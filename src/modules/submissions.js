@@ -499,10 +499,21 @@
 			];
 
 		if ( isAccept ) {
+<<<<<<< HEAD
 			// Remove Draft categories
 			text = text.replace( /\{\{Draft categories\|\n*((?:\n*\[\[Category:\w+\]\]\n*)+)\n*\}\}/gi, '$1' );
 			// Remove Draft article templates
+=======
+			// Remove {{Draft categories}}
+			text = text.replace( /\{\{Draft categories\s*\|((?:\s*\[\[:?Category:[ \S]+?\]\]\s*)*)\s*\}\}/gi, '$1' );
+
+			// Remove {{Draft article}} (and {{Draft}}).
+			// Not removed if the |text= parameter is present, which could contain
+			// arbitrary wikitext and therefore makes the end of the template harder
+			// to detect
+>>>>>>> upstream/master
 			text = text.replace( /\{\{Draft(?!\|\s*text\s*=)(?: article(?!\|\s*text\s*=)(?:\|(?:subject=)?[^\|]+)?|\|(?:subject=)?[^\|]+)?\}\}/gi, '' );
+
 			// Uncomment cats and templates
 			text = text.replace( /\[\[:Category:/gi, '[[Category:' );
 			text = text.replace( /\{\{(tl|tlx|tlg)\|(.*?)\}\}/ig, '{{$2}}' );
@@ -635,9 +646,13 @@
 	};
 
 	AFCH.Text.prototype.updateCategories = function ( categories ) {
+		// There's no "g" flag in categoryRegex, because we use it
+		// to delete its matches in a loop. If it were global, then
+		// it would internally keep track of lsatIndex - then given
+		// two adjacent categories, only the first would get deleted
 		var catIndex, match,
 			text = this.text,
-			categoryRegex = /\[\[:?Category:.*?\s*\]\]/gi,
+			categoryRegex = /\[\[:?Category:.*?\s*\]\]/i,
 			newCategoryCode = '\n';
 
 		// Create the wikicode block
@@ -2143,7 +2158,7 @@
 					// (e.g. pages in `Draft:` namespace with discussion)
 					talkText = talkTextPrefix + '\n\n' + talkText;
 
-					var summary = 'Placing [[Wikipedia:Articles for creation|Articles for creation]] banners';
+					var summary = 'Placing [[Wikipedia:Articles for creation|Articles for creation]] banner';
 					if ( wikiProjectsToAdd.length > 0 ) {
 						summary += ', adding ' + wikiProjectsToAdd.length +
 							' WikiProject banner' + ( ( wikiProjectsToAdd.length === 1 ) ? '' : 's' );
