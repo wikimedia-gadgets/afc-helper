@@ -37,7 +37,7 @@ https.createServer(options, function (req, res) {
 	const reqUrl = new URL(req.url, `http://${req.headers.host}`);
 	if((!reqUrl.searchParams.has("ctype")) || (!reqUrl.searchParams.has("title"))) {
 		res.writeHead(400);
-		res.end("Parameters 'ctype' and/or 'title' not present.");
+		res.end("Parameters 'ctype' and/or 'title' not present. If you navigated to this page using your browser, the server is working correctly! Try visiting a draft page (see <a href='https://en.wikipedia.org/wiki/Wikipedia:WikiProject_Articles_for_creation/Helper_script/Contributing/Developer_setup'>the instructions</a>).");
 		return;
 	}
 	res.writeHead(200, {
