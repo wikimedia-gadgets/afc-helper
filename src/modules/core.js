@@ -598,6 +598,10 @@
 					summary: options.summary + AFCH.consts.summaryAd
 				};
 
+				if ( pagename.indexOf( 'Draft:' ) === 0 ) {
+					request.nocreate = 'true';
+				}
+
 				// Depending on mode, set appendtext=text or prependtext=text,
 				// which overrides the default text option
 				if ( options.mode ) {
