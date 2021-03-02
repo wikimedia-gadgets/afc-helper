@@ -132,11 +132,15 @@ except AttributeError:
 # Prepend this to every page
 header = '/* Uploaded from https://github.com/WPAFC/afch-rewrite, commit: {} ({}) */\n'.format(sha1, branch)
 
+isMainGadget = (wiki == 'en') and (root == 'MediaWiki:Gadget-afch')
+
 def uploadFile(pagename, content):
 
 	# Add header and update static referencres to root directory
 	content = header + content
 	content = content.replace('MediaWiki:Gadget-afch',root)
+	if isMainGadget:
+		content = content.replace('AFCH.consts.beta = true;', 'AFCH.consts.beta = false;')
 
 	setPageText(pagename, content, 'Updating AFCH: {} @ {}'.format(branch, sha1[:6]))
 

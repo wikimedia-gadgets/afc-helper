@@ -64,22 +64,32 @@
 
 			// Add more constants -- don't overwrite those already set, though
 			AFCH.consts = $.extend( {}, {
+				version: '0.9.1',
+				versionName: 'Imperial Ibex',
+
 				// If true, the script will NOT modify actual wiki content and
 				// will instead mock all such API requests (success assumed)
 				mockItUp: false,
+
 				// Full page name, "Wikipedia talk:Articles for creation/sandbox"
 				pagename: mw.config.get( 'wgPageName' ).replace( /_/g, ' ' ),
+
 				// Link to the current page, "/wiki/Wikipedia talk:Articles for creation/sandbox"
 				pagelink: mw.util.getUrl(),
+
 				// Used when status is disabled
 				nullstatus: { update: function () { return; } },
+
 				// Current user
 				user: mw.user.getName(),
+
 				// Edit summary ad
 				summaryAd: ' ([[WP:AFCH|AFCH]] ' + AFCH.consts.version + ')',
+
 				// Require users to be on whitelist to use the script
 				// Testwiki users don't need to be on it
 				whitelistRequired: mw.config.get( 'wgDBname' ) !== 'testwiki',
+
 				// Name of the whitelist page for reviewers
 				whitelistTitle: 'Wikipedia:WikiProject Articles for creation/Participants'
 			}, AFCH.consts );
@@ -178,20 +188,6 @@
 			if ( AFCH.consts.beta ) {
 				// Load minified css
 				mw.loader.load( AFCH.consts.scriptpath + '?action=raw&ctype=text/css&title=MediaWiki:Gadget-afch.css', 'text/css' );
-				// Load dependencies
-				mw.loader.load( [
-					// jquery resources
-					'jquery.chosen',
-					'jquery.spinner',
-					'jquery.ui.dialog',
-
-					// mediawiki.api
-					'mediawiki.api',
-					'mediawiki.api.titleblacklist',
-
-					// mediawiki plugins
-					'mediawiki.feedback'
-				] );
 			}
 
 			// And finally load the subscript

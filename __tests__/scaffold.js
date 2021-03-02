@@ -20,6 +20,10 @@ mw.user = {
 	getName: jest.genMockFunction()
 };
 
+mw.loader = {
+	using: function () { return { then: function ( callback ) { callback(); } }; }
+};
+
 var basePageHtml = fs.readFileSync( './__tests__/test-frame.html' ).toString();
 
 requireScript = function ( name ) {
@@ -30,6 +34,10 @@ setPageTitle = function ( title ) {
 	mw.config.get.mockImplementation( function ( requested ) {
 		if ( requested === 'wgPageName' ) {
 			return title;
+		} else if ( requested === 'wgNamespaceNumber' ) {
+			if ( title.indexOf( 'Draft:' ) === 0 ) {
+				return 118;
+			}
 		}
 	} );
 };
