@@ -132,7 +132,7 @@ except AttributeError:
 # Prepend this to every page
 header = '/* Uploaded from https://github.com/WPAFC/afch-rewrite, commit: {} ({}) */\n'.format(sha1, branch)
 
-isMainGadget = (wiki == 'en') and (root == 'MediaWiki:Gadget-afch')
+isMainGadget = (wiki == 'en') and (root == 'MediaWiki:Gadget-afchelper')
 
 def uploadFile(pagename, content):
 
