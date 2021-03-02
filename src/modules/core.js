@@ -184,13 +184,26 @@
 				return false;
 			}
 
+			var promise = $.when();
+
 			if ( AFCH.consts.beta ) {
 				// Load minified css
 				mw.loader.load( AFCH.consts.scriptpath + '?action=raw&ctype=text/css&title=MediaWiki:Gadget-afch.css', 'text/css' );
+				promise = mw.loader.using( [
+					'jquery.chosen',
+					'jquery.spinner',
+					'jquery.ui',
+
+					'mediawiki.api',
+					'mediawiki.util',
+					'mediawiki.user'
+				] );
 			}
 
 			// And finally load the subscript
-			$.getScript( AFCH.consts.baseurl + '/' + type + '.js' );
+			promise.then( function () {
+				$.getScript( AFCH.consts.baseurl + '/' + type + '.js' );
+			} );
 
 			return true;
 		},

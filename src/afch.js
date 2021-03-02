@@ -22,38 +22,27 @@
 			return;
 	}
 
-	mw.loader.using( [
-		'jquery.chosen',
-		'jquery.spinner',
-		'jquery.ui',
+	// Initialize the AFCH object
+	window.AFCH = {};
 
-		'mediawiki.api',
-		'mediawiki.util',
-		'mediawiki.user'
-	] ).then( function () {
+	// Set up constants
+	AFCH.consts = {};
 
-		// Initialize the AFCH object
-		window.AFCH = {};
+	AFCH.consts.scriptpath = mw.config.get( 'wgServer' ) + mw.config.get( 'wgScript' );
 
-		// Set up constants
-		AFCH.consts = {};
+	// These next two statements (setting beta and baseurl) may be modified
+	// by the uploading script! If you change them, check that the uploading
+	// script at scripts/upload.py doesn't break.
+	AFCH.consts.beta = true;
+	AFCH.consts.baseurl = AFCH.consts.scriptpath +
+		'?action=raw&ctype=text/javascript&title=MediaWiki:Gadget-afch.js';
 
-		AFCH.consts.scriptpath = mw.config.get( 'wgServer' ) + mw.config.get( 'wgScript' );
-
-		// These next two statements (setting beta and baseurl) may be modified
-		// by the uploading script! If you change them, check that the uploading
-		// script at scripts/upload.py doesn't break.
-		AFCH.consts.beta = true;
-		AFCH.consts.baseurl = AFCH.consts.scriptpath +
-			'?action=raw&ctype=text/javascript&title=MediaWiki:Gadget-afch.js';
-
-		$.getScript( AFCH.consts.baseurl + '/core.js' ).done( function () {
-			var loaded = AFCH.load( 'submissions' ); // perhaps eventually there will be more modules besides just 'submissions'
-			if ( !loaded ) {
-				mw.notify( 'AFCH could not be loaded: ' + ( AFCH.error || 'unknown error' ),
-					{ title: 'AFCH error' } );
-			}
-		} );
+	$.getScript( AFCH.consts.baseurl + '/core.js' ).done( function () {
+		var loaded = AFCH.load( 'submissions' ); // perhaps eventually there will be more modules besides just 'submissions'
+		if ( !loaded ) {
+			mw.notify( 'AFCH could not be loaded: ' + ( AFCH.error || 'unknown error' ),
+				{ title: 'AFCH error' } );
+		}
 	} );
 }() );
 //</nowiki>
