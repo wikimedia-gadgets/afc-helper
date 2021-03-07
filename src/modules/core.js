@@ -68,7 +68,7 @@
 
 				// If true, the script will NOT modify actual wiki content and
 				// will instead mock all such API requests (success assumed)
-				mockItUp: false,
+				mockItUp: AFCH.consts.mockItUp || false,
 
 				// Full page name, "Wikipedia talk:Articles for creation/sandbox"
 				pagename: mw.config.get( 'wgPageName' ).replace( /_/g, ' ' ),
