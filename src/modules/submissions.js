@@ -487,9 +487,9 @@
 		return new mw.Api().get( { action: 'query', list: 'categorymembers', cmtitle: 'Category:' + cat, cmtype: 'subcat' } ).then( function ( data ) {
 			return $.when.apply( $, data.query.categorymembers.map( function ( e ) {
 				var txt = e.title.replace( /Category:(.*?\s*)/gi, '$1' );
-				return getDraftArticleSubcatsInner( txt ); // changed it to return apiCall here
+				return getDraftArticleSubcatsInner( txt );
 			} ) ).then( function () {
-				var result = [ cat ]; // starting with cat here, not an empty array
+				var result = [ cat ];
 				Array.prototype.slice.call( arguments ).forEach( function ( e ) {
 					e.forEach( function ( ele ) {
 						if ( !result.includes( ele ) ) {
@@ -559,6 +559,7 @@
 				}
 			} );
 		}
+
 		// Assemble a master regexp and remove all now-unneeded comments (commentsToRemove)
 		commentRegex = new RegExp( '<!-{2,}\\s*(' + commentsToRemove.join( '|' ) + ')\\s*-{2,}>', 'gi' );
 		text = text.replace( commentRegex, '' );
@@ -666,6 +667,7 @@
 			text = this.text,
 			categoryRegex = /\[\[:?Category:.*?\s*\]\]/i,
 			newCategoryCode = '\n';
+
 		// Create the wikicode block
 		$.each( categories, function ( _, category ) {
 			if ( draftArticleSubcats.includes( category ) ) {
@@ -677,7 +679,9 @@
 				}
 			}
 		} );
+
 		match = categoryRegex.exec( text );
+
 		// If there are no categories currently on the page,
 		// just add the categories at the bottom
 		if ( !match ) {
@@ -690,8 +694,10 @@
 				text = text.replace( match[ 0 ], '' );
 				match = categoryRegex.exec( text );
 			}
+
 			text = text.substring( 0, catIndex ) + newCategoryCode + text.substring( catIndex );
 		}
+
 		this.text = text;
 		return this.text;
 	};
@@ -727,6 +733,7 @@
 			$afch.remove();
 		}
 	} );
+
 	function getDraftArticleSubcats( cat ) {
 		var articleSubcats = [],
 			// This is so a new version of AFCH will invalidate the articleSubcats cache
@@ -2072,15 +2079,12 @@
 
 	function handleAccept( data ) {
 		var newText = data.afchText;
+
 		$.when( AFCH.actions.movePage( afchPage.rawTitle, data.newTitle,
 			'Publishing accepted [[Wikipedia:Articles for creation|Articles for creation]] submission',
 			{ movetalk: true } ), // Also move associated talk page if exists (e.g. `Draft_talk:`)
 		getDraftArticleSubcats( 'Draft articles' )
 		).done( function ( moveData, draftArticleSubcats ) {
-			// draftArticleSubcats.forEach( function ( e ) {
-			// 	console.log( e );
-			// } );
-			// console.log( draftArticleSubcats[ 0 ] );
 			var $patrolLink,
 				newPage = new AFCH.Page( moveData.to ),
 				talkPage = newPage.getTalkPage(),
