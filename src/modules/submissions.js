@@ -483,12 +483,11 @@
 		return this.text;
 	};
 
-	function apiCall( cat ) {
+	function getDraftArticleSubcatsInner( cat ) {
 		return new mw.Api().get( { action: 'query', list: 'categorymembers', cmtitle: 'Category:' + cat, cmtype: 'subcat' } ).then( function ( data ) {
 			return $.when.apply( $, data.query.categorymembers.map( function ( e ) {
 				var txt = e.title.replace( /Category:(.*?\s*)/gi, '$1' );
-				// console.log( txt );
-				return apiCall( txt ); // changed it to return apiCall here
+				return getDraftArticleSubcatsInner( txt ); // changed it to return apiCall here
 			} ) ).then( function () {
 				var result = [ cat ]; // starting with cat here, not an empty array
 				Array.prototype.slice.call( arguments ).forEach( function ( e ) {
@@ -552,10 +551,11 @@
 			] );
 		} else {
 			// If not yet accepted, comment out cats
-			text = text.replace( /\[\[Category:(.*?\s*)\]\]/gi, function call( _, category ) {
-				var res = getDraftArticlesSubcats( category, draftArticleSubcats );
-				if ( !res ) {
-					return '[[:Category:';
+			text = text.replace( /\[\[:?Category:(.*?\s*)\]\]/gi, function call( match, category ) {
+				if ( draftArticleSubcats.includes( category ) ) {
+					return '[[Category:' + category + ']]';
+				} else {
+					return '[[:Category:' + category + ']]';
 				}
 			} );
 		}
@@ -667,11 +667,8 @@
 			categoryRegex = /\[\[:?Category:.*?\s*\]\]/i,
 			newCategoryCode = '\n';
 		// Create the wikicode block
-		// console.log( draftArticleSubcats[ 0 ] );
-		// console.log( categories );
 		$.each( categories, function ( _, category ) {
-			var res = getDraftArticlesSubcats( category, draftArticleSubcats );
-			if ( res ) {
+			if ( draftArticleSubcats.includes( category ) ) {
 				return;
 			} else {
 				var trimmed = $.trim( category );
@@ -679,10 +676,7 @@
 					newCategoryCode += '\n[[Category:' + trimmed + ']]';
 				}
 			}
-			// console.log( newCategoryCode );
 		} );
-		// } );
-		// console.log( newCategoryCode );
 		match = categoryRegex.exec( text );
 		// If there are no categories currently on the page,
 		// just add the categories at the bottom
@@ -698,9 +692,7 @@
 			}
 			text = text.substring( 0, catIndex ) + newCategoryCode + text.substring( catIndex );
 		}
-		// getDraftArticlesSubcats();
 		this.text = text;
-		console.log( this.text );
 		return this.text;
 	};
 
@@ -735,14 +727,29 @@
 			$afch.remove();
 		}
 	} );
-	function getDraftArticlesSubcats( category, draftArticleSubcats ) {
-		draftArticleSubcats = JSON.stringify( draftArticleSubcats );
-		// console.log( JSON.stringify( category ), draftArticleSubcats[ 2 ] );
-		// console.log( draftArticleSubcats.includes( Successful requests for permissions‎ ) );
-		if ( draftArticleSubcats.includes( JSON.stringify( category ) ) ) {
-			return true;
+	function getDraftArticleSubcats( cat ) {
+		var articleSubcats = [],
+			// This is so a new version of AFCH will invalidate the articleSubcats cache
+			lsKey = 'afch-' + AFCH.consts.version + 'draft-article-subcats';
+		if ( window.localStorage && window.localStorage[ lsKey ] ) {
+			articleSubcats = JSON.parse( window.localStorage[ lsKey ] );
+			return articleSubcats;
+		} else {
+			return getDraftArticleSubcatsInner( cat ).then( function ( articleSubcats ) { // there has to be a return here so that the function will return something
+				// If possible, cache the articleSubcats data!
+				if ( window.localStorage ) {
+					try {
+						window.localStorage.removeItem( lsKey );
+						window.localStorage[ lsKey ] = JSON.stringify( articleSubcats );
+					} catch ( e ) {
+						AFCH.log( 'Unable to cache articleSubcats list: ' + e.message );
+					}
+				}
+				return articleSubcats;
+			} ).fail( function ( jqxhr, textStatus, errorThrown ) {
+				console.error( 'Could not parse articleSubcats list: ', textStatus, errorThrown );
+			} );
 		}
-		return false;
 	}
 	function createAFCHInstance() {
 		/**
@@ -2068,7 +2075,7 @@
 		$.when( AFCH.actions.movePage( afchPage.rawTitle, data.newTitle,
 			'Publishing accepted [[Wikipedia:Articles for creation|Articles for creation]] submission',
 			{ movetalk: true } ), // Also move associated talk page if exists (e.g. `Draft_talk:`)
-		apiCall( 'Wikipedia' )
+		getDraftArticleSubcats( 'Draft articles' )
 		).done( function ( moveData, draftArticleSubcats ) {
 			// draftArticleSubcats.forEach( function ( e ) {
 			// 	console.log( e );
@@ -2493,14 +2500,14 @@
 
 	function handleCleanup() {
 		prepareForProcessing( 'Cleaning' );
-		$.when( afchPage.getText( false ), apiCall( 'Wikimedia' ) ).done( function ( rawText, temp1 ) {
+		$.when( afchPage.getText( false ), getDraftArticleSubcats( 'Draft articles' ) ).done( function ( rawText, draftArticleSubcats ) {
 			var text = new AFCH.Text( rawText );
 
 			// Even though we didn't modify them, still update the templates,
 			// because the order may have changed/been corrected
 			text.updateAfcTemplates( afchSubmission.makeWikicode() );
 
-			text.cleanUp( temp1 );
+			text.cleanUp( draftArticleSubcats );
 
 			afchPage.edit( {
 				contents: text.get(),
