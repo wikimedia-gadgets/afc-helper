@@ -536,8 +536,6 @@
 			text = text.replace( /\[\[Category:/gi, '[[:Category:' );
 		}
 
-		console.log( text );
-
 		//Section header removed
 		text = text.replace( /\n+==.+?==(\[\[:?Category:.+?\]\]|\s+)*$/, '' );
 
