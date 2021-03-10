@@ -27,7 +27,6 @@
 
 	// Set up constants
 	AFCH.consts = {};
-	AFCH.consts.mockItUp = true;
 
 	AFCH.consts.scriptpath = mw.config.get( 'wgServer' ) + mw.config.get( 'wgScript' );
 
