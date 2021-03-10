@@ -501,6 +501,31 @@
 			} );
 		} );
 	}
+
+	function getDraftArticleSubcats( cat ) {
+		var articleSubcats = [],
+			// This is so a new version of AFCH will invalidate the articleSubcats cache
+			lsKey = 'afch-' + AFCH.consts.version + 'draft-article-subcats';
+		if ( window.localStorage && window.localStorage[ lsKey ] ) {
+			articleSubcats = JSON.parse( window.localStorage[ lsKey ] );
+			return articleSubcats;
+		} else {
+			return getDraftArticleSubcatsInner( cat ).then( function ( articleSubcats ) { // there has to be a return here so that the function will return something
+				// If possible, cache the articleSubcats data!
+				if ( window.localStorage ) {
+					try {
+						window.localStorage[ lsKey ] = JSON.stringify( articleSubcats );
+					} catch ( e ) {
+						AFCH.log( 'Unable to cache articleSubcats list: ' + e.message );
+					}
+				}
+				return articleSubcats;
+			} ).fail( function ( jqxhr, textStatus, errorThrown ) {
+				console.error( 'Could not parse articleSubcats list: ', textStatus, errorThrown );
+			} );
+		}
+	}
+
 	AFCH.Text.prototype.cleanUp = function ( isAccept, draftArticleSubcats ) {
 		var text = this.text,
 			commentRegex,
@@ -734,30 +759,6 @@
 		}
 	} );
 
-	function getDraftArticleSubcats( cat ) {
-		var articleSubcats = [],
-			// This is so a new version of AFCH will invalidate the articleSubcats cache
-			lsKey = 'afch-' + AFCH.consts.version + 'draft-article-subcats';
-		if ( window.localStorage && window.localStorage[ lsKey ] ) {
-			articleSubcats = JSON.parse( window.localStorage[ lsKey ] );
-			return articleSubcats;
-		} else {
-			return getDraftArticleSubcatsInner( cat ).then( function ( articleSubcats ) { // there has to be a return here so that the function will return something
-				// If possible, cache the articleSubcats data!
-				if ( window.localStorage ) {
-					try {
-						window.localStorage.removeItem( lsKey );
-						window.localStorage[ lsKey ] = JSON.stringify( articleSubcats );
-					} catch ( e ) {
-						AFCH.log( 'Unable to cache articleSubcats list: ' + e.message );
-					}
-				}
-				return articleSubcats;
-			} ).fail( function ( jqxhr, textStatus, errorThrown ) {
-				console.error( 'Could not parse articleSubcats list: ', textStatus, errorThrown );
-			} );
-		}
-	}
 	function createAFCHInstance() {
 		/**
 		 * global; wraps ALL afch-y things
