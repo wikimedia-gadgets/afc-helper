@@ -536,6 +536,9 @@
 			text = text.replace( /\[\[Category:/gi, '[[:Category:' );
 		}
 
+		//Section header removed
+		text = text.replace( /\n+==.+?==(\[\[:?Category:.+?\]\]|\s+)*$/, '' );
+
 		// Assemble a master regexp and remove all now-unneeded comments (commentsToRemove)
 		commentRegex = new RegExp( '<!-{2,}\\s*(' + commentsToRemove.join( '|' ) + ')\\s*-{2,}>', 'gi' );
 		text = text.replace( commentRegex, '' );
