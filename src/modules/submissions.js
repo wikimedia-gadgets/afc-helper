@@ -2143,7 +2143,8 @@
 						summary += ', removing ' + wikiProjectsToRemove.length +
 							' WikiProject banner' + ( ( wikiProjectsToRemove.length === 1 ) ? '' : 's' );
 					}
-
+					var draftRemoved = /class=\||class=draft\|/;
+					talkText = talkText.replace( draftRemoved, ' ' );
 					talkPage.edit( {
 						contents: talkText,
 						summary: summary
