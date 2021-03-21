@@ -536,8 +536,9 @@
 			text = text.replace( /\[\[Category:/gi, '[[:Category:' );
 		}
 
-		//Section header removed
-		text = text.replace( /\n+==.+?==(\[\[:?Category:.+?\]\]|\s+)*$/, '' );
+		// Remove empty section at the end (caused by "Resubmit" button on "declined" template)
+		// Section may have categories after it - keep them there
+		text = text.replace( /\n+==.+?==((?:\[\[:?Category:.+?\]\]|\s+)*)$/, '$1' );
 
 		// Assemble a master regexp and remove all now-unneeded comments (commentsToRemove)
 		commentRegex = new RegExp( '<!-{2,}\\s*(' + commentsToRemove.join( '|' ) + ')\\s*-{2,}>', 'gi' );
