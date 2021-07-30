@@ -19,6 +19,7 @@
 		"camelcase": 0,
 		"eqeqeq": 0,
 		"jsdoc/check-param-names": 0,
+		"jsdoc/check-tag-names": 0,
 		"jsdoc/no-undefined-types": 0,
 		"jsdoc/require-param-type": 0,
 		"jsdoc/require-returns": 0,

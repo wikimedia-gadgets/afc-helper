@@ -13,11 +13,11 @@ mediaWiki = mw = {};
 
 // We're always mocking this, what the heck
 mw.config = {
-	get: jest.genMockFunction()
+	get: jest.fn()
 };
 
 mw.user = {
-	getName: jest.genMockFunction()
+	getName: jest.fn()
 };
 
 mw.loader = {

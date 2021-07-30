@@ -34,5 +34,9 @@
     "jest-cli": "^27.0.6",
     "jquery": "^3.6.0",
     "minimist": "^1.2.5"
+  },
+  "jest": {
+    "testEnvironment": "jsdom",
+    "testMatch": [ "**/__tests__/**/test-*.[jt]s?(x)", "**/?(*.)+(spec|test).[jt]s?(x)" ]
   }
 }
