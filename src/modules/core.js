@@ -4,6 +4,7 @@
 
 		/**
 		 * Log anything to the console
+		 *
 		 * @param {anything} thing(s)
 		 */
 		log: function () {
@@ -23,6 +24,7 @@
 
 		/**
 		 * Add a function to run when AFCH.destroy() is run
+		 *
 		 * @param {Function} fn
 		 */
 		addDestroyFunction: function ( fn ) {
@@ -43,6 +45,7 @@
 
 		/**
 		 * Prepares the AFCH gadget by setting constants and checking environment
+		 *
 		 * @return {bool} Whether or not all setup functions executed successfully
 		 */
 		setup: function () {
@@ -122,7 +125,8 @@
 
 				if ( !userAllowed ) {
 
-					// If we can detect that the gadget is currently enabled, offer a one-click "disable" link
+					// If we can detect that the gadget is currently enabled,
+					// offer a one-click "disable" link
 					if ( mw.user.options.get( 'gadget-afchelper' ) === '1' ) {
 						$howToDisable = $( '<span>' )
 							.append( 'If you wish to disable the helper script, ' )
@@ -130,8 +134,8 @@
 								.text( 'click here' )
 								.click( function () {
 									// Submit the API request to disable the gadget.
-									// Note: We don't use `AFCH.api` here, because AFCH has already been
-									// destroyed due to the user not being on the whitelist!
+									// Note: We don't use `AFCH.api` here, because AFCH has already
+									// been destroyed due to the user not being on the whitelist!
 									( new mw.Api() ).postWithToken( 'options', {
 										action: 'options',
 										change: 'gadget-afchelper=0'
@@ -143,7 +147,8 @@
 							)
 							.append( '. ' );
 
-					// Otherwise, AFCH is probably installed via common.js/skin.js -- offer links for easy access.
+					// Otherwise, AFCH is probably installed via common.js/skin.js:
+					// offer links for easy access.
 					} else {
 						$howToDisable = $( '<span>' )
 							.append( 'If you wish to disable the helper script, you will need to manually ' +
@@ -176,6 +181,7 @@
 
 		/**
 		 * Loads the subscript and dependencies
+		 *
 		 * @param {string} type Which type of script to load:
 		 *                      'redirects' or 'ffu' or 'submissions'
 		 */
@@ -210,6 +216,7 @@
 
 		/**
 		 * Appends a feedback link to the given element
+		 *
 		 * @param {string|jQuery} $element The jQuery element or selector to which the link should be appended
 		 * @param {string} type (optional) The part of AFCH that feedback is being given for, e.g. "files for upload"
 		 * @param {string} linkText (optional) Text to display in the link; by default "Give feedback!"
@@ -233,6 +240,8 @@
 
 		/**
 		 * Represents a page, mainly a wrapper for various actions
+		 *
+		 * @param name
 		 */
 		Page: function ( name ) {
 			var pg = this;
@@ -261,9 +270,10 @@
 			/**
 			 * Makes an API request to get a variety of details about the current
 			 * revision of the page, which it then sets.
+			 *
 			 * @param {bool} usecache if true, will resolve immediately if function has
 			 *                        run successfully before
-			 * @return {$.Deferred} resolves when data set successfully
+			 * @return {jQuery.Deferred} resolves when data set successfully
 			 */
 			this._revisionApiRequest = function ( usecache ) {
 				var deferred = $.Deferred();
@@ -295,6 +305,7 @@
 
 			/**
 			 * Gets the page text
+			 *
 			 * @param {bool} usecache use cache if possible
 			 * @return {string}
 			 */
@@ -310,7 +321,8 @@
 
 			/**
 			 * Gets templates on the page
-			 * @return {array} array of objects, each representing a template like
+			 *
+			 * @return {Array} array of objects, each representing a template like
 			 *                       {
 			 *                           target: 'templateName',
 			 *                           params: { 1: 'foo', test: 'go to the {{bar}}' }
@@ -338,6 +350,8 @@
 						 * the templates to use wikicode syntax instead. Rather than messing
 						 * with recursion and all that mess, /g is our friend...which is pefectly
 						 * satisfactory for our purposes.
+						 *
+						 * @param $v
 						 */
 						function parseValue( $v ) {
 							var text = AFCH.jQueryToHtml( $v );
@@ -376,11 +390,12 @@
 
 			/**
 			 * Gets the categories from the page
+			 *
 			 * @param {bool} useApi If true, use the api to get categories, instead of parsing the page. This is
 			 *                      necessary if you need info about transcluded categories.
 			 * @param {bool} includeCategoryLinks If true, will also include links to categories (e.g. [[:Category:Foo]]).
 			 *                                    Note that if useApi is true, includeCategoryLinks must be false.
-			 * @return {array}
+			 * @return {Array}
 			 */
 			this.getCategories = function ( useApi, includeCategoryLinks ) {
 				var deferred = $.Deferred(),
@@ -489,6 +504,8 @@
 
 			/**
 			 * Gets the associated talk page
+			 *
+			 * @param textOnly
 			 * @return {AFCH.Page}
 			 */
 			this.getTalkPage = function ( textOnly ) {
@@ -512,12 +529,13 @@
 		actions: {
 			/**
 			 * Gets the full wikicode content of a page
+			 *
 			 * @param {string} pagename The page to get the contents of, namespace included
-			 * @param {object} options Object with properties:
+			 * @param {Object} options Object with properties:
 			 *                          hide: {bool} set to true to hide the API request in the status log
 			 *                          moreProps: {string} additional properties to request, separated by `|`,
 			 *                          moreParameters: {object} additioanl query parameters
-			 * @return {$.Deferred} Resolves with pagetext and full data available as parameters
+			 * @return {jQuery.Deferred} Resolves with pagetext and full data available as parameters
 			 */
 			getPageText: function ( pagename, options ) {
 				var status, request, rvprop = 'content',
@@ -575,8 +593,9 @@
 			/**
 			 * Modifies a page's content
 			 * TODO the property name "contents" is quite silly, because people used to the MediaWiki API are gonna write "text"
+			 *
 			 * @param {string} pagename The page to be modified, namespace included
-			 * @param {object} options Object with properties:
+			 * @param {Object} options Object with properties:
 			 *                          contents: {string} the text to add to/replace the page,
 			 *                          summary: {string} edit summary, will have the edit summary ad at the end,
 			 *                          createonly: {bool} set to true to only edit the page if it doesn't exist,
@@ -656,9 +675,10 @@
 
 			/**
 			 * Deletes a page
+			 *
 			 * @param  {string} pagename Page to delete
 			 * @param  {string} reason   Reason for deletion; shown in deletion log
-			 * @return {$.Deferred} Resolves with success/failure
+			 * @return {jQuery.Deferred} Resolves with success/failure
 			 */
 			deletePage: function ( pagename, reason ) {
 				// FIXME: implement
@@ -667,12 +687,13 @@
 
 			/**
 			 * Moves a page
+			 *
 			 * @param {string} oldTitle Page to move
 			 * @param {string} newTitle Move target
 			 * @param {string} reason Reason for moving; shown in move log
-			 * @param {object} additionalParameters https://www.mediawiki.org/wiki/API:Move#Parameters
+			 * @param {Object} additionalParameters https://www.mediawiki.org/wiki/API:Move#Parameters
 			 * @param {bool} hide Don't show the move in the status display
-			 * @return {$.Deferred} Resolves with success/failure
+			 * @return {jQuery.Deferred} Resolves with success/failure
 			 */
 			movePage: function ( oldTitle, newTitle, reason, additionalParameters, hide ) {
 				var status, request, deferred = $.Deferred();
@@ -721,12 +742,14 @@
 			/**
 			 * Notifies a user. Follows redirects and appends a message
 			 * to the bottom of the user's talk page.
+			 *
 			 * @param  {string} user
-			 * @param  {object} data object with properties
+			 * @param  {Object} data object with properties
 			 *                   - message: {string}
 			 *                   - summary: {string}
 			 *                   - hide: {bool}, default false
-			 * @return {$.Deferred} Resolves with success/failure
+			 * @param options
+			 * @return {jQuery.Deferred} Resolves with success/failure
 			 */
 			notifyUser: function ( user, options ) {
 				var deferred = $.Deferred(),
@@ -753,11 +776,12 @@
 
 			/**
 			 * Logs a CSD nomination
-			 * @param {object} options
+			 *
+			 * @param {Object} options
 			 *                  - title {string}
 			 *                  - reason {string}
 			 *                  - usersNotified {array} optional
-			 * @return {$.Deferred} resolves false if the page did not exist, otherwise
+			 * @return {jQuery.Deferred} resolves false if the page did not exist, otherwise
 			 *                      resolves/rejects with data from the edit
 			 */
 			logCSD: function ( options ) {
@@ -817,10 +841,11 @@
 
 			/**
 			 * If user is allowed, marks a given recentchanges ID as patrolled
+			 *
 			 * @param {string|number} rcid rcid to mark as patrolled
 			 * @param {string} title Prettier title to display. If not specified, falls back to just
 			 *                       displaying the rcid instead.
-			 * @return {$.Deferred}
+			 * @return {jQuery.Deferred}
 			 */
 			patrolRcid: function ( rcid, title ) {
 				var request, deferred = $.Deferred(),
@@ -867,6 +892,7 @@
 
 			/**
 			 * Creates the status container
+			 *
 			 * @param  {selector} location String/jQuery selector for where the
 			 *                             status container should be prepended
 			 */
@@ -879,14 +905,16 @@
 
 			/**
 			 * Represents an element in the status container
+			 *
 			 * @param  {string} initialText Initial text of the element
-			 * @param {object} substitutions key-value pairs of strings that should be replaced by something
+			 * @param {Object} substitutions key-value pairs of strings that should be replaced by something
 			 *                               else. For example, { '$2': mw.user.getUser() }. If not redefined, $1
 			 *                               will be equal to the current page name.
 			 */
 			Element: function ( initialText, substitutions ) {
 				/**
 				 * Replace the status element with new html content
+				 *
 				 * @param  {jQuery|string} html Content of the element
 				 *                              Can use $1 to represent the page name
 				 */
@@ -940,11 +968,13 @@
 		 * A simple framework for getting/setting interface messages.
 		 * Not every message necessarily needs to go through here. But
 		 * it's nice to separate long messages from the code itself.
+		 *
 		 * @type {Object}
 		 */
 		msg: {
 			/**
 			 * AFCH messages loaded by default for all subscripts.
+			 *
 			 * @type {Object}
 			 */
 			store: {},
@@ -952,8 +982,9 @@
 			/**
 			 * Retrieve the text of a message, or a placeholder if the
 			 * message is not set
+			 *
 			 * @param {string} key Message key
-			 * @param {object} substitutions replacements to make
+			 * @param {Object} substitutions replacements to make
 			 * @return {string} Message value
 			 */
 			get: function ( key, substitutions ) {
@@ -975,7 +1006,8 @@
 
 			/**
 			 * Set a new message or messages
-			 * @param {string|object} key
+			 *
+			 * @param {string | Object} key
 			 * @param {string} value if key is a string, value
 			 */
 			set: function ( key, value ) {
@@ -1022,9 +1054,10 @@
 
 			/**
 			 * Set a value in the data store
+			 *
 			 * @param {string} key
-			 * @param {mixed} value
-			 * @return {$.Deferred} success
+			 * @param {Mixed} value
+			 * @return {jQuery.Deferred} success
 			 */
 			set: function ( key, value ) {
 				var deferred = $.Deferred(),
@@ -1055,9 +1088,10 @@
 
 			/**
 			 * Gets a value from the data store
+			 *
 			 * @param {string} key
-			 * @param {mixed} fallback fallback if option not present
-			 * @return {mixed} value
+			 * @param {Mixed} fallback fallback if option not present
+			 * @return {Mixed} value
 			 */
 			get: function ( key, fallback ) {
 				var value,
@@ -1088,7 +1122,7 @@
 		 *  AFCH.preferences = new AFCH.Preferences();
 		 *  AFCH.preferences.initLink( $( '.put-prefs-link-here' ) );
 		 *
-		 * @type {object}
+		 * @type {Object}
 		 */
 		Preferences: function () {
 			var prefs = this;
@@ -1096,7 +1130,8 @@
 			/**
 			 * Default values for user preferences; details for each preference can be
 			 * found inline in `templates/tpl-preferences.html`.
-			 * @type {object}
+			 *
+			 * @type {Object}
 			 */
 			this.prefDefaults = {
 				autoOpen: false,
@@ -1106,7 +1141,8 @@
 
 			/**
 			 * Current user's preferences
-			 * @type {object}
+			 *
+			 * @type {Object}
 			 */
 			this.prefStore = $.extend( {}, this.prefDefaults, AFCH.userData.get( 'preferences', {} ) );
 
@@ -1302,8 +1338,10 @@
 
 		/**
 		 * Removes a key from a given object and returns the value of the key
+		 *
+		 * @param object
 		 * @param {string} key
-		 * @return {mixed}
+		 * @return {Mixed}
 		 */
 		getAndDelete: function ( object, key ) {
 			var v = object[ key ];
@@ -1313,8 +1351,9 @@
 
 		/**
 		 * Removes all occurences of a value from an array
-		 * @param {array} array
-		 * @param {mixed} value
+		 *
+		 * @param {Array} array
+		 * @param {Mixed} value
 		 */
 		removeFromArray: function ( array, value ) {
 			var index = $.inArray( value, array );
@@ -1334,7 +1373,7 @@
 		 * be used as the key in the data object.
 		 *
 		 * @param {jQuery} $selector elements to get values from
-		 * @return {object} object of values, with the ids as keys
+		 * @return {Object} object of values, with the ids as keys
 		 */
 		getFormValues: function ( $selector ) {
 			var data = {};
@@ -1382,6 +1421,7 @@
 
 		/**
 		 * Creates an <a> element that links to a given page.
+		 *
 		 * @param {string} pagename - The title of the page.
 		 * @param {string} displayTitle - What gets shown by the link.
 		 * @param {boolean} [newTab=true] - Whether to open page in a new tab.
@@ -1403,6 +1443,7 @@
 
 		/**
 		 * Creates an <a> element that links to a random page in the given category.
+		 *
 		 * @param {string} pagename - The name of the category (without the namespace).
 		 * @param {string} displayTitle - What gets shown by the link.
 		 * @return {jQuery} <a> element
@@ -1466,6 +1507,7 @@
 
 		/**
 		 * Returns the relative time that has elapsed between an oldDate and a nowDate
+		 *
 		 * @param {Date|string} old (if it is a string it will be assumed to be a
 		 *                           MediaWiki timestamp and converted to a Date first)
 		 * @param {Date} now optional, defaults to `new Date()`
@@ -1511,6 +1553,7 @@
 
 		/**
 		 * Converts an element into a toggle for another element
+		 *
 		 * @param {string} toggleSelector When clicked, will show/hide elementSelector
 		 * @param {string} elementSelector Element(s) to be shown or hidden
 		 * @param {string} showText e.g. "Show the div"
@@ -1538,6 +1581,7 @@
 
 		/**
 		 * Gets the full raw HTML content of a jQuery object
+		 *
 		 * @param {jQuery} $element
 		 * @return {string}
 		 */
@@ -1552,6 +1596,7 @@
 		 * If there is no match, return false
 		 *
 		 * @param {string} string string to parse
+		 * @param mwstyle
 		 * @return {Date|integer}
 		 */
 		parseForTimestamp: function ( string, mwstyle ) {
@@ -1584,6 +1629,7 @@
 
 		/**
 		 * Parses a MediaWiki internal YYYYMMDDHHMMSS timestamp
+		 *
 		 * @param {string} string
 		 * @return {Date|bool} if unable to parse, returns false
 		 */
@@ -1610,6 +1656,7 @@
 
 		/**
 		 * Converts a Date object to YYYYMMDDHHMMSS format
+		 *
 		 * @param {Date} date
 		 * @return {number}
 		 */
@@ -1641,7 +1688,7 @@
 		 * describing the reason.
 		 *
 		 * @param {string} code an AfC decline reason code
-		 * @return {$.Deferred} Resolves with the requested HTML
+		 * @return {jQuery.Deferred} Resolves with the requested HTML
 		 */
 		getReason: function ( code ) {
 			var deferred = $.Deferred();

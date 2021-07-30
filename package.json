@@ -19,19 +19,20 @@
     "hogan.js": "^3.0.2"
   },
   "devDependencies": {
-    "eslint": "^4.15.0",
-    "eslint-config-wikimedia": "^0.5.0",
-    "grunt": "^1.0.1",
+    "eslint": "^7.31.0",
+    "eslint-config-wikimedia": "^0.20.0",
+    "eslint-plugin-jsdoc": "^36.0.6",
+    "grunt": "^1.4.1",
     "grunt-autoprefixer": "^3.0.4",
-    "grunt-contrib-clean": "^1.1.0",
+    "grunt-contrib-clean": "^2.0.0",
     "grunt-contrib-concat": "^1.0.1",
     "grunt-contrib-copy": "^1.0.0",
-    "grunt-contrib-cssmin": "^2.2.1",
-    "grunt-contrib-less": "^1.4.1",
-    "grunt-eslint": "^20.1.0",
+    "grunt-contrib-cssmin": "^4.0.0",
+    "grunt-contrib-less": "^3.0.0",
+    "grunt-eslint": "^23.0.0",
     "grunt-exec": "^3.0.0",
-    "jest-cli": "^12.1.1",
-    "jquery": "^3.2.1",
+    "jest-cli": "^27.0.6",
+    "jquery": "^3.6.0",
     "minimist": "^1.2.5"
   }
 }
