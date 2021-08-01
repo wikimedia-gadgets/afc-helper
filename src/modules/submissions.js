@@ -59,7 +59,8 @@
 
 	/**
 	 * Parses a submission, writing its current status and data to various properties
-	 * @return {$.Deferred} Resolves with the submission when parsed successfully
+	 *
+	 * @return {jQuery.Deferred} Resolves with the submission when parsed successfully
 	 */
 	AFCH.Submission.prototype.parse = function () {
 		var sub = this,
@@ -76,7 +77,8 @@
 
 	/**
 	 * Internal function
-	 * @param {array} templates list of templates to parse
+	 *
+	 * @param {Array} templates list of templates to parse
 	 */
 	AFCH.Submission.prototype.loadDataFromTemplates = function ( templates ) {
 		// Represent each AfC submission template as an object.
@@ -217,6 +219,7 @@
 
 	/**
 	 * Converts all the data to a hunk of wikicode
+	 *
 	 * @return {string}
 	 */
 	AFCH.Submission.prototype.makeWikicode = function () {
@@ -316,7 +319,8 @@
 
 	/**
 	 * Checks if submission is G13 eligible
-	 * @return {$.Deferred} Resolves to bool if submission is eligible
+	 *
+	 * @return {jQuery.Deferred} Resolves to bool if submission is eligible
 	 */
 	AFCH.Submission.prototype.isG13Eligible = function () {
 		var deferred = $.Deferred();
@@ -350,8 +354,10 @@
 
 	/**
 	 * Sets the submission status
+	 *
 	 * @param {string} newStatus status to set, 'd'|'t'|'r'|''
 	 * @param {params} optional; params to add to the template whose status was set
+	 * @param newParams
 	 * @return {bool} success
 	 */
 	AFCH.Submission.prototype.setStatus = function ( newStatus, newParams ) {
@@ -393,7 +399,8 @@
 
 	/**
 	 * Add a new template to the beginning of this.templates
-	 * @param {object} data object with properties of template
+	 *
+	 * @param {Object} data object with properties of template
 	 *                      - status (default: '')
 	 *                      - timestamp (default: '{{subst:REVISIONTIMESTAMP}}')
 	 *                      - params (default: {})
@@ -413,6 +420,7 @@
 
 	/**
 	 * Add a new comment to the beginning of this.comments
+	 *
 	 * @param {string} text comment text
 	 * @return {bool} success
 	 */
@@ -439,7 +447,7 @@
 	 * Gets the submitter, or, if no specific submitter is available,
 	 * just the page creator
 	 *
-	 * @return {$.Deferred} resolves with user
+	 * @return {jQuery.Deferred} resolves with user
 	 */
 	AFCH.Submission.prototype.getSubmitter = function () {
 		var deferred = $.Deferred(),
@@ -458,6 +466,7 @@
 
 	/**
 	 * Represents text of an AfC submission
+	 *
 	 * @param {[type]} text [description]
 	 */
 	AFCH.Text = function ( text ) {
@@ -631,7 +640,9 @@
 	/**
 	 * Removes old submission templates/comments and then adds new ones
 	 * specified by `new`
+	 *
 	 * @param {string} new
+	 * @param newCode
 	 */
 	AFCH.Text.prototype.updateAfcTemplates = function ( newCode ) {
 		this.removeAfcTemplates();
@@ -868,6 +879,7 @@
 
 	/**
 	 * Loads warnings about the submission
+	 *
 	 * @return {jQuery}
 	 */
 	function getSubmissionWarnings() {
@@ -876,9 +888,10 @@
 
 		/**
 		 * Adds a warning
+		 *
 		 * @param {string} message
 		 * @param {string|bool} actionMessage set to false to hide action link
-		 * @param {function|string} onAction function to call of success, or URL to browse to
+		 * @param {Function | string} onAction function to call of success, or URL to browse to
 		 */
 		function addWarning( message, actionMessage, onAction ) {
 			var $action,
@@ -1076,7 +1089,7 @@
 								.addClass( 'long-comments' )
 								.appendTo( $warningDiv );
 
-							// Show the relevant code snippets
+						// Show the relevant code snippets
 						$.each( longCommentMatches, function ( _, comment ) {
 							$( '<div>' )
 								.addClass( 'code-wrapper' )
@@ -1155,6 +1168,7 @@
 	/**
 	 * Clear the viewer, set up the status log, and
 	 * then update the button text
+	 *
 	 * @param {string} actionTitle optional, if there is no content available and the
 	 *                             script has to load a new view, this will be its title
 	 * @param {string} actionClass optional, if there is no content available and the
@@ -1242,7 +1256,7 @@
 	 * Also sets up the viewer for the "processing" stage.
 	 *
 	 * @param {Function} fn function to call with data
-	 * @param {object} extraData more data to pass; will be inserted
+	 * @param {Object} extraData more data to pass; will be inserted
 	 *                           into the data passed to `fn`
 	 */
 	function addFormSubmitHandler( fn, extraData ) {
@@ -1270,7 +1284,8 @@
 	/**
 	 * Displays a spinner in the main content area and then
 	 * calls the passed function
-	 * @param {function} fn function to call when spinner has been displayed
+	 *
+	 * @param {Function} fn function to call when spinner has been displayed
 	 * @return {[type]} [description]
 	 */
 	function spinnerAndRun( fn ) {
@@ -1300,9 +1315,10 @@
 
 	/**
 	 * Loads a new view
+	 *
 	 * @param {string} name view to be loaded
-	 * @param {object} data data to populate the view with
-	 * @param {function} callback function to call when view is loaded
+	 * @param {Object} data data to populate the view with
+	 * @param {Function} callback function to call when view is loaded
 	 */
 	function loadView( name, data, callback ) {
 		// Show the back button if we're not loading the main view

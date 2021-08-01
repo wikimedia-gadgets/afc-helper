@@ -1,5 +1,8 @@
 {
 	"extends": "wikimedia",
+	"plugins": [
+        "jsdoc"
+    ],
 	"env": {
 		"browser": true,
 		"jquery": true
@@ -15,11 +18,21 @@
 	"rules": {
 		"camelcase": 0,
 		"eqeqeq": 0,
+		"jsdoc/check-param-names": 0,
+		"jsdoc/check-tag-names": 0,
+		"jsdoc/no-undefined-types": 0,
+		"jsdoc/require-param-type": 0,
+		"jsdoc/require-returns": 0,
+		"jsdoc/require-returns-check": 0,
+		"jsdoc/valid-types": 0, 
+		"max-len": 0,
+		"max-statements-per-line": 0,
 		"no-console": 0,
 		"no-global-assign": 0,
 		"no-implicit-globals": 0,
-		"no-native-reassign": 0,
 		"no-new": 0,
+		"no-prototype-builtins": 0,
+		"no-shadow": 0,
 		"no-undef": 0,
 		"no-underscore-dangle": 0,
 		"no-unused-vars": 0,
@@ -28,7 +41,11 @@
 		"no-useless-escape": 0,
 		"one-var": 0,
 		"spaced-comment": 0,
-		"valid-jsdoc": 0,
 		"vars-on-top": 0
+	},
+	"settings": {
+		"jsdoc": {
+			"ignoreInternal": true
+		}
 	}
 }
