@@ -4,14 +4,12 @@
 	switch ( mw.config.get( 'wgNamespaceNumber' ) ) {
 		case 4: // Wikipedia
 		case 5: // Wikipedia talk
-			var i = -1;
 			var pageName = mw.config.get( 'wgTitle' );
-			while ( ++i < 22 ) { // 'Articles for creation/'.length === 22
-				if ( pageName.charCodeAt( i ) !== 'Articles for creation/'.charCodeAt( i ) ) {
-					return;
-				}
-			}
-			if ( pageName === 'Wikipedia:Articles_for_creation/Redirects' ) {
+			// return nothing for now, all drafts are now under Draft namespace
+			// currently only the article submission script is running here.
+			// to be used when script(s) for other modules such as category and
+			// redirect requests are reintergrated into here.
+			if ( pageName !== 'Articles for creation/sandbox' ) {
 				return;
 			}
 			break;
