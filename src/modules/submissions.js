@@ -1487,6 +1487,41 @@
 					placeholder_text_single: 'Click to select'
 				} );
 
+				// If draft is assessed as stub, show stub sorting
+				// interface using User:SD0001/StubSorter.js
+				$afch.find( '#newAssessment' ).change( function () {
+					var isClassStub = $( this ).val() === 'stub';
+					$afch.find( '#stubSorterWrapper' ).toggleClass( 'hidden', !isClassStub );
+					if ( isClassStub ) {
+						if ( mw.config.get( 'wgDBname' ) !== 'enwiki' ) {
+							console.warn( 'no stub sorting script available for this language wiki' );
+							return;
+						}
+
+						if ( $afch.find( '#stubSorterContainer' ).html() === '' ) {
+							mw.hook( 'StubSorter_activate' ).fire( $afch.find( '#stubSorterContainer' ) );
+							var promise = $.when();
+							var wasStubSorterActivated = $afch.find( '#stubSorterContainer' ).html() !== '';
+							if ( !wasStubSorterActivated ) {
+								promise = mw.loader.getScript( 'https://en.wikipedia.org/w/index.php?title=User:SD0001/StubSorter.js&action=raw&ctype=text/javascript' );
+							}
+
+							promise.then( function () {
+								if ( !wasStubSorterActivated ) {
+									mw.hook( 'StubSorter_activate' ).fire( $afch.find( '#stubSorterContainer' ) );
+								}
+
+								$( '#stub_sorter_select_chosen' ).css( 'width', '' );
+								$( '#stub-sorter-select' ).addClass( 'afch-input' );
+
+								if ( /\{\{[^{ ]*[sS]tub(\|.*?)?\}\}\s*/.test( pageText ) ) {
+									$afch.find( '#newAssessment' ).val( 'stub' ).trigger( 'chosen:updated' ).trigger( 'change' );
+								}
+							} );
+						}
+					}
+				} );
+
 				$afch.find( '#newWikiProjects' ).chosen( {
 					placeholder_text_multiple: 'Start typing to filter WikiProjects...',
 					no_results_text: 'Whoops, no WikiProjects matched in database!',
@@ -2080,8 +2115,14 @@
 
 				}
 
+				// Stub sorting
+				newText = newText.get();
+				if ( typeof window.StubSorter_create_edit === 'function' ) {
+					newText = window.StubSorter_create_edit( newText, data[ 'stub-sorter-select' ] ).text;
+				}
+
 				newPage.edit( {
-					contents: newText.get(),
+					contents: newText,
 					summary: 'Cleaning up accepted [[Wikipedia:Articles for creation|Articles for creation]] submission'
 				} );
 
