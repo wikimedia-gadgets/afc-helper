@@ -54,7 +54,14 @@ wiki = sys.argv[1]
 
 if wiki not in ('en', 'test'):
 	print('Error: unrecognized wiki "{}". Must be "en" or "test".'.format(wiki))
-	sys.exit(0)
+	sys.exit(1)
+
+# Base page name on-wiki
+root = sys.argv[2]
+
+if root.endswith('.js'):
+    print('Error: root "{}" ends in .js - likely a mistake.'.format(root))
+    sys.exit(1)
 
 # First, create a build
 command = 'grunt build'
@@ -116,9 +123,6 @@ else:
 			page.save(summary=summary)
 		else:
 			print('Skipping {}, no changes made'.format(title))
-
-# Base page name on-wiki
-root = sys.argv[2]
 
 # Get branch name and the current commit
 repo = git.Repo(os.getcwd())
