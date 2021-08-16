@@ -2118,7 +2118,7 @@
 				// Stub sorting
 				newText = newText.get();
 				if ( typeof window.StubSorter_create_edit === 'function' ) {
-					newText = window.StubSorter_create_edit( newText, data[ 'stub-sorter-select' ] ).text;
+					newText = window.StubSorter_create_edit( newText, data[ 'stub-sorter-select' ] || [] ).text;
 				}
 
 				newPage.edit( {
