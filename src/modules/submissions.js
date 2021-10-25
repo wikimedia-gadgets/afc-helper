@@ -527,6 +527,9 @@
 			// Remove draft topics template
 			text = text.replace( /\{\{draft topics\|(.*?)\}\}\n?/ig, '' );
 
+			// Remove AfC topic template
+			text = text.replace( /\{\{AfC topic\|(.*?)\}\}\n?/ig, '' );
+
 			// Remove drafts moved from mainspace template
 			text = text.replace( /\{\{Drafts moved from mainspace\|(.*?)\}\}\n?/ig, '' );
 
