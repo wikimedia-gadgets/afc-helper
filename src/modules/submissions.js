@@ -2524,6 +2524,7 @@
 
 			afchPage.edit( {
 				contents: text.get(),
+				minor: true,
 				summary: 'Cleaning up submission'
 			} );
 		} );
