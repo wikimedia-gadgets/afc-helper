@@ -1348,7 +1348,7 @@
 				deferred.resolve( wikiProjects );
 			} else {
 				$.ajax( {
-					url: mw.config.get( 'wgServer' ) + '/w/index.php?title=User:Theo%27s_Little_Bot/afchwikiproject.js&action=raw&ctype=text/json',
+					url: mw.config.get( 'wgServer' ) + '/w/index.php?title=Wikipedia:WikiProject_Articles_for_creation/WikiProject_templates.json&action=raw&ctype=text/json',
 					dataType: 'json'
 				} ).done( function ( projectData ) {
 					$.each( projectData, function ( display, template ) {
