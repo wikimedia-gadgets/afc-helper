@@ -628,6 +628,10 @@
 				if ( pagename.indexOf( 'Draft:' ) === 0 ) {
 					request.nocreate = 'true';
 				}
+				
+				if ( options.minor ) {
+					request.minor = 'true';
+				}
 
 				// Depending on mode, set appendtext=text or prependtext=text,
 				// which overrides the default text option
