@@ -628,7 +628,7 @@
 				if ( pagename.indexOf( 'Draft:' ) === 0 ) {
 					request.nocreate = 'true';
 				}
-				
+
 				if ( options.minor ) {
 					request.minor = 'true';
 				}
