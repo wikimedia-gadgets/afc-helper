@@ -1936,7 +1936,7 @@
 				// If a reason has been specified, show the textarea, notify
 				// option, and the submit form button
 				$afch.find( '#declineTextarea' ).add( '#notifyWrapper' ).add( '#afchSubmitForm' )
-					.toggleClass( 'hidden', !reason );
+					.toggleClass( 'hidden', !reason || !reason.length );
 			} ); // End change handler for the decline reason select box
 
 			// And the the handlers for when a specific REJECT reason is selected
@@ -1946,7 +1946,7 @@
 				// If a reason has been specified, show the textarea, notify
 				// option, and the submit form button
 				$afch.find( '#rejectTextarea' ).add( '#notifyWrapper' ).add( '#afchSubmitForm' )
-					.toggleClass( 'hidden', !reason );
+					.toggleClass( 'hidden', !reason || !reason.length );
 			} ); // End change handler for the reject reason select box
 
 			// Attach the preview event listener
