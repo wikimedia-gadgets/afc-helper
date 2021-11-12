@@ -1114,11 +1114,28 @@
 			return deferred;
 		}
 
+		function checkForCopyvio() {
+			return AFCH.api.get( {
+				action: 'pagetriagelist',
+				page_id: mw.config.get( 'wgArticleId' )
+			} ).then( function ( json ) {
+				var triageInfo = json.pagetriagelist.pages[ 0 ];
+				if ( triageInfo && triageInfo.copyvio === mw.config.get( 'wgCurRevisionId' ) ) {
+					addWarning( 'This submission may contain copyright violations', 'CopyPatrol', function () {
+						window.open( 'https://copypatrol.toolforge.org/en?filter=all&searchCriteria=page_exact&searchText=' +
+							encodeURIComponent( afchPage.rawTitle ) + '&drafts=1&revision=' +
+							mw.config.get( 'wgCurRevisionId' ), '_blank' );
+					} );
+				}
+			} );
+		}
+
 		$.when(
 			checkReferences(),
 			checkDeletionLog(),
 			checkReviewState(),
-			checkLongComments()
+			checkLongComments(),
+			checkForCopyvio()
 		).then( function () {
 			deferred.resolve( warnings );
 		} );
