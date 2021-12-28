@@ -1664,16 +1664,6 @@
 				}
 				prefillBiographyDetails();
 
-				// Ask for the month/day IF the birth year has been entered
-				$afch.find( '#birthYear' ).keyup( function () {
-					$afch.find( '#birthMonthDayWrapper' ).toggleClass( 'hidden', !this.value.length );
-				} );
-
-				// Ask for the month/day IF the death year has been entered
-				$afch.find( '#deathYear' ).keyup( function () {
-					$afch.find( '#deathMonthDayWrapper' ).toggleClass( 'hidden', !this.value.length );
-				} );
-
 				// If subject is dead, show options for death details
 				$afch.find( '#lifeStatus' ).change( function () {
 					$afch.find( '#deathWrapper' ).toggleClass( 'hidden', $( this ).val() !== 'dead' );
