@@ -21,7 +21,11 @@
 		this.page = page;
 
 		this.shortTitle = this.page.title.getMainText();
-		if ( [ 2, 5 ].indexOf( this.page.title.getNamespaceId() ) !== -1 ) {
+		if ( [ /* User: */ 2, /* Wikipedia talk: */ 5 ].indexOf( this.page.title.getNamespaceId() ) !== -1 ) {
+			// We need to strip the first path component (part before first slash) from
+			// titles in the User or Wikipedia talk namespaces because those always have
+			// an extra page level - being subpages of the user page or WT:Articles for
+			// creation, respectively:
 			// 'User:Example/Foo' => 'Foo'
 			// 'WT:Articles for creation/Foo' => 'Foo'
 			// 'User:Example/Intel 8231/8232' => 'Intel 8231/8232'
