@@ -20,8 +20,13 @@
 		// The associated page
 		this.page = page;
 
-		// 'WT:Articles for creation/Foo' => 'Foo'
-		this.shortTitle = this.page.title.getMainText().match( /([^\/]+)\/?$/ )[ 1 ];
+		this.shortTitle = this.page.title.getMainText();
+		if ( [ 2, 5 ].indexOf( this.page.title.getNamespaceId() ) !== -1 ) {
+			// 'User:Example/Foo' => 'Foo'
+			// 'WT:Articles for creation/Foo' => 'Foo'
+			// 'User:Example/Intel 8231/8232' => 'Intel 8231/8232'
+			this.shortTitle = this.shortTitle.replace( /.*?\//, '' );
+		}
 
 		this.resetVariables();
 	};
