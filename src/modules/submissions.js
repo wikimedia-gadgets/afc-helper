@@ -425,11 +425,7 @@
 	 * @return {bool} success
 	 */
 	AFCH.Submission.prototype.addNewComment = function ( text ) {
-		var commentText = $.trim( text );
-
-		if ( commentText.indexOf( '~~' + '~~' ) === -1 ) {
-			commentText += ' ~~' + '~~';
-		}
+		var commentText = addSignature( text );
 
 		this.comments.unshift( {
 			// Unicorns are explained in loadDataFromTemplates()
@@ -1985,8 +1981,29 @@
 		addFormSubmitHandler( handleDecline );
 	}
 
+	function addSignature( text ) {
+		text = text.trim();
+		if ( text.indexOf( '~~' + '~~' ) === -1 ) {
+			text += ' ~~' + '~~';
+		}
+		return text;
+	}
+
+	function previewComment() {
+		var commentText = $( '#commentText' ).val();
+		if ( commentText ) {
+			AFCH.api.parse( '{{AfC comment|' + addSignature( commentText ) + '}}', {
+				pst: true,
+				title: mw.config.get( 'wgPageName' )
+			} ).then( function ( html ) {
+				$( '#commentPreview' ).html( html );
+			} );
+		}
+	}
+
 	function showCommentOptions() {
 		loadView( 'comment', {} );
+		$( '#commentText' ).on( 'keyup', mw.util.debounce( 500, previewComment ) );
 		addFormSubmitHandler( handleComment );
 	}
 
