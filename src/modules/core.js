@@ -136,7 +136,7 @@
 									// Submit the API request to disable the gadget.
 									// Note: We don't use `AFCH.api` here, because AFCH has already
 									// been destroyed due to the user not being on the whitelist!
-									( new mw.Api() ).postWithToken( 'options', {
+									( new mw.Api() ).postWithEditToken( {
 										action: 'options',
 										change: 'gadget-afchelper=0'
 									} ).done( function ( data ) {
@@ -645,7 +645,7 @@
 					return deferred;
 				}
 
-				AFCH.api.postWithToken( 'edit', request )
+				AFCH.api.postWithEditToken( request )
 					.done( function ( data ) {
 						var $diffLink;
 
@@ -724,7 +724,7 @@
 					return deferred;
 				}
 
-				AFCH.api.postWithToken( 'edit', request ) // Move token === edit token
+				AFCH.api.postWithEditToken( request ) // Move token === edit token
 					.done( function ( data ) {
 						if ( data && data.move ) {
 							status.update( 'Moved $1 to $2' );
@@ -1079,7 +1079,7 @@
 					window.localStorage[ fullKey ] = fullValue;
 				}
 
-				AFCH.api.postWithToken( 'options', {
+				AFCH.api.postWithEditToken( {
 					action: 'options',
 					optionname: fullKey,
 					optionvalue: fullValue
