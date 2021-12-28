@@ -57,6 +57,11 @@ http.createServer({}, async function (req, res) {
 	if(reqTitle.endsWith("core.js")) {
 		content += readFile(HOGAN_FILE) + ';';
 		content += readFile("src/modules/core.js");
+		// enable mockItUp by default for testing
+		content = content.replace(
+			'mockItUp: AFCH.consts.mockItUp || false,',
+			'mockItUp: AFCH.consts.mockItUp || true,'
+		);
 	} else if(reqTitle.endsWith("submissions.js")) {
 		if(reqTitle.endsWith("tpl-submissions.js")) {
 			content += readFile("src/templates/tpl-submissions.html");
@@ -73,10 +78,6 @@ http.createServer({}, async function (req, res) {
 		content = content.replace(
 			"AFCH.consts.scriptpath = mw.config.get( 'wgServer' ) + mw.config.get( 'wgScript' );",
 			`AFCH.consts.scriptpath = 'http://localhost:${port}';`
-		);
-		content = content.replace(
-			'mockItUp: AFCH.consts.mockItUp || false,',
-			'mockItUp: AFCH.consts.mockItUp || true,'
 		);
 	} else {
 		console.error(`bad filename: ${reqTitle}`);
