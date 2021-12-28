@@ -526,17 +526,17 @@
 			text = text.replace( /\[\[:Category:/gi, '[[Category:' );
 			text = text.replace( /\{\{(tl|tlx|tlg)\|(.*?)\}\}/ig, '{{$2}}' );
 
-			// Strip the AFC G13 postponement template
-			text = text.replace( /\{\{AfC postpone G13(?:\|\d*)?\}\}\n*/gi, '' );
+			var templatesToRemove = [
+				'AfC postpone G13',
+				'Draft topics',
+				'AfC topic',
+				'Drafts moved from mainspace',
+				'Promising draft'
+			];
 
-			// Remove draft topics template
-			text = text.replace( /\{\{draft topics\|(.*?)\}\}\n?/ig, '' );
-
-			// Remove AfC topic template
-			text = text.replace( /\{\{AfC topic\|(.*?)\}\}\n?/ig, '' );
-
-			// Remove drafts moved from mainspace template
-			text = text.replace( /\{\{Drafts moved from mainspace\|(.*?)\}\}\n?/ig, '' );
+			templatesToRemove.forEach( function ( template ) {
+				text = text.replace( new RegExp( '\\{\\{' + template + '\\s*\\|?(.*?)\\}\\}\\n?', 'gi' ), '' );
+			} );
 
 			// Add to the list of comments to remove
 			$.merge( commentsToRemove, [
