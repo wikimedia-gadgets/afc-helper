@@ -9,6 +9,17 @@ module.exports = function ( grunt ) {
 			}
 		},
 
+		concat: {
+			options: {
+				separator: ';'
+			},
+			dependencies: {
+				files: {
+					'build/modules/core.js': [ 'node_modules/hogan.js/build/gh-pages/builds/2.0.0/hogan-2.0.0.js', 'build/modules/core.js' ]
+				}
+			}
+		},
+
 		clean: {
 			build: {
 				src: [ 'build' ]
@@ -61,6 +72,7 @@ module.exports = function ( grunt ) {
 
 	grunt.loadNpmTasks( 'grunt-autoprefixer' );
 	grunt.loadNpmTasks( 'grunt-contrib-clean' );
+	grunt.loadNpmTasks( 'grunt-contrib-concat' );
 	grunt.loadNpmTasks( 'grunt-contrib-copy' );
 	grunt.loadNpmTasks( 'grunt-contrib-cssmin' );
 	grunt.loadNpmTasks( 'grunt-contrib-less' );
@@ -88,7 +100,7 @@ module.exports = function ( grunt ) {
 	grunt.registerTask(
 		'build',
 		'Tests files, moves them to the /build directory, and minifies CSS.',
-		[ 'clean:build', 'test', 'copy', 'styling' ]
+		[ 'clean:build', 'test', 'copy', 'concat:dependencies', 'styling' ]
 	);
 
 	grunt.registerTask( 'default', [ 'build' ] );

@@ -35,10 +35,7 @@
 	AFCH.consts.baseurl = AFCH.consts.scriptpath +
 		'?action=raw&ctype=text/javascript&title=MediaWiki:Gadget-afch.js';
 
-	$.when(
-		$.getScript( AFCH.consts.baseurl + '/core.js' ),
-		$.getScript( 'https://tools-static.wmflabs.org/cdnjs/ajax/libs/hogan.js/3.0.2/hogan.min.js' )
-	).done( function () {
+	$.getScript( AFCH.consts.baseurl + '/core.js' ).done( function () {
 		var loaded = AFCH.load( 'submissions' ); // perhaps eventually there will be more modules besides just 'submissions'
 		if ( !loaded ) {
 			mw.notify( 'AFCH could not be loaded: ' + ( AFCH.error || 'unknown error' ),

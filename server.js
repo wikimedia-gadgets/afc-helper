@@ -4,14 +4,18 @@
 // Serves the script from localhost for development purposes.
 // Note that we serve the un-built JS files from src/ instead of the built JS
 // files from build/. This avoids having to run the build process every time.
+// The build process does almost nothing for JS (as it just concatenates the
+// hogan file).
 
 const child_process = require('child_process');
 const fs = require('fs');
 const http = require('http');
 const process = require('process');
 
-if(!fs.existsSync('./node_modules/jquery')) {
-	console.log('No file found at ./node_modules/jquery - downloading it with "npm install"...');
+const HOGAN_FILE = 'node_modules/hogan.js/build/gh-pages/builds/2.0.0/hogan-2.0.0.js';
+
+if(!fs.existsSync(HOGAN_FILE)) {
+	console.log('No file found at ' + HOGAN_FILE + ' - downloading it with "npm install"...');
 	child_process.execSync('npm install', { stdio: 'inherit' });
 }
 
@@ -51,6 +55,7 @@ http.createServer({}, async function (req, res) {
 	// This is the reverse of what happens to filenames in scripts/upload.py
 	var content = '';
 	if(reqTitle.endsWith("core.js")) {
+		content += readFile(HOGAN_FILE) + ';';
 		content += readFile("src/modules/core.js");
 		// enable mockItUp by default for testing
 		content = content.replace(
