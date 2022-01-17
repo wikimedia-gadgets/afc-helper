@@ -1948,7 +1948,10 @@
 				// If a reason has been specified, show the textarea, notify
 				// option, and the submit form button
 				$afch.find( '#declineTextarea' ).add( '#notifyWrapper' ).add( '#afchSubmitForm' )
-					.toggleClass( 'hidden', !reason || !reason.length );
+					.toggleClass( 'hidden', !reason || !reason.length )
+					.on( 'keyup', mw.util.debounce( 500, function () {
+						previewComment( $( '#declineTextarea' ), $( '#declineInputPreview' ) );
+					} ) );
 			} ); // End change handler for the decline reason select box
 
 			// And the the handlers for when a specific REJECT reason is selected
@@ -1958,7 +1961,10 @@
 				// If a reason has been specified, show the textarea, notify
 				// option, and the submit form button
 				$afch.find( '#rejectTextarea' ).add( '#notifyWrapper' ).add( '#afchSubmitForm' )
-					.toggleClass( 'hidden', !reason || !reason.length );
+					.toggleClass( 'hidden', !reason || !reason.length )
+					.on( 'keyup', mw.util.debounce( 500, function () {
+						previewComment( $( '#rejectTextarea' ), $( '#rejectInputPreview' ) );
+					} ) );
 			} ); // End change handler for the reject reason select box
 
 			// Attach the preview event listener
@@ -2005,23 +2011,25 @@
 		return text;
 	}
 
-	function previewComment() {
-		var commentText = $( '#commentText' ).val();
+	function previewComment( $textarea, $previewArea ) {
+		var commentText = $textarea.val();
 		if ( commentText ) {
 			AFCH.api.parse( '{{AfC comment|1=' + addSignature( commentText ) + '}}', {
 				pst: true,
 				title: mw.config.get( 'wgPageName' )
 			} ).then( function ( html ) {
-				$( '#commentPreview' ).html( html );
+				$previewArea.html( html );
 			} );
 		} else {
-			$( '#commentPreview' ).html( '' );
+			$previewArea.html( '' );
 		}
 	}
 
 	function showCommentOptions() {
 		loadView( 'comment', {} );
-		$( '#commentText' ).on( 'keyup', mw.util.debounce( 500, previewComment ) );
+		$( '#commentText' ).on( 'keyup', mw.util.debounce( 500, function () {
+			previewComment( $( '#commentText' ), $( '#commentPreview' ) );
+		} ) );
 		addFormSubmitHandler( handleComment );
 	}
 
