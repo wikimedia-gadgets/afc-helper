@@ -640,7 +640,7 @@
 				}
 
 				if ( AFCH.consts.mockItUp ) {
-					AFCH.log( request );
+					AFCH.log( 'Edit to "' + pagename + '"', request );
 					deferred.resolve();
 					return deferred;
 				}
