@@ -2014,6 +2014,8 @@
 			} ).then( function ( html ) {
 				$( '#commentPreview' ).html( html );
 			} );
+		} else {
+			$( '#commentPreview' ).html( "" );
 		}
 	}
 
