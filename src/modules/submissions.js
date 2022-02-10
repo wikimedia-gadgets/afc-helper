@@ -1135,12 +1135,27 @@
 			} );
 		}
 
+		function checkForBlocks() {
+			var deferred = $.Deferred();
+			afchPage.getCreator().then( function ( creator ) {
+				checkIfUserIsBlocked( creator ).then( function ( blockData ) {
+					if ( blockData !== null ) {
+						var warning = creator + ' was blocked by ' + blockData.by + ' with an expiry time of ' + blockData.expiry + '. Reason: ' + blockData.reason;
+						addWarning( warning );
+					}
+					deferred.resolve();
+				} );
+			} );
+			return deferred;
+		}
+
 		$.when(
 			checkReferences(),
 			checkDeletionLog(),
 			checkReviewState(),
 			checkLongComments(),
-			checkForCopyvio()
+			checkForCopyvio(),
+			checkForBlocks()
 		).then( function () {
 			deferred.resolve( warnings );
 		} );
@@ -2015,6 +2030,31 @@
 				$( '#commentPreview' ).html( html );
 			} );
 		}
+	}
+
+	function checkIfUserIsBlocked( userName ) {
+		var deferred = $.Deferred();
+		AFCH.api.get( {
+			action: 'query',
+			list: 'blocks',
+			bkusers: userName
+		} ).then( function ( data ) {
+			var blocks = data.query.blocks;
+			var blockData = null;
+			var currentTime = new Date().toJSON();
+
+			for ( var i = 0; i < blocks.length; i++ ) {
+				if ( blocks[ i ].expiry === 'infinity' || blocks[ i ].expiry > currentTime ) {
+					blockData = blocks[ i ];
+				}
+			}
+
+			deferred.resolve( blockData );
+		} ).catch( function ( err ) {
+			console.log( 'abort ' + err );
+			deferred.resolve( null );
+		} );
+		return deferred;
 	}
 
 	function showCommentOptions() {
