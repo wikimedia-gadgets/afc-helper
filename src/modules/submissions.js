@@ -2015,7 +2015,7 @@
 				$( '#commentPreview' ).html( html );
 			} );
 		} else {
-			$( '#commentPreview' ).html( "" );
+			$( '#commentPreview' ).html( '' );
 		}
 	}
 
