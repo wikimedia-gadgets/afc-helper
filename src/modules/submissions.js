@@ -1137,7 +1137,6 @@
 
 		function checkForBlocks() {
 			var deferred = $.Deferred();
-			console.log( afchPage );
 			afchSubmission.getSubmitter().then( function ( creator ) {
 				checkIfUserIsBlocked( creator ).then( function ( blockData ) {
 					if ( blockData !== null ) {
