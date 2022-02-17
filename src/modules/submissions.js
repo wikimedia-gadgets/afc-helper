@@ -1137,7 +1137,8 @@
 
 		function checkForBlocks() {
 			var deferred = $.Deferred();
-			afchPage.getCreator().then( function ( creator ) {
+			console.log( afchPage );
+			afchSubmission.getSubmitter().then( function ( creator ) {
 				checkIfUserIsBlocked( creator ).then( function ( blockData ) {
 					if ( blockData !== null ) {
 						var warning = creator + ' was blocked by ' + blockData.by + ' with an expiry time of ' + blockData.expiry + '. Reason: ' + blockData.reason;
@@ -2033,28 +2034,27 @@
 	}
 
 	function checkIfUserIsBlocked( userName ) {
-		var deferred = $.Deferred();
-		AFCH.api.get( {
+		return AFCH.api.get( {
 			action: 'query',
 			list: 'blocks',
 			bkusers: userName
 		} ).then( function ( data ) {
 			var blocks = data.query.blocks;
 			var blockData = null;
-			var currentTime = new Date().toJSON();
+			var currentTime = new Date().toISOString();
 
 			for ( var i = 0; i < blocks.length; i++ ) {
 				if ( blocks[ i ].expiry === 'infinity' || blocks[ i ].expiry > currentTime ) {
 					blockData = blocks[ i ];
+					break;
 				}
 			}
 
-			deferred.resolve( blockData );
+			return blockData;
 		} ).catch( function ( err ) {
 			console.log( 'abort ' + err );
-			deferred.resolve( null );
+			return null;
 		} );
-		return deferred;
 	}
 
 	function showCommentOptions() {
