@@ -2008,12 +2008,14 @@
 	function previewComment() {
 		var commentText = $( '#commentText' ).val();
 		if ( commentText ) {
-			AFCH.api.parse( '{{AfC comment|' + addSignature( commentText ) + '}}', {
+			AFCH.api.parse( '{{AfC comment|1=' + addSignature( commentText ) + '}}', {
 				pst: true,
 				title: mw.config.get( 'wgPageName' )
 			} ).then( function ( html ) {
 				$( '#commentPreview' ).html( html );
 			} );
+		} else {
+			$( '#commentPreview' ).html( '' );
 		}
 	}
 
