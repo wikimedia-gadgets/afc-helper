@@ -1136,17 +1136,14 @@
 		}
 
 		function checkForBlocks() {
-			var deferred = $.Deferred();
-			afchSubmission.getSubmitter().then( function ( creator ) {
-				checkIfUserIsBlocked( creator ).then( function ( blockData ) {
+			return afchSubmission.getSubmitter().then( function ( creator ) {
+				return checkIfUserIsBlocked( creator ).then( function ( blockData ) {
 					if ( blockData !== null ) {
 						var warning = creator + ' was blocked by ' + blockData.by + ' with an expiry time of ' + blockData.expiry + '. Reason: ' + blockData.reason;
 						addWarning( warning );
 					}
-					deferred.resolve();
 				} );
 			} );
-			return deferred;
 		}
 
 		$.when(
