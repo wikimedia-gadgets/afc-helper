@@ -1139,7 +1139,13 @@
 			return afchSubmission.getSubmitter().then( function ( creator ) {
 				return checkIfUserIsBlocked( creator ).then( function ( blockData ) {
 					if ( blockData !== null ) {
-						var warning = creator + ' was blocked by ' + blockData.by + ' with an expiry time of ' + blockData.expiry + '. Reason: ' + blockData.reason;
+						var date = 'infinity';
+						if ( blockData.expiry !== 'infinity' ) {
+							var data = new Date( blockData.expiry );
+							var monthNames = [ 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December' ];
+							date = data.getDate() + ' ' + monthNames[ data.getMonth() ] + ' ' + data.getFullYear() + ' ' + data.getUTCHours() + ':' + data.getUTCMinutes() + ' UTC';
+						}
+						var warning = 'Submitter ' + creator + ' was blocked by ' + blockData.by + ' with an expiry time of ' + date + '. Reason: ' + blockData.reason;
 						addWarning( warning );
 					}
 				} );
