@@ -1143,7 +1143,7 @@
 						if ( blockData.expiry !== 'infinity' ) {
 							var data = new Date( blockData.expiry );
 							var monthNames = [ 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December' ];
-							date = data.getDate() + ' ' + monthNames[ data.getMonth() ] + ' ' + data.getFullYear() + ' ' + data.getUTCHours() + ':' + data.getUTCMinutes() + ' UTC';
+							date = data.getUTCDate() + ' ' + monthNames[ data.getUTCMonth() ] + ' ' + data.getUTCFullYear() + ' ' + data.getUTCHours() + ':' + data.getUTCMinutes() + ' UTC';
 						}
 						var warning = 'Submitter ' + creator + ' was blocked by ' + blockData.by + ' with an expiry time of ' + date + '. Reason: ' + blockData.reason;
 						addWarning( warning );
