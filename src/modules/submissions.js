@@ -1135,12 +1135,30 @@
 			} );
 		}
 
+		function checkForBlocks() {
+			return afchSubmission.getSubmitter().then( function ( creator ) {
+				return checkIfUserIsBlocked( creator ).then( function ( blockData ) {
+					if ( blockData !== null ) {
+						var date = 'infinity';
+						if ( blockData.expiry !== 'infinity' ) {
+							var data = new Date( blockData.expiry );
+							var monthNames = [ 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December' ];
+							date = data.getUTCDate() + ' ' + monthNames[ data.getUTCMonth() ] + ' ' + data.getUTCFullYear() + ' ' + data.getUTCHours() + ':' + data.getUTCMinutes() + ' UTC';
+						}
+						var warning = 'Submitter ' + creator + ' was blocked by ' + blockData.by + ' with an expiry time of ' + date + '. Reason: ' + blockData.reason;
+						addWarning( warning );
+					}
+				} );
+			} );
+		}
+
 		$.when(
 			checkReferences(),
 			checkDeletionLog(),
 			checkReviewState(),
 			checkLongComments(),
-			checkForCopyvio()
+			checkForCopyvio(),
+			checkForBlocks()
 		).then( function () {
 			deferred.resolve( warnings );
 		} );
@@ -2023,6 +2041,30 @@
 		} else {
 			$previewArea.html( '' );
 		}
+	}
+
+	function checkIfUserIsBlocked( userName ) {
+		return AFCH.api.get( {
+			action: 'query',
+			list: 'blocks',
+			bkusers: userName
+		} ).then( function ( data ) {
+			var blocks = data.query.blocks;
+			var blockData = null;
+			var currentTime = new Date().toISOString();
+
+			for ( var i = 0; i < blocks.length; i++ ) {
+				if ( blocks[ i ].expiry === 'infinity' || blocks[ i ].expiry > currentTime ) {
+					blockData = blocks[ i ];
+					break;
+				}
+			}
+
+			return blockData;
+		} ).catch( function ( err ) {
+			console.log( 'abort ' + err );
+			return null;
+		} );
 	}
 
 	function showCommentOptions() {
