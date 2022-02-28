@@ -429,6 +429,17 @@
 				return deferred;
 			};
 
+			this.getShortDescription = function () {
+				return AFCH.api.get( {
+					action: 'query',
+					prop: 'description',
+					titles: this.rawTitle,
+					formatversion: 2
+				} ).then( function ( json ) {
+					return json.query.pages[ 0 ].description || '';
+				} );
+			};
+
 			this.getLastModifiedDate = function () {
 				var deferred = $.Deferred();
 
