@@ -2556,7 +2556,7 @@
 
 					AFCH.actions.notifyUser( submitter, {
 						message: message,
-						summary: 'Notification: Your [[' + AFCH.consts.pagename + '|Articles for Creation submission]] has been ' + isDecline ? 'declined' : 'rejected'
+						summary: 'Notification: Your [[' + AFCH.consts.pagename + '|Articles for Creation submission]] has been ' + ( isDecline ? 'declined' : 'rejected' )
 					} );
 				} );
 			} );
