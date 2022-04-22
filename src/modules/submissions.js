@@ -678,9 +678,14 @@
 		match = categoryRegex.exec( text );
 
 		// If there are no categories currently on the page,
-		// just add the categories at the bottom
+		// just add the categories at the bottom,
+		// or {{uncategorized}} if there are no new categories
 		if ( !match ) {
+			if ( newCategoryCode == '\n' ) {
+				newCategoryCode += "\n{{Uncategorized|date={{subst:CURRENTMONTHNAME}} {{subst:CURRENTYEAR}}}}";
+			}
 			text += newCategoryCode;
+			
 		// If there are categories on the page, remove them all, and
 		// then add the new categories where the last category used to be
 		} else {
