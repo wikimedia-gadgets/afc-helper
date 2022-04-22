@@ -1707,7 +1707,8 @@
 
 					// Prefill `LastName, FirstName` for Biography if the page title is two words and
 					// therefore probably safe to asssume in a `FirstName LastName` format.
-					titleParts = afchSubmission.shortTitle.split( ' ' );
+					title = afchSubmission.shortTitle.replace(/ \([\s\S]*?\)$/g, '')
+					titleParts = title.split(' ');
 					if ( titleParts.length === 2 ) {
 						$afch.find( '#subjectName' ).val( titleParts[ 1 ] + ', ' + titleParts[ 0 ] );
 					}
