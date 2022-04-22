@@ -1705,7 +1705,8 @@
 				function prefillBiographyDetails() {
 					var titleParts;
 
-					// Prefill `LastName, FirstName` for Biography if the page title is two words and
+					// Prefill `LastName, FirstName` for Biography if the page title is two words
+					// after removing any trailing parantheticals (likely disambiguation), and
 					// therefore probably safe to asssume in a `FirstName LastName` format.
 					title = afchSubmission.shortTitle.replace(/ \([\s\S]*?\)$/g, '')
 					titleParts = title.split(' ');
