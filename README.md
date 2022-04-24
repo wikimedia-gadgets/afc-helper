@@ -17,7 +17,7 @@ If you'd like to contribute directly to the code, that's great too! In order to 
 
 To serve the script locally for development, use `npm start` and follow the instructions. The [Contributing](https://en.wikipedia.org/wiki/Wikipedia:WikiProject_Articles_for_creation/Helper_script/Contributing) page has more details if you get stuck.
 
-**Protip for developers**: if you set `AFCH.consts.mockItUp = true;` using your browser console or in src/afch.js, instead of logging API requests in the console, the script will actually make page edits. (It used to default to making the page edits, but that wasn't very useful.)
+**Protip for developers**: if you set `AFCH.consts.mockItUp = false;` using your browser console or in src/afch.js, instead of logging API requests in the console, the script will actually make page edits. (It used to default to making the page edits, but that wasn't very useful.)
 
 ### Testing
 We have unit tests! `afch-rewrite` uses [Jest](https://github.com/facebook/jest) for testing, a framework built on top of Jasmine that offers dead-simple mocking, built-in simulated DOM manipulation using [jsdom](https://github.com/tmpvar/jsdom), and more.
