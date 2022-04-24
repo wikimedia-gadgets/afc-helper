@@ -6,11 +6,9 @@ afch-rewrite [![Build Status](https://travis-ci.org/WPAFC/afch-rewrite.png)](htt
 A tool for reviewing Articles for Creation submissions on the English Wikipedia, rewritten using clear, object-oriented JavaScript with a focus on killing bloat while adding value.
 
 ### Using
-
 The script can be installed on the English Wikipedia by following the instructions at [WP:AFCH](https://en.wikipedia.org/wiki/WP:AFCH).
 
 ### Contributing
-
 *Looking for detailed instructions about how to contribute to afch-rewrite? Check out the [Contributing](https://en.wikipedia.org/wiki/Wikipedia:WikiProject_Articles_for_creation/Helper_script/Contributing) page on Wikipedia!*
 
 Your contributions are welcome! Please add feature requests and bug reports to [WT:AFCH](https://en.wikipedia.org/wiki/WT:AFCH) on enwiki to keep discussions centralized; GitHub also works.
@@ -19,7 +17,7 @@ If you'd like to contribute directly to the code, that's great too! In order to 
 
 To serve the script locally for development, use `npm start` and follow the instructions. The [Contributing](https://en.wikipedia.org/wiki/Wikipedia:WikiProject_Articles_for_creation/Helper_script/Contributing) page has more details if you get stuck.
 
-**Protip for developers**: Set `AFCH.consts.mockItUp = true;` using your browser console and instead of making API requests which modify wiki content, the script will log what it *would have done* instead.
+**Protip for developers**: if you set `AFCH.consts.mockItUp = true;` using your browser console or in src/afch.js, instead of logging API requests in the console, the script will actually make page edits. (It used to default to making the page edits, but that wasn't very useful.)
 
 ### Testing
 We have unit tests! `afch-rewrite` uses [Jest](https://github.com/facebook/jest) for testing, a framework built on top of Jasmine that offers dead-simple mocking, built-in simulated DOM manipulation using [jsdom](https://github.com/tmpvar/jsdom), and more.
@@ -32,7 +30,6 @@ To upload the script to a wiki, use `scripts/upload.py`. Detailed instructions a
 New versions of the script can be released through `scripts/release.py`, which automatically updates version history, inline version constants, `package.json`, etc.
 
 ### Version history
-
 * 0.9.1 Imperial Ibex (05 December 2018)
 * 0.9 Hatted Hamster (8 November 2014)
 * 0.8 Wandering Walrus (18 May 2014)
