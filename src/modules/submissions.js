@@ -1961,6 +1961,10 @@
 							updateTextfield( 'Title of existing related article, if one exists', 'Charlie and the Chocolate Factory', candidateDupeName, pos );
 						},
 
+						adv: function ( pos ) {
+							$afch.add('#csdWrapper').removeClass('hidden');
+						},
+
 						// Custom decline rationale
 						reason: function () {
 							$afch.find( '#declineTextarea' )
@@ -2454,6 +2458,11 @@
 			}
 		}
 
+		// Excessive advertisment/promotion gets {{db-g11}}'d
+		if ( ( declineReason === 'adv' || declineReason2 === 'adv' ) && data.csdSubmission ) {
+			text.prepend('{{db-g11}}\n');
+		}
+
 		if ( !isDecline ) {
 			newParams.reject = 'yes';
 		}
@@ -2564,12 +2573,21 @@
 
 		// Log CSD if necessary
 		if ( data.csdSubmission ) {
+
+			var csdReason = ''
+			if (declineReason === 'cv') {
+				csdReason = '[[WP:G12]] ({{tl|db-copyvio}})';
+			} else if ( declineReason === 'adv' ) {
+				csdReason = '[[WP:G11]] ({{tl|db-spam}})';
+			} else {
+				csdReason = '{{tl|db-reason}} ([[WP:AFC|Articles for creation]])';
+			}
+
 			// FIXME: Only get submitter if needed...?
 			afchSubmission.getSubmitter().done( function ( submitter ) {
 				AFCH.actions.logCSD( {
 					title: afchPage.rawTitle,
-					reason: declineReason === 'cv' ? '[[WP:G12]] ({{tl|db-copyvio}})' :
-						'{{tl|db-reason}} ([[WP:AFC|Articles for creation]])',
+					reason: csdReason,
 					usersNotified: data.notifyUser ? [ submitter ] : []
 				} );
 			} );
