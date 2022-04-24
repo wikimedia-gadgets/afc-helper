@@ -1905,7 +1905,7 @@
 					candidateDupeName = ( afchSubmission.shortTitle !== 'sandbox' ) ? afchSubmission.shortTitle : '',
 					prevDeclineComment = $afch.find( '#declineTextarea' ).val(),
 					declineHandlers = {
-						cv: function ( pos ) {
+						cv: function ( ) {
 							$afch.find( '#cvUrlWrapper' ).removeClass( 'hidden' );
 							$afch.add( '#csdWrapper' ).removeClass( 'hidden' );
 
@@ -1961,7 +1961,11 @@
 							updateTextfield( 'Title of existing related article, if one exists', 'Charlie and the Chocolate Factory', candidateDupeName, pos );
 						},
 
-						adv: function ( pos ) {
+						adv: function () {
+							$afch.add('#csdWrapper').removeClass('hidden');
+						},
+
+						van: function () {
 							$afch.add('#csdWrapper').removeClass('hidden');
 						},
 
@@ -2435,7 +2439,7 @@
 			afchSubmission.addNewComment( data.rejectTextarea );
 		}
 
-		// Copyright violations get {{db-g12}}'d as well
+		// Copyright violations get {{db-g12}}'d, excessive advertisment gets {{db-g11}}'d, vandalism gets {{db-g3}}'d
 		if ( ( declineReason === 'cv' || declineReason2 === 'cv' ) && data.csdSubmission ) {
 			var cvUrls = data.cvUrlTextarea.split( '\n' ).slice( 0, 3 ),
 				urlParam = '';
@@ -2456,11 +2460,10 @@
 			} else {
 				newParams.details2 = cvUrls.join( ', ' );
 			}
-		}
-
-		// Excessive advertisment/promotion gets {{db-g11}}'d
-		if ( ( declineReason === 'adv' || declineReason2 === 'adv' ) && data.csdSubmission ) {
+		} else if ( ( declineReason === 'adv' || declineReason2 === 'adv' ) && data.csdSubmission ) {
 			text.prepend('{{db-g11}}\n');
+		} else	if ( ( declineReason === 'van' || declineReason2 === 'van') && data.csdSubmission ) {
+			text.prepend('{{db-g3}}\n');
 		}
 
 		if ( !isDecline ) {
@@ -2575,10 +2578,12 @@
 		if ( data.csdSubmission ) {
 
 			var csdReason = ''
-			if (declineReason === 'cv') {
+			if (declineReason === 'cv' || declineReason2 === 'cv') {
 				csdReason = '[[WP:G12]] ({{tl|db-copyvio}})';
-			} else if ( declineReason === 'adv' ) {
+			} else if ( declineReason === 'adv' || declineReason2 === 'adv') {
 				csdReason = '[[WP:G11]] ({{tl|db-spam}})';
+			} else if ( declineReason === 'van' || declineReason2 === 'van') {
+				csdReason = '[[WP:G3]] ({{tl|db-vandalism}})';
 			} else {
 				csdReason = '{{tl|db-reason}} ([[WP:AFC|Articles for creation]])';
 			}
