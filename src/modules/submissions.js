@@ -1969,6 +1969,10 @@
 							$afch.add('#csdWrapper').removeClass('hidden');
 						},
 
+						joke: function () {
+							$afch.add('#csdWrapper').removeClass('hidden');
+						},
+						
 						// Custom decline rationale
 						reason: function () {
 							$afch.find( '#declineTextarea' )
@@ -2439,31 +2443,35 @@
 			afchSubmission.addNewComment( data.rejectTextarea );
 		}
 
-		// Copyright violations get {{db-g12}}'d, excessive advertisment gets {{db-g11}}'d, vandalism gets {{db-g3}}'d
-		if ( ( declineReason === 'cv' || declineReason2 === 'cv' ) && data.csdSubmission ) {
-			var cvUrls = data.cvUrlTextarea.split( '\n' ).slice( 0, 3 ),
-				urlParam = '';
+		// Copyright violations get {{db-g12}}'d, excessive advertisment gets {{db-g11}}'d, vandalism and hoaxes get {{db-g3}}'d
+		if ( data.csdSubmission ) {
+			if (declineReason === 'cv' || declineReason2 === 'cv') {
+				var cvUrls = data.cvUrlTextarea.split('\n').slice(0, 3),
+					urlParam = '';
 
-			// Build url param for db-g12 template
-			urlParam = cvUrls[ 0 ];
-			if ( cvUrls.length > 1 ) {
-				urlParam += '|url2=' + cvUrls[ 1 ];
-				if ( cvUrls.length > 2 ) {
-					urlParam += '|url3=' + cvUrls[ 2 ];
+				// Build url param for db-g12 template
+				urlParam = cvUrls[0];
+				if (cvUrls.length > 1) {
+					urlParam += '|url2=' + cvUrls[1];
+					if (cvUrls.length > 2) {
+						urlParam += '|url3=' + cvUrls[2];
+					}
 				}
-			}
-			text.prepend( '{{db-g12|url=' + urlParam + ( afchPage.additionalData.revId ? '|oldid=' + afchPage.additionalData.revId : '' ) + '}}\n' );
+				text.prepend('{{db-g12|url=' + urlParam + (afchPage.additionalData.revId ? '|oldid=' + afchPage.additionalData.revId : '') + '}}\n');
 
-			// Include the URLs in the decline template
-			if ( declineReason === 'cv' ) {
-				newParams[ '3' ] = cvUrls.join( ', ' );
-			} else {
-				newParams.details2 = cvUrls.join( ', ' );
-			}
-		} else if ( ( declineReason === 'adv' || declineReason2 === 'adv' ) && data.csdSubmission ) {
-			text.prepend('{{db-g11}}\n');
-		} else	if ( ( declineReason === 'van' || declineReason2 === 'van') && data.csdSubmission ) {
-			text.prepend('{{db-g3}}\n');
+				// Include the URLs in the decline template
+				if (declineReason === 'cv') {
+					newParams['3'] = cvUrls.join(', ');
+				} else {
+					newParams.details2 = cvUrls.join(', ');
+				}
+			} else if (declineReason === 'adv' || declineReason2 === 'adv') {
+				text.prepend('{{db-g11}}\n');
+			} else if (declineReason === 'van' || declineReason2 === 'van' 
+					|| declineReason === 'joke' || declineReason2 === 'joke') {
+				text.prepend('{{db-g3}}\n');
+			} 
+
 		}
 
 		if ( !isDecline ) {
@@ -2584,6 +2592,8 @@
 				csdReason = '[[WP:G11]] ({{tl|db-spam}})';
 			} else if ( declineReason === 'van' || declineReason2 === 'van') {
 				csdReason = '[[WP:G3]] ({{tl|db-vandalism}})';
+			} else if ( declineReason === 'joke' || declineReason2 === 'joke') {
+				csdReason = '[[WP:G3]] ({{tl|db-hoax}})';
 			} else {
 				csdReason = '{{tl|db-reason}} ([[WP:AFC|Articles for creation]])';
 			}
