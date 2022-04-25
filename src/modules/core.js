@@ -857,12 +857,14 @@
 
 				logPage.getText().done(function (logText) {
 					var header = AFCH.actions.addLogHeaderIfNeeded(logText);
-					var actioningTitle = '\n# ' + options.actionType + 'ing [[:' + options.title + ']]';
+					var action = '\n# ' + options.actionType.charAt(0).toUpperCase() + options.actionType.slice(1)
+										+ (options.actionType === 'decline' ? '' : 'e') + 'd';
+					var title = ' [[:' + options.title + ']]';
 					var byUser = ' by [[User:' + options.submitter + '|]]';
 					var sig = ' ~~' + '~~' + '~\n';
 
 					logPage.edit({
-						contents: header + actioningTitle + byUser + sig,
+						contents: header + action + title + byUser + sig,
 						mode: 'appendtext',
 						summary: 'Logging ' + options.actionType + ' of [[' + options.title + ']]',
 						statusText: 'Logging ' + options.actionType + ' to'
