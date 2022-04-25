@@ -810,11 +810,6 @@
 				}
 
 				logPage.getText().done( function ( logText ) {
-					var status,
-						date = new Date(),
-						monthNames = [ 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December' ],
-						headerRe = new RegExp( '^==+\\s*' + monthNames[ date.getMonth() ] + '\\s+' + date.getUTCFullYear() + '\\s*==+', 'm' ),
-						appendText = '';
 
 					// Don't edit if the page has doesn't exist or has no text
 					if ( !logText ) {
@@ -822,10 +817,7 @@
 						return;
 					}
 
-					// Add header for new month if necessary
-					if ( !headerRe.test( logText ) ) {
-						appendText += '\n\n=== ' + monthNames[ date.getMonth() ] + ' ' + date.getUTCFullYear() + ' ===';
-					}
+					var appendText = AFCH.actions.addLogHeaderIfNeeded(logText);
 
 					appendText += '\n# [[:' + options.title + ']]: ' + options.reason;
 
@@ -852,6 +844,52 @@
 				} );
 
 				return deferred;
+			},
+
+			logAfc: function ( options ) {
+				var deferred = $.Deferred(),
+					logPage = new AFCH.Page('User:' + mw.config.get('wgUserName') + '/AfC log');
+
+				// Abort if user disabled in preferences
+				if (!AFCH.prefs.logAfc) {
+					return;
+				}
+
+				logPage.getText().done(function (logText) {
+					var header = AFCH.actions.addLogHeaderIfNeeded(logText);
+					var actioningTitle = '\n# ' + options.actionType + 'ing [[:' + options.title + ']]';
+					var byUser = ' by [[User:' + options.submitter + '|]]';
+					var sig = ' ~~' + '~~' + '~\n';
+
+					logPage.edit({
+						contents: header + actioningTitle + byUser + sig,
+						mode: 'appendtext',
+						summary: 'Logging ' + options.actionType + ' of [[' + options.title + ']]',
+						statusText: 'Logging ' + options.actionType + ' to'
+					}).done(function (data) {
+						deferred.resolve(data);
+					}).fail(function (data) {
+						deferred.reject(data);
+					});
+				});
+
+				return deferred;
+			},
+
+			/** Takes text of the log page; returns a string with the header for the current month
+			 * if that header doesn't already exist
+			 */
+			addLogHeaderIfNeeded: function (logText) {
+				var date = new Date(),
+					monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+					headerRe = new RegExp('^==+\\s*' + monthNames[date.getMonth()] + '\\s+' + date.getUTCFullYear() + '\\s*==+', 'm'),
+					headerText = '';
+
+				if (!headerRe.test(logText)) {
+					headerText += '\n\n=== ' + monthNames[date.getMonth()] + ' ' + date.getUTCFullYear() + ' ===';
+				}
+
+				return headerText;
 			},
 
 			/**
@@ -1151,7 +1189,8 @@
 			this.prefDefaults = {
 				autoOpen: false,
 				logCsd: true,
-				launchLinkPosition: 'p-cactions'
+				launchLinkPosition: 'p-cactions',
+				logAfc: false
 			};
 
 			/**
