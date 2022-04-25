@@ -856,15 +856,25 @@
 				}
 
 				logPage.getText().done(function (logText) {
+					// Build log message
 					var header = AFCH.actions.addLogHeaderIfNeeded(logText);
 					var action = '\n# ' + options.actionType.charAt(0).toUpperCase() + options.actionType.slice(1)
 										+ (options.actionType === 'decline' ? '' : 'e') + 'd';
 					var title = ' [[:' + options.title + ']]';
+
+					var declineReason = '';
+					if (options.actionType === 'decline') {
+						console.log(options.declineReason);
+						console.log(options.declineReason2);
+						declineReason = ' (' + options.declineReason + (options.declineReason2 ? '/' + options.declineReason2 : '') + ')';
+					}
+
 					var byUser = ' by [[User:' + options.submitter + '|]]';
 					var sig = ' ~~' + '~~' + '~\n';
 
+					// Make log edit
 					logPage.edit({
-						contents: header + action + title + byUser + sig,
+						contents: header + action + title + declineReason + byUser + sig,
 						mode: 'appendtext',
 						summary: 'Logging ' + options.actionType + ' of [[' + options.title + ']]',
 						statusText: 'Logging ' + options.actionType + ' to'

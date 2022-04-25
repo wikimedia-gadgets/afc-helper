@@ -2578,6 +2578,8 @@
 			AFCH.actions.logAfc({
 				title: afchPage.rawTitle,
 				actionType: isDecline ? "decline" : "reject",
+				declineReason: declineReason,
+				declineReason2: declineReason2,
 				submitter: submitter,
 			});
 
