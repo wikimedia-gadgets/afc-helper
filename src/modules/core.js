@@ -1192,7 +1192,7 @@
 				autoOpen: false,
 				logCsd: true,
 				launchLinkPosition: 'p-cactions',
-				logAfc: true
+				logAfc: false
 			};
 
 			/**
