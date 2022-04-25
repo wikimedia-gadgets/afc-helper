@@ -864,9 +864,11 @@
 
 					var declineReason = '';
 					if (options.actionType === 'decline') {
-						console.log(options.declineReason);
-						console.log(options.declineReason2);
-						declineReason = ' (' + options.declineReason + (options.declineReason2 ? '/' + options.declineReason2 : '') + ')';
+						// Custom is stored as 'reason' (because of template weirdness?), convert if necessary
+						options.declineReason = (options.declineReason === 'reason') ? 'custom' : options.declineReason;
+						options.declineReason2 = (options.declineReason2 === 'reason') ? 'custom' : options.declineReason2;
+
+						declineReason = ' (' + options.declineReason + (options.declineReason2 ? ' & ' + options.declineReason2 : '') + ')';
 					}
 
 					var byUser = ' by [[User:' + options.submitter + '|]]';
