@@ -85,9 +85,6 @@
 				// Current user
 				user: mw.user.getName(),
 
-				// Is the user an admin?
-				userSysop: $.inArray('sysop', mw.config.get('wgUserGroups')) > -1,
-
 				// Edit summary ad
 				summaryAd: ' ([[WP:AFCH|AFCH]] ' + AFCH.consts.version + ')',
 
@@ -124,7 +121,8 @@
 				// three characters long on the list!
 				var $howToDisable,
 					sanitizedUser = user.replace( /[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&' ),
-					userAllowed = ( new RegExp( '\\|\\s*' + sanitizedUser + '\\s*}' ) ).test( text ) || AFCH.consts.userSysop;
+					userSysop = $.inArray('sysop', mw.config.get('wgUserGroups')) > -1,
+					userAllowed = (new RegExp('\\|\\s*' + sanitizedUser + '\\s*}')).test(text) || userSysop;
 
 				if ( !userAllowed ) {
 

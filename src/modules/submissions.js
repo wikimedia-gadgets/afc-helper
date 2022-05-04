@@ -1782,7 +1782,7 @@
 							// current reviewer is not an admin, also display an error
 							// FIXME: offer one-click request unprotection?
 							$.each( data.query.pages[ '-1' ].protection, function ( _, entry ) {
-								if ( entry.type === 'create' && entry.level === 'sysop' && !AFCH.consts.userSysop ) {
+								if (entry.type === 'create' && entry.level === 'sysop' && $.inArray('sysop', mw.config.get('wgUserGroups')) === -1 ) {
 									errorHtml = 'Darn it, "' + linkToPage + '" is create-protected. You will need to request unprotection before accepting.';
 									buttonText = 'The proposed title is create-protected';
 								}
