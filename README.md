@@ -1,4 +1,4 @@
-afch-rewrite [![Build Status](https://travis-ci.org/WPAFC/afch-rewrite.png)](https://travis-ci.org/WPAFC/afch-rewrite) [![Release](https://img.shields.io/github/release/wpafc/afch-rewrite.svg)](https://github.com/WPAFC/afch-rewrite/releases)
+afch-rewrite [![Build Status](https://github.com/WPAFC/afch-rewrite/actions/workflows/unit_tests.yml/badge.svg)] [![Release](https://img.shields.io/github/release/wpafc/afch-rewrite.svg)](https://github.com/WPAFC/afch-rewrite/releases)
 ============
 
 **v0.9.1 Imperial Ibex**
@@ -24,7 +24,7 @@ To serve the script locally for development, use `npm start` and follow the inst
 ### Testing
 We have unit tests! `afch-rewrite` uses [Jest](https://github.com/facebook/jest) for testing, a framework built on top of Jasmine that offers dead-simple mocking, built-in simulated DOM manipulation using [jsdom](https://github.com/tmpvar/jsdom), and more.
 
-Tests are stored in the `__tests__` directory and are run automatically on new commits via Travis.
+Tests are stored in the `__tests__` directory and are run automatically on new commits via GitHub Actions.
 
 ### Uploading and releasing the script
 To upload the script to a wiki, use `scripts/upload.py`. Detailed instructions are included at the top of the file.
