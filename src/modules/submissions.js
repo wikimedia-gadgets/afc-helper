@@ -1490,7 +1490,7 @@
 			// If any templates weren't in the WikiProject map, check if they were redirects
 			if ( otherTemplates.length > 0 ) {
 				var titles = otherTemplates.map( function ( n ) { return 'Template:' + n; } );
-				titles = titles.slice( 0, 50 ); // regular users (non-admins, non-bots) will get API error if requesting more than 50 templates at a time
+				titles = titles.slice( 0, 50 ); // prevent API error by capping max # of titles at 50
 				titles = titles.join( '|' );
 				return AFCH.api.post( {
 					action: 'query',
