@@ -2626,9 +2626,9 @@
 		}
 
 		submitter.done( function ( submitter ) {
-			var params = submitter ? { u: submitter } : {};
-			var status = !submitter ? 't' : '';
-			var makeTimestamp = Boolean( submitter );
+			var params = ( submitter === '' ) ? {} : { u: submitter };
+			var status = ( submitter === '' ) ? 't' : '';
+			var makeTimestamp = ( submitter !== '' );
 
 			afchSubmission.setStatus( status, params, makeTimestamp );
 
