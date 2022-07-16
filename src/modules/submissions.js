@@ -365,7 +365,7 @@
 	 * Sets the submission status
 	 *
 	 * @param {string} newStatus status to set, 'd'|'t'|'r'|''
-	 * @param newParams
+	 * @param {Object} newParams
 	 * @param {bool} [makeTimestamp=true]
 	 * @return {bool} success
 	 */
@@ -2627,8 +2627,8 @@
 
 		submitter.done( function ( submitter ) {
 			var params = submitter ? { u: submitter } : {};
-			var status = ( submitter === '' ) ? 't' : '';
-			var makeTimestamp = submitter !== '';
+			var status = !submitter ? 't' : '';
+			var makeTimestamp = Boolean( submitter );
 
 			afchSubmission.setStatus( status, params, makeTimestamp );
 
