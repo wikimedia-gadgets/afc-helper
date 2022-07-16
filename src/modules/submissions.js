@@ -365,11 +365,15 @@
 	 * Sets the submission status
 	 *
 	 * @param {string} newStatus status to set, 'd'|'t'|'r'|''
-	 * @param {params} optional; params to add to the template whose status was set
 	 * @param newParams
+	 * @param {bool} [makeTimestamp=true]
 	 * @return {bool} success
 	 */
-	AFCH.Submission.prototype.setStatus = function ( newStatus, newParams ) {
+	AFCH.Submission.prototype.setStatus = function ( newStatus, newParams, makeTimestamp ) {
+		if ( makeTimestamp === undefined ) {
+			makeTimestamp = true;
+		}
+
 		var relevantTemplate = this.templates[ 0 ];
 
 		if ( [ 'd', 't', 'r', '' ].indexOf( newStatus ) === -1 ) {
@@ -390,7 +394,7 @@
 			this.addNewTemplate( {
 				status: newStatus,
 				params: newParams
-			} );
+			}, makeTimestamp );
 		} else {
 			// Just modify the template at the top of the stack
 			relevantTemplate.status = newStatus;
@@ -413,11 +417,12 @@
 	 *                      - status (default: '')
 	 *                      - timestamp (default: '{{subst:REVISIONTIMESTAMP}}')
 	 *                      - params (default: {})
+	 * @param {bool} makeTimestamp
 	 */
-	AFCH.Submission.prototype.addNewTemplate = function ( data ) {
+	AFCH.Submission.prototype.addNewTemplate = function ( data, makeTimestamp ) {
 		this.templates.unshift( $.extend( /* deep */ true, {
 			status: '',
-			timestamp: '{{subst:REVISIONTIMESTAMP}}',
+			timestamp: makeTimestamp ? '{{subst:REVISIONTIMESTAMP}}' : '',
 			params: {
 				ns: mw.config.get( 'wgNamespaceNumber' )
 			}
@@ -2623,8 +2628,9 @@
 		submitter.done( function ( submitter ) {
 			var params = submitter ? { u: submitter } : {};
 			var status = ( submitter === '' ) ? 't' : '';
+			var makeTimestamp = submitter !== '';
 
-			afchSubmission.setStatus( status, params );
+			afchSubmission.setStatus( status, params, makeTimestamp );
 
 			text.updateAfcTemplates( afchSubmission.makeWikicode() );
 			text.cleanUp();
