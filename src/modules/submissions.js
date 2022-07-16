@@ -2621,13 +2621,10 @@
 		}
 
 		submitter.done( function ( submitter ) {
-			var params = { u: submitter };
-			var hasNoSubmitter = submitter === '';
-			if ( hasNoSubmitter ) {
-				params[ '1' ] = 'T'; // unsubmitted
-			}
+			var params = submitter ? { u: submitter } : {};
+			var status = ( submitter === '' ) ? 't' : '';
 
-			afchSubmission.setStatus( '', params );
+			afchSubmission.setStatus( status, params );
 
 			text.updateAfcTemplates( afchSubmission.makeWikicode() );
 			text.cleanUp();
