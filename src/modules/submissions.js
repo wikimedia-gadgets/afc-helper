@@ -2613,13 +2613,21 @@
 			afchPage.getCreator().done( function ( user ) {
 				submitter.resolve( user );
 			} );
+		} else if ( submitType === 'unsubmitted' ) {
+			submitter.resolve( '' );
 		} else {
 			// Custom selected submitter
 			submitter.resolve( data.submitType );
 		}
 
 		submitter.done( function ( submitter ) {
-			afchSubmission.setStatus( '', { u: submitter } );
+			var params = { u: submitter };
+			var hasNoSubmitter = submitter === '';
+			if ( hasNoSubmitter ) {
+				params[ '1' ] = 'T'; // unsubmitted
+			}
+
+			afchSubmission.setStatus( '', params );
 
 			text.updateAfcTemplates( afchSubmission.makeWikicode() );
 			text.cleanUp();
