@@ -818,7 +818,7 @@
 						return;
 					}
 
-					var appendText = AFCH.actions.addLogHeaderIfNeeded(logText);
+					var appendText = AFCH.actions.addLogHeaderIfNeeded( logText );
 
 					appendText += '\n# [[:' + options.title + ']]: ' + options.reason;
 
@@ -849,59 +849,62 @@
 
 			logAfc: function ( options ) {
 				var deferred = $.Deferred(),
-					logPage = new AFCH.Page('User:' + mw.config.get('wgUserName') + '/AfC log');
+					logPage = new AFCH.Page( 'User:' + mw.config.get( 'wgUserName' ) + '/AfC log' );
 
 				// Abort if user disabled in preferences
-				if (!AFCH.prefs.logAfc) {
+				if ( !AFCH.prefs.logAfc ) {
 					return;
 				}
 
-				logPage.getText().done(function (logText) {
+				logPage.getText().done( function ( logText ) {
 					// Build log message
-					var header = AFCH.actions.addLogHeaderIfNeeded(logText);
-					var action = '\n# ' + options.actionType.charAt(0).toUpperCase() + options.actionType.slice(1)
-										+ (options.actionType === 'decline' ? '' : 'e') + 'd';
+					var header = AFCH.actions.addLogHeaderIfNeeded( logText );
+					var action = '\n# ' + options.actionType.charAt( 0 ).toUpperCase() + options.actionType.slice( 1 ) +
+										( options.actionType === 'decline' ? '' : 'e' ) + 'd';
 					var title = ' [[:' + options.title + ']]';
 
 					var declineReason = '';
-					if (options.actionType === 'decline') {
+					if ( options.actionType === 'decline' ) {
 						// Custom is stored as 'reason' (because of template weirdness?), convert if necessary
-						options.declineReason = (options.declineReason === 'reason') ? 'custom' : options.declineReason;
-						options.declineReason2 = (options.declineReason2 === 'reason') ? 'custom' : options.declineReason2;
+						options.declineReason = ( options.declineReason === 'reason' ) ? 'custom' : options.declineReason;
+						options.declineReason2 = ( options.declineReason2 === 'reason' ) ? 'custom' : options.declineReason2;
 
-						declineReason = ' (' + options.declineReason + (options.declineReason2 ? ' & ' + options.declineReason2 : '') + ')';
+						declineReason = ' (' + options.declineReason + ( options.declineReason2 ? ' & ' + options.declineReason2 : '' ) + ')';
 					}
 
 					var byUser = ' by [[User:' + options.submitter + '|]]';
 					var sig = ' ~~' + '~~' + '~\n';
 
 					// Make log edit
-					logPage.edit({
+					logPage.edit( {
 						contents: header + action + title + declineReason + byUser + sig,
 						mode: 'appendtext',
 						summary: 'Logging ' + options.actionType + ' of [[' + options.title + ']]',
 						statusText: 'Logging ' + options.actionType + ' to'
-					}).done(function (data) {
-						deferred.resolve(data);
-					}).fail(function (data) {
-						deferred.reject(data);
-					});
-				});
+					} ).done( function ( data ) {
+						deferred.resolve( data );
+					} ).fail( function ( data ) {
+						deferred.reject( data );
+					} );
+				} );
 
 				return deferred;
 			},
 
-			/** Takes text of the log page; returns a string with the header for the current month
+			/**
+			 * Takes text of the log page; returns a string with the header for the current month
 			 * if that header doesn't already exist
+			 *
+			 * @param {string} logText Text of user's AfC log
 			 */
-			addLogHeaderIfNeeded: function (logText) {
+			addLogHeaderIfNeeded: function ( logText ) {
 				var date = new Date(),
-					monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
-					headerRe = new RegExp('^==+\\s*' + monthNames[date.getMonth()] + '\\s+' + date.getUTCFullYear() + '\\s*==+', 'm'),
+					monthNames = [ 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December' ],
+					headerRe = new RegExp( '^==+\\s*' + monthNames[ date.getUTCMonth() ] + '\\s+' + date.getUTCFullYear() + '\\s*==+', 'm' ),
 					headerText = '';
 
-				if (!headerRe.test(logText)) {
-					headerText += '\n\n=== ' + monthNames[date.getMonth()] + ' ' + date.getUTCFullYear() + ' ===';
+				if ( !headerRe.test( logText ) ) {
+					headerText += '\n\n=== ' + monthNames[ date.getUTCMonth() ] + ' ' + date.getUTCFullYear() + ' ===';
 				}
 
 				return headerText;
