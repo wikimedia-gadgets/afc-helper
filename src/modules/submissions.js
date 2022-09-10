@@ -2433,19 +2433,21 @@
 		}
 
 		// Copyright violations get {{db-g12}}'d as well
-		if ( ( declineReason === 'cv' || declineReason2 === 'cv' ) && data.csdSubmission ) {
+		if ( declineReason === 'cv' || declineReason2 === 'cv' ) {
 			var cvUrls = data.cvUrlTextarea.split( '\n' ).slice( 0, 3 ),
 				urlParam = '';
 
-			// Build url param for db-g12 template
-			urlParam = cvUrls[ 0 ];
-			if ( cvUrls.length > 1 ) {
-				urlParam += '|url2=' + cvUrls[ 1 ];
-				if ( cvUrls.length > 2 ) {
-					urlParam += '|url3=' + cvUrls[ 2 ];
+			if ( data.csdSubmission ) {
+				// Build url param for db-g12 template
+				urlParam = cvUrls[ 0 ];
+				if ( cvUrls.length > 1 ) {
+					urlParam += '|url2=' + cvUrls[ 1 ];
+					if ( cvUrls.length > 2 ) {
+						urlParam += '|url3=' + cvUrls[ 2 ];
+					}
 				}
+				text.prepend( '{{db-g12|url=' + urlParam + ( afchPage.additionalData.revId ? '|oldid=' + afchPage.additionalData.revId : '' ) + '}}\n' );
 			}
-			text.prepend( '{{db-g12|url=' + urlParam + ( afchPage.additionalData.revId ? '|oldid=' + afchPage.additionalData.revId : '' ) + '}}\n' );
 
 			// Include the URLs in the decline template
 			if ( declineReason === 'cv' ) {
