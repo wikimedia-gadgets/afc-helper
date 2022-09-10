@@ -2366,7 +2366,18 @@
 							summary: 'Adding [[' + newPage + ']] to list of recent AfC creations'
 						} );
 					} );
-			} );
+
+				// LOG TO USERSPACE
+				// ----------
+
+				afchSubmission.getSubmitter().done(function (submitter) {
+					AFCH.actions.logAfc({
+						title: afchPage.rawTitle,
+						actionType: "accept",
+						submitter: submitter,
+					});
+				});
+			})
 	}
 
 	function handleDecline( data ) {
@@ -2564,18 +2575,27 @@
 			} );
 		}
 
-		// Log CSD if necessary
-		if ( data.csdSubmission ) {
-			// FIXME: Only get submitter if needed...?
-			afchSubmission.getSubmitter().done( function ( submitter ) {
-				AFCH.actions.logCSD( {
+		// Log AfC if enabled and CSD if necessary
+		afchSubmission.getSubmitter().done( function ( submitter ) {
+			AFCH.actions.logAfc({
+				title: afchPage.rawTitle,
+				actionType: isDecline ? "decline" : "reject",
+				declineReason: declineReason,
+				declineReason2: declineReason2,
+				submitter: submitter,
+			});
+
+
+			if (data.csdSubmission) {
+				AFCH.actions.logCSD({
 					title: afchPage.rawTitle,
 					reason: declineReason === 'cv' ? '[[WP:G12]] ({{tl|db-copyvio}})' :
 						'{{tl|db-reason}} ([[WP:AFC|Articles for creation]])',
-					usersNotified: data.notifyUser ? [ submitter ] : []
-				} );
-			} );
-		}
+					usersNotified: data.notifyUser ? [submitter] : []
+				});
+			 }
+		} );
+		
 	}
 
 	function handleComment( data ) {
