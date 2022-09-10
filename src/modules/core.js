@@ -121,7 +121,8 @@
 				// three characters long on the list!
 				var $howToDisable,
 					sanitizedUser = user.replace( /[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&' ),
-					userAllowed = ( new RegExp( '\\|\\s*' + sanitizedUser + '\\s*}' ) ).test( text );
+					userSysop = $.inArray('sysop', mw.config.get('wgUserGroups')) > -1,
+					userAllowed = (new RegExp('\\|\\s*' + sanitizedUser + '\\s*}')).test(text) || userSysop;
 
 				if ( !userAllowed ) {
 
