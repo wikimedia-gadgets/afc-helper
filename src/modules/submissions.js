@@ -1415,7 +1415,8 @@
 				// This is so a new version of AFCH will invalidate the WikiProject cache
 				lsKey = 'afch-' + AFCH.consts.version + '-wikiprojects-2';
 
-			if ( window.localStorage && window.localStorage[ lsKey ] ) {
+			if ( window.localStorage && window.localStorage[ lsKey ] && window.localStorage[ lsKey + '-exp' ] &&
+				( window.localStorage[ lsKey + '-exp' ] > Date.now() ) ) {
 				wikiProjects = JSON.parse( window.localStorage[ lsKey ] );
 				deferred.resolve( wikiProjects );
 			} else {
@@ -1434,6 +1435,7 @@
 					if ( window.localStorage ) {
 						try {
 							window.localStorage[ lsKey ] = JSON.stringify( wikiProjects );
+							window.localStorage[ lsKey + '-exp' ] = Date.now() + ( 7 * 24 * 60 * 60 * 1000 );
 						} catch ( e ) {
 							AFCH.log( 'Unable to cache WikiProject list: ' + e.message );
 						}
