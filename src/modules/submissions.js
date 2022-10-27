@@ -1413,11 +1413,10 @@
 			var deferred = $.Deferred(),
 				wikiProjects = [],
 				// This is so a new version of AFCH will invalidate the WikiProject cache
-				lsKey = 'afch-' + AFCH.consts.version + '-wikiprojects-2';
+				lsKey = 'mw-afch-' + AFCH.consts.version + '-wikiprojects-2';
 
-			if ( window.localStorage && window.localStorage[ lsKey ] && window.localStorage[ lsKey + '-exp' ] &&
-				( window.localStorage[ lsKey + '-exp' ] > Date.now() ) ) {
-				wikiProjects = JSON.parse( window.localStorage[ lsKey ] );
+			if ( mw.storage.getObject( lsKey ) ) {
+				wikiProjects = mw.storage.getObject( lskey );
 				deferred.resolve( wikiProjects );
 			} else {
 				$.ajax( {
@@ -1432,13 +1431,8 @@
 					} );
 
 					// If possible, cache the WikiProject data!
-					if ( window.localStorage ) {
-						try {
-							window.localStorage[ lsKey ] = JSON.stringify( wikiProjects );
-							window.localStorage[ lsKey + '-exp' ] = Date.now() + ( 7 * 24 * 60 * 60 * 1000 );
-						} catch ( e ) {
-							AFCH.log( 'Unable to cache WikiProject list: ' + e.message );
-						}
+					if ( !mw.storage.setObject( lskey, wikiProjects, ( 7 * 24 * 60 * 60 ) ) ) {
+						AFCH.log( 'Unable to cache WikiProject list.' );
 					}
 
 					deferred.resolve( wikiProjects );
