@@ -1416,7 +1416,7 @@
 				lsKey = 'afch-' + AFCH.consts.version + '-wikiprojects-2';
 
 			if ( window.localStorage && window.localStorage[ lsKey ] && window.localStorage[ lsKey + '-exp' ]
-				&& (window.localStorage[ lsKey + '-exp' ] > Date.now) ) {
+				&& ( window.localStorage[ lsKey + '-exp' ] > Date.now() ) ) {
 				wikiProjects = JSON.parse( window.localStorage[ lsKey ] );
 				deferred.resolve( wikiProjects );
 			} else {
