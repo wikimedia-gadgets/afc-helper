@@ -1431,7 +1431,7 @@
 					} );
 
 					// If possible, cache the WikiProject data!
-					if ( !mw.storage.setObject( lskey, wikiProjects, ( 7 * 24 * 60 * 60 ) ) ) {
+					if ( !mw.storage.setObject( lsKey, wikiProjects, ( 7 * 24 * 60 * 60 ) ) ) {
 						AFCH.log( 'Unable to cache WikiProject list.' );
 					}
 
