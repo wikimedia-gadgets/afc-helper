@@ -1411,14 +1411,14 @@
 		 */
 		function loadWikiProjectList() {
 			var deferred = $.Deferred(),
-				wikiProjects = [],
 				// This is so a new version of AFCH will invalidate the WikiProject cache
-				lsKey = 'mw-afch-' + AFCH.consts.version + '-wikiprojects-2';
+				lsKey = 'mw-afch-' + AFCH.consts.version + '-wikiprojects-2',
+				wikiProjects = mw.storage.getObject( lsKey );
 
-			if ( mw.storage.getObject( lsKey ) ) {
-				wikiProjects = mw.storage.getObject( lskey );
+			if ( wikiProjects ) {
 				deferred.resolve( wikiProjects );
 			} else {
+				wikiProjects = [];
 				$.ajax( {
 					url: mw.config.get( 'wgServer' ) + '/w/index.php?title=Wikipedia:WikiProject_Articles_for_creation/WikiProject_templates.json&action=raw&ctype=text/json',
 					dataType: 'json'
