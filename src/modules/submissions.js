@@ -1411,14 +1411,14 @@
 		 */
 		function loadWikiProjectList() {
 			var deferred = $.Deferred(),
-				wikiProjects = [],
 				// This is so a new version of AFCH will invalidate the WikiProject cache
-				lsKey = 'afch-' + AFCH.consts.version + '-wikiprojects-2';
+				lsKey = 'mw-afch-' + AFCH.consts.version + '-wikiprojects-2',
+				wikiProjects = mw.storage.getObject( lsKey );
 
-			if ( window.localStorage && window.localStorage[ lsKey ] ) {
-				wikiProjects = JSON.parse( window.localStorage[ lsKey ] );
+			if ( wikiProjects ) {
 				deferred.resolve( wikiProjects );
 			} else {
+				wikiProjects = [];
 				$.ajax( {
 					url: mw.config.get( 'wgServer' ) + '/w/index.php?title=Wikipedia:WikiProject_Articles_for_creation/WikiProject_templates.json&action=raw&ctype=text/json',
 					dataType: 'json'
@@ -1431,12 +1431,8 @@
 					} );
 
 					// If possible, cache the WikiProject data!
-					if ( window.localStorage ) {
-						try {
-							window.localStorage[ lsKey ] = JSON.stringify( wikiProjects );
-						} catch ( e ) {
-							AFCH.log( 'Unable to cache WikiProject list: ' + e.message );
-						}
+					if ( !mw.storage.setObject( lsKey, wikiProjects, ( 7 * 24 * 60 * 60 ) ) ) {
+						AFCH.log( 'Unable to cache WikiProject list.' );
 					}
 
 					deferred.resolve( wikiProjects );
