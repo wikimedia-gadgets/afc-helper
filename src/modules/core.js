@@ -122,7 +122,9 @@
 				var $howToDisable,
 					sanitizedUser = user.replace( /[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&' ),
 					userSysop = $.inArray( 'sysop', mw.config.get( 'wgUserGroups' ) ) > -1,
-					userAllowed = ( new RegExp( '\\|\\s*' + sanitizedUser + '\\s*}' ) ).test( text ) || userSysop;
+					userNPP = $.inArray( 'patroller', mw.config.get( 'wgUserGroups' ) ) > -1,
+					userOnWhitelist = ( new RegExp( '\\|\\s*' + sanitizedUser + '\\s*}' ) ).test( text ),
+					userAllowed = userOnWhitelist || userSysop || userNPP;
 
 				if ( !userAllowed ) {
 
