@@ -61,7 +61,7 @@ module.exports = function ( grunt ) {
 		},
 
 		eslint: {
-			target: [ 'src/**/*.js', 'contrib/**/*.js', '__tests__/**/*.js', 'Gruntfile.js' ]
+			target: [ 'src/**/*.js', 'contrib/**/*.js', 'tests/**/*.js', 'Gruntfile.js' ]
 		},
 
 		exec: {
