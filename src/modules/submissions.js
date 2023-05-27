@@ -728,7 +728,7 @@
 	};
 
 	// Add the launch link
-	$afchLaunchLink = $( mw.util.addPortletLink( AFCH.prefs.launchLinkPosition, '#', 'Review (AFCH beta)',
+	$afchLaunchLink = $( mw.util.addPortletLink( AFCH.prefs.launchLinkPosition, '#', 'Review (AFCH)',
 		'afch-launch', 'Review submission using afch-rewrite', '1' ) );
 
 	if ( AFCH.prefs.autoOpen &&
