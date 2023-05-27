@@ -13,6 +13,7 @@
   },
   "scripts": {
     "test": "grunt test",
+    "teststyle": "grunt teststyle",
     "generate-certificates": "node scripts/generate-certificates.js"
   },
   "dependencies": {

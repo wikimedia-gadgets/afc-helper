@@ -89,7 +89,7 @@ module.exports = function ( grunt ) {
 	grunt.registerTask(
 		'test',
 		'Runs unit tests as well as checks code style/quality.',
-		[ 'teststyle', 'exec:jest' ]
+		[ 'exec:jest' ]
 	);
 
 	grunt.registerTask(
