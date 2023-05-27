@@ -11,7 +11,8 @@ module.exports = function ( grunt ) {
 
 		concat: {
 			options: {
-				separator: ';'
+				separator: ';',
+				banner: '// <nowiki>\n'
 			},
 			dependencies: {
 				files: {

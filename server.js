@@ -30,7 +30,7 @@ if(!fs.existsSync('build/afch.css')) {
 }
 
 const port = process.env.PORT || 4444;
-console.log(`Serving AFCH at http://localhost:${port} (Ctrl+C to stop). Developer setup: browse to https://test.wikipedia.org/wiki/Main_Page?withJS=MediaWiki:Setup-afch-dev.js - make sure to log in if you aren't logged in. There should be a box with a link to your personal test draft.
+console.log(`Serving AFCH on port ${port} (Ctrl+C to stop). Now browse to https://test.wikipedia.org/wiki/Main_Page?withJS=MediaWiki:Setup-afch-dev.js - make sure to log in if you aren't logged in. There should be a box with a link to your personal test draft.
 
 Let us know if you see any errors: https://en.wikipedia.org/wiki/Wikipedia:WikiProject_Articles_for_creation/Helper_script/Contributing#Need_help?
 

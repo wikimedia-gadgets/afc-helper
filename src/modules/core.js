@@ -125,7 +125,10 @@
 				// three characters long on the list!
 				var $howToDisable,
 					sanitizedUser = user.replace( /[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&' ),
-					userAllowed = ( new RegExp( '\\|\\s*' + sanitizedUser + '\\s*}' ) ).test( text );
+					userSysop = $.inArray( 'sysop', mw.config.get( 'wgUserGroups' ) ) > -1,
+					userNPP = $.inArray( 'patroller', mw.config.get( 'wgUserGroups' ) ) > -1,
+					userOnWhitelist = ( new RegExp( '\\|\\s*' + sanitizedUser + '\\s*}' ) ).test( text ),
+					userAllowed = userOnWhitelist || userSysop || userNPP;
 
 				if ( !userAllowed ) {
 
@@ -433,6 +436,17 @@
 				return deferred;
 			};
 
+			this.getShortDescription = function () {
+				return AFCH.api.get( {
+					action: 'query',
+					prop: 'description',
+					titles: this.rawTitle,
+					formatversion: 2
+				} ).then( function ( json ) {
+					return json.query.pages[ 0 ].description || '';
+				} );
+			};
+
 			this.getLastModifiedDate = function () {
 				var deferred = $.Deferred();
 
@@ -644,7 +658,7 @@
 				}
 
 				if ( AFCH.consts.mockItUp ) {
-					AFCH.log( request );
+					AFCH.log( 'Edit to "' + pagename + '"', request );
 					deferred.resolve();
 					return deferred;
 				}
@@ -803,11 +817,6 @@
 				}
 
 				logPage.getText().done( function ( logText ) {
-					var status,
-						date = new Date(),
-						monthNames = [ 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December' ],
-						headerRe = new RegExp( '^==+\\s*' + monthNames[ date.getMonth() ] + '\\s+' + date.getUTCFullYear() + '\\s*==+', 'm' ),
-						appendText = '';
 
 					// Don't edit if the page has doesn't exist or has no text
 					if ( !logText ) {
@@ -815,10 +824,7 @@
 						return;
 					}
 
-					// Add header for new month if necessary
-					if ( !headerRe.test( logText ) ) {
-						appendText += '\n\n=== ' + monthNames[ date.getMonth() ] + ' ' + date.getUTCFullYear() + ' ===';
-					}
+					var appendText = AFCH.actions.addLogHeaderIfNeeded( logText );
 
 					appendText += '\n# [[:' + options.title + ']]: ' + options.reason;
 
@@ -845,6 +851,69 @@
 				} );
 
 				return deferred;
+			},
+
+			logAfc: function ( options ) {
+				var deferred = $.Deferred(),
+					logPage = new AFCH.Page( 'User:' + mw.config.get( 'wgUserName' ) + '/AfC log' );
+
+				// Abort if user disabled in preferences
+				if ( !AFCH.prefs.logAfc ) {
+					return;
+				}
+
+				logPage.getText().done( function ( logText ) {
+					// Build log message
+					var header = AFCH.actions.addLogHeaderIfNeeded( logText );
+					var action = '\n# ' + options.actionType.charAt( 0 ).toUpperCase() + options.actionType.slice( 1 ) +
+										( options.actionType === 'decline' ? '' : 'e' ) + 'd';
+					var title = ' [[:' + options.title + ']]';
+
+					var declineReason = '';
+					if ( options.actionType === 'decline' ) {
+						// Custom is stored as 'reason' (because of template weirdness?), convert if necessary
+						options.declineReason = ( options.declineReason === 'reason' ) ? 'custom' : options.declineReason;
+						options.declineReason2 = ( options.declineReason2 === 'reason' ) ? 'custom' : options.declineReason2;
+
+						declineReason = ' (' + options.declineReason + ( options.declineReason2 ? ' & ' + options.declineReason2 : '' ) + ')';
+					}
+
+					var byUser = ' by [[User:' + options.submitter + '|]]';
+					var sig = ' ~~' + '~~' + '~\n';
+
+					// Make log edit
+					logPage.edit( {
+						contents: header + action + title + declineReason + byUser + sig,
+						mode: 'appendtext',
+						summary: 'Logging ' + options.actionType + ' of [[' + options.title + ']]',
+						statusText: 'Logging ' + options.actionType + ' to'
+					} ).done( function ( data ) {
+						deferred.resolve( data );
+					} ).fail( function ( data ) {
+						deferred.reject( data );
+					} );
+				} );
+
+				return deferred;
+			},
+
+			/**
+			 * Takes text of the log page; returns a string with the header for the current month
+			 * if that header doesn't already exist
+			 *
+			 * @param {string} logText Text of user's AfC log
+			 */
+			addLogHeaderIfNeeded: function ( logText ) {
+				var date = new Date(),
+					monthNames = [ 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December' ],
+					headerRe = new RegExp( '^==+\\s*' + monthNames[ date.getUTCMonth() ] + '\\s+' + date.getUTCFullYear() + '\\s*==+', 'm' ),
+					headerText = '';
+
+				if ( !headerRe.test( logText ) ) {
+					headerText += '\n\n=== ' + monthNames[ date.getUTCMonth() ] + ' ' + date.getUTCFullYear() + ' ===';
+				}
+
+				return headerText;
 			},
 
 			/**
@@ -1144,7 +1213,8 @@
 			this.prefDefaults = {
 				autoOpen: false,
 				logCsd: true,
-				launchLinkPosition: 'p-cactions'
+				launchLinkPosition: 'p-cactions',
+				logAfc: false
 			};
 
 			/**
