@@ -21,7 +21,7 @@ To serve the script locally for development, use `npm start` and follow the inst
 
 **Protip for developers**: AFCH running using `npm start` will run in silent mode by default. That is, it will not edit any pages, but instead will output API queries to your browser console.
 
-To turn this off, add `window.afchMockItUp = false;` to your common.js file, or open a browser console and type `AFCH.consts.mockItUp = false;`
+To turn this off, add `window.afchSuppressEdits = false;` to your common.js file, or open a browser console and type `AFCH.consts.mockItUp = false;`
 
 ### Testing
 We have unit tests! `afch-rewrite` uses [Jest](https://github.com/facebook/jest) for testing, a framework built on top of Jasmine that offers dead-simple mocking, built-in simulated DOM manipulation using [jsdom](https://github.com/tmpvar/jsdom), and more.
