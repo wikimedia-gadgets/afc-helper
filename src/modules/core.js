@@ -1579,6 +1579,18 @@
 		},
 
 		/**
+		 * Remove empty section at the end (caused by "Resubmit" button on "declined" template)
+		 * Section may have categories after it - keep them there
+		 *
+		 * @param {string} wikicode
+		 */
+		removeEmptySectionAtEnd: function ( wikicode ) {
+			wikicode = wikicode.replace( /(\n)==[^=]+==\n\s*?(\[\[Category:|$)/i, '$1$2' );
+			wikicode = wikicode.replace( /\n\n$/, '\n' );
+			return wikicode;
+		},
+
+		/**
 		 * Returns the relative time that has elapsed between an oldDate and a nowDate
 		 *
 		 * @param {Date|string} old (if it is a string it will be assumed to be a
