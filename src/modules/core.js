@@ -96,7 +96,7 @@
 				whitelistTitle: 'Wikipedia:WikiProject Articles for creation/Participants'
 			}, AFCH.consts );
 
-			if ( window.afchSuppressEdits === false ) {
+			if ( window.afchSuppressDevEdits === false ) {
 				AFCH.consts.mockItUp = false;
 			}
 
