@@ -101,7 +101,7 @@ module.exports = function ( grunt ) {
 	grunt.registerTask(
 		'build',
 		'Tests files, moves them to the /build directory, and minifies CSS.',
-		[ 'clean:build', 'test', 'copy', 'concat:dependencies', 'styling' ]
+		[ 'clean:build', 'test', 'lint', 'copy', 'concat:dependencies', 'styling' ]
 	);
 
 	grunt.registerTask( 'default', [ 'build' ] );
