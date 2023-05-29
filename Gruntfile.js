@@ -81,7 +81,7 @@ module.exports = function ( grunt ) {
 	grunt.loadNpmTasks( 'grunt-exec' );
 
 	grunt.registerTask(
-		'teststyle',
+		'lint',
 		'Tests files for code style and code quality.',
 		[ 'eslint' ]
 	);
