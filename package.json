@@ -13,8 +13,7 @@
   },
   "scripts": {
     "test": "grunt test",
-    "lint": "grunt lint",
-    "generate-certificates": "node scripts/generate-certificates.js"
+    "lint": "grunt lint"
   },
   "dependencies": {
     "hogan.js": "^3.0.2"
