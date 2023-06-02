@@ -80,6 +80,12 @@ describe( 'AFCH.removeEmptySectionAtEnd', function () {
 		expect( output ).toBe( 'Test\n\n==Test2==\n\n[[Category:Test]]\n\n [[Category:Test2]]\n' );
 	} );
 
+	it( 'don\'t trim if no heading was deleted', function () {
+		var wikicode = 'Test\n\n';
+		var output = AFCH.removeEmptySectionAtEnd( wikicode );
+		expect( output ).toBe( 'Test\n\n' );
+	} );
+
 	// Catastrophic backtracking occurs if this test causes the test suite to get stuck for a long time
 	it( 'should not cause regex catastrophic backtracking', function () {
 		var wikicode = '{{AFC submission}}\n==A==\n                                                                                                             \nB';
