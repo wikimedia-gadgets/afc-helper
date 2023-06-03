@@ -1585,7 +1585,7 @@
 		 * @param {string} wikicode
 		 */
 		removeEmptySectionAtEnd: function ( wikicode ) {
-			result = wikicode.replace( /(\n)==[^=]+==\n\s*?(\[\[Category:|$)/i, '$1$2' );
+			result = wikicode.replace( /(\n)==[^=]+==\n\s*?(\[\[:?Category:|$)/i, '$1$2' );
 			var headingWasRemoved = result !== wikicode;
 			if ( headingWasRemoved ) {
 				result = result.replace( /\n\n$/, '\n' );

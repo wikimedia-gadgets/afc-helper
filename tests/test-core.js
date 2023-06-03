@@ -62,6 +62,12 @@ describe( 'AFCH.removeEmptySectionAtEnd', function () {
 		expect( output ).toBe( 'Test\n\n==Test2==\n\n[[Category:Test]]\n' );
 	} );
 
+	it( 'disabled category', function () {
+		var wikicode = 'Test\n\n==Test2==\n\n== Test 3 ==\n\n[[:Category:Test]]\n';
+		var output = AFCH.removeEmptySectionAtEnd( wikicode );
+		expect( output ).toBe( 'Test\n\n==Test2==\n\n[[:Category:Test]]\n' );
+	} );
+
 	it( 'two headings without body text and with two categories #1', function () {
 		var wikicode = 'Test\n\n==Test2==\n\n== Test 3 ==\n\n[[Category:Test]]\n[[Category:Test2]]\n';
 		var output = AFCH.removeEmptySectionAtEnd( wikicode );
