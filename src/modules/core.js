@@ -96,6 +96,10 @@
 				whitelistTitle: 'Wikipedia:WikiProject Articles for creation/Participants'
 			}, AFCH.consts );
 
+			if ( window.afchSuppressDevEdits === false ) {
+				AFCH.consts.mockItUp = false;
+			}
+
 			// Check whitelist if necessary, but don't delay loading of the
 			// script for users who ARE allowed; rather, just destroy the
 			// script instance when and if it finds the user is not listed
