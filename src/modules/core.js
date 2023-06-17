@@ -61,10 +61,6 @@
 			AFCH.preferences = new AFCH.Preferences();
 			AFCH.prefs = AFCH.preferences.prefStore;
 
-			// Must be defined above the larger $.extend block
-			// because AFCH.consts.summaryAd depends on it
-			AFCH.consts.version = '0.9.1';
-
 			// Add more constants -- don't overwrite those already set, though
 			AFCH.consts = $.extend( AFCH.consts, {
 				versionName: 'Imperial Ibex',
