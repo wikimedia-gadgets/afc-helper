@@ -63,8 +63,6 @@
 
 			// Add more constants -- don't overwrite those already set, though
 			AFCH.consts = $.extend( AFCH.consts, {
-				versionName: 'Imperial Ibex',
-
 				// If true, the script will NOT modify actual wiki content and
 				// will instead mock all such API requests (success assumed)
 				mockItUp: AFCH.consts.mockItUp || false,
@@ -82,7 +80,7 @@
 				user: mw.user.getName(),
 
 				// Edit summary ad
-				summaryAd: ' ([[WP:AFCH|AFCH]] ' + AFCH.consts.version + ')',
+				summaryAd: ' ([[WP:AFCH|AFCH]])',
 
 				// Require users to be on whitelist to use the script
 				// Testwiki users don't need to be on it
@@ -235,7 +233,7 @@
 				.addClass( 'feedback-link link' )
 				.click( function () {
 					feedback.launch( {
-						subject: '[' + AFCH.consts.version + '] ' + ( type ? 'Feedback about ' + type : 'AFCH feedback' )
+						subject: ( type ? 'Feedback about ' + type : 'AFCH feedback' )
 					} );
 				} )
 				.appendTo( $element );
@@ -1288,8 +1286,6 @@
 				// of the preferences as variables, as well as an additional few used in other locations.
 				this.$dialog.empty().append(
 					this.views.renderView( 'preferences', $.extend( {}, this.prefStore, {
-						version: AFCH.consts.version,
-						versionName: AFCH.consts.versionName,
 						userAgent: window.navigator.userAgent
 					} ) )
 				);
