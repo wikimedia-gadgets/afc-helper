@@ -29,6 +29,17 @@ To upload the script to a wiki, use `scripts/upload.py`. Detailed instructions a
 
 New versions of the script can be released through `scripts/release.py`, which automatically updates version history, inline version constants, `package.json`, etc.
 
+### Dependencies
+Below is a list of dependencies and what they are involved with, so you know what to test when updating dependencies.
+
+* Regular
+  * hogan.js - HTML template framework. Creates code that ends up on-wiki.
+* Dev Only
+  * eslint - Used by CI and code editor
+  * grunt - Used by CI and `npm start`
+  * jest-cli - Used by CI and unit tests
+  * jquery - Used by CI and unit tests
+
 ### Version history
 * 0.9.1 Imperial Ibex (05 December 2018)
 * 0.9 Hatted Hamster (8 November 2014)
