@@ -1467,11 +1467,6 @@
 				} else {
 					value = $element.val();
 
-					// Ignore placeholder text
-					if ( value === $element.attr( 'placeholder' ) ) {
-						value = '';
-					}
-
 					// For <select multiple> with nothing selected, jQuery returns null...
 					// convert that to an empty array so that $.each() won't explode later
 					if ( value === null ) {

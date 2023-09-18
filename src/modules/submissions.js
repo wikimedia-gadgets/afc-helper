@@ -2223,12 +2223,17 @@
 
 				// Add biography details
 				if ( data.isBiography ) {
-
+					var deathYear = 'LIVING';
+					if ( data.lifeStatus === 'dead' ) {
+						deathYear = data.deathYear || 'MISSING';
+					} else if ( data.lifeStatus === 'unknown' ) {
+						deathYear = 'UNKNOWN';
+					}
 					// {{subst:L}}, which generates DEFAULTSORT as well as
 					// adds the appropriate birth/death year categories
 					newText.append( '\n{{subst:L' +
 						'|1=' + data.birthYear +
-						'|2=' + ( data.deathYear || '' ) +
+						'|2=' + deathYear +
 						'|3=' + data.subjectName + '}}'
 					);
 
