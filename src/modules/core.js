@@ -651,6 +651,10 @@
 					request.minor = 'true';
 				}
 
+				if ( ['nochange', 'unwatch', 'watch'].includes(options.watchlist) ) {
+					request.watchlist = options.watchlist;
+				}
+
 				// Depending on mode, set appendtext=text or prependtext=text,
 				// which overrides the default text option
 				if ( options.mode ) {
