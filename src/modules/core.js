@@ -651,8 +651,10 @@
 					request.minor = 'true';
 				}
 
-				if ( [ 'nochange', 'unwatch', 'watch' ].includes( options.watchlist ) ) {
+				if ( [ 'nochange', 'preferences', 'unwatch', 'watch' ].includes( options.watchlist ) ) {
 					request.watchlist = options.watchlist;
+				} else if ( AFCH.prefs.noWatch ) {
+					request.watchlist = 'nochange';
 				}
 
 				// Depending on mode, set appendtext=text or prependtext=text,
@@ -739,6 +741,10 @@
 					to: newTitle,
 					reason: reason + AFCH.consts.summaryAd
 				}, additionalParameters );
+
+				if ( AFCH.prefs.noWatch ) {
+					request.watchlist = 'nochange';
+				}
 
 				if ( AFCH.consts.mockItUp ) {
 					AFCH.log( request );
@@ -1218,7 +1224,8 @@
 				autoOpen: false,
 				logCsd: true,
 				launchLinkPosition: 'p-cactions',
-				logAfc: false
+				logAfc: false,
+				noWatch: false
 			};
 
 			/**
