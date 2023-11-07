@@ -651,7 +651,7 @@
 					request.minor = 'true';
 				}
 
-				if ( ['nochange', 'unwatch', 'watch'].includes(options.watchlist) ) {
+				if ( [ 'nochange', 'unwatch', 'watch' ].includes( options.watchlist ) ) {
 					request.watchlist = options.watchlist;
 				}
 
