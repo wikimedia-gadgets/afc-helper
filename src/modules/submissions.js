@@ -2364,7 +2364,8 @@
 
 						recentPage.edit( {
 							contents: newRecentText,
-							summary: 'Adding [[' + newPage + ']] to list of recent AfC creations'
+							summary: 'Adding [[' + newPage + ']] to list of recent AfC creations',
+							watchlist: 'nochange'
 						} );
 					} );
 
