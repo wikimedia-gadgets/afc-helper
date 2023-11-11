@@ -24,10 +24,14 @@ We have unit tests! `afch-rewrite` uses [Jest](https://github.com/facebook/jest)
 
 Tests are stored in the `tests` directory and are run automatically on new commits via GitHub Actions.
 
-### Uploading and releasing the script
+### Deploying
+Interface administrators can [click here](https://en.wikipedia.org/wiki/Wikipedia:WikiProject_Articles_for_creation/Helper_script/Deploying) for a detailed work instruction of how to deploy to English Wikipedia.
+
 To upload the script to a wiki, use `scripts/upload.py`. Detailed instructions are included at the top of the file.
 
 New versions of the script can be released through `scripts/release.py`, which automatically updates version history, inline version constants, `package.json`, etc.
+
+As of 2023, we are "uploading" rather than "releasing".
 
 ### Dependencies
 Below is a list of dependencies and what they are involved with, so you know what to test when updating dependencies.
