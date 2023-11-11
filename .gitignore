@@ -4,3 +4,9 @@ build
 */#*.*#
 *.swp
 certificates/
+pywikibot-*
+throttle.ctrl
+user-*
+venv/
+logs/
+apicache-py3/
