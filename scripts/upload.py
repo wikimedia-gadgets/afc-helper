@@ -92,6 +92,7 @@ print('Uploading to {}...'.format(wiki))
 def stripFirstLine(text):
 	return '\n'.join(text.splitlines()[1:])
 
+# Which of the two bot libraries are we using to write our edits?
 if using_mwclient:
 	if wiki == 'en':
 		server_name = 'en.wikipedia.org'
@@ -109,7 +110,7 @@ if using_mwclient:
 			page.save(text, summary=summary)
 		else:
 			print('Skipping {}, no changes made'.format(title))
-else:
+else: #pywikibot
 	site = pywikibot.Site(wiki, "wikipedia")
 	site.login()
 	print('Logged in as {}.'.format(site.user()))
@@ -156,16 +157,16 @@ def uploadDirectory(directory):
 	for script in files:
 		# Skip hidden files and Emacs spam
 		if not script.startswith('.') and not script.endswith('~'):
-			with open(directory + '/' + script, 'r') as f:
+			with open(directory + '/' + script, mode="r", encoding="utf-8") as f:
 				content = f.read()
 			uploadSubscript(os.path.splitext(script)[0], content)
 
 # Upload afch.js
-with open('build/afch.js', 'r') as f:
+with open('build/afch.js', mode="r", encoding="utf-8") as f:
 	uploadFile(root + '.js', f.read())
 
 # Upload afch.css
-with open('build/afch.css', 'r') as f:
+with open('build/afch.css', mode="r", encoding="utf-8") as f:
 	uploadFile(root + '.css', f.read())
 
 # Now upload everything else: modules, templates
