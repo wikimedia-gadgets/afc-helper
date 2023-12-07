@@ -1626,7 +1626,7 @@
 
 			wikicode = lines.join( '\n' );
 
-			// The old algorithm had some quirks related to adding and removing \n. Mimic the old algorithm, for backwards compatibility.
+			// The old algorithm had some quirks related to adding and removing \n. Mimic the old algorithm for now, so that unit tests pass and users don't have to get used to new behavior.
 			if ( wikicode.match( /\n\n$/ ) ) {
 				wikicode = wikicode.slice( 0, -1 );
 			}
