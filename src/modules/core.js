@@ -1598,21 +1598,14 @@
 			var count = lines.length;
 			for ( i = count - 1; i >= 0; i-- ) {
 				var line = lines[ i ];
-
 				var isWhitespace = line.match( /^\s*$/ );
-				if ( isWhitespace ) {
-					linesToKeep.push( line );
-					continue;
-				}
-
 				var isCategory = line.match( /^\s*\[\[:?Category:/i );
-				if ( isCategory ) {
+				var isHeading = line.match( /^==[^=]+==$/i );
+
+				if ( isWhitespace || isCategory ) {
 					linesToKeep.push( line );
 					continue;
-				}
-
-				var isHeading = line.match( /^==[^=]+==$/i );
-				if ( isHeading ) {
+				} else if ( isHeading ) {
 					break;
 				}
 
