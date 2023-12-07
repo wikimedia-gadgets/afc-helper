@@ -1,7 +1,5 @@
-afch-rewrite [![Build Status](https://github.com/WPAFC/afch-rewrite/actions/workflows/unit_tests.yml/badge.svg)] [![Release](https://img.shields.io/github/release/wpafc/afch-rewrite.svg)](https://github.com/WPAFC/afch-rewrite/releases)
+afch-rewrite [![Build Status](https://github.com/WPAFC/afch-rewrite/actions/workflows/unit_tests.yml/badge.svg)]
 ============
-
-**v0.9.1 Imperial Ibex**
 
 A tool for reviewing Articles for Creation submissions on the English Wikipedia, rewritten using clear, object-oriented JavaScript with a focus on killing bloat while adding value.
 
@@ -27,11 +25,7 @@ Tests are stored in the `tests` directory and are run automatically on new commi
 ### Deploying
 Interface administrators can [click here](https://en.wikipedia.org/wiki/Wikipedia:WikiProject_Articles_for_creation/Helper_script/Deploying) for a detailed work instruction of how to deploy to English Wikipedia.
 
-To upload the script to a wiki, use `scripts/upload.py`. Detailed instructions are included at the top of the file.
-
-New versions of the script can be released through `scripts/release.py`, which automatically updates version history, inline version constants, `package.json`, etc.
-
-As of 2023, we are "uploading" rather than "releasing".
+To deploy AFC Helper to a wiki, use `scripts/upload.py`.
 
 ### Dependencies
 Below is a list of dependencies and what they are involved with, so you know what to test when updating dependencies.
@@ -43,18 +37,6 @@ Below is a list of dependencies and what they are involved with, so you know wha
   * grunt - Used by CI and `npm start`
   * jest-cli - Used by CI and unit tests
   * jquery - Used by CI and unit tests
-
-### Version history
-* 0.9.1 Imperial Ibex (05 December 2018)
-* 0.9 Hatted Hamster (8 November 2014)
-* 0.8 Wandering Walrus (18 May 2014)
-* 0.7 Less is More (13 April 2014)
-* 0.6 Dancing Turtle (27 March 2014)
-* 0.5 Cold Moose (21 March 2014)
-* 0.4 Rewired Robot (14 March 2014)
-* 0.3 Excited Murmur (12 March 2014)
-* 0.2 Egalitarian Elephant (27 February 2014)
-* 0.1 Exploding Fireball (4 January 2014)
 
 ### License
 
