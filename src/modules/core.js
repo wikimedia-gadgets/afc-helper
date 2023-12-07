@@ -1585,12 +1585,63 @@
 		 * @param {string} wikicode
 		 */
 		removeEmptySectionAtEnd: function ( wikicode ) {
-			result = wikicode.replace( /(\n)==[^=]+==\n\s*?(\[\[:?Category:|$)/i, '$1$2' );
-			var headingWasRemoved = result !== wikicode;
-			if ( headingWasRemoved ) {
-				result = result.replace( /\n\n$/, '\n' );
+			// Hard to write a regex that doesn't catastrophic backtrack while still saving multiple categories and multiple blank lines. So we'll do this the old-fashioned way...
+
+			// Divide wikitext into lines
+			var lines = wikicode.split( '\n' );
+
+			// Buffers
+			var linesToKeep = [];
+			var i;
+
+			// Crawl the list of lines backward (bottom up)
+			var count = lines.length;
+			for ( i = count - 1; i >= 0; i-- ) {
+				var line = lines[ i ];
+
+				var isWhitespace = line.match( /^\s*$/ );
+				if ( isWhitespace ) {
+					linesToKeep.push( line );
+					continue;
+				}
+
+				var isCategory = line.match( /^\s*\[\[:?Category:/i );
+				if ( isCategory ) {
+					linesToKeep.push( line );
+					continue;
+				}
+
+				var isHeading = line.match( /^==[^=]+==$/i );
+				if ( isHeading ) {
+					break;
+				}
+
+				// If it's something besides the three things above, such as text, then there's no blank headings to delete. Return unaltered wikitext. We're done.
+				return wikicode;
 			}
-			return result;
+
+			// Delete the lines we checked from the array of lines. We'll be replacing these with new lines in a moment.
+			lines = lines.slice( 0, i );
+
+			// Add the categories and blank lines back
+			// Need to iterate backward, same as the loop above
+			count = linesToKeep.length;
+			for ( var j = count - 1; j >= 0; j-- ) {
+				var lineToKeep = linesToKeep[ j ];
+				lines.push( lineToKeep );
+			}
+
+			wikicode = lines.join( '\n' );
+
+			// The old algorithm removed one \n from the end. To keep backwards compatibility, will copy that here.
+			if ( wikicode.match( /\n\n$/ ) ) {
+				wikicode = wikicode.slice( 0, -1 );
+			}
+
+			// The old alg also removed one \n if multiple \n occurred between text and the categories. Keeping for backwards compatibility.
+			wikicode = wikicode.replace( /\n(\n\n\[\[:?Category:)/i, '$1' );
+
+			return wikicode;
 		},
 
 		/**

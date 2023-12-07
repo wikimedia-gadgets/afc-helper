@@ -44,6 +44,24 @@ describe( 'AFCH.removeEmptySectionAtEnd', function () {
 		expect( output ).toBe( 'Test\n\n==Test2==\nMore test text\n\n== Test 3 ==\nYour text here.\n[[Category:Test]]\n' );
 	} );
 
+	it( '1 heading, 1 category, 1 heading, 1 empty heading', function () {
+		var wikicode = 'Test\n\n==Test2==\nMore test text\n\n[[Category:Test]]\n\n== Test 3 ==\nYour text here.\n\n== Test 4 ==\n';
+		var output = AFCH.removeEmptySectionAtEnd( wikicode );
+		expect( output ).toBe( 'Test\n\n==Test2==\nMore test text\n\n[[Category:Test]]\n\n== Test 3 ==\nYour text here.\n' );
+	} );
+
+	it( '1 heading, 2 categories, 1 heading, 1 empty heading', function () {
+		var wikicode = 'Test\n\n==Test2==\nMore test text\n\n[[Category:Test]]\n[[Category:Test2]]\n\n== Test 3 ==\nYour text here.\n\n== Test 4 ==\n';
+		var output = AFCH.removeEmptySectionAtEnd( wikicode );
+		expect( output ).toBe( 'Test\n\n==Test2==\nMore test text\n\n[[Category:Test]]\n[[Category:Test2]]\n\n== Test 3 ==\nYour text here.\n' );
+	} );
+
+	it( '1 empty heading, 2 categories, 1 heading, 1 empty heading', function () {
+		var wikicode = 'Test\n\n==Test2==\n[[Category:Test]]\n[[Category:Test2]]\n\n== Test 3 ==\nYour text here.\n\n== Test 4 ==\n';
+		var output = AFCH.removeEmptySectionAtEnd( wikicode );
+		expect( output ).toBe( 'Test\n\n==Test2==\n[[Category:Test]]\n[[Category:Test2]]\n\n== Test 3 ==\nYour text here.\n' );
+	} );
+
 	it( 'one heading without body text', function () {
 		var wikicode = 'Test\n\n==Test2==\n';
 		var output = AFCH.removeEmptySectionAtEnd( wikicode );
