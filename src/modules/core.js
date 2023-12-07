@@ -1626,12 +1626,10 @@
 
 			wikicode = lines.join( '\n' );
 
-			// The old algorithm removed one \n from the end. To keep backwards compatibility, will copy that here.
+			// The old algorithm had some quirks related to adding and removing \n. Mimic the old algorithm, for backwards compatibility.
 			if ( wikicode.match( /\n\n$/ ) ) {
 				wikicode = wikicode.slice( 0, -1 );
 			}
-
-			// The old alg also removed one \n if multiple \n occurred between text and the categories. Keeping for backwards compatibility.
 			wikicode = wikicode.replace( /\n(\n\n\[\[:?Category:)/i, '$1' );
 
 			return wikicode;
