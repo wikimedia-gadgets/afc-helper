@@ -1579,8 +1579,9 @@
 		},
 
 		/**
-		 * Remove empty section at the end (caused by "Resubmit" button on "declined" template)
-		 * Section may have categories after it - keep them there
+		 * Remove empty section at the end of the draft. Empty sections at the end of drafts
+		 * frequently happen because of how the "Resubmit" button on the "declined" template
+		 * works. The empty section may have categories after it - keep them there.
 		 *
 		 * @param {string} wikicode
 		 */
