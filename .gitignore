@@ -3,7 +3,6 @@ build
 */*.*~
 */#*.*#
 *.swp
-certificates/
 pywikibot-*
 throttle.ctrl
 user-*
