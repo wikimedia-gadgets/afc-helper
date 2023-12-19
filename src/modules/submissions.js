@@ -811,7 +811,7 @@
 					.append(
 						$( '<div>' )
 							.addClass( 'initial-header' )
-							.text( 'Loading AFCH v' + AFCH.consts.version + '...' )
+							.text( 'Loading AFCH ...' )
 					)
 			);
 
@@ -856,9 +856,7 @@
 				decline: submission.isCurrentlySubmitted,
 				comment: true, // Comments are always okay!
 				submit: !submission.isCurrentlySubmitted,
-				alreadyUnderReview: submission.isUnderReview,
-				version: AFCH.consts.version,
-				versionName: AFCH.consts.versionName
+				alreadyUnderReview: submission.isUnderReview
 			} );
 
 			// Set up the extra options slide-out panel, which appears
@@ -1411,8 +1409,8 @@
 		 */
 		function loadWikiProjectList() {
 			var deferred = $.Deferred(),
-				// This is so a new version of AFCH will invalidate the WikiProject cache
-				lsKey = 'mw-afch-' + AFCH.consts.version + '-wikiprojects-2',
+				// Left over from when a new version of AFCH would invalidate the WikiProject cache. The lsKey doesn't change nowadays though.
+				lsKey = 'mw-afch-wikiprojects-2',
 				wikiProjects = mw.storage.getObject( lsKey );
 
 			if ( wikiProjects ) {
