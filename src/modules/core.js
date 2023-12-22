@@ -1571,6 +1571,64 @@
 		},
 
 		/**
+		 * Remove empty section at the end of the draft. Empty sections at the end of drafts
+		 * frequently happen because of how the "Resubmit" button on the "declined" template
+		 * works. The empty section may have categories after it - keep them there.
+		 *
+		 * @param {string} wikicode
+		 */
+		removeEmptySectionAtEnd: function ( wikicode ) {
+			// Hard to write a regex that doesn't catastrophic backtrack while still saving multiple categories and multiple blank lines. So we'll do this the old-fashioned way...
+
+			// Divide wikitext into lines
+			var lines = wikicode.split( '\n' );
+
+			// Buffers
+			var linesToKeep = [];
+			var i;
+
+			// Crawl the list of lines backward (bottom up)
+			var count = lines.length;
+			for ( i = count - 1; i >= 0; i-- ) {
+				var line = lines[ i ];
+				var isWhitespace = line.match( /^\s*$/ );
+				var isCategory = line.match( /^\s*\[\[:?Category:/i );
+				var isHeading = line.match( /^==[^=]+==$/i );
+
+				if ( isWhitespace || isCategory ) {
+					linesToKeep.push( line );
+					continue;
+				} else if ( isHeading ) {
+					break;
+				}
+
+				// If it's something besides the three things above, such as text, then there's no blank headings to delete. Return unaltered wikitext. We're done.
+				return wikicode;
+			}
+
+			// Delete the lines we checked from the array of lines. We'll be replacing these with new lines in a moment.
+			lines = lines.slice( 0, i );
+
+			// Add the categories and blank lines back
+			// Need to iterate backward, same as the loop above
+			count = linesToKeep.length;
+			for ( var j = count - 1; j >= 0; j-- ) {
+				var lineToKeep = linesToKeep[ j ];
+				lines.push( lineToKeep );
+			}
+
+			wikicode = lines.join( '\n' );
+
+			// The old algorithm had some quirks related to adding and removing \n. Mimic the old algorithm for now, so that unit tests pass and users don't have to get used to new behavior.
+			if ( wikicode.match( /\n\n$/ ) ) {
+				wikicode = wikicode.slice( 0, -1 );
+			}
+			wikicode = wikicode.replace( /\n(\n\n\[\[:?Category:)/i, '$1' );
+
+			return wikicode;
+		},
+
+		/**
 		 * Returns the relative time that has elapsed between an oldDate and a nowDate
 		 *
 		 * @param {Date|string} old (if it is a string it will be assumed to be a
