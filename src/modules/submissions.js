@@ -459,7 +459,26 @@
 			user = this.params.u;
 
 		if ( user ) {
-			deferred.resolve( user );
+			AFCH.api.get( {
+				action: 'query',
+				format: 'json',
+				list: 'logevents',
+				formatversion: '2',
+				letype: 'renameuser',
+				letitle: ( new mw.Title( user, 2 ) ).getPrefixedText()
+			} ).done( function ( resp ) {
+				var logevents = resp.query.logevents;
+
+				if ( logevents.length ) {
+					var newName = logevents[ 0 ].params.newuser;
+					this.params.u = newName;
+					this.getSubmitter().done( function ( user ) {
+						deferred.resolve( user );
+					} );
+				} else {
+					deferred.resolve( user );
+				}
+			}.bind( this ) );
 		} else {
 			this.page.getCreator().done( function ( user ) {
 				deferred.resolve( user );
