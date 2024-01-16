@@ -8,12 +8,12 @@
 		"jquery": true
 	},
 	"globals": {
-		"AFCH": true,
-		"Hogan": false,
-		"importScript": false,
-		"mediaWiki": true,
-		"mw": true,
-		"OO": false
+		"AFCH": "writable",
+		"Hogan": "readonly",
+		"importScript": "readonly",
+		"mediaWiki": "writable",
+		"mw": "writable",
+		"OO": "readonly"
 	},
 	"rules": {
 		"camelcase": 0,
