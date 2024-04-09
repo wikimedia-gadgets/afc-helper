@@ -622,6 +622,10 @@
 		this.text = this.text.replace( /^\s*/, '' );
 	};
 
+	AFCH.Text.prototype.getAfcComments = function () {
+		return this.text.match( /\{\{\s*afc comment[\s\S]+?\(UTC\)\}\}/gi );
+	};
+
 	AFCH.Text.prototype.removeAfcTemplates = function () {
 		// FIXME: Awful regex to remove the old submission templates
 		// This is bad. It works for most cases but has a hellish time
@@ -2210,6 +2214,12 @@
 				// ARTICLE
 				// -------
 
+				// get comments left by reviewers to put on talk page
+				var comments = [];
+				if ( data.copyComments ) {
+					comments = newText.getAfcComments();
+				}
+
 				newText.removeAfcTemplates();
 
 				newText.updateCategories( data.newCategories );
@@ -2322,6 +2332,10 @@
 					if ( wikiProjectsToRemove.length > 0 ) {
 						summary += ', removing ' + wikiProjectsToRemove.length +
 							' WikiProject banner' + ( ( wikiProjectsToRemove.length === 1 ) ? '' : 's' );
+					}
+
+					if ( comments && comments.length > 0 ) {
+						talkText += '== Comments left by AfC reviewers ==\n' + comments.join( '\n\n' );
 					}
 
 					talkPage.edit( {
