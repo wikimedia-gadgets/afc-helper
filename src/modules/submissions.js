@@ -2334,7 +2334,7 @@
 							' WikiProject banner' + ( ( wikiProjectsToRemove.length === 1 ) ? '' : 's' );
 					}
 
-					if ( comments.length > 0 ) {
+					if ( comments && comments.length > 0 ) {
 						talkText += '== Comments left by AfC reviewers ==\n' + comments.join( '\n\n' );
 					}
 
