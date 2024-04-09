@@ -3,7 +3,7 @@
 <!-- preferences -->
 <div class="afch afch-form afch-preferences">
 	<div class="details centered">
-		<strong>AFCH v{{version}} / {{versionName}}</strong>
+		<strong>AFCH</strong>
 		<div>User-Agent: {{userAgent}}</div>
 	</div>
 	<div id="autoOpenWrapper">
@@ -20,6 +20,10 @@
 	<div id="logCsdWrapper">
 		<label for="logCsd" class="afch-label">Log speedy deletion nominations</label>
 		<input type="checkbox" id="logCsd" class="afch-input" {{#logCsd}}checked{{/logCsd}} />
+	</div>
+	<div id="logAfcWrapper">
+		<label for="logAfc" class="afch-label">Log acceptances, declines, and rejects</label>
+		<input type="checkbox" id="logAfc" class="afch-input" {{#logAfc}}checked{{/logAfc}} />
 	</div>
 </div>
 <!-- /preferences -->

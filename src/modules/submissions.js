@@ -555,7 +555,7 @@
 
 		// Remove empty section at the end (caused by "Resubmit" button on "declined" template)
 		// Section may have categories after it - keep them there
-		text = text.replace( /\n+==.+?==((?:\[\[:?Category:.+?\]\]|\s+)*)$/, '$1' );
+		text = AFCH.removeEmptySectionAtEnd( text );
 
 		// Assemble a master regexp and remove all now-unneeded comments (commentsToRemove)
 		commentRegex = new RegExp( '<!-{2,}\\s*(' + commentsToRemove.join( '|' ) + ')\\s*-{2,}>', 'gi' );
@@ -732,7 +732,7 @@
 	};
 
 	// Add the launch link
-	$afchLaunchLink = $( mw.util.addPortletLink( AFCH.prefs.launchLinkPosition, '#', 'Review (AFCH beta)',
+	$afchLaunchLink = $( mw.util.addPortletLink( AFCH.prefs.launchLinkPosition, '#', 'Review (AFCH)',
 		'afch-launch', 'Review submission using afch-rewrite', '1' ) );
 
 	if ( AFCH.prefs.autoOpen &&
@@ -815,7 +815,7 @@
 					.append(
 						$( '<div>' )
 							.addClass( 'initial-header' )
-							.text( 'Loading AFCH v' + AFCH.consts.version + '...' )
+							.text( 'Loading AFCH ...' )
 					)
 			);
 
@@ -860,9 +860,7 @@
 				decline: submission.isCurrentlySubmitted,
 				comment: true, // Comments are always okay!
 				submit: !submission.isCurrentlySubmitted,
-				alreadyUnderReview: submission.isUnderReview,
-				version: AFCH.consts.version,
-				versionName: AFCH.consts.versionName
+				alreadyUnderReview: submission.isUnderReview
 			} );
 
 			// Set up the extra options slide-out panel, which appears
@@ -1306,10 +1304,9 @@
 				);
 
 			// Show a link to the next random submissions
-			new AFCH.status.Element( 'Continue to next $1, $2, or $3 &raquo;', {
+			new AFCH.status.Element( 'Continue to next $1 or $2 &raquo;', {
 				$1: AFCH.makeLinkElementToCategory( 'Pending AfC submissions', 'random submission' ),
-				$2: AFCH.makeLinkElementToCategory( 'AfC pending submissions by age/0 days ago', 'zero-day-old submission' ),
-				$3: AFCH.makeLinkElementToCategory( 'AfC pending submissions by age/Very old', 'very old submission' )
+				$2: AFCH.makeLinkElementToCategory( 'AfC pending submissions by age/0 days ago', 'zero-day-old submission' )
 			} );
 
 			// Also, automagically reload the page in place
@@ -1416,14 +1413,14 @@
 		 */
 		function loadWikiProjectList() {
 			var deferred = $.Deferred(),
-				wikiProjects = [],
-				// This is so a new version of AFCH will invalidate the WikiProject cache
-				lsKey = 'afch-' + AFCH.consts.version + '-wikiprojects-2';
+				// Left over from when a new version of AFCH would invalidate the WikiProject cache. The lsKey doesn't change nowadays though.
+				lsKey = 'mw-afch-wikiprojects-2',
+				wikiProjects = mw.storage.getObject( lsKey );
 
-			if ( window.localStorage && window.localStorage[ lsKey ] ) {
-				wikiProjects = JSON.parse( window.localStorage[ lsKey ] );
+			if ( wikiProjects ) {
 				deferred.resolve( wikiProjects );
 			} else {
+				wikiProjects = [];
 				$.ajax( {
 					url: mw.config.get( 'wgServer' ) + '/w/index.php?title=Wikipedia:WikiProject_Articles_for_creation/WikiProject_templates.json&action=raw&ctype=text/json',
 					dataType: 'json'
@@ -1436,12 +1433,8 @@
 					} );
 
 					// If possible, cache the WikiProject data!
-					if ( window.localStorage ) {
-						try {
-							window.localStorage[ lsKey ] = JSON.stringify( wikiProjects );
-						} catch ( e ) {
-							AFCH.log( 'Unable to cache WikiProject list: ' + e.message );
-						}
+					if ( !mw.storage.setObject( lsKey, wikiProjects, ( 7 * 24 * 60 * 60 ) ) ) {
+						AFCH.log( 'Unable to cache WikiProject list.' );
 					}
 
 					deferred.resolve( wikiProjects );
@@ -1493,8 +1486,10 @@
 
 			// If any templates weren't in the WikiProject map, check if they were redirects
 			if ( otherTemplates.length > 0 ) {
-				var titles = otherTemplates.map( function ( n ) { return 'Template:' + n; } ).join( '|' );
-				return AFCH.api.get( {
+				var titles = otherTemplates.map( function ( n ) { return 'Template:' + n; } );
+				titles = titles.slice( 0, 50 ); // prevent API error by capping max # of titles at 50
+				titles = titles.join( '|' );
+				return AFCH.api.post( {
 					action: 'query',
 					titles: titles,
 					redirects: 'true'
@@ -1786,8 +1781,7 @@
 							// current reviewer is not an admin, also display an error
 							// FIXME: offer one-click request unprotection?
 							$.each( data.query.pages[ '-1' ].protection, function ( _, entry ) {
-								if ( entry.type === 'create' && entry.level === 'sysop' &&
-									$.inArray( 'sysop', mw.config.get( 'wgUserGroups' ) ) === -1 ) {
+								if ( entry.type === 'create' && entry.level === 'sysop' && $.inArray( 'sysop', mw.config.get( 'wgUserGroups' ) ) === -1 ) {
 									errorHtml = 'Darn it, "' + linkToPage + '" is create-protected. You will need to request unprotection before accepting.';
 									buttonText = 'The proposed title is create-protected';
 								}
@@ -2237,12 +2231,17 @@
 
 				// Add biography details
 				if ( data.isBiography ) {
-
+					var deathYear = 'LIVING';
+					if ( data.lifeStatus === 'dead' ) {
+						deathYear = data.deathYear || 'MISSING';
+					} else if ( data.lifeStatus === 'unknown' ) {
+						deathYear = 'UNKNOWN';
+					}
 					// {{subst:L}}, which generates DEFAULTSORT as well as
 					// adds the appropriate birth/death year categories
 					newText.append( '\n{{subst:L' +
 						'|1=' + data.birthYear +
-						'|2=' + ( data.deathYear || '' ) +
+						'|2=' + deathYear +
 						'|3=' + data.subjectName + '}}'
 					);
 
@@ -2380,6 +2379,17 @@
 							summary: 'Adding [[' + newPage + ']] to list of recent AfC creations'
 						} );
 					} );
+
+				// LOG TO USERSPACE
+				// ----------
+
+				afchSubmission.getSubmitter().done( function ( submitter ) {
+					AFCH.actions.logAfc( {
+						title: afchPage.rawTitle,
+						actionType: 'accept',
+						submitter: submitter
+					} );
+				} );
 			} );
 	}
 
@@ -2446,19 +2456,21 @@
 		}
 
 		// Copyright violations get {{db-g12}}'d as well
-		if ( ( declineReason === 'cv' || declineReason2 === 'cv' ) && data.csdSubmission ) {
+		if ( declineReason === 'cv' || declineReason2 === 'cv' ) {
 			var cvUrls = data.cvUrlTextarea.split( '\n' ).slice( 0, 3 ),
 				urlParam = '';
 
-			// Build url param for db-g12 template
-			urlParam = cvUrls[ 0 ];
-			if ( cvUrls.length > 1 ) {
-				urlParam += '|url2=' + cvUrls[ 1 ];
-				if ( cvUrls.length > 2 ) {
-					urlParam += '|url3=' + cvUrls[ 2 ];
+			if ( data.csdSubmission ) {
+				// Build url param for db-g12 template
+				urlParam = cvUrls[ 0 ];
+				if ( cvUrls.length > 1 ) {
+					urlParam += '|url2=' + cvUrls[ 1 ];
+					if ( cvUrls.length > 2 ) {
+						urlParam += '|url3=' + cvUrls[ 2 ];
+					}
 				}
+				text.prepend( '{{db-g12|url=' + urlParam + ( afchPage.additionalData.revId ? '|oldid=' + afchPage.additionalData.revId : '' ) + '}}\n' );
 			}
-			text.prepend( '{{db-g12|url=' + urlParam + ( afchPage.additionalData.revId ? '|oldid=' + afchPage.additionalData.revId : '' ) + '}}\n' );
 
 			// Include the URLs in the decline template
 			if ( declineReason === 'cv' ) {
@@ -2570,24 +2582,31 @@
 
 					AFCH.actions.notifyUser( submitter, {
 						message: message,
-						summary: 'Notification: Your [[' + AFCH.consts.pagename + '|Articles for Creation submission]] has been ' + isDecline ? 'declined' : 'rejected'
+						summary: 'Notification: Your [[' + AFCH.consts.pagename + '|Articles for Creation submission]] has been ' + ( isDecline ? 'declined' : 'rejected' )
 					} );
 				} );
 			} );
 		}
 
-		// Log CSD if necessary
-		if ( data.csdSubmission ) {
-			// FIXME: Only get submitter if needed...?
-			afchSubmission.getSubmitter().done( function ( submitter ) {
+		// Log AfC if enabled and CSD if necessary
+		afchSubmission.getSubmitter().done( function ( submitter ) {
+			AFCH.actions.logAfc( {
+				title: afchPage.rawTitle,
+				actionType: isDecline ? 'decline' : 'reject',
+				declineReason: declineReason,
+				declineReason2: declineReason2,
+				submitter: submitter
+			} );
+
+			if ( data.csdSubmission ) {
 				AFCH.actions.logCSD( {
 					title: afchPage.rawTitle,
 					reason: declineReason === 'cv' ? '[[WP:G12]] ({{tl|db-copyvio}})' :
 						'{{tl|db-reason}} ([[WP:AFC|Articles for creation]])',
 					usersNotified: data.notifyUser ? [ submitter ] : []
 				} );
-			} );
-		}
+			}
+		} );
 	}
 
 	function handleComment( data ) {

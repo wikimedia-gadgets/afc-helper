@@ -1,16 +1,12 @@
-afch-rewrite [![Build Status](https://travis-ci.org/WPAFC/afch-rewrite.png)](https://travis-ci.org/WPAFC/afch-rewrite) [![Release](https://img.shields.io/github/release/wpafc/afch-rewrite.svg)](https://github.com/WPAFC/afch-rewrite/releases)
+afch-rewrite [![Build Status](https://github.com/WPAFC/afch-rewrite/actions/workflows/unit_tests.yml/badge.svg)]
 ============
-
-**v0.9.1 Imperial Ibex**
 
 A tool for reviewing Articles for Creation submissions on the English Wikipedia, rewritten using clear, object-oriented JavaScript with a focus on killing bloat while adding value.
 
 ### Using
-
 The script can be installed on the English Wikipedia by following the instructions at [WP:AFCH](https://en.wikipedia.org/wiki/WP:AFCH).
 
 ### Contributing
-
 *Looking for detailed instructions about how to contribute to afch-rewrite? Check out the [Contributing](https://en.wikipedia.org/wiki/Wikipedia:WikiProject_Articles_for_creation/Helper_script/Contributing) page on Wikipedia!*
 
 Your contributions are welcome! Please add feature requests and bug reports to [WT:AFCH](https://en.wikipedia.org/wiki/WT:AFCH) on enwiki to keep discussions centralized; GitHub also works.
@@ -19,30 +15,28 @@ If you'd like to contribute directly to the code, that's great too! In order to 
 
 To serve the script locally for development, use `npm start` and follow the instructions. The [Contributing](https://en.wikipedia.org/wiki/Wikipedia:WikiProject_Articles_for_creation/Helper_script/Contributing) page has more details if you get stuck.
 
-**Protip for developers**: Set `AFCH.consts.mockItUp = true;` using your browser console and instead of making API requests which modify wiki content, the script will log what it *would have done* instead.
+**Protip for developers**: AFCH running using `npm start` will run in silent mode by default. That is, it will not edit any pages, but instead will output API queries to your browser console. To turn this off, add `window.afchSuppressDevEdits = false;` to your common.js file, or open a browser console and type `AFCH.consts.mockItUp = false;`
 
 ### Testing
 We have unit tests! `afch-rewrite` uses [Jest](https://github.com/facebook/jest) for testing, a framework built on top of Jasmine that offers dead-simple mocking, built-in simulated DOM manipulation using [jsdom](https://github.com/tmpvar/jsdom), and more.
 
-Tests are stored in the `__tests__` directory and are run automatically on new commits via Travis.
+Tests are stored in the `tests` directory and are run automatically on new commits via GitHub Actions.
 
-### Uploading and releasing the script
-To upload the script to a wiki, use `scripts/upload.py`. Detailed instructions are included at the top of the file.
+### Deploying
+Interface administrators can [click here](https://en.wikipedia.org/wiki/Wikipedia:WikiProject_Articles_for_creation/Helper_script/Deploying) for a detailed work instruction of how to deploy to English Wikipedia.
 
-New versions of the script can be released through `scripts/release.py`, which automatically updates version history, inline version constants, `package.json`, etc.
+To deploy AFC Helper to a wiki, use `scripts/upload.py`.
 
-### Version history
+### Dependencies
+Below is a list of dependencies and what they are involved with, so you know what to test when updating dependencies.
 
-* 0.9.1 Imperial Ibex (05 December 2018)
-* 0.9 Hatted Hamster (8 November 2014)
-* 0.8 Wandering Walrus (18 May 2014)
-* 0.7 Less is More (13 April 2014)
-* 0.6 Dancing Turtle (27 March 2014)
-* 0.5 Cold Moose (21 March 2014)
-* 0.4 Rewired Robot (14 March 2014)
-* 0.3 Excited Murmur (12 March 2014)
-* 0.2 Egalitarian Elephant (27 February 2014)
-* 0.1 Exploding Fireball (4 January 2014)
+* Regular
+  * hogan.js - HTML template framework. Creates code that ends up on-wiki.
+* Dev Only
+  * eslint - Used by CI and code editor
+  * grunt - Used by CI and `npm start`
+  * jest-cli - Used by CI and unit tests
+  * jquery - Used by CI and unit tests
 
 ### License
 

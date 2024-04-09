@@ -3,5 +3,9 @@ build
 */*.*~
 */#*.*#
 *.swp
-package-lock.json
-certificates/
+pywikibot-*
+throttle.ctrl
+user-*
+venv/
+logs/
+apicache-py3/

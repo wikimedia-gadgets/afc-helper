@@ -61,14 +61,8 @@
 			AFCH.preferences = new AFCH.Preferences();
 			AFCH.prefs = AFCH.preferences.prefStore;
 
-			// Must be defined above the larger $.extend block
-			// because AFCH.consts.summaryAd depends on it
-			AFCH.consts.version = '0.9.1';
-
 			// Add more constants -- don't overwrite those already set, though
 			AFCH.consts = $.extend( AFCH.consts, {
-				versionName: 'Imperial Ibex',
-
 				// If true, the script will NOT modify actual wiki content and
 				// will instead mock all such API requests (success assumed)
 				mockItUp: AFCH.consts.mockItUp || false,
@@ -86,7 +80,7 @@
 				user: mw.user.getName(),
 
 				// Edit summary ad
-				summaryAd: ' ([[WP:AFCH|AFCH]] ' + AFCH.consts.version + ')',
+				summaryAd: ' ([[WP:AFCH|AFCH]])',
 
 				// Require users to be on whitelist to use the script
 				// Testwiki users don't need to be on it
@@ -95,6 +89,10 @@
 				// Name of the whitelist page for reviewers
 				whitelistTitle: 'Wikipedia:WikiProject Articles for creation/Participants'
 			}, AFCH.consts );
+
+			if ( window.afchSuppressDevEdits === false ) {
+				AFCH.consts.mockItUp = false;
+			}
 
 			// Check whitelist if necessary, but don't delay loading of the
 			// script for users who ARE allowed; rather, just destroy the
@@ -121,7 +119,10 @@
 				// three characters long on the list!
 				var $howToDisable,
 					sanitizedUser = user.replace( /[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&' ),
-					userAllowed = ( new RegExp( '\\|\\s*' + sanitizedUser + '\\s*}' ) ).test( text );
+					userSysop = $.inArray( 'sysop', mw.config.get( 'wgUserGroups' ) ) > -1,
+					userNPP = $.inArray( 'patroller', mw.config.get( 'wgUserGroups' ) ) > -1,
+					userOnWhitelist = ( new RegExp( '\\|\\s*' + sanitizedUser + '\\s*}' ) ).test( text ),
+					userAllowed = userOnWhitelist || userSysop || userNPP;
 
 				if ( !userAllowed ) {
 
@@ -232,7 +233,7 @@
 				.addClass( 'feedback-link link' )
 				.click( function () {
 					feedback.launch( {
-						subject: '[' + AFCH.consts.version + '] ' + ( type ? 'Feedback about ' + type : 'AFCH feedback' )
+						subject: ( type ? 'Feedback about ' + type : 'AFCH feedback' )
 					} );
 				} )
 				.appendTo( $element );
@@ -810,11 +811,6 @@
 				}
 
 				logPage.getText().done( function ( logText ) {
-					var status,
-						date = new Date(),
-						monthNames = [ 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December' ],
-						headerRe = new RegExp( '^==+\\s*' + monthNames[ date.getMonth() ] + '\\s+' + date.getUTCFullYear() + '\\s*==+', 'm' ),
-						appendText = '';
 
 					// Don't edit if the page has doesn't exist or has no text
 					if ( !logText ) {
@@ -822,10 +818,7 @@
 						return;
 					}
 
-					// Add header for new month if necessary
-					if ( !headerRe.test( logText ) ) {
-						appendText += '\n\n=== ' + monthNames[ date.getMonth() ] + ' ' + date.getUTCFullYear() + ' ===';
-					}
+					var appendText = AFCH.actions.addLogHeaderIfNeeded( logText );
 
 					appendText += '\n# [[:' + options.title + ']]: ' + options.reason;
 
@@ -852,6 +845,69 @@
 				} );
 
 				return deferred;
+			},
+
+			logAfc: function ( options ) {
+				var deferred = $.Deferred(),
+					logPage = new AFCH.Page( 'User:' + mw.config.get( 'wgUserName' ) + '/AfC log' );
+
+				// Abort if user disabled in preferences
+				if ( !AFCH.prefs.logAfc ) {
+					return;
+				}
+
+				logPage.getText().done( function ( logText ) {
+					// Build log message
+					var header = AFCH.actions.addLogHeaderIfNeeded( logText );
+					var action = '\n# ' + options.actionType.charAt( 0 ).toUpperCase() + options.actionType.slice( 1 ) +
+										( options.actionType === 'decline' ? '' : 'e' ) + 'd';
+					var title = ' [[:' + options.title + ']]';
+
+					var declineReason = '';
+					if ( options.actionType === 'decline' ) {
+						// Custom is stored as 'reason' (because of template weirdness?), convert if necessary
+						options.declineReason = ( options.declineReason === 'reason' ) ? 'custom' : options.declineReason;
+						options.declineReason2 = ( options.declineReason2 === 'reason' ) ? 'custom' : options.declineReason2;
+
+						declineReason = ' (' + options.declineReason + ( options.declineReason2 ? ' & ' + options.declineReason2 : '' ) + ')';
+					}
+
+					var byUser = ' by [[User:' + options.submitter + '|]]';
+					var sig = ' ~~' + '~~' + '~\n';
+
+					// Make log edit
+					logPage.edit( {
+						contents: header + action + title + declineReason + byUser + sig,
+						mode: 'appendtext',
+						summary: 'Logging ' + options.actionType + ' of [[' + options.title + ']]',
+						statusText: 'Logging ' + options.actionType + ' to'
+					} ).done( function ( data ) {
+						deferred.resolve( data );
+					} ).fail( function ( data ) {
+						deferred.reject( data );
+					} );
+				} );
+
+				return deferred;
+			},
+
+			/**
+			 * Takes text of the log page; returns a string with the header for the current month
+			 * if that header doesn't already exist
+			 *
+			 * @param {string} logText Text of user's AfC log
+			 */
+			addLogHeaderIfNeeded: function ( logText ) {
+				var date = new Date(),
+					monthNames = [ 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December' ],
+					headerRe = new RegExp( '^==+\\s*' + monthNames[ date.getUTCMonth() ] + '\\s+' + date.getUTCFullYear() + '\\s*==+', 'm' ),
+					headerText = '';
+
+				if ( !headerRe.test( logText ) ) {
+					headerText += '\n\n=== ' + monthNames[ date.getUTCMonth() ] + ' ' + date.getUTCFullYear() + ' ===';
+				}
+
+				return headerText;
 			},
 
 			/**
@@ -1151,7 +1207,8 @@
 			this.prefDefaults = {
 				autoOpen: false,
 				logCsd: true,
-				launchLinkPosition: 'p-cactions'
+				launchLinkPosition: 'p-cactions',
+				logAfc: false
 			};
 
 			/**
@@ -1229,8 +1286,6 @@
 				// of the preferences as variables, as well as an additional few used in other locations.
 				this.$dialog.empty().append(
 					this.views.renderView( 'preferences', $.extend( {}, this.prefStore, {
-						version: AFCH.consts.version,
-						versionName: AFCH.consts.versionName,
 						userAgent: window.navigator.userAgent
 					} ) )
 				);
@@ -1404,11 +1459,6 @@
 				} else {
 					value = $element.val();
 
-					// Ignore placeholder text
-					if ( value === $element.attr( 'placeholder' ) ) {
-						value = '';
-					}
-
 					// For <select multiple> with nothing selected, jQuery returns null...
 					// convert that to an empty array so that $.each() won't explode later
 					if ( value === null ) {
@@ -1518,6 +1568,64 @@
 			}
 
 			return newCode;
+		},
+
+		/**
+		 * Remove empty section at the end of the draft. Empty sections at the end of drafts
+		 * frequently happen because of how the "Resubmit" button on the "declined" template
+		 * works. The empty section may have categories after it - keep them there.
+		 *
+		 * @param {string} wikicode
+		 */
+		removeEmptySectionAtEnd: function ( wikicode ) {
+			// Hard to write a regex that doesn't catastrophic backtrack while still saving multiple categories and multiple blank lines. So we'll do this the old-fashioned way...
+
+			// Divide wikitext into lines
+			var lines = wikicode.split( '\n' );
+
+			// Buffers
+			var linesToKeep = [];
+			var i;
+
+			// Crawl the list of lines backward (bottom up)
+			var count = lines.length;
+			for ( i = count - 1; i >= 0; i-- ) {
+				var line = lines[ i ];
+				var isWhitespace = line.match( /^\s*$/ );
+				var isCategory = line.match( /^\s*\[\[:?Category:/i );
+				var isHeading = line.match( /^==[^=]+==$/i );
+
+				if ( isWhitespace || isCategory ) {
+					linesToKeep.push( line );
+					continue;
+				} else if ( isHeading ) {
+					break;
+				}
+
+				// If it's something besides the three things above, such as text, then there's no blank headings to delete. Return unaltered wikitext. We're done.
+				return wikicode;
+			}
+
+			// Delete the lines we checked from the array of lines. We'll be replacing these with new lines in a moment.
+			lines = lines.slice( 0, i );
+
+			// Add the categories and blank lines back
+			// Need to iterate backward, same as the loop above
+			count = linesToKeep.length;
+			for ( var j = count - 1; j >= 0; j-- ) {
+				var lineToKeep = linesToKeep[ j ];
+				lines.push( lineToKeep );
+			}
+
+			wikicode = lines.join( '\n' );
+
+			// The old algorithm had some quirks related to adding and removing \n. Mimic the old algorithm for now, so that unit tests pass and users don't have to get used to new behavior.
+			if ( wikicode.match( /\n\n$/ ) ) {
+				wikicode = wikicode.slice( 0, -1 );
+			}
+			wikicode = wikicode.replace( /\n(\n\n\[\[:?Category:)/i, '$1' );
+
+			return wikicode;
 		},
 
 		/**

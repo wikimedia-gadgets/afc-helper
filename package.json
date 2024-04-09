@@ -1,19 +1,18 @@
 {
-  "name": "afch-rewrite",
-  "version": "0.9.1",
+  "name": "afc-helper",
   "description": "A tool for reviewing Articles for Creation submissions on the English Wikipedia.",
-  "homepage": "https://github.com/WPAFC/afch-rewrite",
+  "homepage": "https://github.com/wikimedia-gadgets/afc-helper",
   "bugs": {
-    "url": "https://github.com/WPAFC/afch-rewrite/issues"
+    "url": "https://github.com/wikimedia-gadgets/afc-helper/issues"
   },
   "license": "GPL-3.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/WPAFC/afch-rewrite/npm.git"
+    "url": "https://github.com/wikimedia-gadgets/afc-helper/npm.git"
   },
   "scripts": {
     "test": "grunt test",
-    "generate-certificates": "node scripts/generate-certificates.js"
+    "lint": "grunt lint"
   },
   "dependencies": {
     "hogan.js": "^3.0.2"
@@ -32,11 +31,10 @@
     "grunt-eslint": "^23.0.0",
     "grunt-exec": "^3.0.0",
     "jest-cli": "^27.0.6",
-    "jquery": "^3.6.0",
-    "minimist": "^1.2.5"
+    "jquery": "^3.6.0"
   },
   "jest": {
     "testEnvironment": "jsdom",
-    "testMatch": [ "**/__tests__/**/test-*.[jt]s?(x)", "**/?(*.)+(spec|test).[jt]s?(x)" ]
+    "testMatch": [ "**/tests/**/test-*.[jt]s?(x)", "**/?(*.)+(spec|test).[jt]s?(x)" ]
   }
 }

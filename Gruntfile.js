@@ -61,7 +61,7 @@ module.exports = function ( grunt ) {
 		},
 
 		eslint: {
-			target: [ 'src/**/*.js', 'contrib/**/*.js', '__tests__/**/*.js', 'Gruntfile.js' ]
+			target: [ 'src/**/*.js', 'contrib/**/*.js', 'tests/**/*.js', 'Gruntfile.js' ]
 		},
 
 		exec: {
@@ -81,7 +81,7 @@ module.exports = function ( grunt ) {
 	grunt.loadNpmTasks( 'grunt-exec' );
 
 	grunt.registerTask(
-		'teststyle',
+		'lint',
 		'Tests files for code style and code quality.',
 		[ 'eslint' ]
 	);
@@ -89,7 +89,7 @@ module.exports = function ( grunt ) {
 	grunt.registerTask(
 		'test',
 		'Runs unit tests as well as checks code style/quality.',
-		[ 'teststyle', 'exec:jest' ]
+		[ 'exec:jest' ]
 	);
 
 	grunt.registerTask(
@@ -101,7 +101,7 @@ module.exports = function ( grunt ) {
 	grunt.registerTask(
 		'build',
 		'Tests files, moves them to the /build directory, and minifies CSS.',
-		[ 'clean:build', 'test', 'copy', 'concat:dependencies', 'styling' ]
+		[ 'clean:build', 'test', 'lint', 'copy', 'concat:dependencies', 'styling' ]
 	);
 
 	grunt.registerTask( 'default', [ 'build' ] );
