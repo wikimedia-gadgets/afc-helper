@@ -614,6 +614,7 @@
 			 *                          mode: {string} 'appendtext' or 'prependtext'; default: (replace everything)
 			 *                          hide: {bool} Set to true to supress logging in statusWindow
 			 *                          statusText: {string} message to show in status; default: "Editing"
+			 *                          followRedirects: {boolean} true to follow redirects, false to ignore redirects
 			 * @return {jQuery.Deferred} Resolves if saved with all data
 			 */
 			editPage: function ( pagename, options ) {
@@ -621,6 +622,11 @@
 
 				if ( !options ) {
 					options = {};
+				}
+
+				// Default to false
+				if ( !options.followRedirects ) {
+					options.followRedirects = false;
 				}
 
 				if ( !options.hide ) {
@@ -634,7 +640,8 @@
 					action: 'edit',
 					text: options.contents,
 					title: pagename,
-					summary: options.summary + AFCH.consts.summaryAd
+					summary: options.summary + AFCH.consts.summaryAd,
+					redirect: options.followRedirects
 				};
 
 				if ( pagename.indexOf( 'Draft:' ) === 0 ) {
@@ -777,7 +784,8 @@
 						summary: options.summary || 'Notifying user',
 						mode: 'appendtext',
 						statusText: 'Notifying',
-						hide: options.hide
+						hide: options.hide,
+						followRedirects: true
 					} )
 						.done( function () {
 							deferred.resolve();
