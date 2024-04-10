@@ -2285,10 +2285,7 @@
 						data.subjectName,
 						data.existingWikiProjects,
 						data.alreadyHasWPBio,
-						data.existingWPBioTemplateName,
-						AFCH.removeFromArray,
-						$.inArray,
-						$.each
+						data.existingWPBioTemplateName
 					);
 					talkText = results.talkText;
 

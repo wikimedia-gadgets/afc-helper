@@ -1639,12 +1639,9 @@
 		 * @param {Array} existingWikiProjects
 		 * @param {boolean} alreadyHasWPBio
 		 * @param {null} existingWPBioTemplateName
-		 * @param {Function} removeFromArray AFCH.removeFromArray()
-		 * @param {Function} inArray $.inArray()
-		 * @param {Function} each $.each()
 		 * @returns {Object} { talkText, countOfWikiProjectsAdded, countOfWikiProjectsRemoved }
 		 */
-		addTalkPageBanners: function ( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName, existingWikiProjects, alreadyHasWPBio, existingWPBioTemplateName, removeFromArray, inArray, each ) {
+		addTalkPageBanners: function ( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName, existingWikiProjects, alreadyHasWPBio, existingWPBioTemplateName ) {
 			var talkTextPrefix = '';
 
 			// Add the AFC banner
@@ -1654,7 +1651,7 @@
 			// Add biography banner if specified
 			if ( isBiography ) {
 				// Ensure we don't have duplicate biography tags
-				removeFromArray( newWikiProjects, 'WikiProject Biography' );
+				AFCH.removeFromArray( newWikiProjects, 'WikiProject Biography' );
 
 				talkTextPrefix += ( '\n{{WikiProject Biography|living=' +
 					( lifeStatus !== 'unknown' ? ( lifeStatus === 'living' ? 'yes' : 'no' ) : '' ) +
@@ -1663,7 +1660,7 @@
 
 			// Add disambiguation banner if needed
 			if ( newAssessment === 'disambig' &&
-				inArray( 'WikiProject Disambiguation', newWikiProjects ) === -1 ) {
+				$.inArray( 'WikiProject Disambiguation', newWikiProjects ) === -1 ) {
 				newWikiProjects.push( 'WikiProject Disambiguation' );
 			}
 
@@ -1686,10 +1683,10 @@
 				wikiProjectsToRemove.push( existingWPBioTemplateName || 'wikiproject biography' );
 			}
 
-			each( wikiProjectsToAdd, function ( _index, templateName ) {
+			$.each( wikiProjectsToAdd, function ( _index, templateName ) {
 				talkTextPrefix += '\n{{' + templateName + '|class=' + newAssessment + '}}';
 			} );
-			each( wikiProjectsToRemove, function ( _index, templateName ) {
+			$.each( wikiProjectsToRemove, function ( _index, templateName ) {
 				// Regex from https://stackoverflow.com/a/5306111/1757964
 				var sanitizedTemplateName = templateName.replace( /[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&' );
 				talkText = talkText.replace( new RegExp( '\\n?\\{\\{\\s*' + sanitizedTemplateName + '\\s*.+?\\}\\}', 'is' ), '' );
