@@ -1157,7 +1157,7 @@
 				page_id: mw.config.get( 'wgArticleId' )
 			} ).then( function ( json ) {
 				var triageInfo = json.pagetriagelist.pages[ 0 ];
-				if ( triageInfo && triageInfo.copyvio === mw.config.get( 'wgCurRevisionId' ) ) {
+				if ( triageInfo && triageInfo.copyvio == mw.config.get( 'wgCurRevisionId' ) ) {
 					addWarning( 'This submission may contain copyright violations', 'CopyPatrol', function () {
 						window.open( 'https://copypatrol.wmcloud.org/en?filter=all&searchCriteria=page_exact&searchText=' +
 							encodeURIComponent( afchPage.rawTitle ) + '&drafts=1&revision=' +
