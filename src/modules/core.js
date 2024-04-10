@@ -1629,6 +1629,84 @@
 		},
 
 		/**
+		 * @param {string} talkText Wikitext of the draft talk page
+		 * @param {string} newAssessment Value of "Article assessment" dropdown list, or "" if blank
+		 * @param {number} revId Revision ID of the draft that is being accepted
+		 * @param {boolean} isBiography Value of the "Is the article a biography?" check box
+		 * @param {Array} newWikiProjects Value of the "Add WikiPrjects" chips
+		 * @param {string} lifeStatus Value of "Is the subject alive?" dropdown list ("unknown", "living", "dead")
+		 * @param {string} subjectName Value of the "Subject name (last, first)" text input, or "" if blank
+		 * @param {Array} existingWikiProjects
+		 * @param {boolean} alreadyHasWPBio
+		 * @param {null} existingWPBioTemplateName
+		 * @param {Function} removeFromArray AFCH.removeFromArray()
+		 * @param {Function} inArray $.inArray()
+		 * @param {Function} each $.each()
+		 * @returns {Object} { talkText, countOfWikiProjectsAdded, countOfWikiProjectsRemoved }
+		 */
+		addTalkPageBanners: function ( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName, existingWikiProjects, alreadyHasWPBio, existingWPBioTemplateName, removeFromArray, inArray, each ) {
+			var talkTextPrefix = '';
+
+			// Add the AFC banner
+			talkTextPrefix += '{{subst:WPAFC/article|class=' + newAssessment +
+				( revId ? '|oldid=' + revId : '' ) + '}}';
+
+			// Add biography banner if specified
+			if ( isBiography ) {
+				// Ensure we don't have duplicate biography tags
+				removeFromArray( newWikiProjects, 'WikiProject Biography' );
+
+				talkTextPrefix += ( '\n{{WikiProject Biography|living=' +
+					( lifeStatus !== 'unknown' ? ( lifeStatus === 'living' ? 'yes' : 'no' ) : '' ) +
+					'|class=' + newAssessment + '|listas=' + subjectName + '}}' );
+			}
+
+			// Add disambiguation banner if needed
+			if ( newAssessment === 'disambig' &&
+				inArray( 'WikiProject Disambiguation', newWikiProjects ) === -1 ) {
+				newWikiProjects.push( 'WikiProject Disambiguation' );
+			}
+
+			// Add and remove WikiProjects
+			/** @var {Array} */
+			var wikiProjectsToAdd = newWikiProjects.filter( function ( newTemplateName ) {
+				return !existingWikiProjects.some( function ( existingTplObj ) {
+					return existingTplObj.templateName === newTemplateName;
+				} );
+			} );
+			/** @var {Array} */
+			var wikiProjectsToRemove = existingWikiProjects.filter( function ( existingTplObj ) {
+				return !newWikiProjects.some( function ( newTemplateName ) {
+					return existingTplObj.templateName === newTemplateName;
+				} );
+			} ).map( function ( templateObj ) {
+				return templateObj.realTemplateName || templateObj.templateName;
+			} );
+			if ( alreadyHasWPBio && !isBiography ) {
+				wikiProjectsToRemove.push( existingWPBioTemplateName || 'wikiproject biography' );
+			}
+
+			each( wikiProjectsToAdd, function ( _index, templateName ) {
+				talkTextPrefix += '\n{{' + templateName + '|class=' + newAssessment + '}}';
+			} );
+			each( wikiProjectsToRemove, function ( _index, templateName ) {
+				// Regex from https://stackoverflow.com/a/5306111/1757964
+				var sanitizedTemplateName = templateName.replace( /[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&' );
+				talkText = talkText.replace( new RegExp( '\\n?\\{\\{\\s*' + sanitizedTemplateName + '\\s*.+?\\}\\}', 'is' ), '' );
+			} );
+
+			// We prepend the text so that talk page content is not removed
+			// (e.g. pages in `Draft:` namespace with discussion)
+			talkText = talkTextPrefix + '\n\n' + talkText;
+
+			return {
+				talkText: talkText,
+				countOfWikiProjectsAdded: wikiProjectsToAdd.length,
+				countOfWikiProjectsRemoved: wikiProjectsToRemove.length
+			};
+		},
+
+		/**
 		 * Returns the relative time that has elapsed between an oldDate and a nowDate
 		 *
 		 * @param {Date|string} old (if it is a string it will be assumed to be a
