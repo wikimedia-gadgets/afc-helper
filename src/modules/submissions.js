@@ -2354,7 +2354,7 @@
 						AFCH.actions.notifyUser( submitter, {
 							message: AFCH.msg.get( 'accepted-submission',
 								{ $1: newPage, $2: data.newAssessment } ),
-							summary: 'Notification: Your [[Wikipedia:Articles for creation|Articles for creation]] submission has been accepted'
+							summary: 'Notification: Your [[' + AFCH.consts.pagename + '|Articles for Creation submission]] has been accepted'
 						} );
 					} );
 				}
