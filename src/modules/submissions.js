@@ -2102,9 +2102,22 @@
 
 	function showCommentOptions() {
 		loadView( 'comment', {} );
+
+		var $submitButton = $( '#afchSubmitForm' );
+		$submitButton.hide();
+
 		$( '#commentText' ).on( 'keyup', mw.util.debounce( 500, function () {
 			previewComment( $( '#commentText' ), $( '#commentPreview' ) );
+
+			// Hide the submit button if there is no comment typed in
+			var comment = $( '#commentText' ).val();
+			if ( comment.length > 0 ) {
+				$submitButton.show();
+			} else {
+				$submitButton.hide();
+			}
 		} ) );
+
 		addFormSubmitHandler( handleComment );
 	}
 
