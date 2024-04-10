@@ -8,7 +8,7 @@
   "license": "GPL-3.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/wikimedia-gadgets/afc-helper/npm.git"
+    "url": "https://github.com/wikimedia-gadgets/afc-helper.git"
   },
   "scripts": {
     "test": "grunt test",
