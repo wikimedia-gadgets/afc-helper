@@ -1633,13 +1633,13 @@
 		 * @param {string} newAssessment Value of "Article assessment" dropdown list, or "" if blank
 		 * @param {number} revId Revision ID of the draft that is being accepted
 		 * @param {boolean} isBiography Value of the "Is the article a biography?" check box
-		 * @param {Array} newWikiProjects Value of the "Add WikiPrjects" chips
+		 * @param {Array} newWikiProjects Value of the "Add WikiPrjects" part of the form. The <input> is a chips interface called jquery.chosen. Note that if there are existing WikiProject banners on the page, the form will auto-add those to the "Add WikiProjects" part of the form when it first loads.
 		 * @param {string} lifeStatus Value of "Is the subject alive?" dropdown list ("unknown", "living", "dead")
 		 * @param {string} subjectName Value of the "Subject name (last, first)" text input, or "" if blank
-		 * @param {Array} existingWikiProjects
+		 * @param {Array<Object>} existingWikiProjects An array of associative arrays. The associative arrays contain the keys {string} displayName (example: Somalia), {string} templateName (example: WikiProject Somalia), and {boolean} alreadyOnPage
 		 * @param {boolean} alreadyHasWPBio
 		 * @param {null} existingWPBioTemplateName
-		 * @returns {Object} { talkText, countOfWikiProjectsAdded, countOfWikiProjectsRemoved }
+		 * @returns {Object} { {string} talkText, {number} countOfWikiProjectsAdded, {number} countOfWikiProjectsRemoved }
 		 */
 		addTalkPageBanners: function ( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName, existingWikiProjects, alreadyHasWPBio, existingWPBioTemplateName ) {
 			var talkTextPrefix = '';

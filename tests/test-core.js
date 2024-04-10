@@ -119,7 +119,7 @@ describe( 'AFCH.removeEmptySectionAtEnd', function () {
 } );
 
 describe( 'AFCH.addTalkPageBanners', function () {
-	it( 'accept form is all default values, talk page is blank', function () {
+	it( 'talk page is blank', function () {
 		var talkText = '';
 		var newAssessment = '';
 		var revId = 592485;
@@ -130,13 +130,13 @@ describe( 'AFCH.addTalkPageBanners', function () {
 		var existingWikiProjects = [];
 		var alreadyHasWPBio = false;
 		var existingWPBioTemplateName = null;
-		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName, existingWikiProjects, alreadyHasWPBio, existingWPBioTemplateName, AFCH.removeFromArray, $.inArray, $.each );
+		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName, existingWikiProjects, alreadyHasWPBio, existingWPBioTemplateName );
 		expect( output.talkText ).toBe( '{{subst:WPAFC/article|class=|oldid=592485}}\n\n' );
 		expect( output.countOfWikiProjectsAdded ).toBe( 0 );
 		expect( output.countOfWikiProjectsRemoved ).toBe( 0 );
 	} );
 
-	it( 'accept form is all default values, talk page has existing sections', function () {
+	it( 'talk page has existing sections', function () {
 		var talkText = '== Hello ==\nI have a question. Can you help answer it? –[[User:Novem Linguae|<span style="color:blue">\'\'\'Novem Linguae\'\'\'</span>]] <small>([[User talk:Novem Linguae|talk]])</small> 20:22, 10 April 2024 (UTC)';
 		var newAssessment = '';
 		var revId = 592485;
@@ -147,32 +147,82 @@ describe( 'AFCH.addTalkPageBanners', function () {
 		var existingWikiProjects = [];
 		var alreadyHasWPBio = false;
 		var existingWPBioTemplateName = null;
-		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName, existingWikiProjects, alreadyHasWPBio, existingWPBioTemplateName, AFCH.removeFromArray, $.inArray, $.each );
+		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName, existingWikiProjects, alreadyHasWPBio, existingWPBioTemplateName );
 		expect( output.talkText ).toBe( '{{subst:WPAFC/article|class=|oldid=592485}}\n\n== Hello ==\nI have a question. Can you help answer it? –[[User:Novem Linguae|<span style="color:blue">\'\'\'Novem Linguae\'\'\'</span>]] <small>([[User talk:Novem Linguae|talk]])</small> 20:22, 10 April 2024 (UTC)' );
 		expect( output.countOfWikiProjectsAdded ).toBe( 0 );
 		expect( output.countOfWikiProjectsRemoved ).toBe( 0 );
 	} );
 
-	// TODO: unexpected \n between new banners and old banners
-	it( 'accept form is all default values, talk page has existing WikiProject banners', function () {
+	// FIXME: unexpected \n between new banners and old banners. https://github.com/wikimedia-gadgets/afc-helper/issues/330
+	it( 'talk page has existing WikiProject banners', function () {
 		var talkText = '{{WikiProject Women}}\n{{WikiProject Women\'s sport}}\n{{WikiProject Somalia}}';
 		var newAssessment = '';
-		var revId = 592485;
+		var revId = 592507;
 		var isBiography = false;
-		var newWikiProjects = [];
+		var newWikiProjects = [ 'WikiProject Somalia', 'WikiProject Women', 'WikiProject Women\'s sport' ];
 		var lifeStatus = 'unknown';
 		var subjectName = '';
-		var existingWikiProjects = [];
+		var existingWikiProjects = [
+			{
+				displayName: 'Somalia',
+				templateName: 'WikiProject Somalia',
+				alreadyOnPage: true
+			},
+			{
+				displayName: 'Women',
+				templateName: 'WikiProject Women',
+				alreadyOnPage: true
+			},
+			{
+				displayName: 'Women\'s sport',
+				templateName: 'WikiProject Women\'s sport',
+				alreadyOnPage: true
+			}
+		];
 		var alreadyHasWPBio = false;
 		var existingWPBioTemplateName = null;
-		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName, existingWikiProjects, alreadyHasWPBio, existingWPBioTemplateName, AFCH.removeFromArray, $.inArray, $.each );
-		expect( output.talkText ).toBe( '{{subst:WPAFC/article|class=|oldid=592485}}\n\n{{WikiProject Women}}\n{{WikiProject Women\'s sport}}\n{{WikiProject Somalia}}' );
+		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName, existingWikiProjects, alreadyHasWPBio, existingWPBioTemplateName );
+		expect( output.talkText ).toBe( '{{subst:WPAFC/article|class=|oldid=592507}}\n\n{{WikiProject Women}}\n{{WikiProject Women\'s sport}}\n{{WikiProject Somalia}}' );
 		expect( output.countOfWikiProjectsAdded ).toBe( 0 );
 		expect( output.countOfWikiProjectsRemoved ).toBe( 0 );
 	} );
 
-	// TODO: need a test that has non-default input for existingWikiProjects, alreadyHasWPBio, and existingWPBioTemplateName
-	it( 'accept form is a biography with all fields filled in, talk page is blank', function () {
+	// FIXME: the edit summary of 1 WikiProject banner removed is correct, but this doesn't actually remove the WikiProject banner from the talk page. https://github.com/wikimedia-gadgets/afc-helper/issues/329
+	it( 'remove an existing WikiProject', function () {
+		var talkText = '{{WikiProject Women}}\n{{WikiProject Women\'s sport}}\n{{WikiProject Somalia}}';
+		var newAssessment = '';
+		var revId = 592507;
+		var isBiography = false;
+		// user de-selected WikiProject Somalia
+		var newWikiProjects = [ 'WikiProject Women', 'WikiProject Women\'s sport' ];
+		var lifeStatus = 'unknown';
+		var subjectName = '';
+		var existingWikiProjects = [
+			{
+				displayName: 'Somalia',
+				templateName: 'WikiProject Somalia',
+				alreadyOnPage: true
+			},
+			{
+				displayName: 'Women',
+				templateName: 'WikiProject Women',
+				alreadyOnPage: true
+			},
+			{
+				displayName: 'Women\'s sport',
+				templateName: 'WikiProject Women\'s sport',
+				alreadyOnPage: true
+			}
+		];
+		var alreadyHasWPBio = false;
+		var existingWPBioTemplateName = null;
+		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName, existingWikiProjects, alreadyHasWPBio, existingWPBioTemplateName );
+		expect( output.talkText ).toBe( '{{subst:WPAFC/article|class=|oldid=592507}}\n\n{{WikiProject Women}}\n{{WikiProject Women\'s sport}}\n{{WikiProject Somalia}}' );
+		expect( output.countOfWikiProjectsAdded ).toBe( 0 );
+		expect( output.countOfWikiProjectsRemoved ).toBe( 1 );
+	} );
+
+	it( 'accept form is a biography with all fields filled in', function () {
 		var talkText = '';
 		var newAssessment = 'B';
 		var revId = 592496;
@@ -183,9 +233,56 @@ describe( 'AFCH.addTalkPageBanners', function () {
 		var existingWikiProjects = [];
 		var alreadyHasWPBio = false;
 		var existingWPBioTemplateName = null;
-		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName, existingWikiProjects, alreadyHasWPBio, existingWPBioTemplateName, AFCH.removeFromArray, $.inArray, $.each );
+		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName, existingWikiProjects, alreadyHasWPBio, existingWPBioTemplateName );
 		expect( output.talkText ).toBe( '{{subst:WPAFC/article|class=B|oldid=592496}}\n{{WikiProject Biography|living=yes|class=B|listas=Jones, Bob}}\n{{WikiProject Africa|class=B}}\n{{WikiProject Alabama|class=B}}\n\n' );
 		expect( output.countOfWikiProjectsAdded ).toBe( 2 );
+		expect( output.countOfWikiProjectsRemoved ).toBe( 0 );
+	} );
+
+	// FIXME: is supposed to remove the {{wikiproject biography}} template and report 1 template removed, but does not. code outside of AFCH.addTalkPageBanners() is incorrectly calculating alreadyHasWPBio as false
+	// FIXME: 2 extra line breaks in the output
+	it( 'talk page has {{wikiproject biography}}, and user selects that it\'s not a biography, so should remove {{wikiproject biography}}', function () {
+		var talkText = '{{wikiproject biography|living=yes|class=B|listas=Jones, Bob}}\n{{WikiProject Somalia}}';
+		var newAssessment = '';
+		var revId = 592496;
+		var isBiography = false;
+		var newWikiProjects = [ 'WikiProject Biography', 'WikiProject Somalia' ];
+		var lifeStatus = 'unknown';
+		var subjectName = '';
+		var existingWikiProjects = [
+			{
+				displayName: 'Biography',
+				templateName: 'WikiProject Biography',
+				alreadyOnPage: true
+			},
+			{
+				displayName: 'Somalia',
+				templateName: 'WikiProject Somalia',
+				alreadyOnPage: true
+			}
+		];
+		var alreadyHasWPBio = false;
+		var existingWPBioTemplateName = null;
+		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName, existingWikiProjects, alreadyHasWPBio, existingWPBioTemplateName );
+		expect( output.talkText ).toBe( '{{subst:WPAFC/article|class=|oldid=592496}}\n\n{{wikiproject biography|living=yes|class=B|listas=Jones, Bob}}\n{{WikiProject Somalia}}' );
+		expect( output.countOfWikiProjectsAdded ).toBe( 0 );
+		expect( output.countOfWikiProjectsRemoved ).toBe( 0 );
+	} );
+
+	it( 'user selects class = disambiguation', function () {
+		var talkText = '';
+		var newAssessment = 'disambig';
+		var revId = 592681;
+		var isBiography = false;
+		var newWikiProjects = [];
+		var lifeStatus = 'unknown';
+		var subjectName = '';
+		var existingWikiProjects = [];
+		var alreadyHasWPBio = false;
+		var existingWPBioTemplateName = null;
+		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName, existingWikiProjects, alreadyHasWPBio, existingWPBioTemplateName );
+		expect( output.talkText ).toBe( '{{subst:WPAFC/article|class=disambig|oldid=592681}}\n{{WikiProject Disambiguation|class=disambig}}\n\n' );
+		expect( output.countOfWikiProjectsAdded ).toBe( 1 );
 		expect( output.countOfWikiProjectsRemoved ).toBe( 0 );
 	} );
 } );
