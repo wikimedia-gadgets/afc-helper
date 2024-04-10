@@ -942,7 +942,7 @@
 			if ( actionMessage !== false ) {
 				$action = $( '<a>' )
 					.addClass( 'link' )
-					.text( actionMessage || 'Edit page' )
+					.text( '(' + ( actionMessage || 'Edit page' ) + ')' )
 					.appendTo( $warning );
 
 				if ( typeof onAction === 'function' ) {
