@@ -1159,7 +1159,7 @@
 				var triageInfo = json.pagetriagelist.pages[ 0 ];
 				if ( triageInfo && triageInfo.copyvio === mw.config.get( 'wgCurRevisionId' ) ) {
 					addWarning( 'This submission may contain copyright violations', 'CopyPatrol', function () {
-						window.open( 'https://copypatrol.toolforge.org/en?filter=all&searchCriteria=page_exact&searchText=' +
+						window.open( 'https://copypatrol.wmcloud.org/en?filter=all&searchCriteria=page_exact&searchText=' +
 							encodeURIComponent( afchPage.rawTitle ) + '&drafts=1&revision=' +
 							mw.config.get( 'wgCurRevisionId' ), '_blank' );
 					} );
