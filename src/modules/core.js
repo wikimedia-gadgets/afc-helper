@@ -93,6 +93,7 @@
 			if ( window.afchSuppressDevEdits === false ) {
 				AFCH.consts.mockItUp = false;
 			}
+			AFCH.consts.mockItUp = true;
 
 			// Check whitelist if necessary, but don't delay loading of the
 			// script for users who ARE allowed; rather, just destroy the

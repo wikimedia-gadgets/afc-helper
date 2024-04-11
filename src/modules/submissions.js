@@ -2611,28 +2611,64 @@
 		} );
 	}
 
-	function handleComment( data ) {
-		var text = data.afchText;
-
-		afchSubmission.addNewComment( data.commentText );
-		text.updateAfcTemplates( afchSubmission.makeWikicode() );
-
-		text.cleanUp();
-
-		afchPage.edit( {
-			contents: text.get(),
-			summary: 'Commenting on submission'
-		} );
-
-		if ( data.notifyUser ) {
-			afchSubmission.getSubmitter().done( function ( submitter ) {
-				AFCH.actions.notifyUser( submitter, {
-					message: AFCH.msg.get( 'comment-on-submission',
-						{ $1: AFCH.consts.pagename } ),
-					summary: 'Notification: I\'ve commented on [[' + AFCH.consts.pagename + '|your Articles for Creation submission]]'
-				} );
+	function checkForEditConflict() {
+		var request = {
+			action: 'query',
+			format: 'json',
+			prop: 'revisions',
+			titles: [ mw.config.get( 'wgPageName' ) ],
+			formatversion: 2,
+			rvstartid: mw.config.get( 'wgRevisionId' ),
+			rvdir: 'newer'
+		};
+		var promise = AFCH.api.postWithEditToken( request )
+			.done( function ( data ) {
+				debugger;
+				var revisions = data.query.pages[ 0 ].revisions;
+				if ( revisions && revisions.length > 1 ) {
+					return true;
+				}
+				return false;
 			} );
-		}
+		return promise;
+	}
+
+	function showEditConflictMessage() {
+
+	}
+
+	function handleComment( data ) {
+		checkForEditConflict().then( function ( editConflict ) {
+			debugger;
+			if ( editConflict ) {
+				console.log( 'Edit conflict detected' );
+				showEditConflictMessage();
+				return;
+			}
+			console.log( 'No edit conflict detected' );
+
+			var text = data.afchText;
+
+			afchSubmission.addNewComment( data.commentText );
+			text.updateAfcTemplates( afchSubmission.makeWikicode() );
+
+			text.cleanUp();
+
+			afchPage.edit( {
+				contents: text.get(),
+				summary: 'Commenting on submission'
+			} );
+
+			if ( data.notifyUser ) {
+				afchSubmission.getSubmitter().done( function ( submitter ) {
+					AFCH.actions.notifyUser( submitter, {
+						message: AFCH.msg.get( 'comment-on-submission',
+							{ $1: AFCH.consts.pagename } ),
+						summary: 'Notification: I\'ve commented on [[' + AFCH.consts.pagename + '|your Articles for Creation submission]]'
+					} );
+				} );
+			}
+		} );
 	}
 
 	function handleSubmit( data ) {
