@@ -458,6 +458,7 @@
 		var deferred = $.Deferred(),
 			user = this.params.u;
 
+		// Recursively detect if the user has been renamed by checking the rename log
 		if ( user ) {
 			AFCH.api.get( {
 				action: 'query',
