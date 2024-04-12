@@ -2345,7 +2345,7 @@
 					}
 
 					if ( comments && comments.length > 0 ) {
-						talkText += '== Comments left by AfC reviewers ==\n' + comments.join( '\n\n' );
+						talkText = talkText.trim() + '\n\n== Comments left by AfC reviewers ==\n' + comments.join( '\n\n' );
 					}
 
 					talkPage.edit( {
