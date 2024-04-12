@@ -756,8 +756,7 @@
 			},
 
 			/**
-			 * Notifies a user. Follows redirects and appends a message
-			 * to the bottom of the user's talk page.
+			 * Notifies a user. Appends a message to the bottom of the user's talk page.
 			 *
 			 * @param  {string} user
 			 * @param  {Object} data object with properties
