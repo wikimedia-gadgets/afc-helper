@@ -169,6 +169,8 @@
 			<input type="checkbox" id="notifyUser" class="afch-input" checked/>
 		</div>
 
+		<div id="afchEditConflict"></div>
+
 		<div id="afchSubmitForm" data-running="Accepting submission..." class="gradient-button accept">Accept &amp; publish</div>
 
 	</div>
@@ -304,6 +306,8 @@
 			</div>
 		</div>
 
+		<div id="afchEditConflict"></div>
+
 		<div id="afchSubmitForm" data-running="Declining submission..." class="gradient-button button-centered decline hidden">Decline submission</div>
 
 	</div>
@@ -321,10 +325,12 @@
 
 		<div id="commentPreview"></div>
 
-	<div class="afch-option">
-		<input type="checkbox" id="notifyUser" class="afch-input" {{#notifyByDefault}}checked{{/notifyByDefault}} />
-		<label for="notifyUser" class="afch-label">Notify submitter</label>
-	</div>
+		<div class="afch-option">
+			<input type="checkbox" id="notifyUser" class="afch-input" {{#notifyByDefault}}checked{{/notifyByDefault}} />
+			<label for="notifyUser" class="afch-label">Notify submitter</label>
+		</div>
+
+		<div id="afchEditConflict"></div>
 
 		<div id="afchSubmitForm" data-running="Commenting on submission..." class="gradient-button button-centered comment">Post comment</div>
 
@@ -351,6 +357,8 @@
 			<div id="submitterNameStatus" class="error"></div>
 		</div>
 
+		<div id="afchEditConflict"></div>
+
 		<div id="afchSubmitForm" data-running="Submitting..." class="gradient-button button-centered submit">Submit</div>
 
 	</div>
@@ -365,10 +373,11 @@
 			placeholder="Enter your rationale for postponing deletion, which will be added to the submission as a new comment."
 			cols="100" rows="5"></textarea>
 
+		<div id="afchEditConflict"></div>
+
 		<div id="afchSubmitForm" data-running="Postponing..." class="gradient-button button-centered postpone-g13">
 			Postpone deletion
 		</div>
-
 	</div>
 </div>
 <!-- /postpone-g13 -->

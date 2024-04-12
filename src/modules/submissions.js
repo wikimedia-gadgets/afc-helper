@@ -1347,10 +1347,18 @@
 				// Also provide extra data
 				$.extend( data, extraData );
 
-				prepareForProcessing();
+				checkForEditConflict().then( function ( editConflict ) {
+					if ( editConflict ) {
+						showEditConflictMessage();
+						return;
+					}
 
-				// Now finally call the applicable handler
-				fn( data );
+					// Hide the HTML form. Show #afchStatus messages
+					prepareForProcessing();
+
+					// Now finally call the applicable handler
+					fn( data );
+				} );
 			} );
 		} );
 	}
@@ -2612,6 +2620,7 @@
 	}
 
 	function checkForEditConflict() {
+		// Get all revisions since the page was loaded, starting with the revision of the loaded page
 		var request = {
 			action: 'query',
 			format: 'json',
@@ -2622,9 +2631,9 @@
 			rvdir: 'newer'
 		};
 		var promise = AFCH.api.postWithEditToken( request )
-			.done( function ( data ) {
-				debugger;
+			.then( function ( data ) {
 				var revisions = data.query.pages[ 0 ].revisions;
+				// 1 revision = no edit conflict, 2+ revisions = edit conflict.
 				if ( revisions && revisions.length > 1 ) {
 					return true;
 				}
@@ -2634,41 +2643,40 @@
 	}
 
 	function showEditConflictMessage() {
+		$( '#afchSubmitForm' ).hide();
 
+		// Putting this here instead of in tpl-submissions.html to reduce code duplication
+		var editConflictHtml = 'Edit conflict! Your changes were not saved. Please check the <a id="afchHistoryLink" href="">page history</a>. To avoid overwriting the other person\'s edits, please refresh this page and start again.';
+		$( '#afchEditConflict' ).html( editConflictHtml );
+
+		var historyLink = new mw.Uri( mw.util.getUrl( mw.config.get( 'wgPageName' ), { action: 'history' } ) );
+		$( '#afchHistoryLink' ).prop( 'href', historyLink );
+
+		$( '#afchEditConflict' ).show();
 	}
 
 	function handleComment( data ) {
-		checkForEditConflict().then( function ( editConflict ) {
-			debugger;
-			if ( editConflict ) {
-				console.log( 'Edit conflict detected' );
-				showEditConflictMessage();
-				return;
-			}
-			console.log( 'No edit conflict detected' );
+		var text = data.afchText;
 
-			var text = data.afchText;
+		afchSubmission.addNewComment( data.commentText );
+		text.updateAfcTemplates( afchSubmission.makeWikicode() );
 
-			afchSubmission.addNewComment( data.commentText );
-			text.updateAfcTemplates( afchSubmission.makeWikicode() );
+		text.cleanUp();
 
-			text.cleanUp();
-
-			afchPage.edit( {
-				contents: text.get(),
-				summary: 'Commenting on submission'
-			} );
-
-			if ( data.notifyUser ) {
-				afchSubmission.getSubmitter().done( function ( submitter ) {
-					AFCH.actions.notifyUser( submitter, {
-						message: AFCH.msg.get( 'comment-on-submission',
-							{ $1: AFCH.consts.pagename } ),
-						summary: 'Notification: I\'ve commented on [[' + AFCH.consts.pagename + '|your Articles for Creation submission]]'
-					} );
-				} );
-			}
+		afchPage.edit( {
+			contents: text.get(),
+			summary: 'Commenting on submission'
 		} );
+
+		if ( data.notifyUser ) {
+			afchSubmission.getSubmitter().done( function ( submitter ) {
+				AFCH.actions.notifyUser( submitter, {
+					message: AFCH.msg.get( 'comment-on-submission',
+						{ $1: AFCH.consts.pagename } ),
+					summary: 'Notification: I\'ve commented on [[' + AFCH.consts.pagename + '|your Articles for Creation submission]]'
+				} );
+			} );
+		}
 	}
 
 	function handleSubmit( data ) {
