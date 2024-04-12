@@ -8,7 +8,7 @@ Modified for Pywikibot by Enterprisey
 Usage
 =====
 
-Run this script from the main afch-rewrite directory using Python 3:
+Run this script from the main afc-helper directory using Python 3:
 
 >>> python scripts/upload.py SITE ROOT [--force] [--mwclient USERNAME]
 
@@ -71,7 +71,7 @@ if '--force' in sys.argv:
 	command += ' --force'
 	sys.argv.remove('--force')
 
-print('Building afch-rewrite using `{}`...'.format(command))
+print('Building afc-helper using `{}`...'.format(command))
 
 try:
 	process = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
@@ -135,7 +135,7 @@ except AttributeError:
 	sha1 = branch.commit.id
 
 # Prepend this to every page
-header = '/* Uploaded from https://github.com/WPAFC/afch-rewrite, commit: {} ({}) */\n'.format(sha1, branch)
+header = '/* Uploaded from https://github.com/wikimedia-gadgets/afc-helper, commit: {} ({}) */\n'.format(sha1, branch)
 
 isMainGadget = (wiki == 'en') and (root == 'MediaWiki:Gadget-afchelper')
 
