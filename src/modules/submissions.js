@@ -461,18 +461,18 @@
 		if ( user ) {
 			AFCH.api.get( {
 				action: 'query',
-				format: 'json',
 				list: 'logevents',
-				formatversion: '2',
+				formatversion: 2,
 				letype: 'renameuser',
-				letitle: ( new mw.Title( user, 2 ) ).getPrefixedText()
-			} ).done( function ( resp ) {
+				lelimit: 1,
+				letitle: 'User:' + user
+			} ).then( function ( resp ) {
 				var logevents = resp.query.logevents;
 
 				if ( logevents.length ) {
 					var newName = logevents[ 0 ].params.newuser;
 					this.params.u = newName;
-					this.getSubmitter().done( function ( user ) {
+					this.getSubmitter().then( function ( user ) {
 						deferred.resolve( user );
 					} );
 				} else {
