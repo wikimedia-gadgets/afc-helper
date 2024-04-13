@@ -43,7 +43,7 @@
 		function getText( pageTitle ) {
 			var deferred = $.Deferred();
 
-			// Use afch-rewrite `AFCH.Page` if possible to utilize cache
+			// Use afc-helper `AFCH.Page` if possible to utilize cache
 			if ( window.AFCH ) {
 				return ( new AFCH.Page( pageTitle ) ).getText( true );
 			}
@@ -71,7 +71,7 @@
 				if ( !userAllowed ) {
 					destroyOldAfch();
 
-					// Show the error message. If afch-rewrite is installed,
+					// Show the error message. If afc-helper is installed,
 					// don't show the error message twice.
 					if ( !window.AFCH ) {
 						showNotListedError( userName );

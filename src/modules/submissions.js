@@ -733,7 +733,7 @@
 
 	// Add the launch link
 	$afchLaunchLink = $( mw.util.addPortletLink( AFCH.prefs.launchLinkPosition, '#', 'Review (AFCH)',
-		'afch-launch', 'Review submission using afch-rewrite', '1' ) );
+		'afch-launch', 'Review submission using afc-helper', '1' ) );
 
 	if ( AFCH.prefs.autoOpen &&
 		// Don't autoload in userspace -- too many false positives
@@ -883,7 +883,7 @@
 			} );
 
 			// Add feedback and preferences links
-			// FIXME: Feedback temporarily disabled due to https://github.com/WPAFC/afch-rewrite/issues/71
+			// FIXME: Feedback temporarily disabled due to https://github.com/wikimedia-gadgets/afc-helper/issues/71
 			// AFCH.initFeedback( $afch.find( 'span.feedback-wrapper' ), '[your topic here]', 'give feedback' );
 			AFCH.preferences.initLink( $afch.find( 'span.preferences-wrapper' ), 'preferences' );
 
