@@ -2635,8 +2635,8 @@
 		}
 	}
 
-	// TODO: add auto subscribe to section preference, defaulting to off
-	// TODO: add to handleAccept, handleDecline, handleReject too
+	// TODO: add to preferences screen, defaulting to off
+	// TODO: add to handleAccept, handleDecline, handleReject
 	// TODO: manually test
 
 	function subscribeToBottomSection( submitter ) {
