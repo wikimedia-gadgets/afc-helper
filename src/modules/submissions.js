@@ -2625,14 +2625,54 @@
 		} );
 
 		if ( data.notifyUser ) {
-			afchSubmission.getSubmitter().done( function ( submitter ) {
+			afchSubmission.getSubmitter().then( function ( submitter ) {
 				AFCH.actions.notifyUser( submitter, {
 					message: AFCH.msg.get( 'comment-on-submission',
 						{ $1: AFCH.consts.pagename } ),
 					summary: 'Notification: I\'ve commented on [[' + AFCH.consts.pagename + '|your Articles for Creation submission]]'
-				} );
+				} ).then( subscribeToBottomSection( submitter ) );
 			} );
 		}
+	}
+
+	// TODO: add auto subscribe to section preference, defaulting to off
+	// TODO: add to handleAccept, handleDecline, handleReject too
+	// TODO: manually test
+
+	function subscribeToBottomSection( submitter ) {
+		if ( /* preferenceIsOff */ ) {
+			return;
+		}
+
+		var talkPage = 'User talk' + submitter;
+
+		AFCH.api.get( {
+			action: 'discussiontoolspageinfo',
+			format: 'json',
+			page: talkPage,
+			formatversion: 2
+		} ).then( function ( json ) {
+			// iterate from the bottom up, until a string beginning with "h-" is found.
+			var transcludedFrom = json.discussiontoolspageinfo.transcludedfrom;
+			var commentName = '';
+			for ( var i = transcludedFrom.length; i > 0; i-- ) {
+				var value = transcludedFrom[ i - 1 ];
+				if ( value.indexOf( 'h-' ) === 0 ) {
+					commentName = value;
+					break;
+				}
+			}
+
+			// Note: if the program code gets the commentName wrong, subscribing is likely to fail silently. That is, it will still subscribe to a section, but because the section does not exist, the AFC reviewer will not receive notifications. You can troubleshoot at https://en.wikipedia.org/wiki/Special:TopicSubscriptions
+			AFCH.api.post( {
+				action: 'discussiontoolssubscribe',
+				format: 'json',
+				formatversion: 2,
+				page: talkPage,
+				commentname: commentName,
+				subscribe: true
+			} );
+		} );
 	}
 
 	function handleSubmit( data ) {
