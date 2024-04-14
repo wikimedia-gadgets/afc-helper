@@ -1767,22 +1767,31 @@
 							inprop: 'protection',
 							titles: page.rawTitle
 						} )
-					).then( function ( rawBlacklistResult, rawData ) {
+						// TODO: query # of revisions
+						// TODO: query page isRedirect
+					).then( function ( rawBlacklist, rawProtection, rawRevisions, rawPage ) {
 						var errorHtml, buttonText;
 
 						// Get just the result, not the Promise object
-						var blacklistResult = rawBlacklistResult[ 0 ],
-							data = rawData[ 0 ];
+						var blacklistResult = rawBlacklist[ 0 ],
+							protectionResult = rawProtection[ 0 ];
 
 						// If the page already exists, display an error
-						if ( !data.query.pages.hasOwnProperty( '-1' ) ) {
+						var pageAlreadyExists = !protectionResult.query.pages.hasOwnProperty( '-1' );
+						if ( pageAlreadyExists && pageIsRedirect && pageRevisionCount > 1 ) {
+							errorHtml = 'Whoops, the page "' + linkToPage + '" is a redirect with non-trivial history. <span id="afch-redirect-notification">Do you want to tag it for speedy deletion so you can accept this draft later after an admin deletes the redirect? <a id="afch-redirect-tag-speedy">Yes</a> / <a id="afch-redirect-abort">No</a></span>';
+
+							// TODO: add addFormSubmitHandler( handleRedirectWithNonTrivialHistory ), which is called when afch-redirect-tag-speedy is clicked. it does a couple things: 1) tags the redirect as {{Db-afc-move}}, 2) marks the draft as under review, 3) watchlist the redirect page in mainspace. the form data from newTitle needs to be available (either via form submission or via javascript wizardry)
+
+							buttonText = 'The proposed title already exists';
+						} else if ( pageAlreadyExists ) {
 							errorHtml = 'Whoops, the page "' + linkToPage + '" already exists.';
 							buttonText = 'The proposed title already exists';
 						} else {
 							// If the page doesn't exist but IS create-protected and the
 							// current reviewer is not an admin, also display an error
 							// FIXME: offer one-click request unprotection?
-							$.each( data.query.pages[ '-1' ].protection, function ( _, entry ) {
+							$.each( protectionResult.query.pages[ '-1' ].protection, function ( _, entry ) {
 								if ( entry.type === 'create' && entry.level === 'sysop' && $.inArray( 'sysop', mw.config.get( 'wgUserGroups' ) ) === -1 ) {
 									errorHtml = 'Darn it, "' + linkToPage + '" is create-protected. You will need to request unprotection before accepting.';
 									buttonText = 'The proposed title is create-protected';
