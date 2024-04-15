@@ -2295,65 +2295,28 @@
 				// ---------
 
 				talkPage.getText().done( function ( talkText ) {
-					var talkTextPrefix = '';
-
-					// Add the AFC banner
-					talkTextPrefix += '{{subst:WPAFC/article|class=' + data.newAssessment +
-						( afchPage.additionalData.revId ? '|oldid=' + afchPage.additionalData.revId : '' ) + '}}';
-
-					// Add biography banner if specified
-					if ( data.isBiography ) {
-						// Ensure we don't have duplicate biography tags
-						AFCH.removeFromArray( data.newWikiProjects, 'WikiProject Biography' );
-
-						talkTextPrefix += ( '\n{{WikiProject Biography|living=' +
-							( data.lifeStatus !== 'unknown' ? ( data.lifeStatus === 'living' ? 'yes' : 'no' ) : '' ) +
-							'|class=' + data.newAssessment + '|listas=' + data.subjectName + '}}' );
-					}
-
-					if ( data.newAssessment === 'disambig' &&
-						$.inArray( 'WikiProject Disambiguation', data.newWikiProjects ) === -1 ) {
-						data.newWikiProjects.push( 'WikiProject Disambiguation' );
-					}
-
-					// Add and remove WikiProjects
-					var wikiProjectsToAdd = data.newWikiProjects.filter( function ( newTemplateName ) {
-						return !data.existingWikiProjects.some( function ( existingTplObj ) {
-							return existingTplObj.templateName === newTemplateName;
-						} );
-					} );
-					var wikiProjectsToRemove = data.existingWikiProjects.filter( function ( existingTplObj ) {
-						return !data.newWikiProjects.some( function ( newTemplateName ) {
-							return existingTplObj.templateName === newTemplateName;
-						} );
-					} ).map( function ( templateObj ) {
-						return templateObj.realTemplateName || templateObj.templateName;
-					} );
-					if ( data.alreadyHasWPBio && !data.isBiography ) {
-						wikiProjectsToRemove.push( data.existingWPBioTemplateName || 'wikiproject biography' );
-					}
-
-					$.each( wikiProjectsToAdd, function ( _index, templateName ) {
-						talkTextPrefix += '\n{{' + templateName + '|class=' + data.newAssessment + '}}';
-					} );
-					$.each( wikiProjectsToRemove, function ( _index, templateName ) {
-						// Regex from https://stackoverflow.com/a/5306111/1757964
-						var sanitizedTemplateName = templateName.replace( /[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&' );
-						talkText = talkText.replace( new RegExp( '\\n?\\{\\{\\s*' + sanitizedTemplateName + '\\s*.+?\\}\\}', 'is' ), '' );
-					} );
-
-					// We prepend the text so that talk page content is not removed
-					// (e.g. pages in `Draft:` namespace with discussion)
-					talkText = talkTextPrefix + '\n\n' + talkText;
+					var results = AFCH.addTalkPageBanners(
+						talkText,
+						data.newAssessment,
+						afchPage.additionalData.revId,
+						data.isBiography,
+						data.newWikiProjects,
+						data.lifeStatus,
+						data.subjectName,
+						data.existingWikiProjects,
+						data.alreadyHasWPBio,
+						data.existingWPBioTemplateName
+					);
+					talkText = results.talkText;
 
 					var summary = 'Placing [[Wikipedia:Articles for creation|Articles for creation]] banner';
-					if ( wikiProjectsToAdd.length > 0 ) {
-						summary += ', adding ' + wikiProjectsToAdd.length +
-							' WikiProject banner' + ( ( wikiProjectsToAdd.length === 1 ) ? '' : 's' );
+					if ( results.countOfWikiProjectsAdded > 0 ) {
+						summary += ', adding ' + results.countOfWikiProjectsAdded +
+							' WikiProject banner' + ( ( results.countOfWikiProjectsAdded === 1 ) ? '' : 's' );
 					}
-					if ( wikiProjectsToRemove.length > 0 ) {
-						summary += ', removing ' + wikiProjectsToRemove.length +
-							' WikiProject banner' + ( ( wikiProjectsToRemove.length === 1 ) ? '' : 's' );
+					if ( results.countOfWikiProjectsRemoved > 0 ) {
+						summary += ', removing ' + results.countOfWikiProjectsRemoved +
+							' WikiProject banner' + ( ( results.countOfWikiProjectsRemoved === 1 ) ? '' : 's' );
 					}
 
 					if ( comments && comments.length > 0 ) {
