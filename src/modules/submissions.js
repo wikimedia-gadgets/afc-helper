@@ -458,8 +458,28 @@
 		var deferred = $.Deferred(),
 			user = this.params.u;
 
+		// Recursively detect if the user has been renamed by checking the rename log
 		if ( user ) {
-			deferred.resolve( user );
+			AFCH.api.get( {
+				action: 'query',
+				list: 'logevents',
+				formatversion: 2,
+				letype: 'renameuser',
+				lelimit: 1,
+				letitle: 'User:' + user
+			} ).then( function ( resp ) {
+				var logevents = resp.query.logevents;
+
+				if ( logevents.length ) {
+					var newName = logevents[ 0 ].params.newuser;
+					this.params.u = newName;
+					this.getSubmitter().then( function ( user ) {
+						deferred.resolve( user );
+					} );
+				} else {
+					deferred.resolve( user );
+				}
+			}.bind( this ) );
 		} else {
 			this.page.getCreator().done( function ( user ) {
 				deferred.resolve( user );
