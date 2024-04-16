@@ -1177,7 +1177,7 @@
 				page_id: mw.config.get( 'wgArticleId' )
 			} ).then( function ( json ) {
 				var triageInfo = json.pagetriagelist.pages[ 0 ];
-				if ( triageInfo && triageInfo.copyvio === mw.config.get( 'wgCurRevisionId' ) ) {
+				if ( triageInfo && Number( triageInfo.copyvio ) === mw.config.get( 'wgCurRevisionId' ) ) {
 					addWarning(
 						'This submission may contain copyright violations',
 						'CopyPatrol',
@@ -2361,7 +2361,8 @@
 
 						recentPage.edit( {
 							contents: newRecentText,
-							summary: 'Adding [[' + newPage + ']] to list of recent AfC creations'
+							summary: 'Adding [[' + newPage + ']] to list of recent AfC creations',
+							watchlist: 'nochange'
 						} );
 					} );
 
