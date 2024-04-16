@@ -239,6 +239,23 @@ describe( 'AFCH.addTalkPageBanners', function () {
 		expect( output.countOfWikiProjectsRemoved ).toBe( 0 );
 	} );
 
+	it( 'lifeStatus = dead', function () {
+		var talkText = '';
+		var newAssessment = '';
+		var revId = 592496;
+		var isBiography = true;
+		var newWikiProjects = [];
+		var lifeStatus = 'dead';
+		var subjectName = '';
+		var existingWikiProjects = [];
+		var alreadyHasWPBio = false;
+		var existingWPBioTemplateName = null;
+		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName, existingWikiProjects, alreadyHasWPBio, existingWPBioTemplateName );
+		expect( output.talkText ).toBe( '{{subst:WPAFC/article|class=|oldid=592496}}\n{{WikiProject Biography|living=no|class=|listas=}}\n\n' );
+		expect( output.countOfWikiProjectsAdded ).toBe( 0 );
+		expect( output.countOfWikiProjectsRemoved ).toBe( 0 );
+	} );
+
 	// FIXME: is supposed to remove the {{wikiproject biography}} template and report 1 template removed, but does not. code outside of AFCH.addTalkPageBanners() is incorrectly calculating alreadyHasWPBio as false
 	// FIXME: 2 extra line breaks in the output
 	it( 'talk page has {{wikiproject biography}}, and user selects that it\'s not a biography, so should remove {{wikiproject biography}}', function () {
