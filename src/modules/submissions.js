@@ -2624,7 +2624,7 @@
 	// TODO: manually test
 
 	function subscribeToBottomSection( submitter ) {
-		if ( /* preferenceIsOff */ ) {
+		if ( !AFCH.prefs.autoSubscribe ) {
 			return;
 		}
 
