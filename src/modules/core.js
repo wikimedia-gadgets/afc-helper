@@ -604,10 +604,10 @@
 
 			/**
 			 * Modifies a page's content
-			 * TODO the property name "contents" is quite silly, because people used to the MediaWiki API are gonna write "text"
 			 *
+			 * @todo the property name "contents" is quite silly, because people used to the MediaWiki API are gonna write "text"
 			 * @param {string} pagename The page to be modified, namespace included
-			 * @param {Object} options Object with properties:
+			 * @param {Object} options Object with properties ('contents' is required, others are optional):
 			 *                          contents: {string} the text to add to/replace the page,
 			 *                          summary: {string} edit summary, will have the edit summary ad at the end,
 			 *                          createonly: {bool} set to true to only edit the page if it doesn't exist,
@@ -615,6 +615,7 @@
 			 *                          hide: {bool} Set to true to supress logging in statusWindow
 			 *                          statusText: {string} message to show in status; default: "Editing"
 			 *                          followRedirects: {boolean} true to follow redirects, false to ignore redirects
+			 *                          watchlist: {string} 'nochange', 'preferences', 'unwatch', or 'watch'
 			 * @return {jQuery.Deferred} Resolves if saved with all data
 			 */
 			editPage: function ( pagename, options ) {
