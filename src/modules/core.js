@@ -1228,7 +1228,8 @@
 				logCsd: true,
 				launchLinkPosition: 'p-cactions',
 				logAfc: false,
-				noWatch: false
+				noWatch: false,
+				autoSubscribe: false
 			};
 
 			/**
