@@ -526,7 +526,7 @@
 					'Once you have saved this page you will find a new yellow \'Review waiting\' box at the bottom of your submission page. ' +
 					'If you have submitted your page previously,(?: either)? the old pink \'Submission declined\' template or the old grey ' +
 					'\'Draft\' template will still appear at the top of your submission page, but you should ignore (them|it). Again, please ' +
-					'don\'t change anything in this text box. Just press the \"Save page\" button below.'
+					'don\'t change anything in this text box. Just press the "Save page" button below.'
 			];
 
 		if ( isAccept ) {
@@ -537,7 +537,7 @@
 			// Not removed if the |text= parameter is present, which could contain
 			// arbitrary wikitext and therefore makes the end of the template harder
 			// to detect
-			text = text.replace( /\{\{Draft(?!\|\s*text\s*=)(?: article(?!\|\s*text\s*=)(?:\|(?:subject=)?[^\|]+)?|\|(?:subject=)?[^\|]+)?\}\}/gi, '' );
+			text = text.replace( /\{\{Draft(?!\|\s*text\s*=)(?: article(?!\|\s*text\s*=)(?:\|(?:subject=)?[^|]+)?|\|(?:subject=)?[^|]+)?\}\}/gi, '' );
 
 			// Uncomment cats and templates
 			text = text.replace( /\[\[:Category:/gi, '[[Category:' );
@@ -588,21 +588,21 @@
 		text = text.replace( /<!--\s*((\[\[:{0,1}(Category:.*?)\]\]\s*)+)-->/gi, '$1' );
 
 		// Remove spaces/commas between <ref> tags
-		text = text.replace( /\s*(<\/\s*ref\s*\>)\s*[,]*\s*(<\s*ref\s*(name\s*=|group\s*=)*\s*[^\/]*>)[ \t]*$/gim, '$1$2' );
+		text = text.replace( /\s*(<\/\s*ref\s*>)\s*[,]*\s*(<\s*ref\s*(name\s*=|group\s*=)*\s*[^/]*>)[ \t]*$/gim, '$1$2' );
 
 		// Remove whitespace before <ref> tags
-		text = text.replace( /[ \t]*(<\s*ref\s*(name\s*=|group\s*=)*\s*.*[^\/]+>)[ \t]*$/gim, '$1' );
+		text = text.replace( /[ \t]*(<\s*ref\s*(name\s*=|group\s*=)*\s*.*[^/]+>)[ \t]*$/gim, '$1' );
 
 		// Move punctuation before <ref> tags
-		text = text.replace( /\s*((<\s*ref\s*(name\s*=|group\s*=)*\s*.*[\/]{1}>)|(<\s*ref\s*(name\s*=|group\s*=)*\s*[^\/]*>(?:<[^<\>]*\>|[^><])*<\/\s*ref\s*\>))[ \t]*([.!?,;:])+$/gim, '$6$1' );
+		text = text.replace( /\s*((<\s*ref\s*(name\s*=|group\s*=)*\s*.*[/]{1}>)|(<\s*ref\s*(name\s*=|group\s*=)*\s*[^/]*>(?:<[^<>]*>|[^><])*<\/\s*ref\s*>))[ \t]*([.!?,;:])+$/gim, '$6$1' );
 
 		// Replace {{http://example.com/foo}} with "* http://example.com/foo" (common newbie error)
-		text = text.replace( /\n\{\{(http[s]?|ftp[s]?|irc|gopher|telnet)\:\/\/(.*?)\}\}/gi, '\n* $1://$3' );
+		text = text.replace( /\n\{\{(http[s]?|ftp[s]?|irc|gopher|telnet):\/\/(.*?)\}\}/gi, '\n* $1://$3' );
 
 		// Convert http://-style links to other wikipages to wikicode syntax
 		// FIXME: Break this out into its own core function? Will it be used elsewhere?
 		function convertExternalLinksToWikilinks( text ) {
-			var linkRegex = /\[{1,2}(?:https?:)?\/\/(?:en.wikipedia.org\/wiki|enwp.org)\/([^\s\|\]\[]+)(?:\s|\|)?((?:\[\[[^\[\]]*\]\]|[^\]\[])*)\]{1,2}/ig,
+			var linkRegex = /\[{1,2}(?:https?:)?\/\/(?:en.wikipedia.org\/wiki|enwp.org)\/([^\s|\][]+)(?:\s|\|)?((?:\[\[[^[\]]*\]\]|[^\][])*)\]{1,2}/ig,
 				linkMatch = linkRegex.exec( text ),
 				title, displayTitle, newLink;
 
@@ -904,12 +904,24 @@
 			AFCH.preferences.initLink( $afch.find( 'span.preferences-wrapper' ), 'preferences' );
 
 			// Set up click handlers
-			$afch.find( '#afchAccept' ).click( function () { spinnerAndRun( showAcceptOptions ); } );
-			$afch.find( '#afchDecline' ).click( function () { spinnerAndRun( showDeclineOptions ); } );
-			$afch.find( '#afchComment' ).click( function () { spinnerAndRun( showCommentOptions ); } );
-			$afch.find( '#afchSubmit' ).click( function () { spinnerAndRun( showSubmitOptions ); } );
-			$afch.find( '#afchClean' ).click( function () { handleCleanup(); } );
-			$afch.find( '#afchMark' ).click( function () { handleMark( /* unmark */ submission.isUnderReview ); } );
+			$afch.find( '#afchAccept' ).click( function () {
+				spinnerAndRun( showAcceptOptions );
+			} );
+			$afch.find( '#afchDecline' ).click( function () {
+				spinnerAndRun( showDeclineOptions );
+			} );
+			$afch.find( '#afchComment' ).click( function () {
+				spinnerAndRun( showCommentOptions );
+			} );
+			$afch.find( '#afchSubmit' ).click( function () {
+				spinnerAndRun( showSubmitOptions );
+			} );
+			$afch.find( '#afchClean' ).click( function () {
+				handleCleanup();
+			} );
+			$afch.find( '#afchMark' ).click( function () {
+				handleMark( /* unmark */ submission.isUnderReview );
+			} );
 
 			// Load warnings about the page, then slide them in
 			getSubmissionWarnings().done( function ( warnings ) {
@@ -927,8 +939,12 @@
 			// but don't hold up the rest of the loading to do so
 			submission.isG13Eligible().done( function ( eligible ) {
 				$afch.find( '.g13-related' ).toggleClass( 'hidden', !eligible );
-				$afch.find( '#afchG13' ).click( function () { handleG13(); } );
-				$afch.find( '#afchPostponeG13' ).click( function () { spinnerAndRun( showPostponeG13Options ); } );
+				$afch.find( '#afchG13' ).click( function () {
+					handleG13();
+				} );
+				$afch.find( '#afchPostponeG13' ).click( function () {
+					spinnerAndRun( showPostponeG13Options );
+				} );
 			} );
 		} );
 	}
@@ -984,7 +1000,7 @@
 						return ref.indexOf( '/>', ref.length - 2 ) === -1;
 					} ),
 
-					refEndRe = /<\/\s*ref\s*\>/ig,
+					refEndRe = /<\/\s*ref\s*>/ig,
 					refEndMatches = text.match( refEndRe ) || [],
 
 					reflistRe = /({{(ref(erence)?(\s|-)?list|listaref|refs|footnote|reference|referencias)(?:{{[^{}]*}}|[^}{])*}})|(<\s*references\s*\/?>)/ig,
@@ -992,7 +1008,7 @@
 
 					// This isn't as good as a tokenizer, and believes that <ref> foo </b> is
 					// completely correct... but it's a good intermediate level solution.
-					malformedRefs = text.match( /<\s*ref\s*[^\/]*>?<\s*[^\/]*\s*ref\s*>/ig ) || [];
+					malformedRefs = text.match( /<\s*ref\s*[^/]*>?<\s*[^/]*\s*ref\s*>/ig ) || [];
 
 				// Uneven (/unclosed) <ref> and </ref> tags
 				if ( refBeginMatches.length !== refEndMatches.length ) {
@@ -1005,7 +1021,7 @@
 					addWarning( 'The submission contains malformed <ref> tags.', 'View details', function () {
 						var $toggleLink = $( this ).addClass( 'malformed-refs-toggle' ),
 							$warningDiv = $( this ).parent();
-						$malformedRefWrapper = $( '<div>' )
+						var $malformedRefWrapper = $( '<div>' )
 							.addClass( 'malformed-refs' )
 							.appendTo( $warningDiv );
 
@@ -1131,7 +1147,7 @@
 					// Simulate cleanUp first so that we don't warn about HTML
 					// comments that the script will remove anyway in the future
 					text = ( new AFCH.Text( rawText ) ).cleanUp( true ),
-					longCommentRegex = /(?:<![ \r\n\t]*--)([^\-]|[\r\n]|-[^\-]){30,}(?:--[ \r\n\t]*>)?/g,
+					longCommentRegex = /(?:<![ \r\n\t]*--)([^-]|[\r\n]|-[^-]){30,}(?:--[ \r\n\t]*>)?/g,
 					longCommentMatches = text.match( longCommentRegex ) || [],
 					numberOfComments = longCommentMatches.length,
 					oneComment = numberOfComments === 1;
@@ -1223,7 +1239,7 @@
 			// $1 = article name
 			// $2 = article class or '' if not available
 			'accepted-submission': headerBegin +
-				'[[$1]] has been accepted ==\n{{subst:Afc talk|$1|class=$2|sig=~~' + '~~}}',
+				'[[$1]] has been accepted ==\n{{subst:Afc talk|$1|class=$2|sig=~~~~}}',
 
 			// $1 = full submission title
 			// $2 = short title
@@ -1250,9 +1266,9 @@
 			'comment-on-submission': '{{subst:AFC notification|comment|article=$1}}',
 
 			// $1 = article name
-			'g13-submission': '{{subst:Db-afc-notice|$1}} ~~' + '~~',
+			'g13-submission': '{{subst:Db-afc-notice|$1}} ~~~~',
 
-			'teahouse-invite': '{{subst:Wikipedia:Teahouse/AFC invitation|sign=~~' + '~~}}'
+			'teahouse-invite': '{{subst:Wikipedia:Teahouse/AFC invitation|sign=~~~~}}'
 		} );
 	}
 
@@ -1501,7 +1517,9 @@
 
 			// If any templates weren't in the WikiProject map, check if they were redirects
 			if ( otherTemplates.length > 0 ) {
-				var titles = otherTemplates.map( function ( n ) { return 'Template:' + n; } );
+				var titles = otherTemplates.map( function ( n ) {
+					return 'Template:' + n;
+				} );
 				titles = titles.slice( 0, 50 ); // prevent API error by capping max # of titles at 50
 				titles = titles.join( '|' );
 				return AFCH.api.post( {
@@ -1557,7 +1575,9 @@
 			if ( !hasWikiProjects ) {
 				mw.notify( 'Could not load WikiProject list!' );
 			}
-			var wikiProjectObjs = Object.keys( wikiProjectMap ).map( function ( key ) { return wikiProjectMap[ key ]; } );
+			var wikiProjectObjs = Object.keys( wikiProjectMap ).map( function ( key ) {
+				return wikiProjectMap[ key ];
+			} );
 
 			loadView( 'accept', {
 				newTitle: afchSubmission.shortTitle,
@@ -1874,7 +1894,9 @@
 			declineCounts = AFCH.userData.get( 'decline-counts', false );
 
 			if ( declineCounts ) {
-				declineList = $.map( declineCounts, function ( _, key ) { return key; } );
+				var declineList = $.map( declineCounts, function ( _, key ) {
+					return key;
+				} );
 
 				// Sort list in descending order (most-used at beginning)
 				declineList.sort( function ( a, b ) {
@@ -2071,8 +2093,8 @@
 
 	function addSignature( text ) {
 		text = text.trim();
-		if ( text.indexOf( '~~' + '~~' ) === -1 ) {
-			text += ' ~~' + '~~';
+		if ( text.indexOf( '~~~~' ) === -1 ) {
+			text += ' ~~~~';
 		}
 		return text;
 	}
@@ -2752,7 +2774,7 @@
 			text = data.afchText,
 			rawText = text.get(),
 			postponeRegex = /\{\{AfC postpone G13\s*(?:\|\s*(\d*)\s*)?\}\}/ig;
-		match = postponeRegex.exec( rawText );
+		var match = postponeRegex.exec( rawText );
 
 		// First add the postpone template
 		if ( match ) {

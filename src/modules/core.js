@@ -118,7 +118,7 @@
 				// the script, so long as there was a user whose name was
 				// three characters long on the list!
 				var $howToDisable,
-					sanitizedUser = user.replace( /[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&' ),
+					sanitizedUser = user.replace( /[-[\]/{}()*+?.\\^$|]/g, '\\$&' ),
 					userSysop = $.inArray( 'sysop', mw.config.get( 'wgUserGroups' ) ) > -1,
 					userNPP = $.inArray( 'patroller', mw.config.get( 'wgUserGroups' ) ) > -1,
 					userOnWhitelist = ( new RegExp( '\\|\\s*' + sanitizedUser + '\\s*}' ) ).test( text ),
@@ -837,7 +837,7 @@
 						} );
 					}
 
-					appendText += ' ~~' + '~~' + '~\n';
+					appendText += ' ~~~~~\n';
 
 					logPage.edit( {
 						contents: appendText,
@@ -880,7 +880,7 @@
 					}
 
 					var byUser = ' by [[User:' + options.submitter + '|]]';
-					var sig = ' ~~' + '~~' + '~\n';
+					var sig = ' ~~~~~\n';
 
 					// Make log edit
 					logPage.edit( {
@@ -1073,7 +1073,7 @@
 					$.each( substitutions, function ( original, replacement ) {
 						text = text.replace(
 							// Escape the original substitution key, then make it a global regex
-							new RegExp( original.replace( /[-\/\\^$*+?.()|[\]{}]/g, '\\$&' ), 'g' ),
+							new RegExp( original.replace( /[-/\\^$*+?.()|[\]{}]/g, '\\$&' ), 'g' ),
 							replacement
 						);
 					} );
