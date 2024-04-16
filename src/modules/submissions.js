@@ -1,4 +1,4 @@
-//<nowiki>
+// <nowiki>
 ( function ( AFCH, $, mw ) {
 	var $afchLaunchLink, $afch, $afchWrapper,
 		afchPage, afchSubmission, afchViews, afchViewer;
@@ -365,9 +365,8 @@
 	 * Sets the submission status
 	 *
 	 * @param {string} newStatus status to set, 'd'|'t'|'r'|''
-	 * @param {params} optional; params to add to the template whose status was set
-	 * @param newParams
-	 * @return {bool} success
+	 * @param {Object} newParams optional; params to add to the template whose status was set
+	 * @return {boolean} success
 	 */
 	AFCH.Submission.prototype.setStatus = function ( newStatus, newParams ) {
 		var relevantTemplate = this.templates[ 0 ];
@@ -431,7 +430,7 @@
 	 * Add a new comment to the beginning of this.comments
 	 *
 	 * @param {string} text comment text
-	 * @return {bool} success
+	 * @return {boolean} success
 	 */
 	AFCH.Submission.prototype.addNewComment = function ( text ) {
 		var commentText = addSignature( text );
@@ -491,8 +490,6 @@
 
 	/**
 	 * Represents text of an AfC submission
-	 *
-	 * @param {[type]} text [description]
 	 */
 	AFCH.Text = function ( text ) {
 		this.text = text;
@@ -673,8 +670,7 @@
 	 * Removes old submission templates/comments and then adds new ones
 	 * specified by `new`
 	 *
-	 * @param {string} new
-	 * @param newCode
+	 * @param {string} newCode
 	 */
 	AFCH.Text.prototype.updateAfcTemplates = function ( newCode ) {
 		this.removeAfcTemplates();
@@ -950,8 +946,8 @@
 		 * Adds a warning
 		 *
 		 * @param {string} message
-		 * @param {string|bool} actionMessage set to false to hide action link
-		 * @param {Function | string} onAction function to call of success, or URL to browse to
+		 * @param {string|boolean} actionMessage set to false to hide action link
+		 * @param {Function|string} onAction function to call of success, or URL to browse to
 		 */
 		function addWarning( message, actionMessage, onAction ) {
 			var $action,
@@ -1380,7 +1376,6 @@
 	 * calls the passed function
 	 *
 	 * @param {Function} fn function to call when spinner has been displayed
-	 * @return {[type]} [description]
 	 */
 	function spinnerAndRun( fn ) {
 		var $spinner, $container = $afch.find( '#afchContent' );
@@ -2788,4 +2783,4 @@
 	}
 
 }( AFCH, jQuery, mediaWiki ) );
-//</nowiki>
+// </nowiki>
