@@ -8,7 +8,7 @@ Modified for Pywikibot by Enterprisey
 Usage
 =====
 
-Run this script from the main afch-rewrite directory using Python 3:
+Run this script from the main afc-helper directory using Python 3:
 
 >>> python scripts/upload.py SITE ROOT [--force] [--mwclient USERNAME]
 
@@ -71,7 +71,7 @@ if '--force' in sys.argv:
 	command += ' --force'
 	sys.argv.remove('--force')
 
-print('Building afch-rewrite using `{}`...'.format(command))
+print('Building afc-helper using `{}`...'.format(command))
 
 try:
 	process = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
@@ -92,6 +92,7 @@ print('Uploading to {}...'.format(wiki))
 def stripFirstLine(text):
 	return '\n'.join(text.splitlines()[1:])
 
+# Which of the two bot libraries are we using to write our edits?
 if using_mwclient:
 	if wiki == 'en':
 		server_name = 'en.wikipedia.org'
@@ -109,7 +110,7 @@ if using_mwclient:
 			page.save(text, summary=summary)
 		else:
 			print('Skipping {}, no changes made'.format(title))
-else:
+else: #pywikibot
 	site = pywikibot.Site(wiki, "wikipedia")
 	site.login()
 	print('Logged in as {}.'.format(site.user()))
@@ -134,7 +135,7 @@ except AttributeError:
 	sha1 = branch.commit.id
 
 # Prepend this to every page
-header = '/* Uploaded from https://github.com/WPAFC/afch-rewrite, commit: {} ({}) */\n'.format(sha1, branch)
+header = '/* Uploaded from https://github.com/wikimedia-gadgets/afc-helper, commit: {} ({}) */\n'.format(sha1, branch)
 
 isMainGadget = (wiki == 'en') and (root == 'MediaWiki:Gadget-afchelper')
 
@@ -156,16 +157,16 @@ def uploadDirectory(directory):
 	for script in files:
 		# Skip hidden files and Emacs spam
 		if not script.startswith('.') and not script.endswith('~'):
-			with open(directory + '/' + script, 'r') as f:
+			with open(directory + '/' + script, mode="r", encoding="utf-8") as f:
 				content = f.read()
 			uploadSubscript(os.path.splitext(script)[0], content)
 
 # Upload afch.js
-with open('build/afch.js', 'r') as f:
+with open('build/afch.js', mode="r", encoding="utf-8") as f:
 	uploadFile(root + '.js', f.read())
 
 # Upload afch.css
-with open('build/afch.css', 'r') as f:
+with open('build/afch.css', mode="r", encoding="utf-8") as f:
 	uploadFile(root + '.css', f.read())
 
 # Now upload everything else: modules, templates

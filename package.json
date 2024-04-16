@@ -1,15 +1,14 @@
 {
-  "name": "afch-rewrite",
-  "version": "0.9.1",
+  "name": "afc-helper",
   "description": "A tool for reviewing Articles for Creation submissions on the English Wikipedia.",
-  "homepage": "https://github.com/WPAFC/afch-rewrite",
+  "homepage": "https://github.com/wikimedia-gadgets/afc-helper",
   "bugs": {
-    "url": "https://github.com/WPAFC/afch-rewrite/issues"
+    "url": "https://github.com/wikimedia-gadgets/afc-helper/issues"
   },
   "license": "GPL-3.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/WPAFC/afch-rewrite/npm.git"
+    "url": "https://github.com/wikimedia-gadgets/afc-helper.git"
   },
   "scripts": {
     "test": "grunt test",

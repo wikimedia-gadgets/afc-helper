@@ -61,14 +61,8 @@
 			AFCH.preferences = new AFCH.Preferences();
 			AFCH.prefs = AFCH.preferences.prefStore;
 
-			// Must be defined above the larger $.extend block
-			// because AFCH.consts.summaryAd depends on it
-			AFCH.consts.version = '0.9.1';
-
 			// Add more constants -- don't overwrite those already set, though
 			AFCH.consts = $.extend( AFCH.consts, {
-				versionName: 'Imperial Ibex',
-
 				// If true, the script will NOT modify actual wiki content and
 				// will instead mock all such API requests (success assumed)
 				mockItUp: AFCH.consts.mockItUp || false,
@@ -86,7 +80,7 @@
 				user: mw.user.getName(),
 
 				// Edit summary ad
-				summaryAd: ' ([[WP:AFCH|AFCH]] ' + AFCH.consts.version + ')',
+				summaryAd: ' ([[WP:AFCH|AFCH]])',
 
 				// Require users to be on whitelist to use the script
 				// Testwiki users don't need to be on it
@@ -239,7 +233,7 @@
 				.addClass( 'feedback-link link' )
 				.click( function () {
 					feedback.launch( {
-						subject: '[' + AFCH.consts.version + '] ' + ( type ? 'Feedback about ' + type : 'AFCH feedback' )
+						subject: ( type ? 'Feedback about ' + type : 'AFCH feedback' )
 					} );
 				} )
 				.appendTo( $element );
@@ -620,6 +614,7 @@
 			 *                          mode: {string} 'appendtext' or 'prependtext'; default: (replace everything)
 			 *                          hide: {bool} Set to true to supress logging in statusWindow
 			 *                          statusText: {string} message to show in status; default: "Editing"
+			 *                          followRedirects: {boolean} true to follow redirects, false to ignore redirects
 			 * @return {jQuery.Deferred} Resolves if saved with all data
 			 */
 			editPage: function ( pagename, options ) {
@@ -627,6 +622,11 @@
 
 				if ( !options ) {
 					options = {};
+				}
+
+				// Default to false
+				if ( !options.followRedirects ) {
+					options.followRedirects = false;
 				}
 
 				if ( !options.hide ) {
@@ -640,7 +640,8 @@
 					action: 'edit',
 					text: options.contents,
 					title: pagename,
-					summary: options.summary + AFCH.consts.summaryAd
+					summary: options.summary + AFCH.consts.summaryAd,
+					redirect: options.followRedirects
 				};
 
 				if ( pagename.indexOf( 'Draft:' ) === 0 ) {
@@ -793,7 +794,8 @@
 						summary: options.summary || 'Notifying user',
 						mode: 'appendtext',
 						statusText: 'Notifying',
-						hide: options.hide
+						hide: options.hide,
+						followRedirects: true
 					} )
 						.done( function () {
 							deferred.resolve();
@@ -1303,8 +1305,6 @@
 				// of the preferences as variables, as well as an additional few used in other locations.
 				this.$dialog.empty().append(
 					this.views.renderView( 'preferences', $.extend( {}, this.prefStore, {
-						version: AFCH.consts.version,
-						versionName: AFCH.consts.versionName,
 						userAgent: window.navigator.userAgent
 					} ) )
 				);
@@ -1587,6 +1587,139 @@
 			}
 
 			return newCode;
+		},
+
+		/**
+		 * Remove empty section at the end of the draft. Empty sections at the end of drafts
+		 * frequently happen because of how the "Resubmit" button on the "declined" template
+		 * works. The empty section may have categories after it - keep them there.
+		 *
+		 * @param {string} wikicode
+		 */
+		removeEmptySectionAtEnd: function ( wikicode ) {
+			// Hard to write a regex that doesn't catastrophic backtrack while still saving multiple categories and multiple blank lines. So we'll do this the old-fashioned way...
+
+			// Divide wikitext into lines
+			var lines = wikicode.split( '\n' );
+
+			// Buffers
+			var linesToKeep = [];
+			var i;
+
+			// Crawl the list of lines backward (bottom up)
+			var count = lines.length;
+			for ( i = count - 1; i >= 0; i-- ) {
+				var line = lines[ i ];
+				var isWhitespace = line.match( /^\s*$/ );
+				var isCategory = line.match( /^\s*\[\[:?Category:/i );
+				var isHeading = line.match( /^==[^=]+==$/i );
+
+				if ( isWhitespace || isCategory ) {
+					linesToKeep.push( line );
+					continue;
+				} else if ( isHeading ) {
+					break;
+				}
+
+				// If it's something besides the three things above, such as text, then there's no blank headings to delete. Return unaltered wikitext. We're done.
+				return wikicode;
+			}
+
+			// Delete the lines we checked from the array of lines. We'll be replacing these with new lines in a moment.
+			lines = lines.slice( 0, i );
+
+			// Add the categories and blank lines back
+			// Need to iterate backward, same as the loop above
+			count = linesToKeep.length;
+			for ( var j = count - 1; j >= 0; j-- ) {
+				var lineToKeep = linesToKeep[ j ];
+				lines.push( lineToKeep );
+			}
+
+			wikicode = lines.join( '\n' );
+
+			// The old algorithm had some quirks related to adding and removing \n. Mimic the old algorithm for now, so that unit tests pass and users don't have to get used to new behavior.
+			if ( wikicode.match( /\n\n$/ ) ) {
+				wikicode = wikicode.slice( 0, -1 );
+			}
+			wikicode = wikicode.replace( /\n(\n\n\[\[:?Category:)/i, '$1' );
+
+			return wikicode;
+		},
+
+		/**
+		 * @param {string} talkText Wikitext of the draft talk page
+		 * @param {string} newAssessment Value of "Article assessment" dropdown list, or "" if blank
+		 * @param {number} revId Revision ID of the draft that is being accepted
+		 * @param {boolean} isBiography Value of the "Is the article a biography?" check box
+		 * @param {Array} newWikiProjects Value of the "Add WikiPrjects" part of the form. The <input> is a chips interface called jquery.chosen. Note that if there are existing WikiProject banners on the page, the form will auto-add those to the "Add WikiProjects" part of the form when it first loads.
+		 * @param {string} lifeStatus Value of "Is the subject alive?" dropdown list ("unknown", "living", "dead")
+		 * @param {string} subjectName Value of the "Subject name (last, first)" text input, or "" if blank
+		 * @param {Array<Object>} existingWikiProjects An array of associative arrays. The associative arrays contain the keys {string} displayName (example: Somalia), {string} templateName (example: WikiProject Somalia), and {boolean} alreadyOnPage
+		 * @param {boolean} alreadyHasWPBio
+		 * @param {null} existingWPBioTemplateName
+		 * @returns {Object} { {string} talkText, {number} countOfWikiProjectsAdded, {number} countOfWikiProjectsRemoved }
+		 */
+		addTalkPageBanners: function ( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName, existingWikiProjects, alreadyHasWPBio, existingWPBioTemplateName ) {
+			var talkTextPrefix = '';
+
+			// Add the AFC banner
+			talkTextPrefix += '{{subst:WPAFC/article|class=' + newAssessment +
+				( revId ? '|oldid=' + revId : '' ) + '}}';
+
+			// Add biography banner if specified
+			if ( isBiography ) {
+				// Ensure we don't have duplicate biography tags
+				AFCH.removeFromArray( newWikiProjects, 'WikiProject Biography' );
+
+				talkTextPrefix += ( '\n{{WikiProject Biography|living=' +
+					( lifeStatus !== 'unknown' ? ( lifeStatus === 'living' ? 'yes' : 'no' ) : '' ) +
+					'|class=' + newAssessment + '|listas=' + subjectName + '}}' );
+			}
+
+			// Add disambiguation banner if needed
+			if ( newAssessment === 'disambig' &&
+				$.inArray( 'WikiProject Disambiguation', newWikiProjects ) === -1 ) {
+				newWikiProjects.push( 'WikiProject Disambiguation' );
+			}
+
+			// Add and remove WikiProjects
+			/** @var {Array} */
+			var wikiProjectsToAdd = newWikiProjects.filter( function ( newTemplateName ) {
+				return !existingWikiProjects.some( function ( existingTplObj ) {
+					return existingTplObj.templateName === newTemplateName;
+				} );
+			} );
+			/** @var {Array} */
+			var wikiProjectsToRemove = existingWikiProjects.filter( function ( existingTplObj ) {
+				return !newWikiProjects.some( function ( newTemplateName ) {
+					return existingTplObj.templateName === newTemplateName;
+				} );
+			} ).map( function ( templateObj ) {
+				return templateObj.realTemplateName || templateObj.templateName;
+			} );
+			if ( alreadyHasWPBio && !isBiography ) {
+				wikiProjectsToRemove.push( existingWPBioTemplateName || 'wikiproject biography' );
+			}
+
+			$.each( wikiProjectsToAdd, function ( _index, templateName ) {
+				talkTextPrefix += '\n{{' + templateName + '|class=' + newAssessment + '}}';
+			} );
+			$.each( wikiProjectsToRemove, function ( _index, templateName ) {
+				// Regex from https://stackoverflow.com/a/5306111/1757964
+				var sanitizedTemplateName = templateName.replace( /[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&' );
+				talkText = talkText.replace( new RegExp( '\\n?\\{\\{\\s*' + sanitizedTemplateName + '\\s*.+?\\}\\}', 'is' ), '' );
+			} );
+
+			// We prepend the text so that talk page content is not removed
+			// (e.g. pages in `Draft:` namespace with discussion)
+			talkText = talkTextPrefix + '\n\n' + talkText;
+
+			return {
+				talkText: talkText,
+				countOfWikiProjectsAdded: wikiProjectsToAdd.length,
+				countOfWikiProjectsRemoved: wikiProjectsToRemove.length
+			};
 		},
 
 		/**

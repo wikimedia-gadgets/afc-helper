@@ -458,8 +458,28 @@
 		var deferred = $.Deferred(),
 			user = this.params.u;
 
+		// Recursively detect if the user has been renamed by checking the rename log
 		if ( user ) {
-			deferred.resolve( user );
+			AFCH.api.get( {
+				action: 'query',
+				list: 'logevents',
+				formatversion: 2,
+				letype: 'renameuser',
+				lelimit: 1,
+				letitle: 'User:' + user
+			} ).then( function ( resp ) {
+				var logevents = resp.query.logevents;
+
+				if ( logevents.length ) {
+					var newName = logevents[ 0 ].params.newuser;
+					this.params.u = newName;
+					this.getSubmitter().then( function ( user ) {
+						deferred.resolve( user );
+					} );
+				} else {
+					deferred.resolve( user );
+				}
+			}.bind( this ) );
 		} else {
 			this.page.getCreator().done( function ( user ) {
 				deferred.resolve( user );
@@ -555,7 +575,7 @@
 
 		// Remove empty section at the end (caused by "Resubmit" button on "declined" template)
 		// Section may have categories after it - keep them there
-		text = text.replace( /\n+==.+?==((?:\[\[:?Category:.+?\]\]|\s+)*)$/, '$1' );
+		text = AFCH.removeEmptySectionAtEnd( text );
 
 		// Assemble a master regexp and remove all now-unneeded comments (commentsToRemove)
 		commentRegex = new RegExp( '<!-{2,}\\s*(' + commentsToRemove.join( '|' ) + ')\\s*-{2,}>', 'gi' );
@@ -620,6 +640,10 @@
 		this.text = this.text.replace( /(?:[\t ]*(?:\r?\n|\r)){3,}/ig, '\n\n' );
 		// Remove all whitespace at the top of the article
 		this.text = this.text.replace( /^\s*/, '' );
+	};
+
+	AFCH.Text.prototype.getAfcComments = function () {
+		return this.text.match( /\{\{\s*afc comment[\s\S]+?\(UTC\)\}\}/gi );
 	};
 
 	AFCH.Text.prototype.removeAfcTemplates = function () {
@@ -729,7 +753,7 @@
 
 	// Add the launch link
 	$afchLaunchLink = $( mw.util.addPortletLink( AFCH.prefs.launchLinkPosition, '#', 'Review (AFCH)',
-		'afch-launch', 'Review submission using afch-rewrite', '1' ) );
+		'afch-launch', 'Review submission using afc-helper', '1' ) );
 
 	if ( AFCH.prefs.autoOpen &&
 		// Don't autoload in userspace -- too many false positives
@@ -811,7 +835,7 @@
 					.append(
 						$( '<div>' )
 							.addClass( 'initial-header' )
-							.text( 'Loading AFCH v' + AFCH.consts.version + '...' )
+							.text( 'Loading AFCH ...' )
 					)
 			);
 
@@ -856,9 +880,7 @@
 				decline: submission.isCurrentlySubmitted,
 				comment: true, // Comments are always okay!
 				submit: !submission.isCurrentlySubmitted,
-				alreadyUnderReview: submission.isUnderReview,
-				version: AFCH.consts.version,
-				versionName: AFCH.consts.versionName
+				alreadyUnderReview: submission.isUnderReview
 			} );
 
 			// Set up the extra options slide-out panel, which appears
@@ -881,7 +903,7 @@
 			} );
 
 			// Add feedback and preferences links
-			// FIXME: Feedback temporarily disabled due to https://github.com/WPAFC/afch-rewrite/issues/71
+			// FIXME: Feedback temporarily disabled due to https://github.com/wikimedia-gadgets/afc-helper/issues/71
 			// AFCH.initFeedback( $afch.find( 'span.feedback-wrapper' ), '[your topic here]', 'give feedback' );
 			AFCH.preferences.initLink( $afch.find( 'span.preferences-wrapper' ), 'preferences' );
 
@@ -1157,7 +1179,7 @@
 				var triageInfo = json.pagetriagelist.pages[ 0 ];
 				if ( triageInfo && triageInfo.copyvio === mw.config.get( 'wgCurRevisionId' ) ) {
 					addWarning( 'This submission may contain copyright violations', 'CopyPatrol', function () {
-						window.open( 'https://copypatrol.toolforge.org/en?filter=all&searchCriteria=page_exact&searchText=' +
+						window.open( 'https://copypatrol.wmcloud.org/en?filter=all&searchCriteria=page_exact&searchText=' +
 							encodeURIComponent( afchPage.rawTitle ) + '&drafts=1&revision=' +
 							mw.config.get( 'wgCurRevisionId' ), '_blank' );
 					} );
@@ -1411,8 +1433,8 @@
 		 */
 		function loadWikiProjectList() {
 			var deferred = $.Deferred(),
-				// This is so a new version of AFCH will invalidate the WikiProject cache
-				lsKey = 'mw-afch-' + AFCH.consts.version + '-wikiprojects-2',
+				// Left over from when a new version of AFCH would invalidate the WikiProject cache. The lsKey doesn't change nowadays though.
+				lsKey = 'mw-afch-wikiprojects-2',
 				wikiProjects = mw.storage.getObject( lsKey );
 
 			if ( wikiProjects ) {
@@ -1702,9 +1724,11 @@
 				function prefillBiographyDetails() {
 					var titleParts;
 
-					// Prefill `LastName, FirstName` for Biography if the page title is two words and
+					// Prefill `LastName, FirstName` for Biography if the page title is two words
+					// after removing any trailing parentheticals (likely disambiguation), and
 					// therefore probably safe to asssume in a `FirstName LastName` format.
-					titleParts = afchSubmission.shortTitle.split( ' ' );
+					var title = afchSubmission.shortTitle.replace( / \([\s\S]*?\)$/g, '' );
+					titleParts = title.split( ' ' );
 					if ( titleParts.length === 2 ) {
 						$afch.find( '#subjectName' ).val( titleParts[ 1 ] + ', ' + titleParts[ 0 ] );
 					}
@@ -2212,6 +2236,12 @@
 				// ARTICLE
 				// -------
 
+				// get comments left by reviewers to put on talk page
+				var comments = [];
+				if ( data.copyComments ) {
+					comments = newText.getAfcComments();
+				}
+
 				newText.removeAfcTemplates();
 
 				newText.updateCategories( data.newCategories );
@@ -2265,65 +2295,32 @@
 				// ---------
 
 				talkPage.getText().done( function ( talkText ) {
-					var talkTextPrefix = '';
-
-					// Add the AFC banner
-					talkTextPrefix += '{{subst:WPAFC/article|class=' + data.newAssessment +
-						( afchPage.additionalData.revId ? '|oldid=' + afchPage.additionalData.revId : '' ) + '}}';
-
-					// Add biography banner if specified
-					if ( data.isBiography ) {
-						// Ensure we don't have duplicate biography tags
-						AFCH.removeFromArray( data.newWikiProjects, 'WikiProject Biography' );
-
-						talkTextPrefix += ( '\n{{WikiProject Biography|living=' +
-							( data.lifeStatus !== 'unknown' ? ( data.lifeStatus === 'living' ? 'yes' : 'no' ) : '' ) +
-							'|class=' + data.newAssessment + '|listas=' + data.subjectName + '}}' );
-					}
-
-					if ( data.newAssessment === 'disambig' &&
-						$.inArray( 'WikiProject Disambiguation', data.newWikiProjects ) === -1 ) {
-						data.newWikiProjects.push( 'WikiProject Disambiguation' );
-					}
-
-					// Add and remove WikiProjects
-					var wikiProjectsToAdd = data.newWikiProjects.filter( function ( newTemplateName ) {
-						return !data.existingWikiProjects.some( function ( existingTplObj ) {
-							return existingTplObj.templateName === newTemplateName;
-						} );
-					} );
-					var wikiProjectsToRemove = data.existingWikiProjects.filter( function ( existingTplObj ) {
-						return !data.newWikiProjects.some( function ( newTemplateName ) {
-							return existingTplObj.templateName === newTemplateName;
-						} );
-					} ).map( function ( templateObj ) {
-						return templateObj.realTemplateName || templateObj.templateName;
-					} );
-					if ( data.alreadyHasWPBio && !data.isBiography ) {
-						wikiProjectsToRemove.push( data.existingWPBioTemplateName || 'wikiproject biography' );
-					}
-
-					$.each( wikiProjectsToAdd, function ( _index, templateName ) {
-						talkTextPrefix += '\n{{' + templateName + '|class=' + data.newAssessment + '}}';
-					} );
-					$.each( wikiProjectsToRemove, function ( _index, templateName ) {
-						// Regex from https://stackoverflow.com/a/5306111/1757964
-						var sanitizedTemplateName = templateName.replace( /[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&' );
-						talkText = talkText.replace( new RegExp( '\\n?\\{\\{\\s*' + sanitizedTemplateName + '\\s*.+?\\}\\}', 'is' ), '' );
-					} );
-
-					// We prepend the text so that talk page content is not removed
-					// (e.g. pages in `Draft:` namespace with discussion)
-					talkText = talkTextPrefix + '\n\n' + talkText;
+					var results = AFCH.addTalkPageBanners(
+						talkText,
+						data.newAssessment,
+						afchPage.additionalData.revId,
+						data.isBiography,
+						data.newWikiProjects,
+						data.lifeStatus,
+						data.subjectName,
+						data.existingWikiProjects,
+						data.alreadyHasWPBio,
+						data.existingWPBioTemplateName
+					);
+					talkText = results.talkText;
 
 					var summary = 'Placing [[Wikipedia:Articles for creation|Articles for creation]] banner';
-					if ( wikiProjectsToAdd.length > 0 ) {
-						summary += ', adding ' + wikiProjectsToAdd.length +
-							' WikiProject banner' + ( ( wikiProjectsToAdd.length === 1 ) ? '' : 's' );
+					if ( results.countOfWikiProjectsAdded > 0 ) {
+						summary += ', adding ' + results.countOfWikiProjectsAdded +
+							' WikiProject banner' + ( ( results.countOfWikiProjectsAdded === 1 ) ? '' : 's' );
 					}
-					if ( wikiProjectsToRemove.length > 0 ) {
-						summary += ', removing ' + wikiProjectsToRemove.length +
-							' WikiProject banner' + ( ( wikiProjectsToRemove.length === 1 ) ? '' : 's' );
+					if ( results.countOfWikiProjectsRemoved > 0 ) {
+						summary += ', removing ' + results.countOfWikiProjectsRemoved +
+							' WikiProject banner' + ( ( results.countOfWikiProjectsRemoved === 1 ) ? '' : 's' );
+					}
+
+					if ( comments && comments.length > 0 ) {
+						talkText = talkText.trim() + '\n\n== Comments left by AfC reviewers ==\n' + comments.join( '\n\n' );
 					}
 
 					talkPage.edit( {
@@ -2340,7 +2337,7 @@
 						AFCH.actions.notifyUser( submitter, {
 							message: AFCH.msg.get( 'accepted-submission',
 								{ $1: newPage, $2: data.newAssessment } ),
-							summary: 'Notification: Your [[Wikipedia:Articles for creation|Articles for creation]] submission has been accepted'
+							summary: 'Notification: Your [[' + AFCH.consts.pagename + '|Articles for Creation submission]] has been accepted'
 						} );
 					} );
 				}

@@ -21,7 +21,13 @@ mw.user = {
 };
 
 mw.loader = {
-	using: function () { return { then: function ( callback ) { callback(); } }; }
+	using: function () {
+		return {
+			then: function ( callback ) {
+				callback();
+			}
+		};
+	}
 };
 
 var basePageHtml = fs.readFileSync( './tests/test-frame.html' ).toString();
