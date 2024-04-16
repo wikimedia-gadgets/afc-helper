@@ -2338,7 +2338,7 @@
 							message: AFCH.msg.get( 'accepted-submission',
 								{ $1: newPage, $2: data.newAssessment } ),
 							summary: 'Notification: Your [[' + AFCH.consts.pagename + '|Articles for Creation submission]] has been accepted'
-						} ).then( subscribeToBottomSection( submitter ) );
+						} );
 					} );
 				}
 
@@ -2569,7 +2569,7 @@
 					AFCH.actions.notifyUser( submitter, {
 						message: message,
 						summary: 'Notification: Your [[' + AFCH.consts.pagename + '|Articles for Creation submission]] has been ' + ( isDecline ? 'declined' : 'rejected' )
-					} ).then( subscribeToBottomSection( submitter ) );
+					} );
 				} );
 			} );
 		}
@@ -2614,51 +2614,9 @@
 					message: AFCH.msg.get( 'comment-on-submission',
 						{ $1: AFCH.consts.pagename } ),
 					summary: 'Notification: I\'ve commented on [[' + AFCH.consts.pagename + '|your Articles for Creation submission]]'
-				} ).then( subscribeToBottomSection( submitter ) );
+				} );
 			} );
 		}
-	}
-
-	function subscribeToBottomSection( submitter ) {
-		if ( !AFCH.prefs.autoSubscribe ) {
-			return;
-		}
-
-		// Figure out the DiscussionTools ID of the section we want to subscribe to
-		var talkPage = 'User talk:' + submitter;
-		AFCH.api.get( {
-			action: 'discussiontoolspageinfo',
-			format: 'json',
-			page: talkPage,
-			formatversion: 2
-		} ).then( function ( json ) {
-			debugger;
-
-			var transcludedFrom = json.discussiontoolspageinfo.transcludedfrom;
-			transcludedFrom = Object.keys( transcludedFrom );
-			var commentName = '';
-			// Iterate from the bottom up, until a string beginning with "h-" is found. This is our user talk section that we just created.
-			for ( var i = transcludedFrom.length; i > 0; i-- ) {
-				var value = transcludedFrom[ i - 1 ];
-				if ( value.indexOf( 'h-' ) === 0 ) {
-					commentName = value;
-					break;
-				}
-			}
-
-			// Subscribe to that DiscussionTools section ID
-			AFCH.api.post( {
-				action: 'discussiontoolssubscribe',
-				format: 'json',
-				formatversion: 2,
-				page: talkPage,
-				commentname: commentName,
-				subscribe: true
-			} ).then( function ( json ) {
-				debugger;
-				console.log( json );
-			} );
-		} );
 	}
 
 	function handleSubmit( data ) {
@@ -2782,7 +2740,7 @@
 						message: AFCH.msg.get( 'g13-submission',
 							{ $1: AFCH.consts.pagename } ),
 						summary: 'Notification: [[WP:G13|G13]] speedy deletion nomination of [[' + AFCH.consts.pagename + ']]'
-					} ).then( subscribeToBottomSection( submitter ) );
+					} );
 				} );
 
 				// And finally log the CSD nomination once all users have been notified
