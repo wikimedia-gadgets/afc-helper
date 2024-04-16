@@ -788,9 +788,13 @@
 			notifyUser: function ( user, options ) {
 				var userTalkPage = new AFCH.Page( new mw.Title( user, 3 ).getPrefixedText() ); // 3 = user talk namespace
 
+				/*
 				var promise = userTalkPage.exists().then( function ( exists ) {
-					userTalkPage.edit( {
-						contents: ( exists ? '' : '{{Talk header}}' ) + '\n\n' + options.message,
+					AFCH.api.postWithToken( 'csrf', {
+						action: 'discussiontoolsedit',
+						page: userTalkPage.rawTitle,
+						summary:
+						wikitext: ( exists ? '' : '{{Talk header}}' ) + '\n\n' + options.message,
 						summary: options.summary || 'Notifying user',
 						mode: 'appendtext',
 						statusText: 'Notifying',
@@ -798,52 +802,9 @@
 						followRedirects: true
 					} ).then( AFCH.actions.subscribeToBottomSection( user ) );
 				} );
+				*/
 
 				return promise;
-			},
-
-			subscribeToBottomSection: function ( submitter ) {
-				if ( !AFCH.prefs.autoSubscribe ) {
-					return;
-				}
-
-				// Figure out the DiscussionTools ID of the section we want to subscribe to
-				var talkPage = 'User talk:' + submitter;
-				AFCH.api.get( {
-					action: 'discussiontoolspageinfo',
-					format: 'json',
-					page: talkPage,
-					formatversion: 2
-				} ).then( function ( json ) {
-					debugger;
-
-					var transcludedFrom = json.discussiontoolspageinfo.transcludedfrom;
-					transcludedFrom = Object.keys( transcludedFrom );
-					var commentName = '';
-					// Iterate from the bottom up, until a string beginning with "h-" is found. This is our user talk section that we just created.
-					for ( var i = transcludedFrom.length; i > 0; i-- ) {
-						var value = transcludedFrom[ i - 1 ];
-						if ( value.indexOf( 'h-' ) === 0 ) {
-							commentName = value;
-							break;
-						}
-					}
-
-					debugger;
-
-					// Subscribe to that DiscussionTools section ID
-					AFCH.api.post( {
-						action: 'discussiontoolssubscribe',
-						format: 'json',
-						formatversion: 2,
-						page: talkPage,
-						commentname: commentName,
-						subscribe: true
-					} ).then( function ( json ) {
-						debugger;
-						console.log( json );
-					} );
-				} );
 			},
 
 			/**
