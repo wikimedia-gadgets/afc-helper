@@ -1510,17 +1510,17 @@
 		 * @param {string} pagename - The title of the page.
 		 * @param {string} displayTitle - What gets shown by the link.
 		 * @param {boolean} [newTab=true] - Whether to open page in a new tab.
-		 * @param {boolean} followRedirects - whether to add &redirect=no to URLs, to prevent auto redirecting when clicked
+		 * @param {boolean} dontFollowRedirects - whether to add &redirect=no to URLs, to prevent auto redirecting when clicked
 		 * @return {jQuery} <a> element
 		 */
-		makeLinkElementToPage: function ( pagename, displayTitle, newTab, followRedirects ) {
+		makeLinkElementToPage: function ( pagename, displayTitle, newTab, dontFollowRedirects ) {
 			var actualTitle = pagename.replace( /_/g, ' ' );
 
 			// newTab is an optional parameter.
 			newTab = ( typeof newTab === 'undefined' ) ? true : newTab;
 
 			var options = {};
-			if ( followRedirects ) {
+			if ( dontFollowRedirects ) {
 				options = { redirect: 'no' };
 			}
 			var url = mw.util.getUrl( actualTitle, options );
