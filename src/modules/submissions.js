@@ -2609,7 +2609,7 @@
 		} );
 
 		if ( data.notifyUser ) {
-			afchSubmission.getSubmitter().then( function ( submitter ) {
+			afchSubmission.getSubmitter().done( function ( submitter ) {
 				AFCH.actions.notifyUser( submitter, {
 					message: AFCH.msg.get( 'comment-on-submission',
 						{ $1: AFCH.consts.pagename } ),

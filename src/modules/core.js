@@ -810,6 +810,7 @@
 					userTalkPage.edit( {
 						contents: ( exists ? '' : '{{Talk header}}' ) + '\n\n' + options.message,
 						summary: options.summary || 'Notifying user',
+						mode: 'appendtext',
 						statusText: 'Notifying',
 						hide: options.hide,
 						subscribe: AFCH.prefs.autoSubscribe
