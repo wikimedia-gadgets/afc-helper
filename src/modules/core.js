@@ -604,10 +604,10 @@
 
 			/**
 			 * Modifies a page's content
-			 * TODO the property name "contents" is quite silly, because people used to the MediaWiki API are gonna write "text"
 			 *
+			 * @todo the property name "contents" is quite silly, because people used to the MediaWiki API are gonna write "text"
 			 * @param {string} pagename The page to be modified, namespace included
-			 * @param {Object} options Object with properties:
+			 * @param {Object} options Object with properties ('contents' is required, others are optional):
 			 *                          contents: {string} the text to add to/replace the page,
 			 *                          summary: {string} edit summary, will have the edit summary ad at the end,
 			 *                          createonly: {bool} set to true to only edit the page if it doesn't exist,
@@ -615,6 +615,7 @@
 			 *                          hide: {bool} Set to true to supress logging in statusWindow
 			 *                          statusText: {string} message to show in status; default: "Editing"
 			 *                          followRedirects: {boolean} true to follow redirects, false to ignore redirects
+			 *                          watchlist: {string} 'nochange', 'preferences', 'unwatch', or 'watch'
 			 * @return {jQuery.Deferred} Resolves if saved with all data
 			 */
 			editPage: function ( pagename, options ) {
@@ -650,6 +651,12 @@
 
 				if ( options.minor ) {
 					request.minor = 'true';
+				}
+
+				if ( [ 'nochange', 'preferences', 'unwatch', 'watch' ].includes( options.watchlist ) ) {
+					request.watchlist = options.watchlist;
+				} else if ( AFCH.prefs.noWatch ) {
+					request.watchlist = 'nochange';
 				}
 
 				// Depending on mode, set appendtext=text or prependtext=text,
@@ -736,6 +743,10 @@
 					to: newTitle,
 					reason: reason + AFCH.consts.summaryAd
 				}, additionalParameters );
+
+				if ( AFCH.prefs.noWatch ) {
+					request.watchlist = 'nochange';
+				}
 
 				if ( AFCH.consts.mockItUp ) {
 					AFCH.log( request );
@@ -1216,7 +1227,8 @@
 				autoOpen: false,
 				logCsd: true,
 				launchLinkPosition: 'p-cactions',
-				logAfc: false
+				logAfc: false,
+				noWatch: false
 			};
 
 			/**
@@ -1634,6 +1646,81 @@
 			wikicode = wikicode.replace( /\n(\n\n\[\[:?Category:)/i, '$1' );
 
 			return wikicode;
+		},
+
+		/**
+		 * @param {string} talkText Wikitext of the draft talk page
+		 * @param {string} newAssessment Value of "Article assessment" dropdown list, or "" if blank
+		 * @param {number} revId Revision ID of the draft that is being accepted
+		 * @param {boolean} isBiography Value of the "Is the article a biography?" check box
+		 * @param {Array} newWikiProjects Value of the "Add WikiPrjects" part of the form. The <input> is a chips interface called jquery.chosen. Note that if there are existing WikiProject banners on the page, the form will auto-add those to the "Add WikiProjects" part of the form when it first loads.
+		 * @param {string} lifeStatus Value of "Is the subject alive?" dropdown list ("unknown", "living", "dead")
+		 * @param {string} subjectName Value of the "Subject name (last, first)" text input, or "" if blank
+		 * @param {Array<Object>} existingWikiProjects An array of associative arrays. The associative arrays contain the keys {string} displayName (example: Somalia), {string} templateName (example: WikiProject Somalia), and {boolean} alreadyOnPage
+		 * @param {boolean} alreadyHasWPBio
+		 * @param {null} existingWPBioTemplateName
+		 * @returns {Object} { {string} talkText, {number} countOfWikiProjectsAdded, {number} countOfWikiProjectsRemoved }
+		 */
+		addTalkPageBanners: function ( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName, existingWikiProjects, alreadyHasWPBio, existingWPBioTemplateName ) {
+			var talkTextPrefix = '';
+
+			// Add the AFC banner
+			talkTextPrefix += '{{subst:WPAFC/article|class=' + newAssessment +
+				( revId ? '|oldid=' + revId : '' ) + '}}';
+
+			// Add biography banner if specified
+			if ( isBiography ) {
+				// Ensure we don't have duplicate biography tags
+				AFCH.removeFromArray( newWikiProjects, 'WikiProject Biography' );
+
+				talkTextPrefix += ( '\n{{WikiProject Biography|living=' +
+					( lifeStatus !== 'unknown' ? ( lifeStatus === 'living' ? 'yes' : 'no' ) : '' ) +
+					'|class=' + newAssessment + '|listas=' + subjectName + '}}' );
+			}
+
+			// Add disambiguation banner if needed
+			if ( newAssessment === 'disambig' &&
+				$.inArray( 'WikiProject Disambiguation', newWikiProjects ) === -1 ) {
+				newWikiProjects.push( 'WikiProject Disambiguation' );
+			}
+
+			// Add and remove WikiProjects
+			/** @var {Array} */
+			var wikiProjectsToAdd = newWikiProjects.filter( function ( newTemplateName ) {
+				return !existingWikiProjects.some( function ( existingTplObj ) {
+					return existingTplObj.templateName === newTemplateName;
+				} );
+			} );
+			/** @var {Array} */
+			var wikiProjectsToRemove = existingWikiProjects.filter( function ( existingTplObj ) {
+				return !newWikiProjects.some( function ( newTemplateName ) {
+					return existingTplObj.templateName === newTemplateName;
+				} );
+			} ).map( function ( templateObj ) {
+				return templateObj.realTemplateName || templateObj.templateName;
+			} );
+			if ( alreadyHasWPBio && !isBiography ) {
+				wikiProjectsToRemove.push( existingWPBioTemplateName || 'wikiproject biography' );
+			}
+
+			$.each( wikiProjectsToAdd, function ( _index, templateName ) {
+				talkTextPrefix += '\n{{' + templateName + '|class=' + newAssessment + '}}';
+			} );
+			$.each( wikiProjectsToRemove, function ( _index, templateName ) {
+				// Regex from https://stackoverflow.com/a/5306111/1757964
+				var sanitizedTemplateName = templateName.replace( /[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&' );
+				talkText = talkText.replace( new RegExp( '\\n?\\{\\{\\s*' + sanitizedTemplateName + '\\s*.+?\\}\\}', 'is' ), '' );
+			} );
+
+			// We prepend the text so that talk page content is not removed
+			// (e.g. pages in `Draft:` namespace with discussion)
+			talkText = talkTextPrefix + '\n\n' + talkText;
+
+			return {
+				talkText: talkText,
+				countOfWikiProjectsAdded: wikiProjectsToAdd.length,
+				countOfWikiProjectsRemoved: wikiProjectsToRemove.length
+			};
 		},
 
 		/**
