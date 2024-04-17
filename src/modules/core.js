@@ -638,8 +638,6 @@
 					status = AFCH.consts.nullstatus;
 				}
 
-				debugger;
-
 				if ( !options.subscribe ) {
 					request = {
 						action: 'edit',
@@ -655,7 +653,7 @@
 						paction: 'addtopic',
 						page: pagename,
 						sectiontitle: '',
-						wikitext: options.contents,
+						wikitext: options.contents.trim(),
 						summary: options.summary + AFCH.consts.summaryAd,
 						autosubscribe: 'yes'
 					};
@@ -689,20 +687,22 @@
 
 				AFCH.api.postWithEditToken( request )
 					.done( function ( data ) {
-						debugger;
 						var $diffLink;
+						var api = options.subscribe ? 'discussiontoolsedit' : 'edit';
+						// The success string is capitalized by one API and not the other
+						var success = options.subscribe ? 'success' : 'Success';
 
-						if ( data && data.edit && data.edit.result && data.edit.result === 'Success' ) {
+						if ( data && data[ api ] && data[ api ].result && data[ api ].result === success ) {
 							deferred.resolve( data );
 
-							if ( data.edit.hasOwnProperty( 'nochange' ) ) {
+							if ( data[ api ].hasOwnProperty( 'nochange' ) ) {
 								status.update( 'No changes made to $1' );
 								return;
 							}
 
 							// Create a link to the diff of the edit
 							$diffLink = AFCH.makeLinkElementToPage(
-								'Special:Diff/' + data.edit.oldrevid + '/' + data.edit.newrevid, '(diff)'
+								'Special:Diff/' + data[ api ].newrevid, '(diff)'
 							).addClass( 'text-smaller' );
 
 							status.update( 'Saved $1 ' + AFCH.jQueryToHtml( $diffLink ) );
@@ -713,7 +713,6 @@
 						}
 					} )
 					.fail( function ( err ) {
-						debugger;
 						deferred.reject( err );
 						status.update( 'Error while saving $1: ' + JSON.stringify( err ) );
 					} );
