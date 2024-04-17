@@ -1789,6 +1789,7 @@
 						} )
 						// TODO: query # of revisions
 						// TODO: query page isRedirect
+						// TODO: make sure this handles redirects that already exist that have 1 revision only. i don't see a conditional for that below yet
 					).then( function ( rawBlacklist, rawProtection, rawRevisions, rawPage ) {
 						var errorHtml, buttonText;
 
@@ -1801,7 +1802,7 @@
 						if ( pageAlreadyExists && pageIsRedirect && pageRevisionCount > 1 ) {
 							errorHtml = 'Whoops, the page "' + linkToPage + '" is a redirect with non-trivial history. <span id="afch-redirect-notification">Do you want to tag it for speedy deletion so you can accept this draft later after an admin deletes the redirect? <a id="afch-redirect-tag-speedy">Yes</a> / <a id="afch-redirect-abort">No</a></span>';
 
-							// TODO: add addFormSubmitHandler( handleRedirectWithNonTrivialHistory ), which is called when afch-redirect-tag-speedy is clicked. it does a couple things: 1) tags the redirect as {{Db-afc-move}}, 2) marks the draft as under review, 3) watchlist the redirect page in mainspace. the form data from newTitle needs to be available (either via form submission or via javascript wizardry)
+							// TODO: add addFormSubmitHandler( handleRedirectWithNonTrivialHistory ), which is called when afch-redirect-tag-speedy is clicked. it does a couple things: 1) prepends the redirect with {{Db-afc-move}}, 2) marks the draft as under review, 3) watchlist the redirect page in mainspace. the form data from newTitle needs to be available (either via form submission or via javascript wizardry)
 
 							buttonText = 'The proposed title already exists';
 						} else if ( pageAlreadyExists ) {
