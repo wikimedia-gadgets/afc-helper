@@ -1301,7 +1301,6 @@
 
 		// Handler will run after the main AJAX requests complete
 		setupAjaxStopHandler();
-
 	}
 
 	/**
@@ -1755,6 +1754,7 @@
 					$status.text( '' );
 					$submitButton
 						.removeClass( 'disabled' )
+						.css( 'pointer-events', 'auto' )
 						.text( 'Accept & publish' );
 
 					// If there is no value, die now, because otherwise mw.Title
@@ -1787,23 +1787,22 @@
 							inprop: 'protection',
 							titles: page.rawTitle
 						} )
-						// TODO: query # of revisions
-						// TODO: query page isRedirect
-						// TODO: make sure this handles redirects that already exist that have 1 revision only. i don't see a conditional for that below yet
-					).then( function ( rawBlacklist, rawProtection, rawRevisions, rawPage ) {
+					).then( function ( rawBlacklist, rawInfo ) {
 						var errorHtml, buttonText;
 
 						// Get just the result, not the Promise object
 						var blacklistResult = rawBlacklist[ 0 ],
-							protectionResult = rawProtection[ 0 ];
+							infoResult = rawInfo[ 0 ];
 
-						// If the page already exists, display an error
-						var pageAlreadyExists = !protectionResult.query.pages.hasOwnProperty( '-1' );
-						if ( pageAlreadyExists && pageIsRedirect && pageRevisionCount > 1 ) {
-							errorHtml = 'Whoops, the page "' + linkToPage + '" is a redirect with non-trivial history. <span id="afch-redirect-notification">Do you want to tag it for speedy deletion so you can accept this draft later after an admin deletes the redirect? <a id="afch-redirect-tag-speedy">Yes</a> / <a id="afch-redirect-abort">No</a></span>';
+						var pageAlreadyExists = !infoResult.query.pages.hasOwnProperty( '-1' );
 
-							// TODO: add addFormSubmitHandler( handleRedirectWithNonTrivialHistory ), which is called when afch-redirect-tag-speedy is clicked. it does a couple things: 1) prepends the redirect with {{Db-afc-move}}, 2) marks the draft as under review, 3) watchlist the redirect page in mainspace. the form data from newTitle needs to be available (either via form submission or via javascript wizardry)
+						var pages = infoResult && infoResult.query && infoResult.query.pages && infoResult.query.pages;
+						var firstPageInObject = Object.values( pages )[ 0 ];
+						var pageIsRedirect = firstPageInObject && ( 'redirect' in firstPageInObject );
 
+						if ( pageAlreadyExists && pageIsRedirect ) {
+							var linkToRedirect = AFCH.jQueryToHtml( AFCH.makeLinkElementToPage( page.rawTitle, null, null, true ) );
+							errorHtml = '<br />Whoops, the page "' + linkToRedirect + '" already exists and is a redirect. <span id="afch-redirect-notification">Do you want to tag it for speedy deletion so you can accept this draft later? <a id="afch-redirect-tag-speedy">Yes</a> / <a id="afch-redirect-abort">No</a></span>';
 							buttonText = 'The proposed title already exists';
 						} else if ( pageAlreadyExists ) {
 							errorHtml = 'Whoops, the page "' + linkToPage + '" already exists.';
@@ -1812,7 +1811,7 @@
 							// If the page doesn't exist but IS create-protected and the
 							// current reviewer is not an admin, also display an error
 							// FIXME: offer one-click request unprotection?
-							$.each( protectionResult.query.pages[ '-1' ].protection, function ( _, entry ) {
+							$.each( infoResult.query.pages[ '-1' ].protection, function ( _, entry ) {
 								if ( entry.type === 'create' && entry.level === 'sysop' && $.inArray( 'sysop', mw.config.get( 'wgUserGroups' ) ) === -1 ) {
 									errorHtml = 'Darn it, "' + linkToPage + '" is create-protected. You will need to request unprotection before accepting.';
 									buttonText = 'The proposed title is create-protected';
@@ -1838,9 +1837,20 @@
 						// Show the error message
 						$status.html( errorHtml );
 
+						// Add listener for the "Do you want to tag it for speedy deletion so you can accept this draft later?" "yes" link.
+						// Listeners have to be added after the HTML elements are created.
+						// TODO: broken, fix
+						// addFormSubmitHandler( handleAcceptOverRedirect );
+
+						// Add listener for the "Do you want to tag it for speedy deletion so you can accept this draft later?" "no" link.
+						$( '#afch-redirect-abort' ).on( 'click', function () {
+							$( '#afch-redirect-notification' ).hide();
+						} );
+
 						// Disable the submit button and show an error in its place
 						$submitButton
 							.addClass( 'disabled' )
+							.css( 'pointer-events', 'none' )
 							.text( buttonText );
 					} );
 				} );
@@ -1856,7 +1866,6 @@
 				existingWPBioTemplateName: existingWPBioTemplateName,
 				existingShortDescription: shortDescription
 			} );
-
 		} );
 	}
 
@@ -1947,11 +1956,13 @@
 									$( this ).removeClass( 'bad-input' );
 									submitButton
 										.removeClass( 'disabled' )
+										.css( 'pointer-events', 'auto' )
 										.text( 'Decline submission' );
 								} else {
 									$( this ).addClass( 'bad-input' );
 									submitButton
 										.addClass( 'disabled' )
+										.css( 'pointer-events', 'none' )
 										.text( 'Please enter between one and three URLs!' );
 								}
 							} );
@@ -2161,6 +2172,7 @@
 				$afch.find( '#submitterNameStatus' ).text( '' );
 				$afch.find( '#afchSubmitForm' )
 					.removeClass( 'disabled' )
+					.css( 'pointer-events', 'auto' )
 					.text( 'Submit' );
 			}
 
@@ -2198,6 +2210,7 @@
 						status.text( 'Remove "User:" from the beginning.' );
 						submitButton
 							.addClass( 'disabled' )
+							.css( 'pointer-events', 'none' )
 							.text( 'Invalid user name' );
 						return;
 					}
@@ -2213,6 +2226,7 @@
 							status.text( 'No user named "' + submitter + '".' );
 							submitButton
 								.addClass( 'disabled' )
+								.css( 'pointer-events', 'none' )
 								.text( 'No such user' );
 						}
 					} );
@@ -2230,6 +2244,16 @@
 
 	// These functions actually perform a given action using data passed
 	// in the `data` parameter.
+
+	function handleAcceptOverRedirect( data ) {
+		// TODO: check if {{Db-afc-move}} has been tagged yet. if not:
+		// TODO: prepend the redirect with {{Db-afc-move}}
+		// TODO: mark the draft as under review
+		// TODO: watchlist the redirect page in mainspace. the form data from newTitle needs to be available (either via form submission or via javascript wizardry)
+		// also add a listener for the "No" link, which will hide #afch-redirect-notification
+		debugger;
+		console.log( 'Test' );
+	}
 
 	function handleAccept( data ) {
 		var newText = data.afchText;
