@@ -610,12 +610,13 @@
 			 * @param {Object} options Object with properties ('contents' is required, others are optional):
 			 *                          contents: {string} the text to add to/replace the page,
 			 *                          summary: {string} edit summary, will have the edit summary ad at the end,
-			 *                          createonly: {bool} set to true to only edit the page if it doesn't exist,
+			 *                          createonly: {boolean} set to true to only edit the page if it doesn't exist,
 			 *                          mode: {string} 'appendtext' or 'prependtext'; default: (replace everything)
-			 *                          hide: {bool} Set to true to supress logging in statusWindow
+			 *                          hide: {boolean} Set to true to supress logging in statusWindow
 			 *                          statusText: {string} message to show in status; default: "Editing"
 			 *                          followRedirects: {boolean} true to follow redirects, false to ignore redirects
 			 *                          watchlist: {string} 'nochange', 'preferences', 'unwatch', or 'watch'
+			 *                          subscribe: {boolean} when appending a talk page section, whether or not to subscribe to it
 			 * @return {jQuery.Deferred} Resolves if saved with all data
 			 */
 			editPage: function ( pagename, options ) {
@@ -637,13 +638,28 @@
 					status = AFCH.consts.nullstatus;
 				}
 
-				request = {
-					action: 'edit',
-					text: options.contents,
-					title: pagename,
-					summary: options.summary + AFCH.consts.summaryAd,
-					redirect: options.followRedirects
-				};
+				debugger;
+
+				if ( !options.subscribe ) {
+					request = {
+						action: 'edit',
+						title: pagename,
+						text: options.contents,
+						summary: options.summary + AFCH.consts.summaryAd,
+						redirect: options.followRedirects
+					};
+				} else {
+					// Because it is easier to do subscriptions with it, use the discussiontoolsedit API instead of the edit API
+					request = {
+						action: 'discussiontoolsedit',
+						paction: 'addtopic',
+						page: pagename,
+						sectiontitle: '',
+						wikitext: options.contents,
+						summary: options.summary + AFCH.consts.summaryAd,
+						autosubscribe: 'yes'
+					};
+				}
 
 				if ( pagename.indexOf( 'Draft:' ) === 0 ) {
 					request.nocreate = 'true';
@@ -661,7 +677,7 @@
 
 				// Depending on mode, set appendtext=text or prependtext=text,
 				// which overrides the default text option
-				if ( options.mode ) {
+				if ( !options.subscribe && options.mode ) {
 					request[ options.mode ] = options.contents;
 				}
 
@@ -673,6 +689,7 @@
 
 				AFCH.api.postWithEditToken( request )
 					.done( function ( data ) {
+						debugger;
 						var $diffLink;
 
 						if ( data && data.edit && data.edit.result && data.edit.result === 'Success' ) {
@@ -696,6 +713,7 @@
 						}
 					} )
 					.fail( function ( err ) {
+						debugger;
 						deferred.reject( err );
 						status.update( 'Error while saving $1: ' + JSON.stringify( err ) );
 					} );
@@ -780,31 +798,32 @@
 			 * @param  {string} user
 			 * @param  {Object} data object with properties
 			 *                   - message: {string}
-			 *                   - summary: {string}
+			 *                   - summary: {string} edit summary
 			 *                   - hide: {bool}, default false
 			 * @param options
 			 * @return {jQuery.Deferred} Resolves with success/failure
 			 */
 			notifyUser: function ( user, options ) {
-				var userTalkPage = new AFCH.Page( new mw.Title( user, 3 ).getPrefixedText() ); // 3 = user talk namespace
+				var deferred = $.Deferred(),
+					userTalkPage = new AFCH.Page( new mw.Title( user, 3 ).getPrefixedText() ); // 3 = user talk namespace
 
-				/*
-				var promise = userTalkPage.exists().then( function ( exists ) {
-					AFCH.api.postWithToken( 'csrf', {
-						action: 'discussiontoolsedit',
-						page: userTalkPage.rawTitle,
-						summary:
-						wikitext: ( exists ? '' : '{{Talk header}}' ) + '\n\n' + options.message,
+				userTalkPage.exists().done( function ( exists ) {
+					userTalkPage.edit( {
+						contents: ( exists ? '' : '{{Talk header}}' ) + '\n\n' + options.message,
 						summary: options.summary || 'Notifying user',
-						mode: 'appendtext',
 						statusText: 'Notifying',
 						hide: options.hide,
-						followRedirects: true
-					} ).then( AFCH.actions.subscribeToBottomSection( user ) );
+						subscribe: AFCH.prefs.autoSubscribe
+					} )
+						.done( function () {
+							deferred.resolve();
+						} )
+						.fail( function () {
+							deferred.reject();
+						} );
 				} );
-				*/
 
-				return promise;
+				return deferred;
 			},
 
 			/**
