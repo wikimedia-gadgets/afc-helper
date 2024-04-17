@@ -813,6 +813,7 @@
 						mode: 'appendtext',
 						statusText: 'Notifying',
 						hide: options.hide,
+						followRedirects: true,
 						subscribe: AFCH.prefs.autoSubscribe
 					} )
 						.done( function () {
