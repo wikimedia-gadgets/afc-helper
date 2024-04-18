@@ -1840,7 +1840,7 @@
 						// Add listener for the "Do you want to tag it for speedy deletion so you can accept this draft later?" "yes" link.
 						// Listeners have to be added after the HTML elements are created.
 						$( '#afch-redirect-tag-speedy' ).on( 'click', function () {
-							handleAcceptOverRedirect();
+							handleAcceptOverRedirect( page.rawTitle );
 						} );
 
 						// Add listener for the "Do you want to tag it for speedy deletion so you can accept this draft later?" "no" link.
@@ -2246,22 +2246,29 @@
 	// These functions actually perform a given action using data passed
 	// in the `data` parameter.
 
-	function handleAcceptOverRedirect() {
-		// do the stuff normally done in addFormSubmitHandler(), since trying to do addFormSubmitHandler( handleAcceptOverRedirect ) early in the code doesn't work
-		afchPage.getText( false ).done( function ( text ) {
-			var draftWikitext = new AFCH.Text( text );
-			prepareForProcessing();
+	function handleAcceptOverRedirect( destinationPageTitle ) {
+		// get rid of the accept form. replace it with the status div.
+		prepareForProcessing();
 
+		afchPage.getText( false ).then( function ( draftWikitext ) {
+			debugger;
 			AFCH.status.Element( 'Checking if redirect is already tagged for speedy deletion' );
-			// API query: wikitext of redirect
-			// .indexOf( '{{Db-afc-move' ) (case insensitive)
+			var destinationPage = new AFCH.Page( destinationPageTitle );
+			var destinationPageWikiText = destinationPage.getText( false ).then( function ( wikitext ) {
+				debugger;
+				var isAlreadyTagged = wikitext.toLowerCase().includes( '{{db-afc-move' );
+				if ( isAlreadyTagged ) {
+					AFCH.status.Element( '<span class="error">Error!</span> It looks like the page is already tagged with {{Db-afc-move}}' );
+					return;
+				}
 
-			AFCH.status.Element( 'Adding {{Db-afc-move}} speedy deletion tag to redirect, and adding to watchlist' );
-			// API edit: prepend the redirect with {{Db-afc-move}}. watchlist = true
+				AFCH.status.Element( 'Adding {{Db-afc-move}} speedy deletion tag to redirect, and adding to watchlist' );
+				// TODO: API edit: prepend the redirect with {{Db-afc-move}}. watchlist = true
 
-			AFCH.status.Element( 'Marking draft as under review' );
-			// tweak draftWikitext so that the template says under review. does a utility function exist for this already?
-			// API edit: draftWikitext
+				AFCH.status.Element( 'Marking draft as under review' );
+				// tweak draftWikitext so that the template says under review. does a utility function exist for this already?
+				// TODO: API edit: draftWikitext
+			} );
 		} );
 	}
 
