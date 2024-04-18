@@ -996,7 +996,7 @@
 			/**
 			 * Represents an element in the status container
 			 *
-			 * @param  {string} initialText Initial text of the element
+			 * @param {string} initialText Initial text of the element
 			 * @param {Object} substitutions key-value pairs of strings that should be replaced by something
 			 *                               else. For example, { '$2': mw.user.getUser() }. If not redefined, $1
 			 *                               will be equal to the current page name.
@@ -1005,7 +1005,7 @@
 				/**
 				 * Replace the status element with new html content
 				 *
-				 * @param  {jQuery|string} html Content of the element
+				 * @param {jQuery|string} html Content of the element
 				 *                              Can use $1 to represent the page name
 				 */
 				this.update = function ( html ) {

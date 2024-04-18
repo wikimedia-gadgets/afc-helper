@@ -1839,8 +1839,9 @@
 
 						// Add listener for the "Do you want to tag it for speedy deletion so you can accept this draft later?" "yes" link.
 						// Listeners have to be added after the HTML elements are created.
-						// TODO: broken, fix
-						// addFormSubmitHandler( handleAcceptOverRedirect );
+						$( '#afch-redirect-tag-speedy' ).on( 'click', function () {
+							handleAcceptOverRedirect();
+						} );
 
 						// Add listener for the "Do you want to tag it for speedy deletion so you can accept this draft later?" "no" link.
 						$( '#afch-redirect-abort' ).on( 'click', function () {
@@ -2245,14 +2246,23 @@
 	// These functions actually perform a given action using data passed
 	// in the `data` parameter.
 
-	function handleAcceptOverRedirect( data ) {
-		// TODO: check if {{Db-afc-move}} has been tagged yet. if not:
-		// TODO: prepend the redirect with {{Db-afc-move}}
-		// TODO: mark the draft as under review
-		// TODO: watchlist the redirect page in mainspace. the form data from newTitle needs to be available (either via form submission or via javascript wizardry)
-		// also add a listener for the "No" link, which will hide #afch-redirect-notification
-		debugger;
-		console.log( 'Test' );
+	function handleAcceptOverRedirect() {
+		// do the stuff normally done in addFormSubmitHandler(), since trying to do addFormSubmitHandler( handleAcceptOverRedirect ) early in the code doesn't work
+		afchPage.getText( false ).done( function ( text ) {
+			var draftWikitext = new AFCH.Text( text );
+			prepareForProcessing();
+
+			AFCH.status.Element( 'Checking if redirect is already tagged for speedy deletion' );
+			// API query: wikitext of redirect
+			// .indexOf( '{{Db-afc-move' ) (case insensitive)
+
+			AFCH.status.Element( 'Adding {{Db-afc-move}} speedy deletion tag to redirect, and adding to watchlist' );
+			// API edit: prepend the redirect with {{Db-afc-move}}. watchlist = true
+
+			AFCH.status.Element( 'Marking draft as under review' );
+			// tweak draftWikitext so that the template says under review. does a utility function exist for this already?
+			// API edit: draftWikitext
+		} );
 	}
 
 	function handleAccept( data ) {
