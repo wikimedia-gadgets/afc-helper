@@ -2250,24 +2250,28 @@
 		// get rid of the accept form. replace it with the status div.
 		prepareForProcessing();
 
-		afchPage.getText( false ).then( function ( draftWikitext ) {
-			debugger;
-			AFCH.status.Element( 'Checking if redirect is already tagged for speedy deletion' );
-			var destinationPage = new AFCH.Page( destinationPageTitle );
-			var destinationPageWikiText = destinationPage.getText( false ).then( function ( wikitext ) {
-				debugger;
-				var isAlreadyTagged = wikitext.toLowerCase().includes( '{{db-afc-move' );
-				if ( isAlreadyTagged ) {
-					AFCH.status.Element( '<span class="error">Error!</span> It looks like the page is already tagged with {{Db-afc-move}}' );
-					return;
-				}
+		// Add {{Db-afc-move}} speedy deletion tag to redirect, and add to watchlist
+		( new AFCH.Page( destinationPageTitle ) ).edit( {
+			contents: '{{Db-afc-move|' + afchPage.rawTitle + '}}\n\n',
+			mode: 'prependtext',
+			summary: 'Requesting speedy deletion ([[Wikipedia:CSD#G6|CSD G6]]).',
+			statusText: 'Tagging',
+			watchlist: 'watch'
+		} );
 
-				AFCH.status.Element( 'Adding {{Db-afc-move}} speedy deletion tag to redirect, and adding to watchlist' );
-				// TODO: API edit: prepend the redirect with {{Db-afc-move}}. watchlist = true
-
-				AFCH.status.Element( 'Marking draft as under review' );
-				// tweak draftWikitext so that the template says under review. does a utility function exist for this already?
-				// TODO: API edit: draftWikitext
+		// Mark the draft as under review.
+		afchPage.getText( false ).then( function ( rawText ) {
+			var text = new AFCH.Text( rawText );
+			afchSubmission.setStatus( 'r', {
+				reviewer: AFCH.consts.user,
+				reviewts: '{{subst:REVISIONTIMESTAMP}}'
+			} );
+			text.updateAfcTemplates( afchSubmission.makeWikicode() );
+			text.cleanUp();
+			afchPage.edit( {
+				contents: text.get(),
+				summary: 'Marking submission as under review',
+				statusText: 'Marking as under review'
 			} );
 		} );
 	}
