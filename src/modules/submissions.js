@@ -1838,7 +1838,6 @@
 						$status.html( errorHtml );
 
 						// Add listener for the "Do you want to tag it for speedy deletion so you can accept this draft later?" "yes" link.
-						// Listeners have to be added after the HTML elements are created.
 						$( '#afch-redirect-tag-speedy' ).on( 'click', function () {
 							handleAcceptOverRedirect( page.rawTitle );
 						} );
@@ -2243,8 +2242,7 @@
 		addFormSubmitHandler( handlePostponeG13 );
 	}
 
-	// These functions actually perform a given action using data passed
-	// in the `data` parameter.
+	// These functions perform a given action using data passed in the `data` parameter.
 
 	function handleAcceptOverRedirect( destinationPageTitle ) {
 		// get rid of the accept form. replace it with the status div.
