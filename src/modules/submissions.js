@@ -1367,10 +1367,18 @@
 				// Also provide extra data
 				$.extend( data, extraData );
 
-				prepareForProcessing();
+				checkForEditConflict().then( function ( editConflict ) {
+					if ( editConflict ) {
+						showEditConflictMessage();
+						return;
+					}
 
-				// Now finally call the applicable handler
-				fn( data );
+					// Hide the HTML form. Show #afchStatus messages
+					prepareForProcessing();
+
+					// Now finally call the applicable handler
+					fn( data );
+				} );
 			} );
 		} );
 	}
@@ -2606,6 +2614,42 @@
 				} );
 			}
 		} );
+	}
+
+	function checkForEditConflict() {
+		// Get all revisions since the page was loaded, starting with the revision of the loaded page
+		var request = {
+			action: 'query',
+			format: 'json',
+			prop: 'revisions',
+			titles: [ mw.config.get( 'wgPageName' ) ],
+			formatversion: 2,
+			rvstartid: mw.config.get( 'wgRevisionId' ),
+			rvdir: 'newer'
+		};
+		var promise = AFCH.api.postWithEditToken( request )
+			.then( function ( data ) {
+				var revisions = data.query.pages[ 0 ].revisions;
+				// 1 revision = no edit conflict, 2+ revisions = edit conflict.
+				if ( revisions && revisions.length > 1 ) {
+					return true;
+				}
+				return false;
+			} );
+		return promise;
+	}
+
+	function showEditConflictMessage() {
+		$( '#afchSubmitForm' ).hide();
+
+		// Putting this here instead of in tpl-submissions.html to reduce code duplication
+		var editConflictHtml = 'Edit conflict! Your changes were not saved. Please check the <a id="afchHistoryLink" href="">page history</a>. To avoid overwriting the other person\'s edits, please refresh this page and start again.';
+		$( '#afchEditConflict' ).html( editConflictHtml );
+
+		var historyLink = new mw.Uri( mw.util.getUrl( mw.config.get( 'wgPageName' ), { action: 'history' } ) );
+		$( '#afchHistoryLink' ).prop( 'href', historyLink );
+
+		$( '#afchEditConflict' ).show();
 	}
 
 	function handleComment( data ) {
