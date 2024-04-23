@@ -1014,7 +1014,7 @@
 			/**
 			 * Represents an element in the status container
 			 *
-			 * @param  {string} initialText Initial text of the element
+			 * @param {string} initialText Initial text of the element
 			 * @param {Object} substitutions key-value pairs of strings that should be replaced by something
 			 *                               else. For example, { '$2': mw.user.getUser() }. If not redefined, $1
 			 *                               will be equal to the current page name.
@@ -1023,7 +1023,7 @@
 				/**
 				 * Replace the status element with new html content
 				 *
-				 * @param  {jQuery|string} html Content of the element
+				 * @param {jQuery|string} html Content of the element
 				 *                              Can use $1 to represent the page name
 				 */
 				this.update = function ( html ) {
@@ -1529,16 +1529,23 @@
 		 * @param {string} pagename - The title of the page.
 		 * @param {string} displayTitle - What gets shown by the link.
 		 * @param {boolean} [newTab=true] - Whether to open page in a new tab.
+		 * @param {boolean} dontFollowRedirects - whether to add &redirect=no to URLs, to prevent auto redirecting when clicked
 		 * @return {jQuery} <a> element
 		 */
-		makeLinkElementToPage: function ( pagename, displayTitle, newTab ) {
+		makeLinkElementToPage: function ( pagename, displayTitle, newTab, dontFollowRedirects ) {
 			var actualTitle = pagename.replace( /_/g, ' ' );
 
 			// newTab is an optional parameter.
 			newTab = ( typeof newTab === 'undefined' ) ? true : newTab;
 
+			var options = {};
+			if ( dontFollowRedirects ) {
+				options = { redirect: 'no' };
+			}
+			var url = mw.util.getUrl( actualTitle, options );
+
 			return $( '<a>' )
-				.attr( 'href', mw.util.getUrl( actualTitle ) )
+				.attr( 'href', url )
 				.attr( 'id', 'afch-cat-link-' + pagename.toLowerCase().replace( / /g, '-' ).replace( /\//g, '-' ) )
 				.attr( 'title', actualTitle )
 				.text( displayTitle || actualTitle )
