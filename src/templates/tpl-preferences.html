@@ -29,6 +29,11 @@
 		<label for="noWatch" class="afch-label">Do not add pages to watchlist</label>
 		<input type="checkbox" id="noWatch" class="afch-input" {{#noWatch}}checked{{/noWatch}} />
 	</div>
+	<div id="autoSubscribeWrapper">
+		<label for="autoSubscribe" class="afch-label"><a href="https://www.mediawiki.org/wiki/Help:DiscussionTools#Topic_subscriptions" target="_blank">Receive a notification</a> when a draft author replies to a user talk message you left them</label>
+		<input type="checkbox" id="autoSubscribe" class="afch-input" {{#autoSubscribe}}checked{{/autoSubscribe}} />
+	</div>
+	<!-- When adding new preferences, don't forget to update core.js prefDefaults -->
 </div>
 <!-- /preferences -->
 

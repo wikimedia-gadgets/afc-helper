@@ -610,12 +610,13 @@
 			 * @param {Object} options Object with properties ('contents' is required, others are optional):
 			 *                          contents: {string} the text to add to/replace the page,
 			 *                          summary: {string} edit summary, will have the edit summary ad at the end,
-			 *                          createonly: {bool} set to true to only edit the page if it doesn't exist,
+			 *                          createonly: {boolean} set to true to only edit the page if it doesn't exist,
 			 *                          mode: {string} 'appendtext' or 'prependtext'; default: (replace everything)
-			 *                          hide: {bool} Set to true to supress logging in statusWindow
+			 *                          hide: {boolean} Set to true to supress logging in statusWindow
 			 *                          statusText: {string} message to show in status; default: "Editing"
 			 *                          followRedirects: {boolean} true to follow redirects, false to ignore redirects
 			 *                          watchlist: {string} 'nochange', 'preferences', 'unwatch', or 'watch'
+			 *                          subscribe: {boolean} when appending a talk page section, whether or not to subscribe to it
 			 * @return {jQuery.Deferred} Resolves if saved with all data
 			 */
 			editPage: function ( pagename, options ) {
@@ -637,13 +638,26 @@
 					status = AFCH.consts.nullstatus;
 				}
 
-				request = {
-					action: 'edit',
-					text: options.contents,
-					title: pagename,
-					summary: options.summary + AFCH.consts.summaryAd,
-					redirect: options.followRedirects
-				};
+				if ( !options.subscribe ) {
+					request = {
+						action: 'edit',
+						title: pagename,
+						text: options.contents,
+						summary: options.summary + AFCH.consts.summaryAd,
+						redirect: options.followRedirects
+					};
+				} else {
+					// Because it is easier to do subscriptions with it, use the discussiontoolsedit API instead of the edit API
+					request = {
+						action: 'discussiontoolsedit',
+						paction: 'addtopic',
+						page: pagename,
+						sectiontitle: '',
+						wikitext: options.contents.trim(),
+						summary: options.summary + AFCH.consts.summaryAd,
+						autosubscribe: 'yes'
+					};
+				}
 
 				if ( pagename.indexOf( 'Draft:' ) === 0 ) {
 					request.nocreate = 'true';
@@ -661,7 +675,7 @@
 
 				// Depending on mode, set appendtext=text or prependtext=text,
 				// which overrides the default text option
-				if ( options.mode ) {
+				if ( !options.subscribe && options.mode ) {
 					request[ options.mode ] = options.contents;
 				}
 
@@ -674,18 +688,21 @@
 				AFCH.api.postWithEditToken( request )
 					.done( function ( data ) {
 						var $diffLink;
+						var api = options.subscribe ? 'discussiontoolsedit' : 'edit';
+						// The success string is capitalized by one API and not the other
+						var success = options.subscribe ? 'success' : 'Success';
 
-						if ( data && data.edit && data.edit.result && data.edit.result === 'Success' ) {
+						if ( data && data[ api ] && data[ api ].result && data[ api ].result === success ) {
 							deferred.resolve( data );
 
-							if ( data.edit.hasOwnProperty( 'nochange' ) ) {
+							if ( data[ api ].hasOwnProperty( 'nochange' ) ) {
 								status.update( 'No changes made to $1' );
 								return;
 							}
 
 							// Create a link to the diff of the edit
 							$diffLink = AFCH.makeLinkElementToPage(
-								'Special:Diff/' + data.edit.oldrevid + '/' + data.edit.newrevid, '(diff)'
+								'Special:Diff/' + data[ api ].newrevid, '(diff)'
 							).addClass( 'text-smaller' );
 
 							status.update( 'Saved $1 ' + AFCH.jQueryToHtml( $diffLink ) );
@@ -780,7 +797,7 @@
 			 * @param {string} user
 			 * @param {Object} options object with properties
 			 *                   - message: {string}
-			 *                   - summary: {string}
+			 *                   - summary: {string} edit summary
 			 *                   - hide: {bool}, default false
 			 * @return {jQuery.Deferred} Resolves with success/failure
 			 */
@@ -795,7 +812,8 @@
 						mode: 'appendtext',
 						statusText: 'Notifying',
 						hide: options.hide,
-						followRedirects: true
+						followRedirects: true,
+						subscribe: AFCH.prefs.autoSubscribe
 					} )
 						.done( function () {
 							deferred.resolve();
@@ -995,7 +1013,7 @@
 			/**
 			 * Represents an element in the status container
 			 *
-			 * @param  {string} initialText Initial text of the element
+			 * @param {string} initialText Initial text of the element
 			 * @param {Object} substitutions key-value pairs of strings that should be replaced by something
 			 *                               else. For example, { '$2': mw.user.getUser() }. If not redefined, $1
 			 *                               will be equal to the current page name.
@@ -1004,7 +1022,7 @@
 				/**
 				 * Replace the status element with new html content
 				 *
-				 * @param  {jQuery|string} html Content of the element
+				 * @param {jQuery|string} html Content of the element
 				 *                              Can use $1 to represent the page name
 				 */
 				this.update = function ( html ) {
@@ -1227,7 +1245,8 @@
 				logCsd: true,
 				launchLinkPosition: 'p-cactions',
 				logAfc: false,
-				noWatch: false
+				noWatch: false,
+				autoSubscribe: false
 			};
 
 			/**
@@ -1509,16 +1528,23 @@
 		 * @param {string} pagename - The title of the page.
 		 * @param {string} displayTitle - What gets shown by the link.
 		 * @param {boolean} [newTab=true] - Whether to open page in a new tab.
+		 * @param {boolean} dontFollowRedirects - whether to add &redirect=no to URLs, to prevent auto redirecting when clicked
 		 * @return {jQuery} <a> element
 		 */
-		makeLinkElementToPage: function ( pagename, displayTitle, newTab ) {
+		makeLinkElementToPage: function ( pagename, displayTitle, newTab, dontFollowRedirects ) {
 			var actualTitle = pagename.replace( /_/g, ' ' );
 
 			// newTab is an optional parameter.
 			newTab = ( typeof newTab === 'undefined' ) ? true : newTab;
 
+			var options = {};
+			if ( dontFollowRedirects ) {
+				options = { redirect: 'no' };
+			}
+			var url = mw.util.getUrl( actualTitle, options );
+
 			return $( '<a>' )
-				.attr( 'href', mw.util.getUrl( actualTitle ) )
+				.attr( 'href', url )
 				.attr( 'id', 'afch-cat-link-' + pagename.toLowerCase().replace( / /g, '-' ).replace( /\//g, '-' ) )
 				.attr( 'title', actualTitle )
 				.text( displayTitle || actualTitle )

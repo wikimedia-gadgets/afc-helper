@@ -140,6 +140,7 @@ div.gradient-button, .gradient-button {
 .afch-preferences {
 	label.afch-label {
 		font-size: 1em;
+		padding: 0;
 	}
 
 	div + div {
@@ -149,5 +150,14 @@ div.gradient-button, .gradient-button {
 
 	.details {
 		padding-bottom: 10px;
+	}
+
+	> div {
+		margin: 5px;
+
+		> label,
+		> [input="checkbox"] {
+			display: inline;
+		}
 	}
 }

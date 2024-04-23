@@ -963,7 +963,7 @@
 		 *
 		 * @param {string} message
 		 * @param {string|boolean} actionMessage set to false to hide action link
-		 * @param {Function|string} onAction function to call of success, or URL to browse to
+		 * @param {Function|string} onAction function to call on success, or URL to browse to
 		 */
 		function addWarning( message, actionMessage, onAction ) {
 			var $action,
@@ -974,7 +974,7 @@
 			if ( actionMessage !== false ) {
 				$action = $( '<a>' )
 					.addClass( 'link' )
-					.text( actionMessage || 'Edit page' )
+					.text( '(' + ( actionMessage || 'Edit page' ) + ')' )
 					.appendTo( $warning );
 
 				if ( typeof onAction === 'function' ) {
@@ -1190,11 +1190,11 @@
 			} ).then( function ( json ) {
 				var triageInfo = json.pagetriagelist.pages[ 0 ];
 				if ( triageInfo && Number( triageInfo.copyvio ) === mw.config.get( 'wgCurRevisionId' ) ) {
-					addWarning( 'This submission may contain copyright violations', 'CopyPatrol', function () {
-						window.open( 'https://copypatrol.wmcloud.org/en?filter=all&searchCriteria=page_exact&searchText=' +
-							encodeURIComponent( afchPage.rawTitle ) + '&drafts=1&revision=' +
-							mw.config.get( 'wgCurRevisionId' ), '_blank' );
-					} );
+					addWarning(
+						'This submission may contain copyright violations',
+						'CopyPatrol',
+						'https://copypatrol.wmcloud.org/en?filter=all&searchCriteria=page_exact&searchText=' + encodeURIComponent( afchPage.rawTitle ) + '&drafts=1&revision=' + mw.config.get( 'wgCurRevisionId' ), '_blank'
+					);
 				}
 			} );
 		}
@@ -1313,7 +1313,6 @@
 
 		// Handler will run after the main AJAX requests complete
 		setupAjaxStopHandler();
-
 	}
 
 	/**
@@ -1343,7 +1342,7 @@
 
 			// Also, automagically reload the page in place
 			$( '#mw-content-text' ).load( AFCH.consts.pagelink + ' #mw-content-text', function () {
-				$afch.find( '#reloadLink' ).text( '(reloaded automatically)' );
+				$afch.find( '#reloadLink' ).text( '(reload)' );
 				// Fire the hook for new page content
 				mw.hook( 'wikipage.content' ).fire( $( '#mw-content-text' ) );
 			} );
@@ -1379,10 +1378,18 @@
 				// Also provide extra data
 				$.extend( data, extraData );
 
-				prepareForProcessing();
+				checkForEditConflict().then( function ( editConflict ) {
+					if ( editConflict ) {
+						showEditConflictMessage();
+						return;
+					}
 
-				// Now finally call the applicable handler
-				fn( data );
+					// Hide the HTML form. Show #afchStatus messages
+					prepareForProcessing();
+
+					// Now finally call the applicable handler
+					fn( data );
+				} );
 			} );
 		} );
 	}
@@ -1770,6 +1777,7 @@
 					$status.text( '' );
 					$submitButton
 						.removeClass( 'disabled' )
+						.css( 'pointer-events', 'auto' )
 						.text( 'Accept & publish' );
 
 					// If there is no value, die now, because otherwise mw.Title
@@ -1802,22 +1810,31 @@
 							inprop: 'protection',
 							titles: page.rawTitle
 						} )
-					).then( function ( rawBlacklistResult, rawData ) {
+					).then( function ( rawBlacklist, rawInfo ) {
 						var errorHtml, buttonText;
 
 						// Get just the result, not the Promise object
-						var blacklistResult = rawBlacklistResult[ 0 ],
-							data = rawData[ 0 ];
+						var blacklistResult = rawBlacklist[ 0 ],
+							infoResult = rawInfo[ 0 ];
 
-						// If the page already exists, display an error
-						if ( !data.query.pages.hasOwnProperty( '-1' ) ) {
+						var pageAlreadyExists = !infoResult.query.pages.hasOwnProperty( '-1' );
+
+						var pages = infoResult && infoResult.query && infoResult.query.pages && infoResult.query.pages;
+						var firstPageInObject = Object.values( pages )[ 0 ];
+						var pageIsRedirect = firstPageInObject && ( 'redirect' in firstPageInObject );
+
+						if ( pageAlreadyExists && pageIsRedirect ) {
+							var linkToRedirect = AFCH.jQueryToHtml( AFCH.makeLinkElementToPage( page.rawTitle, null, null, true ) );
+							errorHtml = '<br />Whoops, the page "' + linkToRedirect + '" already exists and is a redirect. <span id="afch-redirect-notification">Do you want to tag it for speedy deletion so you can accept this draft later? <a id="afch-redirect-tag-speedy">Yes</a> / <a id="afch-redirect-abort">No</a></span>';
+							buttonText = 'The proposed title already exists';
+						} else if ( pageAlreadyExists ) {
 							errorHtml = 'Whoops, the page "' + linkToPage + '" already exists.';
 							buttonText = 'The proposed title already exists';
 						} else {
 							// If the page doesn't exist but IS create-protected and the
 							// current reviewer is not an admin, also display an error
 							// FIXME: offer one-click request unprotection?
-							$.each( data.query.pages[ '-1' ].protection, function ( _, entry ) {
+							$.each( infoResult.query.pages[ '-1' ].protection, function ( _, entry ) {
 								if ( entry.type === 'create' && entry.level === 'sysop' && $.inArray( 'sysop', mw.config.get( 'wgUserGroups' ) ) === -1 ) {
 									errorHtml = 'Darn it, "' + linkToPage + '" is create-protected. You will need to request unprotection before accepting.';
 									buttonText = 'The proposed title is create-protected';
@@ -1843,9 +1860,20 @@
 						// Show the error message
 						$status.html( errorHtml );
 
+						// Add listener for the "Do you want to tag it for speedy deletion so you can accept this draft later?" "yes" link.
+						$( '#afch-redirect-tag-speedy' ).on( 'click', function () {
+							handleAcceptOverRedirect( page.rawTitle );
+						} );
+
+						// Add listener for the "Do you want to tag it for speedy deletion so you can accept this draft later?" "no" link.
+						$( '#afch-redirect-abort' ).on( 'click', function () {
+							$( '#afch-redirect-notification' ).hide();
+						} );
+
 						// Disable the submit button and show an error in its place
 						$submitButton
 							.addClass( 'disabled' )
+							.css( 'pointer-events', 'none' )
 							.text( buttonText );
 					} );
 				} );
@@ -1861,7 +1889,6 @@
 				existingWPBioTemplateName: existingWPBioTemplateName,
 				existingShortDescription: shortDescription
 			} );
-
 		} );
 	}
 
@@ -1954,11 +1981,13 @@
 									$( this ).removeClass( 'bad-input' );
 									submitButton
 										.removeClass( 'disabled' )
+										.css( 'pointer-events', 'auto' )
 										.text( 'Decline submission' );
 								} else {
 									$( this ).addClass( 'bad-input' );
 									submitButton
 										.addClass( 'disabled' )
+										.css( 'pointer-events', 'none' )
 										.text( 'Please enter between one and three URLs!' );
 								}
 							} );
@@ -2139,9 +2168,22 @@
 
 	function showCommentOptions() {
 		loadView( 'comment', {} );
+
+		var $submitButton = $( '#afchSubmitForm' );
+		$submitButton.hide();
+
 		$( '#commentText' ).on( 'keyup', mw.util.debounce( 500, function () {
 			previewComment( $( '#commentText' ), $( '#commentPreview' ) );
+
+			// Hide the submit button if there is no comment typed in
+			var comment = $( '#commentText' ).val();
+			if ( comment.length > 0 ) {
+				$submitButton.show();
+			} else {
+				$submitButton.hide();
+			}
 		} ) );
+
 		addFormSubmitHandler( handleComment );
 	}
 
@@ -2168,6 +2210,7 @@
 				$afch.find( '#submitterNameStatus' ).text( '' );
 				$afch.find( '#afchSubmitForm' )
 					.removeClass( 'disabled' )
+					.css( 'pointer-events', 'auto' )
 					.text( 'Submit' );
 			}
 
@@ -2205,6 +2248,7 @@
 						status.text( 'Remove "User:" from the beginning.' );
 						submitButton
 							.addClass( 'disabled' )
+							.css( 'pointer-events', 'none' )
 							.text( 'Invalid user name' );
 						return;
 					}
@@ -2220,6 +2264,7 @@
 							status.text( 'No user named "' + submitter + '".' );
 							submitButton
 								.addClass( 'disabled' )
+								.css( 'pointer-events', 'none' )
 								.text( 'No such user' );
 						}
 					} );
@@ -2235,8 +2280,37 @@
 		addFormSubmitHandler( handlePostponeG13 );
 	}
 
-	// These functions actually perform a given action using data passed
-	// in the `data` parameter.
+	// These functions perform a given action using data passed in the `data` parameter.
+
+	function handleAcceptOverRedirect( destinationPageTitle ) {
+		// get rid of the accept form. replace it with the status div.
+		prepareForProcessing();
+
+		// Add {{Db-afc-move}} speedy deletion tag to redirect, and add to watchlist
+		( new AFCH.Page( destinationPageTitle ) ).edit( {
+			contents: '{{Db-afc-move|' + afchPage.rawTitle + '}}\n\n',
+			mode: 'prependtext',
+			summary: 'Requesting speedy deletion ([[Wikipedia:CSD#G6|CSD G6]]).',
+			statusText: 'Tagging',
+			watchlist: 'watch'
+		} );
+
+		// Mark the draft as under review.
+		afchPage.getText( false ).then( function ( rawText ) {
+			var text = new AFCH.Text( rawText );
+			afchSubmission.setStatus( 'r', {
+				reviewer: AFCH.consts.user,
+				reviewts: '{{subst:REVISIONTIMESTAMP}}'
+			} );
+			text.updateAfcTemplates( afchSubmission.makeWikicode() );
+			text.cleanUp();
+			afchPage.edit( {
+				contents: text.get(),
+				summary: 'Marking submission as under review',
+				statusText: 'Marking as under review'
+			} );
+		} );
+	}
 
 	function handleAccept( data ) {
 		var newText = data.afchText;
@@ -2610,6 +2684,42 @@
 				} );
 			}
 		} );
+	}
+
+	function checkForEditConflict() {
+		// Get all revisions since the page was loaded, starting with the revision of the loaded page
+		var request = {
+			action: 'query',
+			format: 'json',
+			prop: 'revisions',
+			titles: [ mw.config.get( 'wgPageName' ) ],
+			formatversion: 2,
+			rvstartid: mw.config.get( 'wgRevisionId' ),
+			rvdir: 'newer'
+		};
+		var promise = AFCH.api.postWithEditToken( request )
+			.then( function ( data ) {
+				var revisions = data.query.pages[ 0 ].revisions;
+				// 1 revision = no edit conflict, 2+ revisions = edit conflict.
+				if ( revisions && revisions.length > 1 ) {
+					return true;
+				}
+				return false;
+			} );
+		return promise;
+	}
+
+	function showEditConflictMessage() {
+		$( '#afchSubmitForm' ).hide();
+
+		// Putting this here instead of in tpl-submissions.html to reduce code duplication
+		var editConflictHtml = 'Edit conflict! Your changes were not saved. Please check the <a id="afchHistoryLink" href="">page history</a>. To avoid overwriting the other person\'s edits, please refresh this page and start again.';
+		$( '#afchEditConflict' ).html( editConflictHtml );
+
+		var historyLink = new mw.Uri( mw.util.getUrl( mw.config.get( 'wgPageName' ), { action: 'history' } ) );
+		$( '#afchHistoryLink' ).prop( 'href', historyLink );
+
+		$( '#afchEditConflict' ).show();
 	}
 
 	function handleComment( data ) {
