@@ -951,7 +951,7 @@
 		 *
 		 * @param {string} message
 		 * @param {string|bool} actionMessage set to false to hide action link
-		 * @param {Function | string} onAction function to call of success, or URL to browse to
+		 * @param {Function|string} onAction function to call on success, or URL to browse to
 		 */
 		function addWarning( message, actionMessage, onAction ) {
 			var $action,
@@ -1178,11 +1178,11 @@
 			} ).then( function ( json ) {
 				var triageInfo = json.pagetriagelist.pages[ 0 ];
 				if ( triageInfo && Number( triageInfo.copyvio ) === mw.config.get( 'wgCurRevisionId' ) ) {
-					addWarning( 'This submission may contain copyright violations', 'CopyPatrol', function () {
-						window.open( 'https://copypatrol.wmcloud.org/en?filter=all&searchCriteria=page_exact&searchText=' +
-							encodeURIComponent( afchPage.rawTitle ) + '&drafts=1&revision=' +
-							mw.config.get( 'wgCurRevisionId' ), '_blank' );
-					} );
+					addWarning(
+						'This submission may contain copyright violations',
+						'CopyPatrol',
+						'https://copypatrol.wmcloud.org/en?filter=all&searchCriteria=page_exact&searchText=' + encodeURIComponent( afchPage.rawTitle ) + '&drafts=1&revision=' + mw.config.get( 'wgCurRevisionId' ), '_blank'
+					);
 				}
 			} );
 		}
