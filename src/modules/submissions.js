@@ -1227,7 +1227,7 @@
 			// $1 = article name
 			// $2 = article class or '' if not available
 			'accepted-submission': headerBegin +
-				'[[$1]] has been accepted ==\n{{subst:Afc talk|$1|class=$2|sig=~~' + '~~}}',
+				'[[$1]] has been accepted ==\n{{subst:AfC accept|$1|class=$2}}\n~~~~',
 
 			// $1 = full submission title
 			// $2 = short title
@@ -1238,7 +1238,7 @@
 			// $7 = additional parameter for second decline reason
 			// $8 = additional comment
 			'declined-submission': headerBegin +
-				'[[$1|$2]] ({{subst:CURRENTMONTHNAME}} {{subst:CURRENTDAY}}) ==\n{{subst:Afc decline|full=$1|cv=$3|reason=$4|details=$5|reason2=$6|details2=$7|comment=$8|sig=yes}}',
+				'[[$1|$2]] ({{subst:CURRENTMONTHNAME}} {{subst:CURRENTDAY}}) ==\n{{subst:AfC decline|full=$1|cv=$3|reason=$4|details=$5|reason2=$6|details2=$7|comment=$8}}\n~~~~',
 
 			// $1 = full submission title
 			// $2 = short title
@@ -1248,15 +1248,15 @@
 			// $6 = second reject reason details
 			// $7 = comment by reviewer
 			'rejected-submission': headerBegin +
-				'[[$1|$2]] ({{subst:CURRENTMONTHNAME}} {{subst:CURRENTDAY}}) ==\n{{subst:Afc reject|full=$1|reason=$3|details=$4|reason2=$5|details2=$6|comment=$7|sig=yes}}',
+				'[[$1|$2]] ({{subst:CURRENTMONTHNAME}} {{subst:CURRENTDAY}}) ==\n{{subst:AfC reject|full=$1|reason=$3|details=$4|reason2=$5|details2=$6|comment=$7}}\n~~~~',
 
 			// $1 = article name
-			'comment-on-submission': '{{subst:AFC notification|comment|article=$1}}',
+			'comment-on-submission': '{{subst:AfC notification|comment|article=$1}}\n~~~~',
 
 			// $1 = article name
-			'g13-submission': '{{subst:Db-afc-notice|$1}} ~~' + '~~',
+			'g13-submission': '{{subst:Db-afc-notice|$1}}\n~~~~',
 
-			'teahouse-invite': '{{subst:Wikipedia:Teahouse/AFC invitation|sign=~~' + '~~}}'
+			'teahouse-invite': '{{subst:Wikipedia:Teahouse/AFC invitation}}\n~~~~'
 		} );
 	}
 
