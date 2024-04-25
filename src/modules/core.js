@@ -808,7 +808,7 @@
 
 				userTalkPage.exists().done( function ( exists ) {
 					userTalkPage.edit( {
-						contents: ( exists ? '' : '{{Talk header}}' ) + '\n\n' + options.message,
+						contents: options.message,
 						summary: options.summary || 'Notifying user',
 						mode: 'appendtext',
 						statusText: 'Notifying',
