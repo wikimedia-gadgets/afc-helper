@@ -712,7 +712,7 @@
 				match = categoryRegex.exec( text );
 			}
 
-			text = text.slice( 0, Math.max( 0, catIndex ) ) + newCategoryCode + text.slice( Math.max( 0, catIndex ) );
+			text = text.substring( 0, catIndex ) + newCategoryCode + text.substring( catIndex );
 		}
 
 		this.text = text;
@@ -1044,7 +1044,7 @@
 
 				// <ref> after {{reflist}}
 				if ( hasReflist ) {
-					if ( refBeginRe.test( text.slice( Math.max( 0, reflistRe.lastIndex ) ) ) ) {
+					if ( refBeginRe.test( text.substring( reflistRe.lastIndex ) ) ) {
 						addWarning( 'Not all of the <ref> tags are before the references list. You may not see all references.' );
 					}
 				}
@@ -2575,7 +2575,7 @@
 		if ( declineReason === 'reason' ) {
 
 			// If this is a custom decline, use the text in the edit summary
-			editSummary += data.declineTextarea.slice( 0, Math.max( 0, lengthLimit ) );
+			editSummary += data.declineTextarea.substring( 0, lengthLimit );
 
 			// If we had to trunucate, indicate that
 			if ( data.declineTextarea.length > lengthLimit ) {
@@ -2588,7 +2588,7 @@
 		if ( declineReason2 ) {
 			editSummary += ' and ';
 			if ( declineReason2 === 'reason' ) {
-				editSummary += data.declineTextarea.slice( 0, Math.max( 0, lengthLimit ) );
+				editSummary += data.declineTextarea.substring( 0, lengthLimit );
 				if ( data.declineTextarea.length > lengthLimit ) {
 					editSummary += '...';
 				}

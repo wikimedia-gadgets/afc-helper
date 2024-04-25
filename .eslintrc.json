@@ -30,6 +30,7 @@
 		"no-unused-vars": "warn",
 		"no-use-before-define": "warn",
 		"security/detect-non-literal-regexp": "off",
-		"security/detect-unsafe-regex": "off"
+		"security/detect-unsafe-regex": "off",
+		"unicorn/prefer-string-slice": "off"
 	}
 }
