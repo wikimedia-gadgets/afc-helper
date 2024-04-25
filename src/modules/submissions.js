@@ -2695,13 +2695,13 @@
 			titles: [ mw.config.get( 'wgPageName' ) ],
 			formatversion: 2,
 			rvstartid: mw.config.get( 'wgRevisionId' ),
-			rvdir: 'newer'
+			rvdir: 'newer',
+			rvexcludeuser: mw.config.get( 'wgUserName' )
 		};
 		var promise = AFCH.api.postWithEditToken( request )
 			.then( function ( data ) {
 				var revisions = data.query.pages[ 0 ].revisions;
-				// 1 revision = no edit conflict, 2+ revisions = edit conflict.
-				if ( revisions && revisions.length > 1 ) {
+				if ( revisions && revisions.length > 0 ) {
 					return true;
 				}
 				return false;
