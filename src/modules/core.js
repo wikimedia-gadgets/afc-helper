@@ -1,11 +1,11 @@
-//<nowiki>
+// <nowiki>
 ( function ( AFCH, $, mw ) {
 	$.extend( AFCH, {
 
 		/**
 		 * Log anything to the console
 		 *
-		 * @param {anything} thing(s)
+		 * @param {any} thing(s)
 		 */
 		log: function () {
 			var args = Array.prototype.slice.call( arguments );
@@ -46,7 +46,7 @@
 		/**
 		 * Prepares the AFCH gadget by setting constants and checking environment
 		 *
-		 * @return {bool} Whether or not all setup functions executed successfully
+		 * @return {boolean} Whether or not all setup functions executed successfully
 		 */
 		setup: function () {
 			// Check requirements
@@ -118,7 +118,7 @@
 				// the script, so long as there was a user whose name was
 				// three characters long on the list!
 				var $howToDisable,
-					sanitizedUser = user.replace( /[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&' ),
+					sanitizedUser = user.replace( /[-[\]/{}()*+?.\\^$|]/g, '\\$&' ),
 					userSysop = $.inArray( 'sysop', mw.config.get( 'wgUserGroups' ) ) > -1,
 					userNPP = $.inArray( 'patroller', mw.config.get( 'wgUserGroups' ) ) > -1,
 					userOnWhitelist = ( new RegExp( '\\|\\s*' + sanitizedUser + '\\s*}' ) ).test( text ),
@@ -272,7 +272,7 @@
 			 * Makes an API request to get a variety of details about the current
 			 * revision of the page, which it then sets.
 			 *
-			 * @param {bool} usecache if true, will resolve immediately if function has
+			 * @param {boolean} usecache if true, will resolve immediately if function has
 			 *                        run successfully before
 			 * @return {jQuery.Deferred} resolves when data set successfully
 			 */
@@ -307,7 +307,7 @@
 			/**
 			 * Gets the page text
 			 *
-			 * @param {bool} usecache use cache if possible
+			 * @param {boolean} usecache use cache if possible
 			 * @return {string}
 			 */
 			this.getText = function ( usecache ) {
@@ -392,9 +392,9 @@
 			/**
 			 * Gets the categories from the page
 			 *
-			 * @param {bool} useApi If true, use the api to get categories, instead of parsing the page. This is
+			 * @param {boolean} useApi If true, use the api to get categories, instead of parsing the page. This is
 			 *                      necessary if you need info about transcluded categories.
-			 * @param {bool} includeCategoryLinks If true, will also include links to categories (e.g. [[:Category:Foo]]).
+			 * @param {boolean} includeCategoryLinks If true, will also include links to categories (e.g. [[:Category:Foo]]).
 			 *                                    Note that if useApi is true, includeCategoryLinks must be false.
 			 * @return {Array}
 			 */
@@ -739,7 +739,7 @@
 			 * @param {string} newTitle Move target
 			 * @param {string} reason Reason for moving; shown in move log
 			 * @param {Object} additionalParameters https://www.mediawiki.org/wiki/API:Move#Parameters
-			 * @param {bool} hide Don't show the move in the status display
+			 * @param {boolean} hide Don't show the move in the status display
 			 * @return {jQuery.Deferred} Resolves with success/failure
 			 */
 			movePage: function ( oldTitle, newTitle, reason, additionalParameters, hide ) {
@@ -794,12 +794,11 @@
 			 * Notifies a user. Follows redirects and appends a message
 			 * to the bottom of the user's talk page.
 			 *
-			 * @param  {string} user
-			 * @param  {Object} data object with properties
+			 * @param {string} user
+			 * @param {Object} options object with properties
 			 *                   - message: {string}
 			 *                   - summary: {string} edit summary
 			 *                   - hide: {bool}, default false
-			 * @param options
 			 * @return {jQuery.Deferred} Resolves with success/failure
 			 */
 			notifyUser: function ( user, options ) {
@@ -867,7 +866,7 @@
 						} );
 					}
 
-					appendText += ' ~~' + '~~' + '~\n';
+					appendText += ' ~~~~~\n';
 
 					logPage.edit( {
 						contents: appendText,
@@ -910,7 +909,7 @@
 					}
 
 					var byUser = ' by [[User:' + options.submitter + '|]]';
-					var sig = ' ~~' + '~~' + '~\n';
+					var sig = ' ~~~~~\n';
 
 					// Make log edit
 					logPage.edit( {
@@ -1001,7 +1000,7 @@
 			/**
 			 * Creates the status container
 			 *
-			 * @param  {selector} location String/jQuery selector for where the
+			 * @param {string|jQuery} location String/jQuery selector for where the
 			 *                             status container should be prepended
 			 */
 			init: function ( location ) {
@@ -1103,7 +1102,7 @@
 					$.each( substitutions, function ( original, replacement ) {
 						text = text.replace(
 							// Escape the original substitution key, then make it a global regex
-							new RegExp( original.replace( /[-\/\\^$*+?.()|[\]{}]/g, '\\$&' ), 'g' ),
+							new RegExp( original.replace( /[-/\\^$*+?.()|[\]{}]/g, '\\$&' ), 'g' ),
 							replacement
 						);
 					} );
@@ -1685,7 +1684,7 @@
 		 * @param {Array<Object>} existingWikiProjects An array of associative arrays. The associative arrays contain the keys {string} displayName (example: Somalia), {string} templateName (example: WikiProject Somalia), and {boolean} alreadyOnPage
 		 * @param {boolean} alreadyHasWPBio
 		 * @param {null} existingWPBioTemplateName
-		 * @returns {Object} { {string} talkText, {number} countOfWikiProjectsAdded, {number} countOfWikiProjectsRemoved }
+		 * @return {Object} { {string} talkText, {number} countOfWikiProjectsAdded, {number} countOfWikiProjectsRemoved }
 		 */
 		addTalkPageBanners: function ( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName, existingWikiProjects, alreadyHasWPBio, existingWPBioTemplateName ) {
 			var talkTextPrefix = '';
@@ -1711,13 +1710,13 @@
 			}
 
 			// Add and remove WikiProjects
-			/** @var {Array} */
+			/** @member {Array} */
 			var wikiProjectsToAdd = newWikiProjects.filter( function ( newTemplateName ) {
 				return !existingWikiProjects.some( function ( existingTplObj ) {
 					return existingTplObj.templateName === newTemplateName;
 				} );
 			} );
-			/** @var {Array} */
+			/** @member {Array} */
 			var wikiProjectsToRemove = existingWikiProjects.filter( function ( existingTplObj ) {
 				return !newWikiProjects.some( function ( newTemplateName ) {
 					return existingTplObj.templateName === newTemplateName;
@@ -1841,7 +1840,7 @@
 		 *
 		 * @param {string} string string to parse
 		 * @param mwstyle
-		 * @return {Date|integer}
+		 * @return {Date|number}
 		 */
 		parseForTimestamp: function ( string, mwstyle ) {
 			var exp, match, date;
@@ -1875,7 +1874,7 @@
 		 * Parses a MediaWiki internal YYYYMMDDHHMMSS timestamp
 		 *
 		 * @param {string} string
-		 * @return {Date|bool} if unable to parse, returns false
+		 * @return {Date|boolean} if unable to parse, returns false
 		 */
 		mwTimestampToDate: function ( string ) {
 			var date, dateMatches = /(\d{4})(\d\d)(\d\d)(\d\d)(\d\d)(\d\d)/.exec( string );
@@ -1950,4 +1949,4 @@
 	} );
 
 }( AFCH, jQuery, mediaWiki ) );
-//</nowiki>
+// </nowiki>

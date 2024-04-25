@@ -1,4 +1,4 @@
-//<nowiki>
+// <nowiki>
 ( function () {
 	// Check that we're in the right namespace and on the right page
 	switch ( mw.config.get( 'wgNamespaceNumber' ) ) {
@@ -43,4 +43,4 @@
 		}
 	} );
 }() );
-//</nowiki>
+// </nowiki>
