@@ -18,7 +18,7 @@
     "hogan.js": "^3.0.2"
   },
   "devDependencies": {
-    "eslint": "^9.1.1",
+    "eslint": "^8.57.0",
     "eslint-config-wikimedia": "^0.27.0",
     "grunt": "^1.4.1",
     "grunt-autoprefixer": "^3.0.4",
@@ -27,13 +27,16 @@
     "grunt-contrib-copy": "^1.0.0",
     "grunt-contrib-cssmin": "^4.0.0",
     "grunt-contrib-less": "^3.0.0",
-    "grunt-eslint": "^23.0.0",
+    "grunt-eslint": "^24.3.0",
     "grunt-exec": "^3.0.0",
     "jest-cli": "^27.0.6",
     "jquery": "^3.6.0"
   },
   "jest": {
     "testEnvironment": "jsdom",
-    "testMatch": [ "**/tests/**/test-*.[jt]s?(x)", "**/?(*.)+(spec|test).[jt]s?(x)" ]
+    "testMatch": [
+      "**/tests/**/test-*.[jt]s?(x)",
+      "**/?(*.)+(spec|test).[jt]s?(x)"
+    ]
   }
 }
