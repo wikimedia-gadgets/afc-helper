@@ -16,22 +16,22 @@
 		"OO": "readonly"
 	},
 	"rules": {
-		"camelcase": 0,
-		"eqeqeq": 0,
-		"jsdoc/require-param": 0,
-		"jsdoc/require-param-type": 0,
-		"jsdoc/require-returns": 0,
-		"max-len": 0,
-		"no-console": 0,
-		"no-global-assign": 0,
-		"no-implicit-globals": 0,
-		"no-new": 0,
-		"no-prototype-builtins": 0,
-		"no-shadow": 0,
-		"no-undef": 0,
-		"no-underscore-dangle": 0,
-		"no-unused-vars": 0,
-		"no-use-before-define": 0
+		"camelcase": "off",
+		"eqeqeq": "off",
+		"jsdoc/require-param": "off",
+		"jsdoc/require-param-type": "off",
+		"jsdoc/require-returns": "off",
+		"max-len": "off",
+		"no-console": "off",
+		"no-global-assign": "off",
+		"no-implicit-globals": "off",
+		"no-new": "off",
+		"no-prototype-builtins": "off",
+		"no-shadow": "off",
+		"no-undef": "off",
+		"no-underscore-dangle": "off",
+		"no-unused-vars": "off",
+		"no-use-before-define": "off"
 	},
 	"settings": {
 		"jsdoc": {
