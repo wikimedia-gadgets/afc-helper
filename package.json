@@ -20,7 +20,6 @@
   "devDependencies": {
     "eslint": "^7.31.0",
     "eslint-config-wikimedia": "^0.20.0",
-    "eslint-plugin-jsdoc": "^36.0.6",
     "grunt": "^1.4.1",
     "grunt-autoprefixer": "^3.0.4",
     "grunt-contrib-clean": "^2.0.0",

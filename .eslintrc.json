@@ -1,8 +1,5 @@
 {
 	"extends": "wikimedia",
-	"plugins": [
-        "jsdoc"
-    ],
 	"env": {
 		"browser": true,
 		"jquery": true
@@ -32,10 +29,5 @@
 		"no-underscore-dangle": "warn",
 		"no-unused-vars": "warn",
 		"no-use-before-define": "warn"
-	},
-	"settings": {
-		"jsdoc": {
-			"ignoreInternal": true
-		}
 	}
 }
