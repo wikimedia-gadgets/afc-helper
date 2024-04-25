@@ -74,7 +74,9 @@
 				pagelink: mw.util.getUrl(),
 
 				// Used when status is disabled
-				nullstatus: { update: function () { return; } },
+				nullstatus: { update: function () {
+					return;
+				} },
 
 				// Current user
 				user: mw.user.getName(),
@@ -420,7 +422,7 @@
 
 					while ( match ) {
 						// Name of each category, with first letter capitalized
-						categories.push( match[ 1 ].charAt( 0 ).toUpperCase() + match[ 1 ].substring( 1 ) );
+						categories.push( match[ 1 ].charAt( 0 ).toUpperCase() + match[ 1 ].slice( 1 ) );
 						match = catRegex.exec( text );
 					}
 
