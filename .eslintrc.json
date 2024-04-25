@@ -24,10 +24,12 @@
 		"no-implicit-globals": "warn",
 		"no-new": "warn",
 		"no-prototype-builtins": "warn",
-		"no-shadow": "warn",
+		"no-shadow": "off",
 		"no-undef": "warn",
-		"no-underscore-dangle": "warn",
+		"no-underscore-dangle": "off",
 		"no-unused-vars": "warn",
-		"no-use-before-define": "warn"
+		"no-use-before-define": "warn",
+		"security/detect-non-literal-regexp": "off",
+		"security/detect-unsafe-regex": "off"
 	}
 }
