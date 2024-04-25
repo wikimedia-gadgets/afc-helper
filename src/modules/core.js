@@ -220,30 +220,6 @@
 		},
 
 		/**
-		 * Appends a feedback link to the given element
-		 *
-		 * @param {string|jQuery} $element The jQuery element or selector to which the link should be appended
-		 * @param {string} type (optional) The part of AFCH that feedback is being given for, e.g. "files for upload"
-		 * @param {string} linkText (optional) Text to display in the link; by default "Give feedback!"
-		 */
-		initFeedback: function ( $element, type, linkText ) {
-			var feedback = new mw.Feedback( {
-				title: new mw.Title( 'Wikipedia talk:WikiProject Articles for creation/Helper script' ),
-				bugsLink: 'https://en.wikipedia.org/w/index.php?title=Wikipedia_talk:WikiProject_Articles_for_creation/Helper_script&action=edit&section=new',
-				bugsListLink: 'https://en.wikipedia.org/w/index.php?title=Wikipedia_talk:WikiProject_Articles_for_creation/Helper_script'
-			} );
-			$( '<span>' )
-				.text( linkText || 'Give feedback!' )
-				.addClass( 'feedback-link link' )
-				.click( function () {
-					feedback.launch( {
-						subject: ( type ? 'Feedback about ' + type : 'AFCH feedback' )
-					} );
-				} )
-				.appendTo( $element );
-		},
-
-		/**
 		 * Represents a page, mainly a wrapper for various actions
 		 *
 		 * @param {string} name

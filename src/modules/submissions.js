@@ -899,9 +899,7 @@
 				}
 			} );
 
-			// Add feedback and preferences links
-			// FIXME: Feedback temporarily disabled due to https://github.com/wikimedia-gadgets/afc-helper/issues/71
-			// AFCH.initFeedback( $afch.find( 'span.feedback-wrapper' ), '[your topic here]', 'give feedback' );
+			// Add preferences link
 			AFCH.preferences.initLink( $afch.find( 'span.preferences-wrapper' ), 'preferences' );
 
 			// Set up click handlers
