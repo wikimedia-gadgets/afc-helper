@@ -490,6 +490,8 @@
 
 	/**
 	 * Represents text of an AfC submission
+	 *
+	 * @param {string} text
 	 */
 	AFCH.Text = function ( text ) {
 		this.text = text;
@@ -882,8 +884,7 @@
 			// Set up the extra options slide-out panel, which appears
 			// when the user click on the chevron
 			$afch.find( '#afchExtra .open' ).click( function () {
-				var $extra = $afch.find( '#afchExtra' ),
-					$toggle = $( this );
+				var $extra = $afch.find( '#afchExtra' );
 
 				if ( extrasRevealed ) {
 					$extra.find( 'a' ).hide();
@@ -898,9 +899,7 @@
 				}
 			} );
 
-			// Add feedback and preferences links
-			// FIXME: Feedback temporarily disabled due to https://github.com/wikimedia-gadgets/afc-helper/issues/71
-			// AFCH.initFeedback( $afch.find( 'span.feedback-wrapper' ), '[your topic here]', 'give feedback' );
+			// Add preferences link
 			AFCH.preferences.initLink( $afch.find( 'span.preferences-wrapper' ), 'preferences' );
 
 			// Set up click handlers
@@ -1019,8 +1018,7 @@
 				// <ref>1<ref> instead of <ref>1</ref> detection
 				if ( malformedRefs.length ) {
 					addWarning( 'The submission contains malformed <ref> tags.', 'View details', function () {
-						var $toggleLink = $( this ).addClass( 'malformed-refs-toggle' ),
-							$warningDiv = $( this ).parent();
+						var $warningDiv = $( this ).parent();
 						var $malformedRefWrapper = $( '<div>' )
 							.addClass( 'malformed-refs' )
 							.appendTo( $warningDiv );
@@ -1155,8 +1153,7 @@
 				if ( numberOfComments ) {
 					addWarning( 'The page contains ' + ( oneComment ? 'an' : '' ) + ' HTML comment' + ( oneComment ? '' : 's' ) +
 						' longer than 30 characters.', 'View comment' + ( oneComment ? '' : 's' ), function () {
-						var $toggleLink = $( this ).addClass( 'long-comment-toggle' ),
-							$warningDiv = $( this ).parent(),
+						var $warningDiv = $( this ).parent(),
 							$commentsWrapper = $( '<div>' )
 								.addClass( 'long-comments' )
 								.appendTo( $warningDiv );
@@ -1448,6 +1445,8 @@
 		/**
 		 * If possible, use the session storage to get the WikiProject list.
 		 * If it hasn't been cached already, load it manually and then cache
+		 *
+		 * @return {jQuery.Deferred}
 		 */
 		function loadWikiProjectList() {
 			var deferred = $.Deferred(),
@@ -1538,8 +1537,8 @@
 					if ( data.query && data.query.redirects && data.query.redirects.length > 0 ) {
 						var redirs = data.query.redirects;
 						for ( var redirIdx = 0; redirIdx < redirs.length; redirIdx++ ) {
-							var redir = redirs[ redirIdx ].to.substring( 'Template:'.length ).toLowerCase();
-							var originalName = redirs[ redirIdx ].from.substring( 'Template:'.length );
+							var redir = redirs[ redirIdx ].to.slice( 'Template:'.length ).toLowerCase();
+							var originalName = redirs[ redirIdx ].from.slice( 'Template:'.length );
 							if ( wikiProjectMap.hasOwnProperty( redir ) ) {
 								wikiProjectMap[ redir ].alreadyOnPage = true;
 								wikiProjectMap[ redir ].realTemplateName = originalName;
@@ -1647,7 +1646,7 @@
 				// Extend the chosen menu for new WikiProjects. We hackily show a
 				// "Click to manually add {{PROJECT}}" link -- sadly, jquery.chosen
 				// doesn't support this natively.
-				$afch.find( '#newWikiProjects_chzn input' ).keyup( function ( e ) {
+				$afch.find( '#newWikiProjects_chzn input' ).keyup( function () {
 					var $chzn = $afch.find( '#newWikiProjects_chzn' ),
 						$input = $( this ),
 						newProject = $input.val(),
@@ -1969,7 +1968,7 @@
 					candidateDupeName = ( afchSubmission.shortTitle !== 'sandbox' ) ? afchSubmission.shortTitle : '',
 					prevDeclineComment = $afch.find( '#declineTextarea' ).val(),
 					declineHandlers = {
-						cv: function ( pos ) {
+						cv: function () {
 							$afch.find( '#cvUrlWrapper' ).removeClass( 'hidden' );
 							$afch.add( '#csdWrapper' ).removeClass( 'hidden' );
 
@@ -2095,7 +2094,7 @@
 							type: 'block'
 						} ).css( 'padding', '20px' ) );
 					var reasonDeferreds = reason.map( AFCH.getReason );
-					$.when.apply( $, reasonDeferreds ).then( function ( a, b ) {
+					$.when.apply( $, reasonDeferreds ).then( function () {
 						$( '#previewContainer' )
 							.html( Array.prototype.slice.call( arguments )
 								.join( '<hr />' ) );

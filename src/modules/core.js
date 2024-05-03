@@ -17,7 +17,9 @@
 		},
 
 		/**
-		 * @internal Functions called when AFCH.destroy() is run
+		 * Functions called when AFCH.destroy() is run
+		 *
+		 * @internal
 		 * @type {Array}
 		 */
 		_destroyFunctions: [],
@@ -74,7 +76,9 @@
 				pagelink: mw.util.getUrl(),
 
 				// Used when status is disabled
-				nullstatus: { update: function () { return; } },
+				nullstatus: { update: function () {
+					return;
+				} },
 
 				// Current user
 				user: mw.user.getName(),
@@ -140,7 +144,7 @@
 									( new mw.Api() ).postWithEditToken( {
 										action: 'options',
 										change: 'gadget-afchelper=0'
-									} ).done( function ( data ) {
+									} ).done( function () {
 										mw.notify( 'AFCH has been disabled successfully. If you wish to re-enable it in the ' +
 											'future, you can do so via your Preferences by checking "Yet Another AFC Helper Script".' );
 									} );
@@ -183,8 +187,8 @@
 		/**
 		 * Loads the subscript and dependencies
 		 *
-		 * @param {string} type Which type of script to load:
-		 *                      'redirects' or 'ffu' or 'submissions'
+		 * @param {string} type Which type of script to load: 'redirects' or 'ffu' or 'submissions'
+		 * @return {boolean}
 		 */
 		load: function ( type ) {
 			if ( !AFCH.setup() ) {
@@ -216,33 +220,9 @@
 		},
 
 		/**
-		 * Appends a feedback link to the given element
-		 *
-		 * @param {string|jQuery} $element The jQuery element or selector to which the link should be appended
-		 * @param {string} type (optional) The part of AFCH that feedback is being given for, e.g. "files for upload"
-		 * @param {string} linkText (optional) Text to display in the link; by default "Give feedback!"
-		 */
-		initFeedback: function ( $element, type, linkText ) {
-			var feedback = new mw.Feedback( {
-				title: new mw.Title( 'Wikipedia talk:WikiProject Articles for creation/Helper script' ),
-				bugsLink: 'https://en.wikipedia.org/w/index.php?title=Wikipedia_talk:WikiProject_Articles_for_creation/Helper_script&action=edit&section=new',
-				bugsListLink: 'https://en.wikipedia.org/w/index.php?title=Wikipedia_talk:WikiProject_Articles_for_creation/Helper_script'
-			} );
-			$( '<span>' )
-				.text( linkText || 'Give feedback!' )
-				.addClass( 'feedback-link link' )
-				.click( function () {
-					feedback.launch( {
-						subject: ( type ? 'Feedback about ' + type : 'AFCH feedback' )
-					} );
-				} )
-				.appendTo( $element );
-		},
-
-		/**
 		 * Represents a page, mainly a wrapper for various actions
 		 *
-		 * @param name
+		 * @param {string} name
 		 */
 		Page: function ( name ) {
 			var pg = this;
@@ -352,7 +332,8 @@
 						 * with recursion and all that mess, /g is our friend...which is pefectly
 						 * satisfactory for our purposes.
 						 *
-						 * @param $v
+						 * @param {jQuery} $v
+						 * @return {string}
 						 */
 						function parseValue( $v ) {
 							var text = AFCH.jQueryToHtml( $v );
@@ -420,7 +401,7 @@
 
 					while ( match ) {
 						// Name of each category, with first letter capitalized
-						categories.push( match[ 1 ].charAt( 0 ).toUpperCase() + match[ 1 ].substring( 1 ) );
+						categories.push( match[ 1 ].charAt( 0 ).toUpperCase() + match[ 1 ].slice( 1 ) );
 						match = catRegex.exec( text );
 					}
 
@@ -517,10 +498,9 @@
 			/**
 			 * Gets the associated talk page
 			 *
-			 * @param textOnly
 			 * @return {AFCH.Page}
 			 */
-			this.getTalkPage = function ( textOnly ) {
+			this.getTalkPage = function () {
 				var title, ns = this.title.getNamespaceId();
 
 				// Odd-numbered namespaces are already talk namespaces
@@ -532,7 +512,6 @@
 
 				return new AFCH.Page( title.getPrefixedText() );
 			};
-
 		},
 
 		/**
@@ -721,18 +700,6 @@
 			},
 
 			/**
-			 * Deletes a page
-			 *
-			 * @param  {string} pagename Page to delete
-			 * @param  {string} reason   Reason for deletion; shown in deletion log
-			 * @return {jQuery.Deferred} Resolves with success/failure
-			 */
-			deletePage: function ( pagename, reason ) {
-				// FIXME: implement
-				return false;
-			},
-
-			/**
 			 * Moves a page
 			 *
 			 * @param {string} oldTitle Page to move
@@ -833,8 +800,7 @@
 			 *                  - title {string}
 			 *                  - reason {string}
 			 *                  - usersNotified {array} optional
-			 * @return {jQuery.Deferred} resolves false if the page did not exist, otherwise
-			 *                      resolves/rejects with data from the edit
+			 * @return {jQuery.Deferred|void} resolves false if the page did not exist, otherwise resolves/rejects with data from the edit
 			 */
 			logCSD: function ( options ) {
 				var deferred = $.Deferred(),
@@ -932,6 +898,7 @@
 			 * if that header doesn't already exist
 			 *
 			 * @param {string} logText Text of user's AfC log
+			 * @return {string} headerText
 			 */
 			addLogHeaderIfNeeded: function ( logText ) {
 				var date = new Date(),
@@ -1447,7 +1414,7 @@
 		/**
 		 * Removes a key from a given object and returns the value of the key
 		 *
-		 * @param object
+		 * @param {Object} object
 		 * @param {string} key
 		 * @return {Mixed}
 		 */
@@ -1560,7 +1527,6 @@
 		 */
 		makeLinkElementToCategory: function ( pagename, displayTitle ) {
 			var linkElement = AFCH.makeLinkElementToPage( 'Special:RandomInCategory/' + pagename, displayTitle, false ),
-				linkText = displayTitle || pagename.replace( /_/g, ' ' ),
 				request = {
 					action: 'query',
 					titles: 'Category:' + pagename,
@@ -1621,6 +1587,7 @@
 		 * works. The empty section may have categories after it - keep them there.
 		 *
 		 * @param {string} wikicode
+		 * @return {string} wikicode
 		 */
 		removeEmptySectionAtEnd: function ( wikicode ) {
 			// Hard to write a regex that doesn't catastrophic backtrack while still saving multiple categories and multiple blank lines. So we'll do this the old-fashioned way...

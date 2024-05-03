@@ -1,8 +1,5 @@
 {
 	"extends": "wikimedia",
-	"plugins": [
-        "jsdoc"
-    ],
 	"env": {
 		"browser": true,
 		"jquery": true
@@ -16,26 +13,24 @@
 		"OO": "readonly"
 	},
 	"rules": {
-		"camelcase": 0,
-		"eqeqeq": 0,
-		"jsdoc/require-param": 0,
-		"jsdoc/require-param-type": 0,
-		"jsdoc/require-returns": 0,
-		"max-len": 0,
-		"no-console": 0,
-		"no-global-assign": 0,
-		"no-implicit-globals": 0,
-		"no-new": 0,
-		"no-prototype-builtins": 0,
-		"no-shadow": 0,
-		"no-undef": 0,
-		"no-underscore-dangle": 0,
-		"no-unused-vars": 0,
-		"no-use-before-define": 0
-	},
-	"settings": {
-		"jsdoc": {
-			"ignoreInternal": true
-		}
+		"camelcase": "off",
+		"eqeqeq": "warn",
+		"jsdoc/require-param": "warn",
+		"jsdoc/require-param-type": "warn",
+		"jsdoc/require-returns": "warn",
+		"max-len": "off",
+		"no-console": "off",
+		"no-global-assign": "warn",
+		"no-implicit-globals": "warn",
+		"no-new": "warn",
+		"no-prototype-builtins": "off",
+		"no-shadow": "off",
+		"no-undef": "warn",
+		"no-underscore-dangle": "off",
+		"no-unused-vars": "warn",
+		"no-use-before-define": "warn",
+		"security/detect-non-literal-regexp": "off",
+		"security/detect-unsafe-regex": "off",
+		"unicorn/prefer-string-slice": "off"
 	}
 }

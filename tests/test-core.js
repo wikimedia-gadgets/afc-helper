@@ -2,6 +2,8 @@
  * Tests for src/modules/core.js
  */
 
+/* eslint-env jest */
+
 require( './scaffold.js' );
 
 resetToAFCApplicablePage();
