@@ -2711,7 +2711,8 @@
 				rvdir: 'newer'
 			} ).then( function ( data ) {
 				var revisions = data.query.pages[ 0 ].revisions;
-				if ( revisions && revisions.length > 0 ) {
+				// 1 revision = no edit conflict, 2+ revisions = edit conflict.
+				if ( revisions && revisions.length > 1 ) {
 					return true;
 				}
 				return false;
