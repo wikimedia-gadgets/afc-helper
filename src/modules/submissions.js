@@ -2695,9 +2695,12 @@
 			revids: mw.config.get( 'wgCurRevisionId' ),
 			formatversion: 2
 		} ).then( function ( data ) {
-			// convert timestamp from 2024-05-03T09:40:20Z to 1714729221
+			// convert timestamp format from 2024-05-03T09:40:20Z to 1714729221
 			var currentRevisionTimestampTZ = data.query.pages[ 0 ].revisions[ 0 ].timestamp;
-			var currentRevisionSeconds = ( new Date( currentRevisionTimestampTZ ).getTime() + 1000 ) / 1000;
+			var currentRevisionSeconds = ( new Date( currentRevisionTimestampTZ ).getTime() ) / 1000;
+
+			// add one second. we don't want the current revision to be in our list of revisions
+			currentRevisionSeconds++;
 
 			// Then get all revisions since that timestamp
 			return AFCH.api.get( {
