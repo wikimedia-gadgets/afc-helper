@@ -2687,7 +2687,7 @@
 	}
 
 	function checkForEditConflict() {
-		// Get timestamp of page's current revision
+		// Get timestamp of the revision currently loaded in the browser
 		return AFCH.api.get( {
 			action: 'query',
 			format: 'json',
@@ -2695,9 +2695,8 @@
 			revids: mw.config.get( 'wgCurRevisionId' ),
 			formatversion: 2
 		} ).then( function ( data ) {
-			// example: 2024-05-03T09:40:20Z
+			// convert timestamp from 2024-05-03T09:40:20Z to 1714729221
 			var currentRevisionTimestampTZ = data.query.pages[ 0 ].revisions[ 0 ].timestamp;
-			// example: 1714729221
 			var currentRevisionSeconds = ( new Date( currentRevisionTimestampTZ ).getTime() + 1000 ) / 1000;
 
 			// Then get all revisions since that timestamp
@@ -2710,8 +2709,8 @@
 				rvstart: currentRevisionSeconds,
 				rvdir: 'newer'
 			} ).then( function ( data ) {
-				var revisions = data.query.pages[ 0 ].revisions;
-				if ( revisions && revisions.length > 0 ) {
+				var revisionsSinceTimestamp = data.query.pages[ 0 ].revisions;
+				if ( revisionsSinceTimestamp && revisionsSinceTimestamp.length > 0 ) {
 					return true;
 				}
 				return false;
