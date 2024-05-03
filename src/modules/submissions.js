@@ -2687,25 +2687,36 @@
 	}
 
 	function checkForEditConflict() {
-		// Get all revisions since the page was loaded, starting with the revision of the loaded page
-		var request = {
+		// Get timestamp of page's current revision
+		var promise = AFCH.api.get( {
 			action: 'query',
 			format: 'json',
 			prop: 'revisions',
 			titles: [ mw.config.get( 'wgPageName' ) ],
 			formatversion: 2,
-			rvstartid: mw.config.get( 'wgRevisionId' ),
-			rvdir: 'newer',
-			rvexcludeuser: mw.config.get( 'wgUserName' )
-		};
-		var promise = AFCH.api.postWithEditToken( request )
-			.then( function ( data ) {
+			rvlimit: 1
+		} ).then( function ( data ) {
+			debugger;
+			var currentRevisionTimestamp = data.query.pages[ 0 ].revisions[ 0 ].timestamp;
+			var currentRevisionMilliseconds = new Date( currentRevisionTimestamp ).getTime() + 1000;
+
+			// Then get all revisions since that timestamp
+			var promise = AFCH.api.get( {
+				action: 'query',
+				format: 'json',
+				prop: 'revisions',
+				titles: [ mw.config.get( 'wgPageName' ) ],
+				formatversion: 2,
+				rvstart: currentRevisionMilliseconds,
+				rvdir: 'newer'
+			} ).then( function ( data ) {
 				var revisions = data.query.pages[ 0 ].revisions;
 				if ( revisions && revisions.length > 0 ) {
 					return true;
 				}
 				return false;
 			} );
+		} );
 		return promise;
 	}
 
