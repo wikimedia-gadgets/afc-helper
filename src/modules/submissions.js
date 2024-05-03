@@ -2688,26 +2688,26 @@
 
 	function checkForEditConflict() {
 		// Get timestamp of page's current revision
-		var promise = AFCH.api.get( {
+		return AFCH.api.get( {
 			action: 'query',
 			format: 'json',
 			prop: 'revisions',
-			titles: [ mw.config.get( 'wgPageName' ) ],
-			formatversion: 2,
-			rvlimit: 1
+			revids: mw.config.get( 'wgCurRevisionId' ),
+			formatversion: 2
 		} ).then( function ( data ) {
-			debugger;
-			var currentRevisionTimestamp = data.query.pages[ 0 ].revisions[ 0 ].timestamp;
-			var currentRevisionMilliseconds = new Date( currentRevisionTimestamp ).getTime() + 1000;
+			// example: 2024-05-03T09:40:20Z
+			var currentRevisionTimestampTZ = data.query.pages[ 0 ].revisions[ 0 ].timestamp;
+			// example: 1714729221
+			var currentRevisionSeconds = ( new Date( currentRevisionTimestampTZ ).getTime() + 1000 ) / 1000;
 
 			// Then get all revisions since that timestamp
-			var promise = AFCH.api.get( {
+			return AFCH.api.get( {
 				action: 'query',
 				format: 'json',
 				prop: 'revisions',
 				titles: [ mw.config.get( 'wgPageName' ) ],
 				formatversion: 2,
-				rvstart: currentRevisionMilliseconds,
+				rvstart: currentRevisionSeconds,
 				rvdir: 'newer'
 			} ).then( function ( data ) {
 				var revisions = data.query.pages[ 0 ].revisions;
@@ -2717,7 +2717,6 @@
 				return false;
 			} );
 		} );
-		return promise;
 	}
 
 	function showEditConflictMessage() {
