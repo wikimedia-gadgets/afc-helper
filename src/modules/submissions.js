@@ -673,6 +673,7 @@
 	 * specified by `new`
 	 *
 	 * @param {string} newCode
+	 * @return {string}
 	 */
 	AFCH.Text.prototype.updateAfcTemplates = function ( newCode ) {
 		this.removeAfcTemplates();
@@ -1332,6 +1333,8 @@
 				);
 
 			// Show a link to the next random submissions
+			// We need "new" here because Element uses "this." and needs the right context.
+			// eslint-disable-next-line no-new
 			new AFCH.status.Element( 'Continue to next $1 or $2 &raquo;', {
 				$1: AFCH.makeLinkElementToCategory( 'Pending AfC submissions', 'random submission' ),
 				$2: AFCH.makeLinkElementToCategory( 'AfC pending submissions by age/0 days ago', 'zero-day-old submission' )

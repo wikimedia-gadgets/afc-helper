@@ -4,6 +4,8 @@
  * the actual tests themselves.
  */
 
+/* eslint-env jest, node */
+
 jest.autoMockOff();
 
 fs = require( 'fs' );
