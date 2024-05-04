@@ -2686,26 +2686,38 @@
 	}
 
 	function checkForEditConflict() {
-		// Get all revisions since the page was loaded, starting with the revision of the loaded page
-		var request = {
+		// Get timestamp of the revision currently loaded in the browser
+		return AFCH.api.get( {
 			action: 'query',
 			format: 'json',
 			prop: 'revisions',
-			titles: [ mw.config.get( 'wgPageName' ) ],
-			formatversion: 2,
-			rvstartid: mw.config.get( 'wgRevisionId' ),
-			rvdir: 'newer'
-		};
-		var promise = AFCH.api.postWithEditToken( request )
-			.then( function ( data ) {
-				var revisions = data.query.pages[ 0 ].revisions;
-				// 1 revision = no edit conflict, 2+ revisions = edit conflict.
-				if ( revisions && revisions.length > 1 ) {
+			revids: mw.config.get( 'wgCurRevisionId' ),
+			formatversion: 2
+		} ).then( function ( data ) {
+			// convert timestamp format from 2024-05-03T09:40:20Z to 1714729221
+			var currentRevisionTimestampTZ = data.query.pages[ 0 ].revisions[ 0 ].timestamp;
+			var currentRevisionSeconds = ( new Date( currentRevisionTimestampTZ ).getTime() ) / 1000;
+
+			// add one second. we don't want the current revision to be in our list of revisions
+			currentRevisionSeconds++;
+
+			// Then get all revisions since that timestamp
+			return AFCH.api.get( {
+				action: 'query',
+				format: 'json',
+				prop: 'revisions',
+				titles: [ mw.config.get( 'wgPageName' ) ],
+				formatversion: 2,
+				rvstart: currentRevisionSeconds,
+				rvdir: 'newer'
+			} ).then( function ( data ) {
+				var revisionsSinceTimestamp = data.query.pages[ 0 ].revisions;
+				if ( revisionsSinceTimestamp && revisionsSinceTimestamp.length > 0 ) {
 					return true;
 				}
 				return false;
 			} );
-		return promise;
+		} );
 	}
 
 	function showEditConflictMessage() {
