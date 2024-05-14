@@ -1806,7 +1806,7 @@
 		 * If there is no match, return false
 		 *
 		 * @param {string} string string to parse
-		 * @param mwstyle
+		 * @param {boolean} mwstyle convert to a mediawiki-style timestamp?
 		 * @return {Date|number}
 		 */
 		parseForTimestamp: function ( string, mwstyle ) {
