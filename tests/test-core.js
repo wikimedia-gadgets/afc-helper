@@ -135,7 +135,9 @@ describe( 'AFCH.addTalkPageBanners', function () {
 		var existingWPBioTemplateName = null;
 		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName, existingWikiProjects, alreadyHasWPBio, existingWPBioTemplateName );
 		expect( output.talkText ).toBe(
-`{{subst:WPAFC/article|class=|oldid=592485}}
+`{{WikiProject banner shell|
+{{subst:WPAFC/article|oldid=592485}}
+}}
 
 `
 		);
@@ -159,7 +161,9 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		var existingWPBioTemplateName = null;
 		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName, existingWikiProjects, alreadyHasWPBio, existingWPBioTemplateName );
 		expect( output.talkText ).toBe(
-`{{subst:WPAFC/article|class=|oldid=592485}}
+`{{WikiProject banner shell|
+{{subst:WPAFC/article|oldid=592485}}
+}}
 
 == Hello ==
 I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="color:blue">'''Novem Linguae'''</span>]] <small>([[User talk:Novem Linguae|talk]])</small> 20:22, 10 April 2024 (UTC)`
