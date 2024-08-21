@@ -1709,7 +1709,7 @@
 			talkText = talkTextPrefix + '\n\n' + talkText;
 
 			// Add banner shell if needed
-			var banners = talkText.match( /{{(?:wikiproject[^}]+}}|subst:wpafc|football)/gi );
+			var banners = talkText.match( /{{(?:wikiproject|subst:wpafc\/article|football)[^}]+}}/gi );
 			// https://en.wikipedia.org/wiki/Special:WhatLinksHere?target=Template%3AWikiProject+banner+shell&namespace=&hidetrans=1&hidelinks=1
 			var bannerShellDetectionRegex = /{{(?:WikiProject banner shell|WikiProjectBanners|WikiProject Banners|WPB|WPBS|WikiProject cooperation shell|Wikiprojectbannershell|WikiProject Banner Shell|Wpb|WPBannerShell|Wpbs|Wikiprojectbanners|WP Banner Shell|WP banner shell|Bannershell|Wikiproject banner shell|WIkiProjectBanner Shell|WikiProjectBannerShell|WikiProject BannerShell|Coopshell|WikiprojectBannerShell|WikiProject Shell|Scope shell|Project shell|WikiProject shell|WikiProject banner|Wpbannershell|Multiple wikiprojects|Wikiproject banner holder|Project banner holder|WikiProject banner shell\/test1|Article assessment|WikiProject bannershell)/i;
 			var hasBannerShell = talkText.match( bannerShellDetectionRegex );
