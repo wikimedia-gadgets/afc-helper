@@ -1708,10 +1708,26 @@
 			// (e.g. pages in `Draft:` namespace with discussion)
 			talkText = talkTextPrefix + '\n\n' + talkText;
 
+			// Add banner shell if needed
+			var banners = talkText.match( /{{(?:wikiproject[^}]+}}|subst:wpafc)/gi );
+			// https://en.wikipedia.org/wiki/Special:WhatLinksHere?target=Template%3AWikiProject+banner+shell&namespace=&hidetrans=1&hidelinks=1
+			var bannerShellDetectionRegex = /{{(?:WikiProject banner shell|WikiProjectBanners|WikiProject Banners|WPB|WPBS|WikiProject cooperation shell|Wikiprojectbannershell|WikiProject Banner Shell|Wpb|WPBannerShell|Wpbs|Wikiprojectbanners|WP Banner Shell|WP banner shell|Bannershell|Wikiproject banner shell|WIkiProjectBanner Shell|WikiProjectBannerShell|WikiProject BannerShell|Coopshell|WikiprojectBannerShell|WikiProject Shell|Scope shell|Project shell|WikiProject shell|WikiProject banner|Wpbannershell|Multiple wikiprojects|Wikiproject banner holder|Project banner holder|WikiProject banner shell\/test1|Article assessment|WikiProject bannershell)/i;
+			var hasBannerShell = talkText.match( bannerShellDetectionRegex );
+			if ( banners.length > 1 && !hasBannerShell ) {
+				var bannerShellStart = '{{WikiProject banner shell|';
+				var bannerShellEnd = '}}';
+				var firstBanner = banners[ 0 ];
+				var lastBanner = banners.slice( -1 )[ 0 ];
+				talkText = talkText.replace( firstBanner, bannerShellStart + '\n' + firstBanner );
+				talkText = talkText.replace( lastBanner, lastBanner + '\n' + bannerShellEnd );
+			}
+
 			return {
 				talkText: talkText,
 				countOfWikiProjectsAdded: wikiProjectsToAdd.length,
-				countOfWikiProjectsRemoved: wikiProjectsToRemove.length
+				countOfWikiProjectsRemoved: wikiProjectsToRemove.length,
+				// adding this param mainly for unit tests, so we can test how well the banner detection algorithm works
+				bannerCount: banners.length
 			};
 		},
 

@@ -140,6 +140,7 @@ describe( 'AFCH.addTalkPageBanners', function () {
 		);
 		expect( output.countOfWikiProjectsAdded ).toBe( 0 );
 		expect( output.countOfWikiProjectsRemoved ).toBe( 0 );
+		expect( output.bannerCount ).toBe( 1 );
 	} );
 
 	it( 'talk page has existing sections', function () {
@@ -164,6 +165,7 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		);
 		expect( output.countOfWikiProjectsAdded ).toBe( 0 );
 		expect( output.countOfWikiProjectsRemoved ).toBe( 0 );
+		expect( output.bannerCount ).toBe( 1 );
 	} );
 
 	// FIXME: unexpected \n between new banners and old banners. https://github.com/wikimedia-gadgets/afc-helper/issues/330
@@ -199,14 +201,17 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		var existingWPBioTemplateName = null;
 		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName, existingWikiProjects, alreadyHasWPBio, existingWPBioTemplateName );
 		expect( output.talkText ).toBe(
-`{{subst:WPAFC/article|class=|oldid=592507}}
+`{{WikiProject banner shell|
+{{subst:WPAFC/article|class=|oldid=592507}}
 
 {{WikiProject Women}}
 {{WikiProject Women's sport}}
-{{WikiProject Somalia}}`
+{{WikiProject Somalia}}
+}}`
 		);
 		expect( output.countOfWikiProjectsAdded ).toBe( 0 );
 		expect( output.countOfWikiProjectsRemoved ).toBe( 0 );
+		expect( output.bannerCount ).toBe( 4 );
 	} );
 
 	// FIXME: the edit summary of 1 WikiProject banner removed is correct, but this doesn't actually remove the WikiProject banner from the talk page. https://github.com/wikimedia-gadgets/afc-helper/issues/329
@@ -243,14 +248,17 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		var existingWPBioTemplateName = null;
 		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName, existingWikiProjects, alreadyHasWPBio, existingWPBioTemplateName );
 		expect( output.talkText ).toBe(
-`{{subst:WPAFC/article|class=|oldid=592507}}
+`{{WikiProject banner shell|
+{{subst:WPAFC/article|class=|oldid=592507}}
 
 {{WikiProject Women}}
 {{WikiProject Women's sport}}
-{{WikiProject Somalia}}`
+{{WikiProject Somalia}}
+}}`
 		);
 		expect( output.countOfWikiProjectsAdded ).toBe( 0 );
 		expect( output.countOfWikiProjectsRemoved ).toBe( 1 );
+		expect( output.bannerCount ).toBe( 4 );
 	} );
 
 	it( 'accept form is a biography with all fields filled in', function () {
@@ -266,15 +274,18 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		var existingWPBioTemplateName = null;
 		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName, existingWikiProjects, alreadyHasWPBio, existingWPBioTemplateName );
 		expect( output.talkText ).toBe(
-`{{subst:WPAFC/article|class=B|oldid=592496}}
+`{{WikiProject banner shell|
+{{subst:WPAFC/article|class=B|oldid=592496}}
 {{WikiProject Biography|living=yes|class=B|listas=Jones, Bob}}
 {{WikiProject Africa|class=B}}
 {{WikiProject Alabama|class=B}}
+}}
 
 `
 		);
 		expect( output.countOfWikiProjectsAdded ).toBe( 2 );
 		expect( output.countOfWikiProjectsRemoved ).toBe( 0 );
+		expect( output.bannerCount ).toBe( 4 );
 	} );
 
 	it( 'lifeStatus = dead', function () {
@@ -290,13 +301,16 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		var existingWPBioTemplateName = null;
 		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName, existingWikiProjects, alreadyHasWPBio, existingWPBioTemplateName );
 		expect( output.talkText ).toBe(
-`{{subst:WPAFC/article|class=|oldid=592496}}
+`{{WikiProject banner shell|
+{{subst:WPAFC/article|class=|oldid=592496}}
 {{WikiProject Biography|living=no|class=|listas=}}
+}}
 
 `
 		);
 		expect( output.countOfWikiProjectsAdded ).toBe( 0 );
 		expect( output.countOfWikiProjectsRemoved ).toBe( 0 );
+		expect( output.bannerCount ).toBe( 2 );
 	} );
 
 	// FIXME: is supposed to remove the {{wikiproject biography}} template and report 1 template removed, but does not. code outside of AFCH.addTalkPageBanners() is incorrectly calculating alreadyHasWPBio as false
@@ -327,13 +341,16 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		var existingWPBioTemplateName = null;
 		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName, existingWikiProjects, alreadyHasWPBio, existingWPBioTemplateName );
 		expect( output.talkText ).toBe(
-`{{subst:WPAFC/article|class=|oldid=592496}}
+`{{WikiProject banner shell|
+{{subst:WPAFC/article|class=|oldid=592496}}
 
 {{wikiproject biography|living=yes|class=B|listas=Jones, Bob}}
-{{WikiProject Somalia}}`
+{{WikiProject Somalia}}
+}}`
 		);
 		expect( output.countOfWikiProjectsAdded ).toBe( 0 );
 		expect( output.countOfWikiProjectsRemoved ).toBe( 0 );
+		expect( output.bannerCount ).toBe( 3 );
 	} );
 
 	it( 'user selects class = disambiguation', function () {
@@ -349,12 +366,15 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		var existingWPBioTemplateName = null;
 		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName, existingWikiProjects, alreadyHasWPBio, existingWPBioTemplateName );
 		expect( output.talkText ).toBe(
-`{{subst:WPAFC/article|class=disambig|oldid=592681}}
+`{{WikiProject banner shell|
+{{subst:WPAFC/article|class=disambig|oldid=592681}}
 {{WikiProject Disambiguation|class=disambig}}
+}}
 
 `
 		);
 		expect( output.countOfWikiProjectsAdded ).toBe( 1 );
 		expect( output.countOfWikiProjectsRemoved ).toBe( 0 );
+		expect( output.bannerCount ).toBe( 2 );
 	} );
 } );
