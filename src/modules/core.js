@@ -1709,7 +1709,7 @@
 			talkText = talkTextPrefix + '\n\n' + talkText;
 
 			// Add banner shell if needed
-			var banners = talkText.match( /{{(?:wikiproject[^}]+}}|subst:wpafc)/gi );
+			var banners = talkText.match( /{{(?:wikiproject[^}]+}}|subst:wpafc|football)/gi );
 			// https://en.wikipedia.org/wiki/Special:WhatLinksHere?target=Template%3AWikiProject+banner+shell&namespace=&hidetrans=1&hidelinks=1
 			var bannerShellDetectionRegex = /{{(?:WikiProject banner shell|WikiProjectBanners|WikiProject Banners|WPB|WPBS|WikiProject cooperation shell|Wikiprojectbannershell|WikiProject Banner Shell|Wpb|WPBannerShell|Wpbs|Wikiprojectbanners|WP Banner Shell|WP banner shell|Bannershell|Wikiproject banner shell|WIkiProjectBanner Shell|WikiProjectBannerShell|WikiProject BannerShell|Coopshell|WikiprojectBannerShell|WikiProject Shell|Scope shell|Project shell|WikiProject shell|WikiProject banner|Wpbannershell|Multiple wikiprojects|Wikiproject banner holder|Project banner holder|WikiProject banner shell\/test1|Article assessment|WikiProject bannershell)/i;
 			var hasBannerShell = talkText.match( bannerShellDetectionRegex );
@@ -1722,11 +1722,22 @@
 				talkText = talkText.replace( lastBanner, lastBanner + '\n' + bannerShellEnd );
 			}
 
+			// If banner shell is present, comply with [[WP:PIQA]]. Add the class only to the banner shell. Delete any other class parameters.
+			hasBannerShell = talkText.match( bannerShellDetectionRegex );
+			if ( hasBannerShell ) {
+				// delete all |class= from the entire talk page
+				talkText = talkText.replace( /[\n|}]class\s*=\s*[^\n|}]*([\n|}])/g, '$1' );
+				// add |class= to the banner shell only
+				if ( newAssessment ) {
+					talkText = talkText.replace( bannerShellDetectionRegex, '$&|class=' + newAssessment );
+				}
+			}
+
 			return {
 				talkText: talkText,
 				countOfWikiProjectsAdded: wikiProjectsToAdd.length,
 				countOfWikiProjectsRemoved: wikiProjectsToRemove.length,
-				// adding this param mainly for unit tests, so we can test how well the banner detection algorithm works
+				// adding this param for unit tests, so we can test that the banner detection algorithm works
 				bannerCount: banners.length
 			};
 		},

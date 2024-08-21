@@ -202,7 +202,7 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName, existingWikiProjects, alreadyHasWPBio, existingWPBioTemplateName );
 		expect( output.talkText ).toBe(
 `{{WikiProject banner shell|
-{{subst:WPAFC/article|class=|oldid=592507}}
+{{subst:WPAFC/article|oldid=592507}}
 
 {{WikiProject Women}}
 {{WikiProject Women's sport}}
@@ -249,7 +249,7 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName, existingWikiProjects, alreadyHasWPBio, existingWPBioTemplateName );
 		expect( output.talkText ).toBe(
 `{{WikiProject banner shell|
-{{subst:WPAFC/article|class=|oldid=592507}}
+{{subst:WPAFC/article|oldid=592507}}
 
 {{WikiProject Women}}
 {{WikiProject Women's sport}}
@@ -274,11 +274,11 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		var existingWPBioTemplateName = null;
 		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName, existingWikiProjects, alreadyHasWPBio, existingWPBioTemplateName );
 		expect( output.talkText ).toBe(
-`{{WikiProject banner shell|
-{{subst:WPAFC/article|class=B|oldid=592496}}
-{{WikiProject Biography|living=yes|class=B|listas=Jones, Bob}}
-{{WikiProject Africa|class=B}}
-{{WikiProject Alabama|class=B}}
+`{{WikiProject banner shell|class=B|
+{{subst:WPAFC/article|oldid=592496}}
+{{WikiProject Biography|living=yes|listas=Jones, Bob}}
+{{WikiProject Africa}}
+{{WikiProject Alabama}}
 }}
 
 `
@@ -302,8 +302,8 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName, existingWikiProjects, alreadyHasWPBio, existingWPBioTemplateName );
 		expect( output.talkText ).toBe(
 `{{WikiProject banner shell|
-{{subst:WPAFC/article|class=|oldid=592496}}
-{{WikiProject Biography|living=no|class=|listas=}}
+{{subst:WPAFC/article|oldid=592496}}
+{{WikiProject Biography|living=no|listas=}}
 }}
 
 `
@@ -342,9 +342,9 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName, existingWikiProjects, alreadyHasWPBio, existingWPBioTemplateName );
 		expect( output.talkText ).toBe(
 `{{WikiProject banner shell|
-{{subst:WPAFC/article|class=|oldid=592496}}
+{{subst:WPAFC/article|oldid=592496}}
 
-{{wikiproject biography|living=yes|class=B|listas=Jones, Bob}}
+{{wikiproject biography|living=yes|listas=Jones, Bob}}
 {{WikiProject Somalia}}
 }}`
 		);
@@ -366,9 +366,9 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		var existingWPBioTemplateName = null;
 		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName, existingWikiProjects, alreadyHasWPBio, existingWPBioTemplateName );
 		expect( output.talkText ).toBe(
-`{{WikiProject banner shell|
-{{subst:WPAFC/article|class=disambig|oldid=592681}}
-{{WikiProject Disambiguation|class=disambig}}
+`{{WikiProject banner shell|class=disambig|
+{{subst:WPAFC/article|oldid=592681}}
+{{WikiProject Disambiguation}}
 }}
 
 `
