@@ -3,6 +3,7 @@
  */
 
 /* eslint-env jest */
+/* eslint-disable indent */
 
 require( './scaffold.js' );
 
