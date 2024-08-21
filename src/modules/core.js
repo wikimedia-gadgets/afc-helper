@@ -1716,7 +1716,7 @@
 		},
 
 		/**
-		 * Returns the relative time that has elapsed between an oldDate and a nowDate
+		 * Returns the relative time that  has elapsed between an oldDate and a nowDate
 		 *
 		 * @param {Date|string} old (if it is a string it will be assumed to be a
 		 *                           MediaWiki timestamp and converted to a Date first)
