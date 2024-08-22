@@ -1708,21 +1708,35 @@
 			// (e.g. pages in `Draft:` namespace with discussion)
 			talkText = talkTextPrefix + '\n\n' + talkText;
 
-			// Add banner shell, always. This is easier than maintaining 2 code paths: a code path for 1 banner and a code path for 2+ banners.
-			var banners = talkText.match( /{{(?:wikiproject|subst:wpafc\/article|football)[^}]+}}/gi );
-			// https://en.wikipedia.org/wiki/Special:WhatLinksHere?target=Template%3AWikiProject+banner+shell&namespace=&hidetrans=1&hidelinks=1
-			var bannerShellDetectionRegex = /{{(?:WikiProject banner shell|WikiProjectBanners|WikiProject Banners|WPB|WPBS|WikiProject cooperation shell|Wikiprojectbannershell|WikiProject Banner Shell|Wpb|WPBannerShell|Wpbs|Wikiprojectbanners|WP Banner Shell|WP banner shell|Bannershell|Wikiproject banner shell|WIkiProjectBanner Shell|WikiProjectBannerShell|WikiProject BannerShell|Coopshell|WikiprojectBannerShell|WikiProject Shell|Scope shell|Project shell|WikiProject shell|WikiProject banner|Wpbannershell|Multiple wikiprojects|Wikiproject banner holder|Project banner holder|WikiProject banner shell\/test1|Article assessment|WikiProject bannershell)/i;
+			// If present, delete WikiProject banner shell. We'll re-add it later.
+			var bannerShellTemplates = 'WikiProject banner shell|WikiProjectBanners|WikiProject Banners|WPB|WPBS|WikiProject cooperation shell|Wikiprojectbannershell|WikiProject Banner Shell|Wpb|WPBannerShell|Wpbs|Wikiprojectbanners|WP Banner Shell|WP banner shell|Bannershell|Wikiproject banner shell|WIkiProjectBanner Shell|WikiProjectBannerShell|WikiProject BannerShell|Coopshell|WikiprojectBannerShell|WikiProject Shell|Scope shell|Project shell|WikiProject shell|WikiProject banner|Wpbannershell|Multiple wikiprojects|Wikiproject banner holder|Project banner holder|WikiProject banner shell\\/test1|Article assessment|WikiProject bannershell';
+			var bannerShellDetectionRegex = new RegExp( '{{(?:' + bannerShellTemplates + ')[^\n]*\n', 'i' );
 			var hasBannerShell = talkText.match( bannerShellDetectionRegex );
-			if ( banners.length >= 1 && !hasBannerShell ) {
-				var bannerShellStart = '{{WikiProject banner shell|';
-				var bannerShellEnd = '}}';
-				var firstBanner = banners[ 0 ];
-				var lastBanner = banners.slice( -1 )[ 0 ];
-				talkText = talkText.replace( firstBanner, bannerShellStart + '\n' + firstBanner );
-				talkText = talkText.replace( lastBanner, lastBanner + '\n' + bannerShellEnd );
+			var bannerShellWasDeleted = false;
+			if ( hasBannerShell ) {
+				talkText = talkText.replace( hasBannerShell, '' );
+				bannerShellWasDeleted = true;
 			}
 
-			// If banner shell is present, comply with [[WP:PIQA]]. Add the class only to the banner shell. Delete any other class parameters.
+			// Add WikiProject banner shell, always. This is easier than maintaining 2 code paths: a code path for 1 banner and a code path for 2+ banners.
+			var banners = talkText.match( /{{(?:wikiproject|subst:wpafc\/article|football)[^}]+}}/gi );
+			// https://en.wikipedia.org/wiki/Special:WhatLinksHere?target=Template%3AWikiProject+banner+shell&namespace=&hidetrans=1&hidelinks=1
+			bannerShellDetectionRegex = new RegExp( '{{(?:' + bannerShellTemplates + ')', 'i' );
+			hasBannerShell = talkText.match( bannerShellDetectionRegex );
+			if ( banners.length >= 1 && !hasBannerShell ) {
+				var bannerShellStart = '{{WikiProject banner shell|';
+				var firstBanner = banners[ 0 ];
+				talkText = talkText.replace( firstBanner, bannerShellStart + '\n' + firstBanner );
+
+				// If we deleted the banner shell above, we didn't delete its closing }}. Skip adding it here. Just recycle it.
+				if ( !bannerShellWasDeleted ) {
+					var bannerShellEnd = '}}';
+					var lastBanner = banners.slice( -1 )[ 0 ];
+					talkText = talkText.replace( lastBanner, lastBanner + '\n' + bannerShellEnd );
+				}
+			}
+
+			// Comply with [[WP:PIQA]]. Add the |class= only to the banner shell. Delete all other class parameters (e.g. from WikiProject banners)
 			hasBannerShell = talkText.match( bannerShellDetectionRegex );
 			if ( hasBannerShell ) {
 				// delete all |class= from the entire talk page

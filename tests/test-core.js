@@ -219,6 +219,53 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		expect( output.bannerCount ).toBe( 4 );
 	} );
 
+	it( 'talk page has existing WikiProject banner shell and banners', function () {
+		var talkText =
+`{{WikiProject banner shell|
+{{WikiProject Women}}
+{{WikiProject Women's sport}}
+{{WikiProject Somalia}}
+}}`;
+		var newAssessment = '';
+		var revId = 592507;
+		var isBiography = false;
+		var newWikiProjects = [ 'WikiProject Somalia', 'WikiProject Women', 'WikiProject Women\'s sport' ];
+		var lifeStatus = 'unknown';
+		var subjectName = '';
+		var existingWikiProjects = [
+			{
+				displayName: 'Somalia',
+				templateName: 'WikiProject Somalia',
+				alreadyOnPage: true
+			},
+			{
+				displayName: 'Women',
+				templateName: 'WikiProject Women',
+				alreadyOnPage: true
+			},
+			{
+				displayName: 'Women\'s sport',
+				templateName: 'WikiProject Women\'s sport',
+				alreadyOnPage: true
+			}
+		];
+		var alreadyHasWPBio = false;
+		var existingWPBioTemplateName = null;
+		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName, existingWikiProjects, alreadyHasWPBio, existingWPBioTemplateName );
+		expect( output.talkText ).toBe(
+`{{WikiProject banner shell|
+{{subst:WPAFC/article|oldid=592507}}
+
+{{WikiProject Women}}
+{{WikiProject Women's sport}}
+{{WikiProject Somalia}}
+}}`
+		);
+		expect( output.countOfWikiProjectsAdded ).toBe( 0 );
+		expect( output.countOfWikiProjectsRemoved ).toBe( 0 );
+		expect( output.bannerCount ).toBe( 4 );
+	} );
+
 	// FIXME: the edit summary of 1 WikiProject banner removed is correct, but this doesn't actually remove the WikiProject banner from the talk page. https://github.com/wikimedia-gadgets/afc-helper/issues/329
 	it( 'remove an existing WikiProject', function () {
 		var talkText =
