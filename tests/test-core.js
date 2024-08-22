@@ -208,7 +208,6 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		expect( output.talkText ).toBe(
 `{{WikiProject banner shell|
 {{subst:WPAFC/article|oldid=592507}}
-
 {{WikiProject Women}}
 {{WikiProject Women's sport}}
 {{WikiProject Somalia}}
@@ -255,7 +254,6 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		expect( output.talkText ).toBe(
 `{{WikiProject banner shell|
 {{subst:WPAFC/article|oldid=592507}}
-
 {{WikiProject Women}}
 {{WikiProject Women's sport}}
 {{WikiProject Somalia}}
@@ -266,7 +264,6 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		expect( output.bannerCount ).toBe( 4 );
 	} );
 
-	// FIXME: the edit summary of 1 WikiProject banner removed is correct, but this doesn't actually remove the WikiProject banner from the talk page. https://github.com/wikimedia-gadgets/afc-helper/issues/329
 	it( 'remove an existing WikiProject', function () {
 		var talkText =
 `{{WikiProject Women}}
@@ -302,7 +299,6 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		expect( output.talkText ).toBe(
 `{{WikiProject banner shell|
 {{subst:WPAFC/article|oldid=592507}}
-
 {{WikiProject Women}}
 {{WikiProject Women's sport}}
 {{WikiProject Somalia}}
@@ -395,7 +391,6 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		expect( output.talkText ).toBe(
 `{{WikiProject banner shell|
 {{subst:WPAFC/article|oldid=592496}}
-
 {{wikiproject biography|living=yes|listas=Jones, Bob}}
 {{WikiProject Somalia}}
 }}`

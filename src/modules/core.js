@@ -1747,6 +1747,9 @@
 				}
 			}
 
+			// Remove extra line breaks between banners
+			talkText = talkText.replace( /\}\}\n{2,}\{\{/g, '}}\n{{' );
+
 			return {
 				talkText: talkText,
 				countOfWikiProjectsAdded: wikiProjectsToAdd.length,
