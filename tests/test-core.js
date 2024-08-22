@@ -173,6 +173,63 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		expect( output.bannerCount ).toBe( 1 );
 	} );
 
+	it( 'talk page has existing templates, WikiProject banners on top', function () {
+		var talkText =
+`{{WikiProject Women}}
+{{translated page|ar|بحيرة كناو|version=|small=no|insertversion=|section=}}
+`;
+		var newAssessment = '';
+		var revId = 592485;
+		var isBiography = false;
+		var newWikiProjects = [];
+		var lifeStatus = 'unknown';
+		var subjectName = '';
+		var existingWikiProjects = [];
+		var alreadyHasWPBio = false;
+		var existingWPBioTemplateName = null;
+		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName, existingWikiProjects, alreadyHasWPBio, existingWPBioTemplateName );
+		expect( output.talkText ).toBe(
+`{{WikiProject banner shell|
+{{subst:WPAFC/article|oldid=592485}}
+{{WikiProject Women}}
+}}
+{{translated page|ar|بحيرة كناو|version=|small=no|insertversion=|section=}}
+`
+		);
+		expect( output.countOfWikiProjectsAdded ).toBe( 0 );
+		expect( output.countOfWikiProjectsRemoved ).toBe( 0 );
+		expect( output.bannerCount ).toBe( 2 );
+	} );
+
+	// FIXME: we probably need to write code that cuts every existing WikiProject banner template and pastes it at the top of the page
+	it.skip( 'talk page has existing templates, WikiProject banners on bottom', function () {
+		var talkText =
+`{{translated page|ar|بحيرة كناو|version=|small=no|insertversion=|section=}}
+{{WikiProject Women}}
+`;
+		var newAssessment = '';
+		var revId = 592485;
+		var isBiography = false;
+		var newWikiProjects = [];
+		var lifeStatus = 'unknown';
+		var subjectName = '';
+		var existingWikiProjects = [];
+		var alreadyHasWPBio = false;
+		var existingWPBioTemplateName = null;
+		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName, existingWikiProjects, alreadyHasWPBio, existingWPBioTemplateName );
+		expect( output.talkText ).toBe(
+`{{WikiProject banner shell|
+{{subst:WPAFC/article|oldid=592485}}
+{{WikiProject Women}}
+}}
+{{translated page|ar|بحيرة كناو|version=|small=no|insertversion=|section=}}
+`
+		);
+		expect( output.countOfWikiProjectsAdded ).toBe( 0 );
+		expect( output.countOfWikiProjectsRemoved ).toBe( 0 );
+		expect( output.bannerCount ).toBe( 2 );
+	} );
+
 	// FIXME: unexpected \n between new banners and old banners. https://github.com/wikimedia-gadgets/afc-helper/issues/330
 	it( 'talk page has existing WikiProject banners', function () {
 		var talkText =
