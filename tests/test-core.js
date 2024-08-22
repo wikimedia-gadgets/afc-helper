@@ -264,6 +264,44 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		expect( output.bannerCount ).toBe( 4 );
 	} );
 
+	it( 'talk page has existing WikiProject banner shell and banners, and reviewer adds more banners', function () {
+		var talkText =
+`{{WikiProject banner shell|
+{{WikiProject Film}}
+{{WikiProject Biography}}
+{{WikiProject Women}}
+{{WikiProject Television}}
+}}`;
+		var newAssessment = '';
+		var revId = 592507;
+		var isBiography = true;
+		var newWikiProjects = [ 'WikiProject Romania' ];
+		var lifeStatus = 'living';
+		var subjectName = 'Lazarut, Raluca';
+		// FIXME: existing WikiProject detection is broken. i don't think this is used to modify the draft talk wikicode in any way. but i do think it might be used to populate the existing WikiProject chips on the accept screen. for this test case, there were no chips, when there should have been 4 (film, biography, women, television).
+		var existingWikiProjects = [];
+		// FIXME: is there even a way for this to be set to true? no test case uses it. delete?
+		var alreadyHasWPBio = false;
+		// FIXME: is there even a way for this to be set to not null? no test case uses it. delete?
+		var existingWPBioTemplateName = null;
+		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName, existingWikiProjects, alreadyHasWPBio, existingWPBioTemplateName );
+		// FIXME: WP Biography should not be placed twice
+		expect( output.talkText ).toBe(
+`{{WikiProject banner shell|
+{{subst:WPAFC/article|oldid=592507}}
+{{WikiProject Biography|living=yes|listas=Lazarut, Raluca}}
+{{WikiProject Romania}}
+{{WikiProject Film}}
+{{WikiProject Biography}}
+{{WikiProject Women}}
+{{WikiProject Television}}
+}}`
+		);
+		expect( output.countOfWikiProjectsAdded ).toBe( 1 );
+		expect( output.countOfWikiProjectsRemoved ).toBe( 0 );
+		expect( output.bannerCount ).toBe( 7 );
+	} );
+
 	it( 'remove an existing WikiProject', function () {
 		var talkText =
 `{{WikiProject Women}}
