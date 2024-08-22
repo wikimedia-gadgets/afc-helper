@@ -1719,7 +1719,7 @@
 			}
 
 			// Add WikiProject banner shell, always. This is easier than maintaining 2 code paths: a code path for 1 banner and a code path for 2+ banners.
-			var banners = talkText.match( /{{(?:wikiproject|subst:wpafc\/article|football)[^}]+}}/gi );
+			var banners = talkText.match( /{{(?:wikiproject|subst:wpafc\/article|football|oka)[^}]+}}/gi );
 			// https://en.wikipedia.org/wiki/Special:WhatLinksHere?target=Template%3AWikiProject+banner+shell&namespace=&hidetrans=1&hidelinks=1
 			bannerShellDetectionRegex = new RegExp( '{{(?:' + bannerShellTemplates + ')', 'i' );
 			hasBannerShell = talkText.match( bannerShellDetectionRegex );
