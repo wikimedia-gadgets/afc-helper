@@ -230,7 +230,6 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		expect( output.bannerCount ).toBe( 2 );
 	} );
 
-	// FIXME: unexpected \n between new banners and old banners. https://github.com/wikimedia-gadgets/afc-helper/issues/330
 	it( 'talk page has existing WikiProject banners', function () {
 		var talkText =
 `{{WikiProject Women}}
@@ -342,7 +341,7 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		// FIXME: is there even a way for this to be set to not null? no test case uses it. delete?
 		var existingWPBioTemplateName = null;
 		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName, existingWikiProjects, alreadyHasWPBio, existingWPBioTemplateName );
-		// FIXME: WP Biography should not be placed twice
+		// FIXME: WP Biography should not be placed twice. in general, other WikiProject banners get placed twice too, if the AFC reviewer adds one on the accept screen that's already on the talk page
 		expect( output.talkText ).toBe(
 `{{WikiProject banner shell|
 {{subst:WPAFC/article|oldid=592507}}
@@ -457,7 +456,6 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 	} );
 
 	// FIXME: is supposed to remove the {{wikiproject biography}} template and report 1 template removed, but does not. code outside of AFCH.addTalkPageBanners() is incorrectly calculating alreadyHasWPBio as false
-	// FIXME: 2 extra line breaks in the output
 	it( 'talk page has {{wikiproject biography}}, and user selects that it\'s not a biography, so should remove {{wikiproject biography}}', function () {
 		var talkText =
 `{{wikiproject biography|living=yes|class=B|listas=Jones, Bob}}
