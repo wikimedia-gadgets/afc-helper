@@ -1654,16 +1654,15 @@
 		 *    3) {boolean} alreadyOnPage
 		 * @param {boolean} alreadyHasWPBio
 		 * @param {null} existingWPBioTemplateName
-		 * @return {Object} { {string} talkText, {number} countOfWikiProjectsAdded, {number} countOfWikiProjectsRemoved }
+		 * @return {Object}
+		 *    1) {string} talkText
+		 *    2) {number} wikiProjectBannerCount
 		 */
 		addTalkPageBanners: function ( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName, existingWikiProjects, alreadyHasWPBio, existingWPBioTemplateName ) {
 			// build an array of all banners already on page
 			var bannerTemplates = 'wikiproject (?!banner)|football|oka';
 			var bannerTemplateRegEx = new RegExp( '{{(?:' + bannerTemplates + ')[^}]+}}', 'gi' );
 			var banners = talkText.match( bannerTemplateRegEx ) || [];
-
-			// log the count of existing banners. used to calculate how many banners added and removed in the edit summary
-			var originalBannerCount = banners.length;
 
 			// delete all banners already on page
 			banners.forEach( function ( v ) {
@@ -1684,8 +1683,6 @@
 				( revId ? '|oldid=' + revId : '' ) +
 				'}}'
 			);
-			// AFCH doesn't count the AFC banner, biography banner, and disambiguation banner towards the "added banners" count in the edit summary
-			originalBannerCount++;
 
 			// delete existing biography banner. when accepting, reviewer is forced to choose if it's a biography or not, so we'll add (or not add) our own biography banner later
 			banners = banners.filter( function ( value ) {
@@ -1700,13 +1697,11 @@
 					'|listas=' + subjectName +
 					'}}'
 				);
-				originalBannerCount++;
 			}
 
 			// add disambiguation banner to array
 			if ( newAssessment === 'disambig' ) {
 				banners.push( '{{WikiProject Disambiguation}}' );
-				originalBannerCount++;
 			}
 
 			// add banners selected in UI to array
@@ -1741,11 +1736,8 @@
 			return {
 				// what to write to the talk page
 				talkText: talkText,
-				// used in edit summary. the -1 is because the AFC banner should be ignored
-				countOfWikiProjectsAdded: banners.length - originalBannerCount,
-				countOfWikiProjectsRemoved: 0,
 				// used by unit tests
-				countOfWikiProjects: banners.length
+				wikiProjectBannerCount: banners.length
 			};
 		},
 

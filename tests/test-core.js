@@ -139,9 +139,7 @@ describe( 'AFCH.addTalkPageBanners', function () {
 {{subst:WPAFC/article|oldid=592485}}
 }}`
 		);
-		expect( output.countOfWikiProjectsAdded ).toBe( 0 );
-		expect( output.countOfWikiProjectsRemoved ).toBe( 0 );
-		expect( output.countOfWikiProjects ).toBe( 1 );
+		expect( output.wikiProjectBannerCount ).toBe( 1 );
 	} );
 
 	it( 'talk page has existing sections', function () {
@@ -166,9 +164,7 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 == Hello ==
 I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="color:blue">'''Novem Linguae'''</span>]] <small>([[User talk:Novem Linguae|talk]])</small> 20:22, 10 April 2024 (UTC)`
 		);
-		expect( output.countOfWikiProjectsAdded ).toBe( 0 );
-		expect( output.countOfWikiProjectsRemoved ).toBe( 0 );
-		expect( output.countOfWikiProjects ).toBe( 1 );
+		expect( output.wikiProjectBannerCount ).toBe( 1 );
 	} );
 
 	it( 'talk page has existing templates, WikiProject banners on top', function () {
@@ -193,9 +189,7 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 }}
 {{translated page|ar|بحيرة كناو|version=|small=no|insertversion=|section=}}`
 		);
-		expect( output.countOfWikiProjectsAdded ).toBe( 0 );
-		expect( output.countOfWikiProjectsRemoved ).toBe( 0 );
-		expect( output.countOfWikiProjects ).toBe( 2 );
+		expect( output.wikiProjectBannerCount ).toBe( 2 );
 	} );
 
 	// FIXME: we probably need to write code that cuts every existing WikiProject banner template and pastes it at the top of the page
@@ -221,9 +215,7 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 }}
 {{translated page|ar|بحيرة كناو|version=|small=no|insertversion=|section=}}`
 		);
-		expect( output.countOfWikiProjectsAdded ).toBe( 0 );
-		expect( output.countOfWikiProjectsRemoved ).toBe( 0 );
-		expect( output.countOfWikiProjects ).toBe( 2 );
+		expect( output.wikiProjectBannerCount ).toBe( 2 );
 	} );
 
 	it( '|class= is removed from existing banners', function () {
@@ -245,9 +237,7 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 {{subst:WPAFC/article|oldid=592485}}
 }}`
 		);
-		expect( output.countOfWikiProjectsAdded ).toBe( 0 );
-		expect( output.countOfWikiProjectsRemoved ).toBe( 0 );
-		expect( output.countOfWikiProjects ).toBe( 2 );
+		expect( output.wikiProjectBannerCount ).toBe( 2 );
 	} );
 
 	it( 'talk page has existing WikiProject banners', function () {
@@ -289,9 +279,7 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 {{subst:WPAFC/article|oldid=592507}}
 }}`
 		);
-		expect( output.countOfWikiProjectsAdded ).toBe( 0 );
-		expect( output.countOfWikiProjectsRemoved ).toBe( 0 );
-		expect( output.countOfWikiProjects ).toBe( 4 );
+		expect( output.wikiProjectBannerCount ).toBe( 4 );
 	} );
 
 	it( 'talk page has existing WikiProject banner shell and banners', function () {
@@ -335,9 +323,7 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 {{subst:WPAFC/article|oldid=592507}}
 }}`
 		);
-		expect( output.countOfWikiProjectsAdded ).toBe( 0 );
-		expect( output.countOfWikiProjectsRemoved ).toBe( 0 );
-		expect( output.countOfWikiProjects ).toBe( 4 );
+		expect( output.wikiProjectBannerCount ).toBe( 4 );
 	} );
 
 	it( 'talk page has existing WikiProject banner shell and banners, and reviewer adds more banners', function () {
@@ -371,9 +357,7 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 {{WikiProject Romania}}
 }}`
 		);
-		expect( output.countOfWikiProjectsAdded ).toBe( 1 );
-		expect( output.countOfWikiProjectsRemoved ).toBe( 0 );
-		expect( output.countOfWikiProjects ).toBe( 6 );
+		expect( output.wikiProjectBannerCount ).toBe( 6 );
 	} );
 
 	// FIXME
@@ -417,9 +401,7 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 {{subst:WPAFC/article|oldid=592507}}
 }}`
 		);
-		expect( output.countOfWikiProjectsAdded ).toBe( 0 );
-		expect( output.countOfWikiProjectsRemoved ).toBe( 1 );
-		expect( output.countOfWikiProjects ).toBe( 4 );
+		expect( output.wikiProjectBannerCount ).toBe( 4 );
 	} );
 
 	it( 'accept form is a biography with all fields filled in', function () {
@@ -442,9 +424,7 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 {{WikiProject Alabama}}
 }}`
 		);
-		expect( output.countOfWikiProjectsAdded ).toBe( 2 );
-		expect( output.countOfWikiProjectsRemoved ).toBe( 0 );
-		expect( output.countOfWikiProjects ).toBe( 4 );
+		expect( output.wikiProjectBannerCount ).toBe( 4 );
 	} );
 
 	it( 'lifeStatus = dead', function () {
@@ -465,9 +445,7 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 {{WikiProject Biography|living=no|listas=}}
 }}`
 		);
-		expect( output.countOfWikiProjectsAdded ).toBe( 0 );
-		expect( output.countOfWikiProjectsRemoved ).toBe( 0 );
-		expect( output.countOfWikiProjects ).toBe( 2 );
+		expect( output.wikiProjectBannerCount ).toBe( 2 );
 	} );
 
 	it.skip( 'talk page has {{wikiproject biography}}, and user selects that it\'s not a biography, so should remove {{wikiproject biography}}', function () {
@@ -502,9 +480,7 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 {{subst:WPAFC/article|oldid=592496}}
 }}`
 		);
-		expect( output.countOfWikiProjectsAdded ).toBe( 0 );
-		expect( output.countOfWikiProjectsRemoved ).toBe( 0 );
-		expect( output.countOfWikiProjects ).toBe( 3 );
+		expect( output.wikiProjectBannerCount ).toBe( 3 );
 	} );
 
 	it( 'user selects class = disambiguation', function () {
@@ -525,9 +501,7 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 {{WikiProject Disambiguation}}
 }}`
 		);
-		expect( output.countOfWikiProjectsAdded ).toBe( 1 );
-		expect( output.countOfWikiProjectsRemoved ).toBe( 0 );
-		expect( output.countOfWikiProjects ).toBe( 2 );
+		expect( output.wikiProjectBannerCount ).toBe( 2 );
 	} );
 } );
 
