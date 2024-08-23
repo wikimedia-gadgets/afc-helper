@@ -173,8 +173,8 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		var output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
 		expect( output ).toBe(
 `{{WikiProject banner shell|
-{{WikiProject Women}}
 {{subst:WPAFC/article|oldid=592485}}
+{{WikiProject Women}}
 }}
 {{translated page|ar|بحيرة كناو|version=|small=no|insertversion=|section=}}`
 		);
@@ -194,8 +194,8 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		var output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
 		expect( output ).toBe(
 `{{WikiProject banner shell|
-{{WikiProject Women}}
 {{subst:WPAFC/article|oldid=592485}}
+{{WikiProject Women}}
 }}
 {{translated page|ar|بحيرة كناو|version=|small=no|insertversion=|section=}}`
 		);
@@ -213,8 +213,8 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		var output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
 		expect( output ).toBe(
 `{{WikiProject banner shell|
-{{WikiProject Women}}
 {{subst:WPAFC/article|oldid=592485}}
+{{WikiProject Women}}
 }}`
 		);
 	} );
@@ -233,10 +233,10 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		var output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
 		expect( output ).toBe(
 `{{WikiProject banner shell|
+{{subst:WPAFC/article|oldid=592507}}
 {{WikiProject Women}}
 {{WikiProject Women's sport}}
 {{WikiProject Somalia}}
-{{subst:WPAFC/article|oldid=592507}}
 }}`
 		);
 	} );
@@ -257,10 +257,10 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		var output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
 		expect( output ).toBe(
 `{{WikiProject banner shell|
+{{subst:WPAFC/article|oldid=592507}}
 {{WikiProject Women}}
 {{WikiProject Women's sport}}
 {{WikiProject Somalia}}
-{{subst:WPAFC/article|oldid=592507}}
 }}`
 		);
 	} );
@@ -282,10 +282,10 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		var output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
 		expect( output ).toBe(
 `{{WikiProject banner shell|
+{{subst:WPAFC/article|oldid=592507}}
 {{WikiProject Film}}
 {{WikiProject Women}}
 {{WikiProject Television}}
-{{subst:WPAFC/article|oldid=592507}}
 {{WikiProject Biography|living=yes|listas=Lazarut, Raluca}}
 {{WikiProject Romania}}
 }}`
@@ -308,10 +308,10 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		var output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
 		expect( output ).toBe(
 `{{WikiProject banner shell|
+{{subst:WPAFC/article|oldid=592507}}
 {{WikiProject Women}}
 {{WikiProject Women's sport}}
 {{WikiProject Somalia}}
-{{subst:WPAFC/article|oldid=592507}}
 }}`
 		);
 	} );
@@ -366,8 +366,8 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		var output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
 		expect( output ).toBe(
 `{{WikiProject banner shell|
-{{WikiProject Somalia}}
 {{subst:WPAFC/article|oldid=592496}}
+{{WikiProject Somalia}}
 }}`
 		);
 	} );
@@ -401,8 +401,8 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		var output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
 		expect( output ).toBe(
 `{{WikiProject banner shell|
-{{OKA}}
 {{subst:WPAFC/article|oldid=592681}}
+{{OKA}}
 }}
 {{translated page|pl|Katowice Załęże|version=|small=no|insertversion=|section=}}`
 		);
