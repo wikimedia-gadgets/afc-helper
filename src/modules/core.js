@@ -1653,7 +1653,7 @@
 		addTalkPageBanners: function ( wikicode, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName ) {
 			// build an array of all banners already on page
 			var bannerTemplates = 'wikiproject (?!banner)|football|oka';
-			var bannerTemplateRegEx = new RegExp( '{{(?:' + bannerTemplates + ')[^}]+}}', 'gi' );
+			var bannerTemplateRegEx = new RegExp( '{{(?:' + bannerTemplates + ')[^}]*}}', 'gi' );
 			var banners = wikicode.match( bannerTemplateRegEx ) || [];
 
 			// delete all banners already on page

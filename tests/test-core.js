@@ -388,6 +388,25 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 }}`
 		);
 	} );
+
+	it( 'has {{OKA}} banner and puts it in the banner shell', function () {
+		var wikicode =
+`{{translated page|pl|Katowice Załęże|version=|small=no|insertversion=|section=}}{{OKA}}`;
+		var newAssessment = '';
+		var revId = 592681;
+		var isBiography = false;
+		var newWikiProjects = [];
+		var lifeStatus = 'unknown';
+		var subjectName = '';
+		var output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
+		expect( output ).toBe(
+`{{WikiProject banner shell|
+{{OKA}}
+{{subst:WPAFC/article|oldid=592681}}
+}}
+{{translated page|pl|Katowice Załęże|version=|small=no|insertversion=|section=}}`
+		);
+	} );
 } );
 
 describe( 'AFCH.removeDuplicateBanners', function () {
