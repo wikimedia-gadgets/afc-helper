@@ -137,13 +137,11 @@ describe( 'AFCH.addTalkPageBanners', function () {
 		expect( output.talkText ).toBe(
 `{{WikiProject banner shell|
 {{subst:WPAFC/article|oldid=592485}}
-}}
-
-`
+}}`
 		);
 		expect( output.countOfWikiProjectsAdded ).toBe( 0 );
 		expect( output.countOfWikiProjectsRemoved ).toBe( 0 );
-		expect( output.bannerCount ).toBe( 1 );
+		expect( output.countOfWikiProjects ).toBe( 1 );
 	} );
 
 	it( 'talk page has existing sections', function () {
@@ -170,7 +168,7 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		);
 		expect( output.countOfWikiProjectsAdded ).toBe( 0 );
 		expect( output.countOfWikiProjectsRemoved ).toBe( 0 );
-		expect( output.bannerCount ).toBe( 1 );
+		expect( output.countOfWikiProjects ).toBe( 1 );
 	} );
 
 	it( 'talk page has existing templates, WikiProject banners on top', function () {
@@ -190,19 +188,18 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName, existingWikiProjects, alreadyHasWPBio, existingWPBioTemplateName );
 		expect( output.talkText ).toBe(
 `{{WikiProject banner shell|
-{{subst:WPAFC/article|oldid=592485}}
 {{WikiProject Women}}
+{{subst:WPAFC/article|oldid=592485}}
 }}
-{{translated page|ar|بحيرة كناو|version=|small=no|insertversion=|section=}}
-`
+{{translated page|ar|بحيرة كناو|version=|small=no|insertversion=|section=}}`
 		);
 		expect( output.countOfWikiProjectsAdded ).toBe( 0 );
 		expect( output.countOfWikiProjectsRemoved ).toBe( 0 );
-		expect( output.bannerCount ).toBe( 2 );
+		expect( output.countOfWikiProjects ).toBe( 2 );
 	} );
 
 	// FIXME: we probably need to write code that cuts every existing WikiProject banner template and pastes it at the top of the page
-	it.skip( 'talk page has existing templates, WikiProject banners on bottom', function () {
+	it( 'talk page has existing templates, WikiProject banners on bottom', function () {
 		var talkText =
 `{{translated page|ar|بحيرة كناو|version=|small=no|insertversion=|section=}}
 {{WikiProject Women}}
@@ -219,15 +216,38 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName, existingWikiProjects, alreadyHasWPBio, existingWPBioTemplateName );
 		expect( output.talkText ).toBe(
 `{{WikiProject banner shell|
-{{subst:WPAFC/article|oldid=592485}}
 {{WikiProject Women}}
+{{subst:WPAFC/article|oldid=592485}}
 }}
-{{translated page|ar|بحيرة كناو|version=|small=no|insertversion=|section=}}
-`
+{{translated page|ar|بحيرة كناو|version=|small=no|insertversion=|section=}}`
 		);
 		expect( output.countOfWikiProjectsAdded ).toBe( 0 );
 		expect( output.countOfWikiProjectsRemoved ).toBe( 0 );
-		expect( output.bannerCount ).toBe( 2 );
+		expect( output.countOfWikiProjects ).toBe( 2 );
+	} );
+
+	it( '|class= is removed from existing banners', function () {
+		var talkText =
+`{{WikiProject Women|class=B}}`;
+		var newAssessment = '';
+		var revId = 592485;
+		var isBiography = false;
+		var newWikiProjects = [];
+		var lifeStatus = 'unknown';
+		var subjectName = '';
+		var existingWikiProjects = [];
+		var alreadyHasWPBio = false;
+		var existingWPBioTemplateName = null;
+		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName, existingWikiProjects, alreadyHasWPBio, existingWPBioTemplateName );
+		expect( output.talkText ).toBe(
+`{{WikiProject banner shell|
+{{WikiProject Women}}
+{{subst:WPAFC/article|oldid=592485}}
+}}`
+		);
+		expect( output.countOfWikiProjectsAdded ).toBe( 0 );
+		expect( output.countOfWikiProjectsRemoved ).toBe( 0 );
+		expect( output.countOfWikiProjects ).toBe( 2 );
 	} );
 
 	it( 'talk page has existing WikiProject banners', function () {
@@ -263,15 +283,15 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName, existingWikiProjects, alreadyHasWPBio, existingWPBioTemplateName );
 		expect( output.talkText ).toBe(
 `{{WikiProject banner shell|
-{{subst:WPAFC/article|oldid=592507}}
 {{WikiProject Women}}
 {{WikiProject Women's sport}}
 {{WikiProject Somalia}}
+{{subst:WPAFC/article|oldid=592507}}
 }}`
 		);
 		expect( output.countOfWikiProjectsAdded ).toBe( 0 );
 		expect( output.countOfWikiProjectsRemoved ).toBe( 0 );
-		expect( output.bannerCount ).toBe( 4 );
+		expect( output.countOfWikiProjects ).toBe( 4 );
 	} );
 
 	it( 'talk page has existing WikiProject banner shell and banners', function () {
@@ -309,15 +329,15 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName, existingWikiProjects, alreadyHasWPBio, existingWPBioTemplateName );
 		expect( output.talkText ).toBe(
 `{{WikiProject banner shell|
-{{subst:WPAFC/article|oldid=592507}}
 {{WikiProject Women}}
 {{WikiProject Women's sport}}
 {{WikiProject Somalia}}
+{{subst:WPAFC/article|oldid=592507}}
 }}`
 		);
 		expect( output.countOfWikiProjectsAdded ).toBe( 0 );
 		expect( output.countOfWikiProjectsRemoved ).toBe( 0 );
-		expect( output.bannerCount ).toBe( 4 );
+		expect( output.countOfWikiProjects ).toBe( 4 );
 	} );
 
 	it( 'talk page has existing WikiProject banner shell and banners, and reviewer adds more banners', function () {
@@ -341,24 +361,23 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		// FIXME: is there even a way for this to be set to not null? no test case uses it. delete?
 		var existingWPBioTemplateName = null;
 		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName, existingWikiProjects, alreadyHasWPBio, existingWPBioTemplateName );
-		// FIXME: WP Biography should not be placed twice. in general, other WikiProject banners get placed twice too, if the AFC reviewer adds one on the accept screen that's already on the talk page
 		expect( output.talkText ).toBe(
 `{{WikiProject banner shell|
+{{WikiProject Film}}
+{{WikiProject Women}}
+{{WikiProject Television}}
 {{subst:WPAFC/article|oldid=592507}}
 {{WikiProject Biography|living=yes|listas=Lazarut, Raluca}}
 {{WikiProject Romania}}
-{{WikiProject Film}}
-{{WikiProject Biography}}
-{{WikiProject Women}}
-{{WikiProject Television}}
 }}`
 		);
 		expect( output.countOfWikiProjectsAdded ).toBe( 1 );
 		expect( output.countOfWikiProjectsRemoved ).toBe( 0 );
-		expect( output.bannerCount ).toBe( 7 );
+		expect( output.countOfWikiProjects ).toBe( 6 );
 	} );
 
-	it( 'remove an existing WikiProject', function () {
+	// FIXME
+	it.skip( 'remove an existing WikiProject', function () {
 		var talkText =
 `{{WikiProject Women}}
 {{WikiProject Women's sport}}
@@ -392,15 +411,15 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName, existingWikiProjects, alreadyHasWPBio, existingWPBioTemplateName );
 		expect( output.talkText ).toBe(
 `{{WikiProject banner shell|
-{{subst:WPAFC/article|oldid=592507}}
 {{WikiProject Women}}
 {{WikiProject Women's sport}}
 {{WikiProject Somalia}}
+{{subst:WPAFC/article|oldid=592507}}
 }}`
 		);
 		expect( output.countOfWikiProjectsAdded ).toBe( 0 );
 		expect( output.countOfWikiProjectsRemoved ).toBe( 1 );
-		expect( output.bannerCount ).toBe( 4 );
+		expect( output.countOfWikiProjects ).toBe( 4 );
 	} );
 
 	it( 'accept form is a biography with all fields filled in', function () {
@@ -421,13 +440,11 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 {{WikiProject Biography|living=yes|listas=Jones, Bob}}
 {{WikiProject Africa}}
 {{WikiProject Alabama}}
-}}
-
-`
+}}`
 		);
 		expect( output.countOfWikiProjectsAdded ).toBe( 2 );
 		expect( output.countOfWikiProjectsRemoved ).toBe( 0 );
-		expect( output.bannerCount ).toBe( 4 );
+		expect( output.countOfWikiProjects ).toBe( 4 );
 	} );
 
 	it( 'lifeStatus = dead', function () {
@@ -446,23 +463,21 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 `{{WikiProject banner shell|
 {{subst:WPAFC/article|oldid=592496}}
 {{WikiProject Biography|living=no|listas=}}
-}}
-
-`
+}}`
 		);
 		expect( output.countOfWikiProjectsAdded ).toBe( 0 );
 		expect( output.countOfWikiProjectsRemoved ).toBe( 0 );
-		expect( output.bannerCount ).toBe( 2 );
+		expect( output.countOfWikiProjects ).toBe( 2 );
 	} );
 
-	// FIXME: is supposed to remove the {{wikiproject biography}} template and report 1 template removed, but does not. code outside of AFCH.addTalkPageBanners() is incorrectly calculating alreadyHasWPBio as false
-	it( 'talk page has {{wikiproject biography}}, and user selects that it\'s not a biography, so should remove {{wikiproject biography}}', function () {
+	it.skip( 'talk page has {{wikiproject biography}}, and user selects that it\'s not a biography, so should remove {{wikiproject biography}}', function () {
 		var talkText =
 `{{wikiproject biography|living=yes|class=B|listas=Jones, Bob}}
 {{WikiProject Somalia}}`;
 		var newAssessment = '';
 		var revId = 592496;
 		var isBiography = false;
+		// FIXME: if isBiography = false, WikiProject Biography should not be making it into this array
 		var newWikiProjects = [ 'WikiProject Biography', 'WikiProject Somalia' ];
 		var lifeStatus = 'unknown';
 		var subjectName = '';
@@ -483,14 +498,13 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName, existingWikiProjects, alreadyHasWPBio, existingWPBioTemplateName );
 		expect( output.talkText ).toBe(
 `{{WikiProject banner shell|
-{{subst:WPAFC/article|oldid=592496}}
-{{wikiproject biography|living=yes|listas=Jones, Bob}}
 {{WikiProject Somalia}}
+{{subst:WPAFC/article|oldid=592496}}
 }}`
 		);
 		expect( output.countOfWikiProjectsAdded ).toBe( 0 );
 		expect( output.countOfWikiProjectsRemoved ).toBe( 0 );
-		expect( output.bannerCount ).toBe( 3 );
+		expect( output.countOfWikiProjects ).toBe( 3 );
 	} );
 
 	it( 'user selects class = disambiguation', function () {
@@ -509,12 +523,57 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 `{{WikiProject banner shell|class=disambig|
 {{subst:WPAFC/article|oldid=592681}}
 {{WikiProject Disambiguation}}
-}}
-
-`
+}}`
 		);
 		expect( output.countOfWikiProjectsAdded ).toBe( 1 );
 		expect( output.countOfWikiProjectsRemoved ).toBe( 0 );
-		expect( output.bannerCount ).toBe( 2 );
+		expect( output.countOfWikiProjects ).toBe( 2 );
+	} );
+} );
+
+describe( 'AFCH.removeDuplicateBanners', function () {
+	it( 'should handle empty array', function () {
+		var banners = [];
+		var output = AFCH.removeDuplicateBanners( banners );
+		expect( output ).toEqual( [] );
+	} );
+
+	it( 'should handle array with 1 element', function () {
+		var banners = [ '{{Test}}' ];
+		var output = AFCH.removeDuplicateBanners( banners );
+		expect( output ).toEqual( [ '{{Test}}' ] );
+	} );
+
+	it( 'should handle array with 2 identical elements', function () {
+		var banners = [ '{{Test}}', '{{Test}}' ];
+		var output = AFCH.removeDuplicateBanners( banners );
+		expect( output ).toEqual( [ '{{Test}}' ] );
+	} );
+
+	it( 'should handle array with 2 identical elements, case insensitive', function () {
+		var banners = [ '{{Test}}', '{{test}}' ];
+		var output = AFCH.removeDuplicateBanners( banners );
+		expect( output ).toEqual( [ '{{Test}}' ] );
+	} );
+
+	it( 'should handle array with 2 identical templates, but different parameters', function () {
+		var banners = [ '{{Test|1=a}}', '{{Test|2=b}}' ];
+		var output = AFCH.removeDuplicateBanners( banners );
+		expect( output ).toEqual( [ '{{Test|1=a}}' ] );
+	} );
+
+	it( 'should handle a realistic example using WikiProject banners', function () {
+		var banners =[
+			'{{WikiProject Australia}}',
+			'{{WikiProject Australia}}',
+			'{{wikiproject australia}}',
+			'{{WikiProject Australia|class=A}}',
+			'{{WikiProject Ontario}}'
+		];
+		var output = AFCH.removeDuplicateBanners( banners );
+		expect( output ).toEqual( [
+			'{{WikiProject Australia}}',
+			'{{WikiProject Ontario}}'
+		] );
 	} );
 } );

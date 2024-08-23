@@ -1648,115 +1648,124 @@
 		 * @param {Array} newWikiProjects Value of the "Add WikiPrjects" part of the form. The <input> is a chips interface called jquery.chosen. Note that if there are existing WikiProject banners on the page, the form will auto-add those to the "Add WikiProjects" part of the form when it first loads.
 		 * @param {string} lifeStatus Value of "Is the subject alive?" dropdown list ("unknown", "living", "dead")
 		 * @param {string} subjectName Value of the "Subject name (last, first)" text input, or "" if blank
-		 * @param {Array<Object>} existingWikiProjects An array of associative arrays. The associative arrays contain the keys {string} displayName (example: Somalia), {string} templateName (example: WikiProject Somalia), and {boolean} alreadyOnPage
+		 * @param {Array<Object>} existingWikiProjects An array of associative arrays. The associative arrays contain the keys:
+		 *    1) {string} displayName (example: Somalia),
+		 *    2) {string} templateName (example: WikiProject Somalia),
+		 *    3) {boolean} alreadyOnPage
 		 * @param {boolean} alreadyHasWPBio
 		 * @param {null} existingWPBioTemplateName
 		 * @return {Object} { {string} talkText, {number} countOfWikiProjectsAdded, {number} countOfWikiProjectsRemoved }
 		 */
 		addTalkPageBanners: function ( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName, existingWikiProjects, alreadyHasWPBio, existingWPBioTemplateName ) {
-			var talkTextPrefix = '';
+			// build an array of all banners already on page
+			var bannerTemplates = 'wikiproject (?!banner)|football|oka';
+			var bannerTemplateRegEx = new RegExp( '{{(?:' + bannerTemplates + ')[^}]+}}', 'gi' );
+			var banners = talkText.match( bannerTemplateRegEx ) || [];
 
-			// Add the AFC banner
-			talkTextPrefix += '{{subst:WPAFC/article|class=' + newAssessment +
-				( revId ? '|oldid=' + revId : '' ) + '}}';
+			// log the count of existing banners. used to calculate how many banners added and removed in the edit summary
+			var originalBannerCount = banners.length;
 
-			// Add biography banner if specified
-			if ( isBiography ) {
-				// Ensure we don't have duplicate biography tags
-				AFCH.removeFromArray( newWikiProjects, 'WikiProject Biography' );
-
-				talkTextPrefix += ( '\n{{WikiProject Biography|living=' +
-					( lifeStatus !== 'unknown' ? ( lifeStatus === 'living' ? 'yes' : 'no' ) : '' ) +
-					'|class=' + newAssessment + '|listas=' + subjectName + '}}' );
-			}
-
-			// Add disambiguation banner if needed
-			if ( newAssessment === 'disambig' &&
-				$.inArray( 'WikiProject Disambiguation', newWikiProjects ) === -1 ) {
-				newWikiProjects.push( 'WikiProject Disambiguation' );
-			}
-
-			// Add and remove WikiProjects
-			/** @member {Array} */
-			var wikiProjectsToAdd = newWikiProjects.filter( function ( newTemplateName ) {
-				return !existingWikiProjects.some( function ( existingTplObj ) {
-					return existingTplObj.templateName === newTemplateName;
-				} );
-			} );
-			/** @member {Array} */
-			var wikiProjectsToRemove = existingWikiProjects.filter( function ( existingTplObj ) {
-				return !newWikiProjects.some( function ( newTemplateName ) {
-					return existingTplObj.templateName === newTemplateName;
-				} );
-			} ).map( function ( templateObj ) {
-				return templateObj.realTemplateName || templateObj.templateName;
-			} );
-			if ( alreadyHasWPBio && !isBiography ) {
-				wikiProjectsToRemove.push( existingWPBioTemplateName || 'wikiproject biography' );
-			}
-
-			$.each( wikiProjectsToAdd, function ( _index, templateName ) {
-				talkTextPrefix += '\n{{' + templateName + '|class=' + newAssessment + '}}';
-			} );
-			$.each( wikiProjectsToRemove, function ( _index, templateName ) {
-				// Regex from https://stackoverflow.com/a/5306111/1757964
-				var sanitizedTemplateName = templateName.replace( /[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&' );
-				talkText = talkText.replace( new RegExp( '\\n?\\{\\{\\s*' + sanitizedTemplateName + '\\s*.+?\\}\\}', 'is' ), '' );
+			// delete all banners already on page
+			banners.forEach( function ( v ) {
+				talkText = talkText.replace( v, '' );
 			} );
 
-			// We prepend the text so that talk page content is not removed
-			// (e.g. pages in `Draft:` namespace with discussion)
-			talkText = talkTextPrefix + '\n\n' + talkText;
-
-			// If present, delete WikiProject banner shell. We'll re-add it later.
+			// delete shell already on page
 			var bannerShellTemplates = 'WikiProject banner shell|WikiProjectBanners|WikiProject Banners|WPB|WPBS|WikiProject cooperation shell|Wikiprojectbannershell|WikiProject Banner Shell|Wpb|WPBannerShell|Wpbs|Wikiprojectbanners|WP Banner Shell|WP banner shell|Bannershell|Wikiproject banner shell|WIkiProjectBanner Shell|WikiProjectBannerShell|WikiProject BannerShell|Coopshell|WikiprojectBannerShell|WikiProject Shell|Scope shell|Project shell|WikiProject shell|WikiProject banner|Wpbannershell|Multiple wikiprojects|Wikiproject banner holder|Project banner holder|WikiProject banner shell\\/test1|Article assessment|WikiProject bannershell';
-			var bannerShellDetectionRegex = new RegExp( '{{(?:' + bannerShellTemplates + ')[^\n]*\n', 'i' );
-			var hasBannerShell = talkText.match( bannerShellDetectionRegex );
-			var bannerShellWasDeleted = false;
-			if ( hasBannerShell ) {
-				talkText = talkText.replace( hasBannerShell, '' );
-				bannerShellWasDeleted = true;
+			var bannerShellRegEx = new RegExp( '{{(?:' + bannerShellTemplates + ')[^}]*}}', 'is' );
+			talkText = talkText.replace( bannerShellRegEx, '' );
+
+			// trim
+			talkText = talkText.trim();
+
+			// add AFC banner to array
+			banners.push(
+				'{{subst:WPAFC/article' +
+				( revId ? '|oldid=' + revId : '' ) +
+				'}}'
+			);
+			// AFCH doesn't count the AFC banner, biography banner, and disambiguation banner towards the "added banners" count in the edit summary
+			originalBannerCount++;
+
+			// delete existing biography banner. when accepting, reviewer is forced to choose if it's a biography or not, so we'll add (or not add) our own biography banner later
+			banners = banners.filter( function ( value ) {
+				return !value.match( /^{{WikiProject Biography/i );
+			} );
+
+			// add biography banner to array
+			if ( isBiography ) {
+				banners.push(
+					'{{WikiProject Biography|living=' +
+					( lifeStatus !== 'unknown' ? ( lifeStatus === 'living' ? 'yes' : 'no' ) : '' ) +
+					'|listas=' + subjectName +
+					'}}'
+				);
+				originalBannerCount++;
 			}
 
-			// Add WikiProject banner shell, always. This is easier than maintaining 2 code paths: a code path for 1 banner and a code path for 2+ banners.
-			var banners = talkText.match( /{{(?:wikiproject|subst:wpafc\/article|football|oka)[^}]+}}/gi );
-			// https://en.wikipedia.org/wiki/Special:WhatLinksHere?target=Template%3AWikiProject+banner+shell&namespace=&hidetrans=1&hidelinks=1
-			bannerShellDetectionRegex = new RegExp( '{{(?:' + bannerShellTemplates + ')', 'i' );
-			hasBannerShell = talkText.match( bannerShellDetectionRegex );
-			if ( banners.length >= 1 && !hasBannerShell ) {
-				var bannerShellStart = '{{WikiProject banner shell|';
-				var firstBanner = banners[ 0 ];
-				talkText = talkText.replace( firstBanner, bannerShellStart + '\n' + firstBanner );
-
-				// If we deleted the banner shell above, we didn't delete its closing }}. Skip adding it here. Just recycle it.
-				if ( !bannerShellWasDeleted ) {
-					var bannerShellEnd = '}}';
-					var lastBanner = banners.slice( -1 )[ 0 ];
-					talkText = talkText.replace( lastBanner, lastBanner + '\n' + bannerShellEnd );
-				}
+			// add disambiguation banner to array
+			if ( newAssessment === 'disambig' ) {
+				banners.push( '{{WikiProject Disambiguation}}' );
+				originalBannerCount++;
 			}
 
-			// Comply with [[WP:PIQA]]. Add the |class= only to the banner shell. Delete all other class parameters (e.g. from WikiProject banners)
-			hasBannerShell = talkText.match( bannerShellDetectionRegex );
-			if ( hasBannerShell ) {
-				// delete all |class= from the entire talk page
-				talkText = talkText.replace( /[\n|}]class\s*=\s*[^\n|}]*([\n|}])/g, '$1' );
-				// add |class= to the banner shell only
-				if ( newAssessment ) {
-					talkText = talkText.replace( bannerShellDetectionRegex, '$&|class=' + newAssessment );
-				}
+			// add banners selected in UI to array
+			for ( var key in newWikiProjects ) {
+				banners.push( '{{' + newWikiProjects[ key ] + '}}' );
 			}
 
-			// Remove extra line breaks between banners
-			talkText = talkText.replace( /\}\}\n{2,}\{\{/g, '}}\n{{' );
+			// remove duplicate banners, case insensitive
+			banners = AFCH.removeDuplicateBanners( banners );
+
+			// delete |class= from banners in array
+			banners = banners.map( function ( value ) {
+				return value.replace( /\s*\|\s*class\s*=\s*[^|}]*([\n|}])/, '$1' );
+			} );
+
+			// Convert array back to wikitext and append to top of talk page.
+			// Always add a shell even if it's just wrapping one banner, for code simplification reasons.
+			// Add |class= to shell.
+			talkText = '{{WikiProject banner shell' +
+				( newAssessment ? '|class=' + newAssessment : '' ) +
+				'|\n' +
+				banners.join( '\n' ) +
+				'\n}}\n' +
+				talkText;
+
+			// add an extra line break between the last template and the first heading
+			talkText = talkText.replace( /}}\n==/, '}}\n\n==' );
+
+			// trim. makes unit tests more stable
+			talkText = talkText.trim();
 
 			return {
+				// what to write to the talk page
 				talkText: talkText,
-				countOfWikiProjectsAdded: wikiProjectsToAdd.length,
-				countOfWikiProjectsRemoved: wikiProjectsToRemove.length,
-				// adding this param for unit tests, so we can test that the banner detection algorithm works
-				bannerCount: banners.length
+				// used in edit summary. the -1 is because the AFC banner should be ignored
+				countOfWikiProjectsAdded: banners.length - originalBannerCount,
+				countOfWikiProjectsRemoved: 0,
+				// used by unit tests
+				countOfWikiProjects: banners.length
 			};
+		},
+
+		/**
+		 * In an array of templates, remove duplicate templates, case insensitive.
+		 *
+		 * @param {Array} banners [ '{{WikiProject Australia}}', {{wikiproject australia}}', '{{WikiProject Australia|class=B}}' ]
+		 * @return {Array} banners [ '{{WikiProject Australia}}' ]
+		 */
+		removeDuplicateBanners: function ( banners ) {
+			var uniqueBanners = [];
+			var bannerMap = {};
+			banners.forEach( function ( banner ) {
+				var bannerKey = banner.toLowerCase().match( /{{[^|}]+/ )[ 0 ];
+				if ( !bannerMap[ bannerKey ] ) {
+					uniqueBanners.push( banner );
+					bannerMap[ bannerKey ] = true;
+				}
+			} );
+			return uniqueBanners;
 		},
 
 		/**
