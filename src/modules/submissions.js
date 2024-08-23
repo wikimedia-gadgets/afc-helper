@@ -2398,7 +2398,7 @@
 						data.subjectName
 					);
 
-					var summary = 'Placing [[Wikipedia:Articles for creation|Articles for creation]] banner, and possibly other banners';
+					var summary = 'Placing WikiProject banners';
 
 					if ( comments && comments.length > 0 ) {
 						talkText = talkText.trim() + '\n\n== Comments left by AfC reviewers ==\n' + comments.join( '\n\n' );
