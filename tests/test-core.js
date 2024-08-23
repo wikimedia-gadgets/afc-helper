@@ -3,7 +3,7 @@
  */
 
 /* eslint-env jest */
-/* eslint-disable indent */
+/* eslint-disable indent, quotes */
 
 require( './scaffold.js' );
 
@@ -435,7 +435,7 @@ describe( 'AFCH.removeDuplicateBanners', function () {
 	} );
 
 	it( 'should handle a realistic example using WikiProject banners', function () {
-		var banners =[
+		var banners = [
 			'{{WikiProject Australia}}',
 			'{{WikiProject Australia}}',
 			'{{wikiproject australia}}',
