@@ -1641,35 +1641,33 @@
 		},
 
 		/**
-		 * @param {string} talkText Wikitext of the draft talk page
+		 * @param {string} wikicode Wikitext of the draft talk page
 		 * @param {string} newAssessment Value of "Article assessment" dropdown list, or "" if blank
 		 * @param {number} revId Revision ID of the draft that is being accepted
 		 * @param {boolean} isBiography Value of the "Is the article a biography?" check box
 		 * @param {Array} newWikiProjects Value of the "Add WikiPrjects" part of the form. The <input> is a chips interface called jquery.chosen. Note that if there are existing WikiProject banners on the page, the form will auto-add those to the "Add WikiProjects" part of the form when it first loads.
 		 * @param {string} lifeStatus Value of "Is the subject alive?" dropdown list ("unknown", "living", "dead")
 		 * @param {string} subjectName Value of the "Subject name (last, first)" text input, or "" if blank
-		 * @return {Object}
-		 *    1) {string} talkText
-		 *    2) {number} wikiProjectBannerCount
+		 * @return {Object} wikicode
 		 */
-		addTalkPageBanners: function ( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName ) {
+		addTalkPageBanners: function ( wikicode, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName ) {
 			// build an array of all banners already on page
 			var bannerTemplates = 'wikiproject (?!banner)|football|oka';
 			var bannerTemplateRegEx = new RegExp( '{{(?:' + bannerTemplates + ')[^}]+}}', 'gi' );
-			var banners = talkText.match( bannerTemplateRegEx ) || [];
+			var banners = wikicode.match( bannerTemplateRegEx ) || [];
 
 			// delete all banners already on page
 			banners.forEach( function ( v ) {
-				talkText = talkText.replace( v, '' );
+				wikicode = wikicode.replace( v, '' );
 			} );
 
 			// delete shell already on page
 			var bannerShellTemplates = 'WikiProject banner shell|WikiProjectBanners|WikiProject Banners|WPB|WPBS|WikiProject cooperation shell|Wikiprojectbannershell|WikiProject Banner Shell|Wpb|WPBannerShell|Wpbs|Wikiprojectbanners|WP Banner Shell|WP banner shell|Bannershell|Wikiproject banner shell|WIkiProjectBanner Shell|WikiProjectBannerShell|WikiProject BannerShell|Coopshell|WikiprojectBannerShell|WikiProject Shell|Scope shell|Project shell|WikiProject shell|WikiProject banner|Wpbannershell|Multiple wikiprojects|Wikiproject banner holder|Project banner holder|WikiProject banner shell\\/test1|Article assessment|WikiProject bannershell';
 			var bannerShellRegEx = new RegExp( '{{(?:' + bannerShellTemplates + ')[^}]*}}', 'is' );
-			talkText = talkText.replace( bannerShellRegEx, '' );
+			wikicode = wikicode.replace( bannerShellRegEx, '' );
 
 			// trim. makes unit tests more stable
-			talkText = talkText.trim();
+			wikicode = wikicode.trim();
 
 			// add AFC banner to array
 			banners.push(
@@ -1714,25 +1712,20 @@
 			// Convert array back to wikitext and append to top of talk page.
 			// Always add a shell even if it's just wrapping one banner, for code simplification reasons.
 			// Add |class= to shell.
-			talkText = '{{WikiProject banner shell' +
+			wikicode = '{{WikiProject banner shell' +
 				( newAssessment ? '|class=' + newAssessment : '' ) +
 				'|\n' +
 				banners.join( '\n' ) +
 				'\n}}\n' +
-				talkText;
+				wikicode;
 
 			// add an extra line break between the last template and the first heading
-			talkText = talkText.replace( /}}\n==/, '}}\n\n==' );
+			wikicode = wikicode.replace( /}}\n==/, '}}\n\n==' );
 
 			// trim. makes unit tests more stable
-			talkText = talkText.trim();
+			wikicode = wikicode.trim();
 
-			return {
-				// what to write to the talk page
-				talkText: talkText,
-				// used by unit tests
-				wikiProjectBannerCount: banners.length
-			};
+			return wikicode;
 		},
 
 		/**

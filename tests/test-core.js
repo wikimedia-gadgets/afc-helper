@@ -123,24 +123,23 @@ describe( 'AFCH.removeEmptySectionAtEnd', function () {
 
 describe( 'AFCH.addTalkPageBanners', function () {
 	it( 'talk page is blank', function () {
-		var talkText = '';
+		var wikicode = '';
 		var newAssessment = '';
 		var revId = 592485;
 		var isBiography = false;
 		var newWikiProjects = [];
 		var lifeStatus = 'unknown';
 		var subjectName = '';
-		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
-		expect( output.talkText ).toBe(
+		var output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
+		expect( output ).toBe(
 `{{WikiProject banner shell|
 {{subst:WPAFC/article|oldid=592485}}
 }}`
 		);
-		expect( output.wikiProjectBannerCount ).toBe( 1 );
 	} );
 
 	it( 'talk page has existing sections', function () {
-		var talkText =
+		var wikicode =
 `== Hello ==
 I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="color:blue">'''Novem Linguae'''</span>]] <small>([[User talk:Novem Linguae|talk]])</small> 20:22, 10 April 2024 (UTC)`;
 		var newAssessment = '';
@@ -149,8 +148,8 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		var newWikiProjects = [];
 		var lifeStatus = 'unknown';
 		var subjectName = '';
-		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
-		expect( output.talkText ).toBe(
+		var output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
+		expect( output ).toBe(
 `{{WikiProject banner shell|
 {{subst:WPAFC/article|oldid=592485}}
 }}
@@ -158,11 +157,10 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 == Hello ==
 I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="color:blue">'''Novem Linguae'''</span>]] <small>([[User talk:Novem Linguae|talk]])</small> 20:22, 10 April 2024 (UTC)`
 		);
-		expect( output.wikiProjectBannerCount ).toBe( 1 );
 	} );
 
 	it( 'talk page has existing templates, WikiProject banners on top', function () {
-		var talkText =
+		var wikicode =
 `{{WikiProject Women}}
 {{translated page|ar|بحيرة كناو|version=|small=no|insertversion=|section=}}
 `;
@@ -172,19 +170,18 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		var newWikiProjects = [];
 		var lifeStatus = 'unknown';
 		var subjectName = '';
-		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
-		expect( output.talkText ).toBe(
+		var output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
+		expect( output ).toBe(
 `{{WikiProject banner shell|
 {{WikiProject Women}}
 {{subst:WPAFC/article|oldid=592485}}
 }}
 {{translated page|ar|بحيرة كناو|version=|small=no|insertversion=|section=}}`
 		);
-		expect( output.wikiProjectBannerCount ).toBe( 2 );
 	} );
 
 	it( 'talk page has existing templates, WikiProject banners on bottom', function () {
-		var talkText =
+		var wikicode =
 `{{translated page|ar|بحيرة كناو|version=|small=no|insertversion=|section=}}
 {{WikiProject Women}}
 `;
@@ -194,19 +191,18 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		var newWikiProjects = [];
 		var lifeStatus = 'unknown';
 		var subjectName = '';
-		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
-		expect( output.talkText ).toBe(
+		var output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
+		expect( output ).toBe(
 `{{WikiProject banner shell|
 {{WikiProject Women}}
 {{subst:WPAFC/article|oldid=592485}}
 }}
 {{translated page|ar|بحيرة كناو|version=|small=no|insertversion=|section=}}`
 		);
-		expect( output.wikiProjectBannerCount ).toBe( 2 );
 	} );
 
 	it( '|class= is removed from existing banners', function () {
-		var talkText =
+		var wikicode =
 `{{WikiProject Women|class=B}}`;
 		var newAssessment = '';
 		var revId = 592485;
@@ -214,18 +210,17 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		var newWikiProjects = [];
 		var lifeStatus = 'unknown';
 		var subjectName = '';
-		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
-		expect( output.talkText ).toBe(
+		var output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
+		expect( output ).toBe(
 `{{WikiProject banner shell|
 {{WikiProject Women}}
 {{subst:WPAFC/article|oldid=592485}}
 }}`
 		);
-		expect( output.wikiProjectBannerCount ).toBe( 2 );
 	} );
 
 	it( 'talk page has existing WikiProject banners', function () {
-		var talkText =
+		var wikicode =
 `{{WikiProject Women}}
 {{WikiProject Women's sport}}
 {{WikiProject Somalia}}`;
@@ -235,8 +230,8 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		var newWikiProjects = [ 'WikiProject Somalia', 'WikiProject Women', 'WikiProject Women\'s sport' ];
 		var lifeStatus = 'unknown';
 		var subjectName = '';
-		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
-		expect( output.talkText ).toBe(
+		var output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
+		expect( output ).toBe(
 `{{WikiProject banner shell|
 {{WikiProject Women}}
 {{WikiProject Women's sport}}
@@ -244,11 +239,10 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 {{subst:WPAFC/article|oldid=592507}}
 }}`
 		);
-		expect( output.wikiProjectBannerCount ).toBe( 4 );
 	} );
 
 	it( 'talk page has existing WikiProject banner shell and banners', function () {
-		var talkText =
+		var wikicode =
 `{{WikiProject banner shell|
 {{WikiProject Women}}
 {{WikiProject Women's sport}}
@@ -260,8 +254,8 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		var newWikiProjects = [ 'WikiProject Somalia', 'WikiProject Women', 'WikiProject Women\'s sport' ];
 		var lifeStatus = 'unknown';
 		var subjectName = '';
-		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
-		expect( output.talkText ).toBe(
+		var output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
+		expect( output ).toBe(
 `{{WikiProject banner shell|
 {{WikiProject Women}}
 {{WikiProject Women's sport}}
@@ -269,11 +263,10 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 {{subst:WPAFC/article|oldid=592507}}
 }}`
 		);
-		expect( output.wikiProjectBannerCount ).toBe( 4 );
 	} );
 
 	it( 'talk page has existing WikiProject banner shell and banners, and reviewer adds more banners', function () {
-		var talkText =
+		var wikicode =
 `{{WikiProject banner shell|
 {{WikiProject Film}}
 {{WikiProject Biography}}
@@ -286,8 +279,8 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		var newWikiProjects = [ 'WikiProject Romania' ];
 		var lifeStatus = 'living';
 		var subjectName = 'Lazarut, Raluca';
-		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
-		expect( output.talkText ).toBe(
+		var output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
+		expect( output ).toBe(
 `{{WikiProject banner shell|
 {{WikiProject Film}}
 {{WikiProject Women}}
@@ -297,12 +290,11 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 {{WikiProject Romania}}
 }}`
 		);
-		expect( output.wikiProjectBannerCount ).toBe( 6 );
 	} );
 
 	// FIXME
 	it.skip( 'remove an existing WikiProject', function () {
-		var talkText =
+		var wikicode =
 `{{WikiProject Women}}
 {{WikiProject Women's sport}}
 {{WikiProject Somalia}}`;
@@ -313,8 +305,8 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		var newWikiProjects = [ 'WikiProject Women', 'WikiProject Women\'s sport' ];
 		var lifeStatus = 'unknown';
 		var subjectName = '';
-		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
-		expect( output.talkText ).toBe(
+		var output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
+		expect( output ).toBe(
 `{{WikiProject banner shell|
 {{WikiProject Women}}
 {{WikiProject Women's sport}}
@@ -322,19 +314,18 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 {{subst:WPAFC/article|oldid=592507}}
 }}`
 		);
-		expect( output.wikiProjectBannerCount ).toBe( 4 );
 	} );
 
 	it( 'accept form is a biography with all fields filled in', function () {
-		var talkText = '';
+		var wikicode = '';
 		var newAssessment = 'B';
 		var revId = 592496;
 		var isBiography = true;
 		var newWikiProjects = [ 'WikiProject Africa', 'WikiProject Alabama' ];
 		var lifeStatus = 'living';
 		var subjectName = 'Jones, Bob';
-		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
-		expect( output.talkText ).toBe(
+		var output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
+		expect( output ).toBe(
 `{{WikiProject banner shell|class=B|
 {{subst:WPAFC/article|oldid=592496}}
 {{WikiProject Biography|living=yes|listas=Jones, Bob}}
@@ -342,29 +333,27 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 {{WikiProject Alabama}}
 }}`
 		);
-		expect( output.wikiProjectBannerCount ).toBe( 4 );
 	} );
 
 	it( 'lifeStatus = dead', function () {
-		var talkText = '';
+		var wikicode = '';
 		var newAssessment = '';
 		var revId = 592496;
 		var isBiography = true;
 		var newWikiProjects = [];
 		var lifeStatus = 'dead';
 		var subjectName = '';
-		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
-		expect( output.talkText ).toBe(
+		var output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
+		expect( output ).toBe(
 `{{WikiProject banner shell|
 {{subst:WPAFC/article|oldid=592496}}
 {{WikiProject Biography|living=no|listas=}}
 }}`
 		);
-		expect( output.wikiProjectBannerCount ).toBe( 2 );
 	} );
 
 	it.skip( 'talk page has {{wikiproject biography}}, and user selects that it\'s not a biography, so should remove {{wikiproject biography}}', function () {
-		var talkText =
+		var wikicode =
 `{{wikiproject biography|living=yes|class=B|listas=Jones, Bob}}
 {{WikiProject Somalia}}`;
 		var newAssessment = '';
@@ -374,32 +363,30 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		var newWikiProjects = [ 'WikiProject Biography', 'WikiProject Somalia' ];
 		var lifeStatus = 'unknown';
 		var subjectName = '';
-		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
-		expect( output.talkText ).toBe(
+		var output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
+		expect( output ).toBe(
 `{{WikiProject banner shell|
 {{WikiProject Somalia}}
 {{subst:WPAFC/article|oldid=592496}}
 }}`
 		);
-		expect( output.wikiProjectBannerCount ).toBe( 3 );
 	} );
 
 	it( 'user selects class = disambiguation', function () {
-		var talkText = '';
+		var wikicode = '';
 		var newAssessment = 'disambig';
 		var revId = 592681;
 		var isBiography = false;
 		var newWikiProjects = [];
 		var lifeStatus = 'unknown';
 		var subjectName = '';
-		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
-		expect( output.talkText ).toBe(
+		var output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
+		expect( output ).toBe(
 `{{WikiProject banner shell|class=disambig|
 {{subst:WPAFC/article|oldid=592681}}
 {{WikiProject Disambiguation}}
 }}`
 		);
-		expect( output.wikiProjectBannerCount ).toBe( 2 );
 	} );
 } );
 

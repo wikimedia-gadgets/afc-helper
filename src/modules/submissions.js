@@ -2388,7 +2388,7 @@
 				// ---------
 
 				talkPage.getText().done( function ( talkText ) {
-					var results = AFCH.addTalkPageBanners(
+					talkText = AFCH.addTalkPageBanners(
 						talkText,
 						data.newAssessment,
 						afchPage.additionalData.revId,
@@ -2397,7 +2397,6 @@
 						data.lifeStatus,
 						data.subjectName
 					);
-					talkText = results.talkText;
 
 					var summary = 'Placing [[Wikipedia:Articles for creation|Articles for creation]] banner, and possibly other banners';
 
