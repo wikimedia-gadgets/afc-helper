@@ -1713,9 +1713,10 @@
 			// Convert array back to wikitext and append to top of talk page.
 			// Always add a shell even if it's just wrapping one banner, for code simplification reasons.
 			// Add |class= to shell.
+			// Add |1=. Improves readability when lots of other parameters present.
 			wikicode = '{{WikiProject banner shell' +
 				( newAssessment ? '|class=' + newAssessment : '' ) +
-				'|\n' +
+				'|1=\n' +
 				banners.join( '\n' ) +
 				'\n}}\n' +
 				wikicode;
