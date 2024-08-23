@@ -2395,10 +2395,7 @@
 						data.isBiography,
 						data.newWikiProjects,
 						data.lifeStatus,
-						data.subjectName,
-						data.existingWikiProjects,
-						data.alreadyHasWPBio,
-						data.existingWPBioTemplateName
+						data.subjectName
 					);
 					talkText = results.talkText;
 

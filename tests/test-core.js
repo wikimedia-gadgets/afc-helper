@@ -130,10 +130,7 @@ describe( 'AFCH.addTalkPageBanners', function () {
 		var newWikiProjects = [];
 		var lifeStatus = 'unknown';
 		var subjectName = '';
-		var existingWikiProjects = [];
-		var alreadyHasWPBio = false;
-		var existingWPBioTemplateName = null;
-		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName, existingWikiProjects, alreadyHasWPBio, existingWPBioTemplateName );
+		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
 		expect( output.talkText ).toBe(
 `{{WikiProject banner shell|
 {{subst:WPAFC/article|oldid=592485}}
@@ -152,10 +149,7 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		var newWikiProjects = [];
 		var lifeStatus = 'unknown';
 		var subjectName = '';
-		var existingWikiProjects = [];
-		var alreadyHasWPBio = false;
-		var existingWPBioTemplateName = null;
-		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName, existingWikiProjects, alreadyHasWPBio, existingWPBioTemplateName );
+		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
 		expect( output.talkText ).toBe(
 `{{WikiProject banner shell|
 {{subst:WPAFC/article|oldid=592485}}
@@ -178,10 +172,7 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		var newWikiProjects = [];
 		var lifeStatus = 'unknown';
 		var subjectName = '';
-		var existingWikiProjects = [];
-		var alreadyHasWPBio = false;
-		var existingWPBioTemplateName = null;
-		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName, existingWikiProjects, alreadyHasWPBio, existingWPBioTemplateName );
+		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
 		expect( output.talkText ).toBe(
 `{{WikiProject banner shell|
 {{WikiProject Women}}
@@ -192,7 +183,6 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		expect( output.wikiProjectBannerCount ).toBe( 2 );
 	} );
 
-	// FIXME: we probably need to write code that cuts every existing WikiProject banner template and pastes it at the top of the page
 	it( 'talk page has existing templates, WikiProject banners on bottom', function () {
 		var talkText =
 `{{translated page|ar|بحيرة كناو|version=|small=no|insertversion=|section=}}
@@ -204,10 +194,7 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		var newWikiProjects = [];
 		var lifeStatus = 'unknown';
 		var subjectName = '';
-		var existingWikiProjects = [];
-		var alreadyHasWPBio = false;
-		var existingWPBioTemplateName = null;
-		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName, existingWikiProjects, alreadyHasWPBio, existingWPBioTemplateName );
+		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
 		expect( output.talkText ).toBe(
 `{{WikiProject banner shell|
 {{WikiProject Women}}
@@ -227,10 +214,7 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		var newWikiProjects = [];
 		var lifeStatus = 'unknown';
 		var subjectName = '';
-		var existingWikiProjects = [];
-		var alreadyHasWPBio = false;
-		var existingWPBioTemplateName = null;
-		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName, existingWikiProjects, alreadyHasWPBio, existingWPBioTemplateName );
+		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
 		expect( output.talkText ).toBe(
 `{{WikiProject banner shell|
 {{WikiProject Women}}
@@ -251,26 +235,7 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		var newWikiProjects = [ 'WikiProject Somalia', 'WikiProject Women', 'WikiProject Women\'s sport' ];
 		var lifeStatus = 'unknown';
 		var subjectName = '';
-		var existingWikiProjects = [
-			{
-				displayName: 'Somalia',
-				templateName: 'WikiProject Somalia',
-				alreadyOnPage: true
-			},
-			{
-				displayName: 'Women',
-				templateName: 'WikiProject Women',
-				alreadyOnPage: true
-			},
-			{
-				displayName: 'Women\'s sport',
-				templateName: 'WikiProject Women\'s sport',
-				alreadyOnPage: true
-			}
-		];
-		var alreadyHasWPBio = false;
-		var existingWPBioTemplateName = null;
-		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName, existingWikiProjects, alreadyHasWPBio, existingWPBioTemplateName );
+		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
 		expect( output.talkText ).toBe(
 `{{WikiProject banner shell|
 {{WikiProject Women}}
@@ -295,26 +260,7 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		var newWikiProjects = [ 'WikiProject Somalia', 'WikiProject Women', 'WikiProject Women\'s sport' ];
 		var lifeStatus = 'unknown';
 		var subjectName = '';
-		var existingWikiProjects = [
-			{
-				displayName: 'Somalia',
-				templateName: 'WikiProject Somalia',
-				alreadyOnPage: true
-			},
-			{
-				displayName: 'Women',
-				templateName: 'WikiProject Women',
-				alreadyOnPage: true
-			},
-			{
-				displayName: 'Women\'s sport',
-				templateName: 'WikiProject Women\'s sport',
-				alreadyOnPage: true
-			}
-		];
-		var alreadyHasWPBio = false;
-		var existingWPBioTemplateName = null;
-		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName, existingWikiProjects, alreadyHasWPBio, existingWPBioTemplateName );
+		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
 		expect( output.talkText ).toBe(
 `{{WikiProject banner shell|
 {{WikiProject Women}}
@@ -340,13 +286,7 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		var newWikiProjects = [ 'WikiProject Romania' ];
 		var lifeStatus = 'living';
 		var subjectName = 'Lazarut, Raluca';
-		// FIXME: existing WikiProject detection is broken. i don't think this is used to modify the draft talk wikicode in any way. but i do think it might be used to populate the existing WikiProject chips on the accept screen. for this test case, there were no chips, when there should have been 4 (film, biography, women, television).
-		var existingWikiProjects = [];
-		// FIXME: is there even a way for this to be set to true? no test case uses it. delete?
-		var alreadyHasWPBio = false;
-		// FIXME: is there even a way for this to be set to not null? no test case uses it. delete?
-		var existingWPBioTemplateName = null;
-		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName, existingWikiProjects, alreadyHasWPBio, existingWPBioTemplateName );
+		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
 		expect( output.talkText ).toBe(
 `{{WikiProject banner shell|
 {{WikiProject Film}}
@@ -373,26 +313,7 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		var newWikiProjects = [ 'WikiProject Women', 'WikiProject Women\'s sport' ];
 		var lifeStatus = 'unknown';
 		var subjectName = '';
-		var existingWikiProjects = [
-			{
-				displayName: 'Somalia',
-				templateName: 'WikiProject Somalia',
-				alreadyOnPage: true
-			},
-			{
-				displayName: 'Women',
-				templateName: 'WikiProject Women',
-				alreadyOnPage: true
-			},
-			{
-				displayName: 'Women\'s sport',
-				templateName: 'WikiProject Women\'s sport',
-				alreadyOnPage: true
-			}
-		];
-		var alreadyHasWPBio = false;
-		var existingWPBioTemplateName = null;
-		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName, existingWikiProjects, alreadyHasWPBio, existingWPBioTemplateName );
+		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
 		expect( output.talkText ).toBe(
 `{{WikiProject banner shell|
 {{WikiProject Women}}
@@ -412,10 +333,7 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		var newWikiProjects = [ 'WikiProject Africa', 'WikiProject Alabama' ];
 		var lifeStatus = 'living';
 		var subjectName = 'Jones, Bob';
-		var existingWikiProjects = [];
-		var alreadyHasWPBio = false;
-		var existingWPBioTemplateName = null;
-		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName, existingWikiProjects, alreadyHasWPBio, existingWPBioTemplateName );
+		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
 		expect( output.talkText ).toBe(
 `{{WikiProject banner shell|class=B|
 {{subst:WPAFC/article|oldid=592496}}
@@ -435,10 +353,7 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		var newWikiProjects = [];
 		var lifeStatus = 'dead';
 		var subjectName = '';
-		var existingWikiProjects = [];
-		var alreadyHasWPBio = false;
-		var existingWPBioTemplateName = null;
-		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName, existingWikiProjects, alreadyHasWPBio, existingWPBioTemplateName );
+		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
 		expect( output.talkText ).toBe(
 `{{WikiProject banner shell|
 {{subst:WPAFC/article|oldid=592496}}
@@ -459,21 +374,7 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		var newWikiProjects = [ 'WikiProject Biography', 'WikiProject Somalia' ];
 		var lifeStatus = 'unknown';
 		var subjectName = '';
-		var existingWikiProjects = [
-			{
-				displayName: 'Biography',
-				templateName: 'WikiProject Biography',
-				alreadyOnPage: true
-			},
-			{
-				displayName: 'Somalia',
-				templateName: 'WikiProject Somalia',
-				alreadyOnPage: true
-			}
-		];
-		var alreadyHasWPBio = false;
-		var existingWPBioTemplateName = null;
-		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName, existingWikiProjects, alreadyHasWPBio, existingWPBioTemplateName );
+		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
 		expect( output.talkText ).toBe(
 `{{WikiProject banner shell|
 {{WikiProject Somalia}}
@@ -491,10 +392,7 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		var newWikiProjects = [];
 		var lifeStatus = 'unknown';
 		var subjectName = '';
-		var existingWikiProjects = [];
-		var alreadyHasWPBio = false;
-		var existingWPBioTemplateName = null;
-		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName, existingWikiProjects, alreadyHasWPBio, existingWPBioTemplateName );
+		var output = AFCH.addTalkPageBanners( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
 		expect( output.talkText ).toBe(
 `{{WikiProject banner shell|class=disambig|
 {{subst:WPAFC/article|oldid=592681}}

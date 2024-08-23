@@ -1648,17 +1648,11 @@
 		 * @param {Array} newWikiProjects Value of the "Add WikiPrjects" part of the form. The <input> is a chips interface called jquery.chosen. Note that if there are existing WikiProject banners on the page, the form will auto-add those to the "Add WikiProjects" part of the form when it first loads.
 		 * @param {string} lifeStatus Value of "Is the subject alive?" dropdown list ("unknown", "living", "dead")
 		 * @param {string} subjectName Value of the "Subject name (last, first)" text input, or "" if blank
-		 * @param {Array<Object>} existingWikiProjects An array of associative arrays. The associative arrays contain the keys:
-		 *    1) {string} displayName (example: Somalia),
-		 *    2) {string} templateName (example: WikiProject Somalia),
-		 *    3) {boolean} alreadyOnPage
-		 * @param {boolean} alreadyHasWPBio
-		 * @param {null} existingWPBioTemplateName
 		 * @return {Object}
 		 *    1) {string} talkText
 		 *    2) {number} wikiProjectBannerCount
 		 */
-		addTalkPageBanners: function ( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName, existingWikiProjects, alreadyHasWPBio, existingWPBioTemplateName ) {
+		addTalkPageBanners: function ( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName ) {
 			// build an array of all banners already on page
 			var bannerTemplates = 'wikiproject (?!banner)|football|oka';
 			var bannerTemplateRegEx = new RegExp( '{{(?:' + bannerTemplates + ')[^}]+}}', 'gi' );
@@ -1674,7 +1668,7 @@
 			var bannerShellRegEx = new RegExp( '{{(?:' + bannerShellTemplates + ')[^}]*}}', 'is' );
 			talkText = talkText.replace( bannerShellRegEx, '' );
 
-			// trim
+			// trim. makes unit tests more stable
 			talkText = talkText.trim();
 
 			// add AFC banner to array
