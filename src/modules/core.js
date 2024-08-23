@@ -1669,8 +1669,9 @@
 			// trim. makes unit tests more stable
 			wikicode = wikicode.trim();
 
-			// add AFC banner to array
-			banners.push(
+			// Add AFC banner to array.
+			// Put at top for historical reasons. People are used to it being there.
+			banners.unshift(
 				'{{subst:WPAFC/article' +
 				( revId ? '|oldid=' + revId : '' ) +
 				'}}'
