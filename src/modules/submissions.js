@@ -2388,29 +2388,17 @@
 				// ---------
 
 				talkPage.getText().done( function ( talkText ) {
-					var results = AFCH.addTalkPageBanners(
+					talkText = AFCH.addTalkPageBanners(
 						talkText,
 						data.newAssessment,
 						afchPage.additionalData.revId,
 						data.isBiography,
 						data.newWikiProjects,
 						data.lifeStatus,
-						data.subjectName,
-						data.existingWikiProjects,
-						data.alreadyHasWPBio,
-						data.existingWPBioTemplateName
+						data.subjectName
 					);
-					talkText = results.talkText;
 
-					var summary = 'Placing [[Wikipedia:Articles for creation|Articles for creation]] banner';
-					if ( results.countOfWikiProjectsAdded > 0 ) {
-						summary += ', adding ' + results.countOfWikiProjectsAdded +
-							' WikiProject banner' + ( ( results.countOfWikiProjectsAdded === 1 ) ? '' : 's' );
-					}
-					if ( results.countOfWikiProjectsRemoved > 0 ) {
-						summary += ', removing ' + results.countOfWikiProjectsRemoved +
-							' WikiProject banner' + ( ( results.countOfWikiProjectsRemoved === 1 ) ? '' : 's' );
-					}
+					var summary = 'Placing [[Wikipedia:Articles for creation|Articles for creation]] banner, and possibly other banners';
 
 					if ( comments && comments.length > 0 ) {
 						talkText = talkText.trim() + '\n\n== Comments left by AfC reviewers ==\n' + comments.join( '\n\n' );

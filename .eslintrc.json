@@ -12,6 +12,16 @@
 		"mw": "writable",
 		"OO": "readonly"
 	},
+	"overrides": [
+		{
+			"files": [
+				"tests/*"
+			],
+			"parserOptions": {
+				"ecmaVersion": 6
+			}
+		}
+	],
 	"rules": {
 		"camelcase": "off",
 		"eqeqeq": "warn",

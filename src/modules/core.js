@@ -1641,78 +1641,110 @@
 		},
 
 		/**
-		 * @param {string} talkText Wikitext of the draft talk page
+		 * @param {string} wikicode Wikitext of the draft talk page
 		 * @param {string} newAssessment Value of "Article assessment" dropdown list, or "" if blank
 		 * @param {number} revId Revision ID of the draft that is being accepted
 		 * @param {boolean} isBiography Value of the "Is the article a biography?" check box
 		 * @param {Array} newWikiProjects Value of the "Add WikiPrjects" part of the form. The <input> is a chips interface called jquery.chosen. Note that if there are existing WikiProject banners on the page, the form will auto-add those to the "Add WikiProjects" part of the form when it first loads.
 		 * @param {string} lifeStatus Value of "Is the subject alive?" dropdown list ("unknown", "living", "dead")
 		 * @param {string} subjectName Value of the "Subject name (last, first)" text input, or "" if blank
-		 * @param {Array<Object>} existingWikiProjects An array of associative arrays. The associative arrays contain the keys {string} displayName (example: Somalia), {string} templateName (example: WikiProject Somalia), and {boolean} alreadyOnPage
-		 * @param {boolean} alreadyHasWPBio
-		 * @param {null} existingWPBioTemplateName
-		 * @return {Object} { {string} talkText, {number} countOfWikiProjectsAdded, {number} countOfWikiProjectsRemoved }
+		 * @return {Object} wikicode
 		 */
-		addTalkPageBanners: function ( talkText, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName, existingWikiProjects, alreadyHasWPBio, existingWPBioTemplateName ) {
-			var talkTextPrefix = '';
+		addTalkPageBanners: function ( wikicode, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName ) {
+			// build an array of all banners already on page
+			var bannerTemplates = 'wikiproject (?!banner)|football|oka';
+			var bannerTemplateRegEx = new RegExp( '{{(?:' + bannerTemplates + ')[^}]+}}', 'gi' );
+			var banners = wikicode.match( bannerTemplateRegEx ) || [];
 
-			// Add the AFC banner
-			talkTextPrefix += '{{subst:WPAFC/article|class=' + newAssessment +
-				( revId ? '|oldid=' + revId : '' ) + '}}';
+			// delete all banners already on page
+			banners.forEach( function ( v ) {
+				wikicode = wikicode.replace( v, '' );
+			} );
 
-			// Add biography banner if specified
+			// delete shell already on page
+			var bannerShellTemplates = 'WikiProject banner shell|WikiProjectBanners|WikiProject Banners|WPB|WPBS|WikiProject cooperation shell|Wikiprojectbannershell|WikiProject Banner Shell|Wpb|WPBannerShell|Wpbs|Wikiprojectbanners|WP Banner Shell|WP banner shell|Bannershell|Wikiproject banner shell|WIkiProjectBanner Shell|WikiProjectBannerShell|WikiProject BannerShell|Coopshell|WikiprojectBannerShell|WikiProject Shell|Scope shell|Project shell|WikiProject shell|WikiProject banner|Wpbannershell|Multiple wikiprojects|Wikiproject banner holder|Project banner holder|WikiProject banner shell\\/test1|Article assessment|WikiProject bannershell';
+			var bannerShellRegEx = new RegExp( '{{(?:' + bannerShellTemplates + ')[^}]*}}', 'is' );
+			wikicode = wikicode.replace( bannerShellRegEx, '' );
+
+			// trim. makes unit tests more stable
+			wikicode = wikicode.trim();
+
+			// add AFC banner to array
+			banners.push(
+				'{{subst:WPAFC/article' +
+				( revId ? '|oldid=' + revId : '' ) +
+				'}}'
+			);
+
+			// delete existing biography banner. when accepting, reviewer is forced to choose if it's a biography or not, so we'll add (or not add) our own biography banner later
+			banners = banners.filter( function ( value ) {
+				return !value.match( /^{{WikiProject Biography/i );
+			} );
+
+			// add biography banner to array
 			if ( isBiography ) {
-				// Ensure we don't have duplicate biography tags
-				AFCH.removeFromArray( newWikiProjects, 'WikiProject Biography' );
-
-				talkTextPrefix += ( '\n{{WikiProject Biography|living=' +
+				banners.push(
+					'{{WikiProject Biography|living=' +
 					( lifeStatus !== 'unknown' ? ( lifeStatus === 'living' ? 'yes' : 'no' ) : '' ) +
-					'|class=' + newAssessment + '|listas=' + subjectName + '}}' );
+					'|listas=' + subjectName +
+					'}}'
+				);
 			}
 
-			// Add disambiguation banner if needed
-			if ( newAssessment === 'disambig' &&
-				$.inArray( 'WikiProject Disambiguation', newWikiProjects ) === -1 ) {
-				newWikiProjects.push( 'WikiProject Disambiguation' );
+			// add disambiguation banner to array
+			if ( newAssessment === 'disambig' ) {
+				banners.push( '{{WikiProject Disambiguation}}' );
 			}
 
-			// Add and remove WikiProjects
-			/** @member {Array} */
-			var wikiProjectsToAdd = newWikiProjects.filter( function ( newTemplateName ) {
-				return !existingWikiProjects.some( function ( existingTplObj ) {
-					return existingTplObj.templateName === newTemplateName;
-				} );
-			} );
-			/** @member {Array} */
-			var wikiProjectsToRemove = existingWikiProjects.filter( function ( existingTplObj ) {
-				return !newWikiProjects.some( function ( newTemplateName ) {
-					return existingTplObj.templateName === newTemplateName;
-				} );
-			} ).map( function ( templateObj ) {
-				return templateObj.realTemplateName || templateObj.templateName;
-			} );
-			if ( alreadyHasWPBio && !isBiography ) {
-				wikiProjectsToRemove.push( existingWPBioTemplateName || 'wikiproject biography' );
+			// add banners selected in UI to array
+			for ( var key in newWikiProjects ) {
+				banners.push( '{{' + newWikiProjects[ key ] + '}}' );
 			}
 
-			$.each( wikiProjectsToAdd, function ( _index, templateName ) {
-				talkTextPrefix += '\n{{' + templateName + '|class=' + newAssessment + '}}';
-			} );
-			$.each( wikiProjectsToRemove, function ( _index, templateName ) {
-				// Regex from https://stackoverflow.com/a/5306111/1757964
-				var sanitizedTemplateName = templateName.replace( /[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&' );
-				talkText = talkText.replace( new RegExp( '\\n?\\{\\{\\s*' + sanitizedTemplateName + '\\s*.+?\\}\\}', 'is' ), '' );
+			// remove duplicate banners, case insensitive
+			banners = AFCH.removeDuplicateBanners( banners );
+
+			// delete |class= from banners in array
+			banners = banners.map( function ( value ) {
+				return value.replace( /\s*\|\s*class\s*=\s*[^|}]*([\n|}])/, '$1' );
 			} );
 
-			// We prepend the text so that talk page content is not removed
-			// (e.g. pages in `Draft:` namespace with discussion)
-			talkText = talkTextPrefix + '\n\n' + talkText;
+			// Convert array back to wikitext and append to top of talk page.
+			// Always add a shell even if it's just wrapping one banner, for code simplification reasons.
+			// Add |class= to shell.
+			wikicode = '{{WikiProject banner shell' +
+				( newAssessment ? '|class=' + newAssessment : '' ) +
+				'|\n' +
+				banners.join( '\n' ) +
+				'\n}}\n' +
+				wikicode;
 
-			return {
-				talkText: talkText,
-				countOfWikiProjectsAdded: wikiProjectsToAdd.length,
-				countOfWikiProjectsRemoved: wikiProjectsToRemove.length
-			};
+			// add an extra line break between the last template and the first heading
+			wikicode = wikicode.replace( /}}\n==/, '}}\n\n==' );
+
+			// trim. makes unit tests more stable
+			wikicode = wikicode.trim();
+
+			return wikicode;
+		},
+
+		/**
+		 * In an array of templates, remove duplicate templates, case insensitive.
+		 *
+		 * @param {Array} banners [ '{{WikiProject Australia}}', {{wikiproject australia}}', '{{WikiProject Australia|class=B}}' ]
+		 * @return {Array} banners [ '{{WikiProject Australia}}' ]
+		 */
+		removeDuplicateBanners: function ( banners ) {
+			var uniqueBanners = [];
+			var bannerMap = {};
+			banners.forEach( function ( banner ) {
+				var bannerKey = banner.toLowerCase().match( /{{[^|}]+/ )[ 0 ];
+				if ( !bannerMap[ bannerKey ] ) {
+					uniqueBanners.push( banner );
+					bannerMap[ bannerKey ] = true;
+				}
+			} );
+			return uniqueBanners;
 		},
 
 		/**
