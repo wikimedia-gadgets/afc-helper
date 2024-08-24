@@ -1,5 +1,9 @@
 {
-	"extends": "wikimedia",
+	"extends": [
+		"wikimedia/client/es6",
+		"wikimedia/jquery",
+		"wikimedia/mediawiki"
+	],
 	"env": {
 		"browser": true,
 		"jquery": true
@@ -25,15 +29,31 @@
 	"rules": {
 		"camelcase": "off",
 		"eqeqeq": "warn",
+		"es-x/no-array-prototype-includes": "warn",
+		"es-x/no-object-values": "warn",
+		"es-x/no-regexp-s-flag": "warn",
 		"max-len": "off",
 		"no-console": "off",
 		"no-global-assign": "warn",
 		"no-implicit-globals": "warn",
+		"no-jquery/no-animate": "warn",
+		"no-jquery/no-class-state": "off",
+		"no-jquery/no-each-util": "warn",
+		"no-jquery/no-extend": "off",
+		"no-jquery/no-global-selector": "off",
+		"no-jquery/no-grep": "warn",
+		"no-jquery/no-in-array": "warn",
+		"no-jquery/no-map-util": "warn",
+		"no-jquery/no-sizzle": "warn",
+		"no-jquery/no-slide": "warn",
+		"no-jquery/no-trim": "warn",
+		"no-jquery/variable-pattern": "warn",
 		"no-new": "warn",
 		"no-prototype-builtins": "off",
 		"no-shadow": "off",
 		"no-undef": "warn",
 		"no-underscore-dangle": "off",
+		"prefer-const": "warn",
 		"security/detect-non-literal-regexp": "off",
 		"security/detect-unsafe-regex": "off",
 		"unicorn/prefer-string-slice": "off"

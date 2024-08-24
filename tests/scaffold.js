@@ -32,14 +32,14 @@ mw.loader = {
 	}
 };
 
-var basePageHtml = fs.readFileSync( './tests/test-frame.html' ).toString();
+const basePageHtml = fs.readFileSync( './tests/test-frame.html' ).toString();
 
 requireScript = function ( name ) {
 	return require( './../src/' + name );
 };
 
 setPageTitle = function ( title ) {
-	mw.config.get.mockImplementation( function ( requested ) {
+	mw.config.get.mockImplementation( ( requested ) => {
 		if ( requested === 'wgPageName' ) {
 			return title;
 		} else if ( requested === 'wgNamespaceNumber' ) {
