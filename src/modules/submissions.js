@@ -1600,7 +1600,7 @@
 					const isClassStub = $( this ).val() === 'Stub';
 					$afch.find( '#stubSorterWrapper' ).toggleClass( 'hidden', !isClassStub );
 					if ( isClassStub ) {
-						if ( mw.config.get( 'wgDBname' ) !== 'enwiki' ) {
+						if ( mw.config.get( 'wgDBname' ) !== 'enwiki' && mw.config.get( 'wgDBname' ) !== 'testwiki' ) {
 							console.warn( 'no stub sorting script available for this language wiki' );
 							return;
 						}
