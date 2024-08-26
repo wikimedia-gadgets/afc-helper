@@ -454,4 +454,15 @@ describe( 'AFCH.removeDuplicateBanners', () => {
 			'{{WikiProject Ontario}}'
 		] );
 	} );
+
+	it( 'should handle a space at the end of the template name', () => {
+		const banners = [
+			'{{WikiProject Military history |Indian-task-force=yes}}',
+			'{{WikiProject Military history}}'
+		];
+		const output = AFCH.removeDuplicateBanners( banners );
+		expect( output ).toEqual( [
+			'{{WikiProject Military history |Indian-task-force=yes}}'
+		] );
+	} );
 } );

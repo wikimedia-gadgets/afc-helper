@@ -1732,7 +1732,9 @@
 			const uniqueBanners = [];
 			const bannerMap = {};
 			banners.forEach( ( banner ) => {
-				const bannerKey = banner.toLowerCase().match( /{{[^|}]+/ )[ 0 ];
+				let bannerKey = banner.toLowerCase().match( /{{[^|}]+/ )[ 0 ];
+				// get rid of whitespace at the end of the template name
+				bannerKey = bannerKey.trim();
 				if ( !bannerMap[ bannerKey ] ) {
 					uniqueBanners.push( banner );
 					bannerMap[ bannerKey ] = true;
