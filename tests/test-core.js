@@ -374,7 +374,7 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 
 	it( 'user selects class = disambiguation', () => {
 		const wikicode = '';
-		const newAssessment = 'disambig';
+		const newAssessment = 'Disambig';
 		const revId = 592681;
 		const isBiography = false;
 		const newWikiProjects = [];
@@ -382,7 +382,7 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		const subjectName = '';
 		const output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
 		expect( output ).toBe(
-`{{WikiProject banner shell|class=disambig|1=
+`{{WikiProject banner shell|class=Disambig|1=
 {{subst:WPAFC/article|oldid=592681}}
 {{WikiProject Disambiguation}}
 }}`

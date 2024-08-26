@@ -1597,7 +1597,7 @@
 				// If draft is assessed as stub, show stub sorting
 				// interface using User:SD0001/StubSorter.js
 				$afch.find( '#newAssessment' ).on( 'change', function () {
-					const isClassStub = $( this ).val() === 'stub';
+					const isClassStub = $( this ).val() === 'Stub';
 					$afch.find( '#stubSorterWrapper' ).toggleClass( 'hidden', !isClassStub );
 					if ( isClassStub ) {
 						if ( mw.config.get( 'wgDBname' ) !== 'enwiki' ) {
@@ -1622,7 +1622,7 @@
 								$( '#stub-sorter-select' ).addClass( 'afch-input' );
 
 								if ( /\{\{[^{ ]*[sS]tub(\|.*?)?\}\}\s*/.test( pageText ) ) {
-									$afch.find( '#newAssessment' ).val( 'stub' ).trigger( 'chosen:updated' ).trigger( 'change' );
+									$afch.find( '#newAssessment' ).val( 'Stub' ).trigger( 'chosen:updated' ).trigger( 'change' );
 								}
 							} );
 						}

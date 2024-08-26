@@ -1687,7 +1687,7 @@
 			}
 
 			// add disambiguation banner to array
-			if ( newAssessment === 'disambig' ) {
+			if ( newAssessment === 'Disambig' ) {
 				banners.push( '{{WikiProject Disambiguation}}' );
 			}
 
