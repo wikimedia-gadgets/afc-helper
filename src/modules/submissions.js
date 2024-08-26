@@ -1,6 +1,6 @@
 // <nowiki>
 ( function ( AFCH, $, mw ) {
-	var $afchLaunchLink, $afch, $afchWrapper,
+	let $afchLaunchLink, $afch, $afchWrapper,
 		afchPage, afchSubmission, afchViews, afchViewer;
 
 	// Die if reviewing a nonexistent page or a userjs/css page
@@ -72,10 +72,10 @@
 	 * @return {jQuery.Deferred} Resolves with the submission when parsed successfully
 	 */
 	AFCH.Submission.prototype.parse = function () {
-		var sub = this,
+		const sub = this,
 			deferred = $.Deferred();
 
-		this.page.getTemplates().done( function ( templates ) {
+		this.page.getTemplates().done( ( templates ) => {
 			sub.loadDataFromTemplates( templates );
 			sub.sortAndParseInternalData();
 			deferred.resolve( sub );
@@ -91,11 +91,11 @@
 	 */
 	AFCH.Submission.prototype.loadDataFromTemplates = function ( templates ) {
 		// Represent each AfC submission template as an object.
-		var submissionTemplates = [],
+		const submissionTemplates = [],
 			commentTemplates = [];
 
-		$.each( templates, function ( _, template ) {
-			var name = template.target.toLowerCase();
+		$.each( templates, ( _, template ) => {
+			const name = template.target.toLowerCase();
 			if ( name === 'afc submission' ) {
 				submissionTemplates.push( {
 					status: ( AFCH.getAndDelete( template.params, '1' ) || '' ).toLowerCase(),
@@ -120,7 +120,7 @@
 	 * Sort the internal lists of AFC submission and Afc comment templates
 	 */
 	AFCH.Submission.prototype.sortAndParseInternalData = function () {
-		var sub = this,
+		let sub = this,
 			submissionTemplates = this.templates,
 			commentTemplates = this.comments;
 
@@ -146,7 +146,7 @@
 		this.resetVariables();
 
 		// Useful list of "what to do" in each situation.
-		var statusCases = {
+		const statusCases = {
 			// Declined
 			d: function () {
 				if ( !sub.isPending && !sub.isDraft && !sub.isUnderReview ) {
@@ -189,8 +189,8 @@
 		// the oldest. In the process, we remove unneeded templates (for example,
 		// a draft tag when it's already been submitted) and also set various
 		// "isX" properties of the Submission.
-		submissionTemplates = $.grep( submissionTemplates, function ( template ) {
-			var keepTemplate = true;
+		submissionTemplates = $.grep( submissionTemplates, ( template ) => {
+			let keepTemplate = true;
 
 			if ( statusCases[ template.status ] ) {
 				keepTemplate = statusCases[ template.status ]();
@@ -232,12 +232,12 @@
 	 * @return {string}
 	 */
 	AFCH.Submission.prototype.makeWikicode = function () {
-		var output = [],
+		let output = [],
 			hasDeclineTemplate = false;
 
 		// Submission templates go first
-		$.each( this.templates, function ( _, template ) {
-			var tout = '{{AFC submission|' + template.status,
+		$.each( this.templates, ( _, template ) => {
+			let tout = '{{AFC submission|' + template.status,
 				paramKeys = [];
 
 			// FIXME: Think about if we really want this elaborate-ish
@@ -248,15 +248,15 @@
 			// can scrap this. Until then, though, we can only dream...
 
 			// Make an array of the parameters
-			$.each( template.params, function ( key, value ) {
+			$.each( template.params, ( key, value ) => {
 				// Parameters set to false are ignored
 				if ( value !== false ) {
 					paramKeys.push( key );
 				}
 			} );
 
-			paramKeys.sort( function ( a, b ) {
-				var aIsNumber = !isNaN( a ),
+			paramKeys.sort( ( a, b ) => {
+				const aIsNumber = !isNaN( a ),
 					bIsNumber = !isNaN( b );
 
 				// If we're passed two numerical parameters then
@@ -279,8 +279,8 @@
 				return 0;
 			} );
 
-			$.each( paramKeys, function ( index, key ) {
-				var value = template.params[ key ];
+			$.each( paramKeys, ( index, key ) => {
+				const value = template.params[ key ];
 				// If it is a numerical parameter, doesn't include
 				// `=` in the value, AND is in sequence with the other
 				// numerical parameters, we can omit the key= part
@@ -314,7 +314,7 @@
 		} );
 
 		// Then comment templates
-		$.each( this.comments, function ( _, comment ) {
+		$.each( this.comments, ( _, comment ) => {
 			output.push( '\n{{AFC comment|1=' + comment.text + '}}' );
 		} );
 
@@ -332,7 +332,7 @@
 	 * @return {jQuery.Deferred} Resolves to bool if submission is eligible
 	 */
 	AFCH.Submission.prototype.isG13Eligible = function () {
-		var deferred = $.Deferred();
+		const deferred = $.Deferred();
 
 		// Submission must not currently be submitted
 		if ( this.isCurrentlySubmitted ) {
@@ -348,8 +348,8 @@
 
 		// And not have been modified in 6 months
 		// FIXME: Ignore bot edits?
-		this.page.getLastModifiedDate().done( function ( lastEdited ) {
-			var timeNow = new Date(),
+		this.page.getLastModifiedDate().done( ( lastEdited ) => {
+			const timeNow = new Date(),
 				sixMonthsAgo = new Date();
 
 			sixMonthsAgo.setMonth( timeNow.getMonth() - 6 );
@@ -369,7 +369,7 @@
 	 * @return {boolean} success
 	 */
 	AFCH.Submission.prototype.setStatus = function ( newStatus, newParams ) {
-		var relevantTemplate = this.templates[ 0 ];
+		const relevantTemplate = this.templates[ 0 ];
 
 		if ( [ 'd', 't', 'r', '' ].indexOf( newStatus ) === -1 ) {
 			// Unrecognized status
@@ -433,7 +433,7 @@
 	 * @return {boolean} success
 	 */
 	AFCH.Submission.prototype.addNewComment = function ( text ) {
-		var commentText = addSignature( text );
+		const commentText = addSignature( text );
 
 		this.comments.unshift( {
 			// Unicorns are explained in loadDataFromTemplates()
@@ -454,7 +454,7 @@
 	 * @return {jQuery.Deferred} resolves with user
 	 */
 	AFCH.Submission.prototype.getSubmitter = function () {
-		var deferred = $.Deferred(),
+		const deferred = $.Deferred(),
 			user = this.params.u;
 
 		// Recursively detect if the user has been renamed by checking the rename log
@@ -466,21 +466,21 @@
 				letype: 'renameuser',
 				lelimit: 1,
 				letitle: 'User:' + user
-			} ).then( function ( resp ) {
-				var logevents = resp.query.logevents;
+			} ).then( ( resp ) => {
+				const logevents = resp.query.logevents;
 
 				if ( logevents.length ) {
-					var newName = logevents[ 0 ].params.newuser;
+					const newName = logevents[ 0 ].params.newuser;
 					this.params.u = newName;
-					this.getSubmitter().then( function ( user ) {
+					this.getSubmitter().then( ( user ) => {
 						deferred.resolve( user );
 					} );
 				} else {
 					deferred.resolve( user );
 				}
-			}.bind( this ) );
+			} );
 		} else {
-			this.page.getCreator().done( function ( user ) {
+			this.page.getCreator().done( ( user ) => {
 				deferred.resolve( user );
 			} );
 		}
@@ -517,7 +517,7 @@
 	};
 
 	AFCH.Text.prototype.cleanUp = function ( isAccept ) {
-		var text = this.text,
+		let text = this.text,
 			commentRegex,
 			commentsToRemove = [
 				'Please don\'t change anything and press save',
@@ -545,7 +545,7 @@
 			text = text.replace( /\[\[:Category:/gi, '[[Category:' );
 			text = text.replace( /\{\{(tl|tlx|tlg)\|(.*?)\}\}/ig, '{{$2}}' );
 
-			var templatesToRemove = [
+			const templatesToRemove = [
 				'AfC postpone G13',
 				'Draft topics',
 				'AfC topic',
@@ -553,7 +553,7 @@
 				'Promising draft'
 			];
 
-			templatesToRemove.forEach( function ( template ) {
+			templatesToRemove.forEach( ( template ) => {
 				text = text.replace( new RegExp( '\\{\\{' + template + '\\s*\\|?(.*?)\\}\\}\\n?', 'gi' ), '' );
 			} );
 
@@ -604,7 +604,7 @@
 		// Convert http://-style links to other wikipages to wikicode syntax
 		// FIXME: Break this out into its own core function? Will it be used elsewhere?
 		function convertExternalLinksToWikilinks( text ) {
-			var linkRegex = /\[{1,2}(?:https?:)?\/\/(?:en.wikipedia.org\/wiki|enwp.org)\/([^\s|\][]+)(?:\s|\|)?((?:\[\[[^[\]]*\]\]|[^\][])*)\]{1,2}/ig,
+			let linkRegex = /\[{1,2}(?:https?:)?\/\/(?:en.wikipedia.org\/wiki|enwp.org)\/([^\s|\][]+)(?:\s|\|)?((?:\[\[[^[\]]*\]\]|[^\][])*)\]{1,2}/ig,
 				linkMatch = linkRegex.exec( text ),
 				title, displayTitle, newLink;
 
@@ -685,14 +685,14 @@
 		// to delete its matches in a loop. If it were global, then
 		// it would internally keep track of lsatIndex - then given
 		// two adjacent categories, only the first would get deleted
-		var catIndex, match,
+		let catIndex, match,
 			text = this.text,
 			categoryRegex = /\[\[:?Category:.*?\s*\]\]/i,
 			newCategoryCode = '\n';
 
 		// Create the wikicode block
-		$.each( categories, function ( _, category ) {
-			var trimmed = $.trim( category );
+		$.each( categories, ( _, category ) => {
+			const trimmed = $.trim( category );
 			if ( trimmed ) {
 				newCategoryCode += '\n[[Category:' + trimmed + ']]';
 			}
@@ -721,8 +721,8 @@
 	};
 
 	AFCH.Text.prototype.updateShortDescription = function ( existingShortDescription, newShortDescription ) {
-		var shortDescTemplateExists = /\{\{[Ss]hort ?desc(ription)?\s*\|/.test( this.text );
-		var shortDescExists = !!existingShortDescription;
+		const shortDescTemplateExists = /\{\{[Ss]hort ?desc(ription)?\s*\|/.test( this.text );
+		const shortDescExists = !!existingShortDescription;
 
 		if ( newShortDescription ) {
 			// 1. No shortdesc - insert the one provided by user
@@ -772,7 +772,7 @@
 
 	// If AFCH is destroyed via AFCH.destroy(),
 	// remove the $afch window and the launch link
-	AFCH.addDestroyFunction( function () {
+	AFCH.addDestroyFunction( () => {
 		$afchLaunchLink.remove();
 
 		// The $afch window might not exist yet; make
@@ -799,7 +799,7 @@
 							.html( '&#x25c0; back to options' ) // back arrow
 							.attr( 'title', 'Go back' )
 							.addClass( 'hidden' )
-							.click( function () {
+							.on( 'click', () => {
 								// Reload the review panel
 								spinnerAndRun( setupReviewPanel );
 							} ),
@@ -808,7 +808,7 @@
 						$( '<div>' )
 							.addClass( 'close-link' )
 							.html( '&times;' )
-							.click( function () {
+							.on( 'click', () => {
 								// DIE DIE DIE (...then allow clicks on the launch link again)
 								$afch.remove();
 								$afchLaunchLink
@@ -842,18 +842,18 @@
 		setupReviewPanel();
 
 		// If the "Review" link is clicked again, just reload the main view
-		$afchLaunchLink.click( function () {
+		$afchLaunchLink.on( 'click', () => {
 			spinnerAndRun( setupReviewPanel );
 		} );
 	}
 
 	function setupReviewPanel() {
 		// Store this to a variable so we can wait for its success
-		var loadViews = $.ajax( {
+		const loadViews = $.ajax( {
 			type: 'GET',
 			url: AFCH.consts.baseurl + '/tpl-submissions.js',
 			dataType: 'text'
-		} ).done( function ( data ) {
+		} ).done( ( data ) => {
 			afchViews = new AFCH.Views( data );
 			afchViewer = new AFCH.Viewer( afchViews, $afchWrapper );
 		} );
@@ -869,8 +869,8 @@
 		$.when(
 			afchSubmission.parse(),
 			loadViews
-		).then( function ( submission ) {
-			var extrasRevealed = false;
+		).then( ( submission ) => {
+			let extrasRevealed = false;
 
 			// Render the base buttons view
 			loadView( 'main', {
@@ -884,16 +884,16 @@
 
 			// Set up the extra options slide-out panel, which appears
 			// when the user click on the chevron
-			$afch.find( '#afchExtra .open' ).click( function () {
-				var $extra = $afch.find( '#afchExtra' );
+			$afch.find( '#afchExtra .open' ).on( 'click', () => {
+				const $extra = $afch.find( '#afchExtra' );
 
 				if ( extrasRevealed ) {
 					$extra.find( 'a' ).hide();
-					$extra.stop().animate( { width: '20px' }, 100, 'swing', function () {
+					$extra.stop().animate( { width: '20px' }, 100, 'swing', () => {
 						extrasRevealed = false;
 					} );
 				} else {
-					$extra.stop().animate( { width: '210px' }, 150, 'swing', function () {
+					$extra.stop().animate( { width: '210px' }, 150, 'swing', () => {
 						$extra.find( 'a' ).css( 'display', 'block' );
 						extrasRevealed = true;
 					} );
@@ -904,27 +904,27 @@
 			AFCH.preferences.initLink( $afch.find( 'span.preferences-wrapper' ), 'preferences' );
 
 			// Set up click handlers
-			$afch.find( '#afchAccept' ).click( function () {
+			$afch.find( '#afchAccept' ).on( 'click', () => {
 				spinnerAndRun( showAcceptOptions );
 			} );
-			$afch.find( '#afchDecline' ).click( function () {
+			$afch.find( '#afchDecline' ).on( 'click', () => {
 				spinnerAndRun( showDeclineOptions );
 			} );
-			$afch.find( '#afchComment' ).click( function () {
+			$afch.find( '#afchComment' ).on( 'click', () => {
 				spinnerAndRun( showCommentOptions );
 			} );
-			$afch.find( '#afchSubmit' ).click( function () {
+			$afch.find( '#afchSubmit' ).on( 'click', () => {
 				spinnerAndRun( showSubmitOptions );
 			} );
-			$afch.find( '#afchClean' ).click( function () {
+			$afch.find( '#afchClean' ).on( 'click', () => {
 				handleCleanup();
 			} );
-			$afch.find( '#afchMark' ).click( function () {
+			$afch.find( '#afchMark' ).on( 'click', () => {
 				handleMark( /* unmark */ submission.isUnderReview );
 			} );
 
 			// Load warnings about the page, then slide them in
-			getSubmissionWarnings().done( function ( warnings ) {
+			getSubmissionWarnings().done( ( warnings ) => {
 				if ( warnings.length ) {
 					// FIXME: CSS-based slide-in animation instead to avoid having
 					// to use stupid hide() + removeClass() workaround?
@@ -937,12 +937,12 @@
 
 			// Get G13 eligibility and when known, display relevant buttons...
 			// but don't hold up the rest of the loading to do so
-			submission.isG13Eligible().done( function ( eligible ) {
+			submission.isG13Eligible().done( ( eligible ) => {
 				$afch.find( '.g13-related' ).toggleClass( 'hidden', !eligible );
-				$afch.find( '#afchG13' ).click( function () {
+				$afch.find( '#afchG13' ).on( 'click', () => {
 					handleG13();
 				} );
-				$afch.find( '#afchPostponeG13' ).click( function () {
+				$afch.find( '#afchPostponeG13' ).on( 'click', () => {
 					spinnerAndRun( showPostponeG13Options );
 				} );
 			} );
@@ -955,7 +955,7 @@
 	 * @return {jQuery}
 	 */
 	function getSubmissionWarnings() {
-		var deferred = $.Deferred(),
+		const deferred = $.Deferred(),
 			warnings = [];
 
 		/**
@@ -966,7 +966,7 @@
 		 * @param {Function|string} onAction function to call on success, or URL to browse to
 		 */
 		function addWarning( message, actionMessage, onAction ) {
-			var $action,
+			let $action,
 				$warning = $( '<div>' )
 					.addClass( 'afch-warning' )
 					.text( message );
@@ -978,7 +978,7 @@
 					.appendTo( $warning );
 
 				if ( typeof onAction === 'function' ) {
-					$action.click( onAction );
+					$action.on( 'click', onAction );
 				} else {
 					$action
 						.attr( 'target', '_blank' )
@@ -990,16 +990,13 @@
 		}
 
 		function checkReferences() {
-			var deferred = $.Deferred();
+			const deferred = $.Deferred();
 
-			afchPage.getText( false ).done( function ( text ) {
-				var refBeginRe = /<\s*ref.*?\s*>/ig,
-					refBeginMatches = $.grep( text.match( refBeginRe ) || [], function ( ref ) {
-						// If the ref is closed already, we don't want it
-						// (returning true keeps the item, false removes it)
-						return ref.indexOf( '/>', ref.length - 2 ) === -1;
-					} ),
-
+			afchPage.getText( false ).done( ( text ) => {
+				const refBeginRe = /<\s*ref.*?\s*>/ig,
+					// If the ref is closed already, we don't want it
+					// (returning true keeps the item, false removes it)
+					refBeginMatches = $.grep( text.match( refBeginRe ) || [], ( ref ) => ref.indexOf( '/>', ref.length - 2 ) === -1 ),
 					refEndRe = /<\/\s*ref\s*>/ig,
 					refEndMatches = text.match( refEndRe ) || [],
 
@@ -1019,13 +1016,13 @@
 				// <ref>1<ref> instead of <ref>1</ref> detection
 				if ( malformedRefs.length ) {
 					addWarning( 'The submission contains malformed <ref> tags.', 'View details', function () {
-						var $warningDiv = $( this ).parent();
-						var $malformedRefWrapper = $( '<div>' )
+						const $warningDiv = $( this ).parent();
+						const $malformedRefWrapper = $( '<div>' )
 							.addClass( 'malformed-refs' )
 							.appendTo( $warningDiv );
 
 						// Show the relevant code snippets
-						$.each( malformedRefs, function ( _, ref ) {
+						$.each( malformedRefs, ( _, ref ) => {
 							$( '<div>' )
 								.addClass( 'code-wrapper' )
 								.append( $( '<pre>' ).text( ref ) )
@@ -1058,7 +1055,7 @@
 		}
 
 		function checkDeletionLog() {
-			var deferred = $.Deferred();
+			const deferred = $.Deferred();
 
 			// Don't show deletion notices for "sandbox" to avoid useless
 			// information when reviewing user sandboxes and the like
@@ -1075,8 +1072,8 @@
 				letype: 'delete',
 				lelimit: 10,
 				letitle: afchSubmission.shortTitle
-			} ).done( function ( data ) {
-				var rawDeletions = data.query.logevents;
+			} ).done( ( data ) => {
+				const rawDeletions = data.query.logevents;
 
 				if ( !rawDeletions.length ) {
 					deferred.resolve();
@@ -1085,11 +1082,11 @@
 
 				addWarning( 'The page "' + afchSubmission.shortTitle + '" has been deleted ' + rawDeletions.length + ( rawDeletions.length === 10 ? '+' : '' ) +
 					' time' + ( rawDeletions.length > 1 ? 's' : '' ) + '.', 'View deletion log', function () {
-					var $toggleLink = $( this ).addClass( 'deletion-log-toggle' ),
+					const $toggleLink = $( this ).addClass( 'deletion-log-toggle' ),
 						$warningDiv = $toggleLink.parent(),
 						deletions = [];
 
-					$.each( rawDeletions, function ( _, deletion ) {
+					$.each( rawDeletions, ( _, deletion ) => {
 						deletions.push( {
 							timestamp: deletion.timestamp,
 							relativeTimestamp: AFCH.relativeTimeSince( deletion.timestamp ),
@@ -1117,7 +1114,7 @@
 		}
 
 		function checkReviewState() {
-			var reviewer, isOwnReview;
+			let reviewer, isOwnReview;
 
 			if ( afchSubmission.isUnderReview ) {
 				isOwnReview = afchSubmission.params.reviewer === AFCH.consts.user;
@@ -1132,17 +1129,17 @@
 					' began reviewing this submission ' + AFCH.relativeTimeSince( afchSubmission.params.reviewts ) :
 					' already began reviewing this submission' ) + '.',
 				isOwnReview ? 'Unmark as under review' : 'View page history',
-				isOwnReview ? function () {
+				isOwnReview ? () => {
 					handleMark( /* unmark */ true );
 				} : mw.util.getUrl( AFCH.consts.pagename, { action: 'history' } ) );
 			}
 		}
 
 		function checkLongComments() {
-			var deferred = $.Deferred();
+			const deferred = $.Deferred();
 
-			afchPage.getText( false ).done( function ( rawText ) {
-				var
+			afchPage.getText( false ).done( ( rawText ) => {
+				const
 					// Simulate cleanUp first so that we don't warn about HTML
 					// comments that the script will remove anyway in the future
 					text = ( new AFCH.Text( rawText ) ).cleanUp( true ),
@@ -1154,13 +1151,13 @@
 				if ( numberOfComments ) {
 					addWarning( 'The page contains ' + ( oneComment ? 'an' : '' ) + ' HTML comment' + ( oneComment ? '' : 's' ) +
 						' longer than 30 characters.', 'View comment' + ( oneComment ? '' : 's' ), function () {
-						var $warningDiv = $( this ).parent(),
+						const $warningDiv = $( this ).parent(),
 							$commentsWrapper = $( '<div>' )
 								.addClass( 'long-comments' )
 								.appendTo( $warningDiv );
 
 						// Show the relevant code snippets
-						$.each( longCommentMatches, function ( _, comment ) {
+						$.each( longCommentMatches, ( _, comment ) => {
 							$( '<div>' )
 								.addClass( 'code-wrapper' )
 								.append( $( '<pre>' ).text( $.trim( comment ) ) )
@@ -1185,8 +1182,8 @@
 			return AFCH.api.get( {
 				action: 'pagetriagelist',
 				page_id: mw.config.get( 'wgArticleId' )
-			} ).then( function ( json ) {
-				var triageInfo = json.pagetriagelist.pages[ 0 ];
+			} ).then( ( json ) => {
+				const triageInfo = json.pagetriagelist.pages[ 0 ];
 				if ( triageInfo && Number( triageInfo.copyvio ) === mw.config.get( 'wgCurRevisionId' ) ) {
 					addWarning(
 						'This submission may contain copyright violations',
@@ -1198,20 +1195,18 @@
 		}
 
 		function checkForBlocks() {
-			return afchSubmission.getSubmitter().then( function ( creator ) {
-				return checkIfUserIsBlocked( creator ).then( function ( blockData ) {
-					if ( blockData !== null ) {
-						var date = 'infinity';
-						if ( blockData.expiry !== 'infinity' ) {
-							var data = new Date( blockData.expiry );
-							var monthNames = [ 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December' ];
-							date = data.getUTCDate() + ' ' + monthNames[ data.getUTCMonth() ] + ' ' + data.getUTCFullYear() + ' ' + data.getUTCHours() + ':' + data.getUTCMinutes() + ' UTC';
-						}
-						var warning = 'Submitter ' + creator + ' was blocked by ' + blockData.by + ' with an expiry time of ' + date + '. Reason: ' + blockData.reason;
-						addWarning( warning );
+			return afchSubmission.getSubmitter().then( ( creator ) => checkIfUserIsBlocked( creator ).then( ( blockData ) => {
+				if ( blockData !== null ) {
+					let date = 'infinity';
+					if ( blockData.expiry !== 'infinity' ) {
+						const data = new Date( blockData.expiry );
+						const monthNames = [ 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December' ];
+						date = data.getUTCDate() + ' ' + monthNames[ data.getUTCMonth() ] + ' ' + data.getUTCFullYear() + ' ' + data.getUTCHours() + ':' + data.getUTCMinutes() + ' UTC';
 					}
-				} );
-			} );
+					const warning = 'Submitter ' + creator + ' was blocked by ' + blockData.by + ' with an expiry time of ' + date + '. Reason: ' + blockData.reason;
+					addWarning( warning );
+				}
+			} ) );
 		}
 
 		$.when(
@@ -1221,7 +1216,7 @@
 			checkLongComments(),
 			checkForCopyvio(),
 			checkForBlocks()
-		).then( function () {
+		).then( () => {
 			deferred.resolve( warnings );
 		} );
 
@@ -1232,7 +1227,7 @@
 	 * Stores useful strings to AFCH.msg
 	 */
 	function setMessages() {
-		var headerBegin = '== Your submission at [[Wikipedia:Articles for creation|Articles for creation]]: ';
+		const headerBegin = '== Your submission at [[Wikipedia:Articles for creation|Articles for creation]]: ';
 		AFCH.msg.set( {
 			// $1 = article name
 			// $2 = article class or '' if not available
@@ -1281,7 +1276,7 @@
 	 *                             applied to it
 	 */
 	function prepareForProcessing( actionTitle, actionClass ) {
-		var $content = $afch.find( '#afchContent' ),
+		let $content = $afch.find( '#afchContent' ),
 			$submitBtn = $content.find( '#afchSubmitForm' );
 
 		// If we can't find a submit button or a content area, load
@@ -1320,7 +1315,7 @@
 	 * auto-reloads the page.
 	 */
 	function setupAjaxStopHandler() {
-		$( document ).ajaxStop( function () {
+		$( document ).on( 'ajaxStop', () => {
 			$afch.find( '#afchSubmitForm' )
 				.text( 'Done' )
 				.append(
@@ -1341,7 +1336,7 @@
 			} );
 
 			// Also, automagically reload the page in place
-			$( '#mw-content-text' ).load( AFCH.consts.pagelink + ' #mw-content-text', function () {
+			$( '#mw-content-text' ).load( AFCH.consts.pagelink + ' #mw-content-text', () => {
 				$afch.find( '#reloadLink' ).text( '(reload)' );
 				// Fire the hook for new page content
 				mw.hook( 'wikipage.content' ).fire( $( '#mw-content-text' ) );
@@ -1365,11 +1360,11 @@
 	 *                           into the data passed to `fn`
 	 */
 	function addFormSubmitHandler( fn, extraData ) {
-		$afch.find( '#afchSubmitForm' ).click( function () {
-			var data = {};
+		$afch.find( '#afchSubmitForm' ).on( 'click', () => {
+			const data = {};
 
 			// Provide page text; use cache created after afchSubmission.parse()
-			afchPage.getText( false ).done( function ( text ) {
+			afchPage.getText( false ).done( ( text ) => {
 				data.afchText = new AFCH.Text( text );
 
 				// Also provide the values for each afch-input element
@@ -1378,7 +1373,7 @@
 				// Also provide extra data
 				$.extend( data, extraData );
 
-				checkForEditConflict().then( function ( editConflict ) {
+				checkForEditConflict().then( ( editConflict ) => {
 					if ( editConflict ) {
 						showEditConflictMessage();
 						return;
@@ -1401,7 +1396,7 @@
 	 * @param {Function} fn function to call when spinner has been displayed
 	 */
 	function spinnerAndRun( fn ) {
-		var $spinner, $container = $afch.find( '#afchContent' );
+		let $spinner, $container = $afch.find( '#afchContent' );
 
 		// Add a new spinner if one doesn't already exist
 		if ( !$container.find( '.mw-spinner' ).length ) {
@@ -1452,7 +1447,7 @@
 		 * @return {jQuery.Deferred}
 		 */
 		function loadWikiProjectList() {
-			var deferred = $.Deferred(),
+			let deferred = $.Deferred(),
 				// Left over from when a new version of AFCH would invalidate the WikiProject cache. The lsKey doesn't change nowadays though.
 				lsKey = 'mw-afch-wikiprojects-2',
 				wikiProjects = mw.storage.getObject( lsKey );
@@ -1464,8 +1459,8 @@
 				$.ajax( {
 					url: mw.config.get( 'wgServer' ) + '/w/index.php?title=Wikipedia:WikiProject_Articles_for_creation/WikiProject_templates.json&action=raw&ctype=text/json',
 					dataType: 'json'
-				} ).done( function ( projectData ) {
-					$.each( projectData, function ( display, template ) {
+				} ).done( ( projectData ) => {
+					$.each( projectData, ( display, template ) => {
 						wikiProjects.push( {
 							displayName: display,
 							templateName: template
@@ -1478,7 +1473,7 @@
 					}
 
 					deferred.resolve( wikiProjects );
-				} ).fail( function ( jqxhr, textStatus, errorThrown ) {
+				} ).fail( ( jqxhr, textStatus, errorThrown ) => {
 					console.error( 'Could not parse WikiProject list: ', textStatus, errorThrown );
 				} );
 			}
@@ -1486,17 +1481,15 @@
 			return deferred;
 		}
 
-		var existingWikiProjectsPromise = $.when(
+		const existingWikiProjectsPromise = $.when(
 			loadWikiProjectList(),
 			new AFCH.Page( 'Draft talk:' + afchSubmission.shortTitle ).getTemplates()
-		).then( function ( wikiProjects, templates ) {
-			var templateNames = templates.map( function ( template ) {
-				return template.target.trim().toLowerCase();
-			} );
+		).then( ( wikiProjects, templates ) => {
+			let templateNames = templates.map( ( template ) => template.target.trim().toLowerCase() );
 
 			// Turn the WikiProject list into an Object to make lookups faster
-			var wikiProjectMap = {};
-			for ( var projIdx = 0; projIdx < wikiProjects.length; projIdx++ ) {
+			let wikiProjectMap = {};
+			for ( let projIdx = 0; projIdx < wikiProjects.length; projIdx++ ) {
 				wikiProjectMap[ wikiProjects[ projIdx ].templateName.toLowerCase() ] = {
 					displayName: wikiProjects[ projIdx ].displayName,
 					templateName: wikiProjects[ projIdx ].templateName,
@@ -1504,7 +1497,7 @@
 				};
 			}
 
-			var alreadyHasWPBio = false;
+			let alreadyHasWPBio = false;
 
 			if ( templates.length === 0 ) {
 				return {
@@ -1513,8 +1506,8 @@
 				};
 			}
 
-			var otherTemplates = [];
-			for ( var tplIdx = 0; tplIdx < templateNames.length; tplIdx++ ) {
+			let otherTemplates = [];
+			for ( let tplIdx = 0; tplIdx < templateNames.length; tplIdx++ ) {
 				if ( wikiProjectMap.hasOwnProperty( templateNames[ tplIdx ] ) ) {
 					wikiProjectMap[ templateNames[ tplIdx ] ].alreadyOnPage = true;
 				} else if ( templateNames[ tplIdx ] === 'wikiproject biography' ) {
@@ -1526,22 +1519,20 @@
 
 			// If any templates weren't in the WikiProject map, check if they were redirects
 			if ( otherTemplates.length > 0 ) {
-				var titles = otherTemplates.map( function ( n ) {
-					return 'Template:' + n;
-				} );
+				let titles = otherTemplates.map( ( n ) => 'Template:' + n );
 				titles = titles.slice( 0, 50 ); // prevent API error by capping max # of titles at 50
 				titles = titles.join( '|' );
 				return AFCH.api.post( {
 					action: 'query',
 					titles: titles,
 					redirects: 'true'
-				} ).then( function ( data ) {
-					var existingWPBioTemplateName = null;
+				} ).then( ( data ) => {
+					let existingWPBioTemplateName = null;
 					if ( data.query && data.query.redirects && data.query.redirects.length > 0 ) {
-						var redirs = data.query.redirects;
-						for ( var redirIdx = 0; redirIdx < redirs.length; redirIdx++ ) {
-							var redir = redirs[ redirIdx ].to.slice( 'Template:'.length ).toLowerCase();
-							var originalName = redirs[ redirIdx ].from.slice( 'Template:'.length );
+						let redirs = data.query.redirects;
+						for ( let redirIdx = 0; redirIdx < redirs.length; redirIdx++ ) {
+							let redir = redirs[ redirIdx ].to.slice( 'Template:'.length ).toLowerCase();
+							let originalName = redirs[ redirIdx ].from.slice( 'Template:'.length );
 							if ( wikiProjectMap.hasOwnProperty( redir ) ) {
 								wikiProjectMap[ redir ].alreadyOnPage = true;
 								wikiProjectMap[ redir ].realTemplateName = originalName;
@@ -1570,23 +1561,21 @@
 			existingWikiProjectsPromise,
 			afchPage.getCategories( /* useApi */ false, /* includeCategoryLinks */ true ),
 			afchPage.getShortDescription()
-		).then( function ( pageText, existingWikiProjectsResult, categories, shortDescription ) {
-			var alreadyHasWPBio = existingWikiProjectsResult.alreadyHasWPBio,
+		).then( ( pageText, existingWikiProjectsResult, categories, shortDescription ) => {
+			const alreadyHasWPBio = existingWikiProjectsResult.alreadyHasWPBio,
 				wikiProjectMap = existingWikiProjectsResult.wikiProjectMap,
 				existingWPBioTemplateName = existingWikiProjectsResult.existingWPBioTemplateName;
-			var existingWikiProjects = []; // already on draft's talk page
-			$.each( wikiProjectMap, function ( lowercaseTemplateName, obj ) {
+			const existingWikiProjects = []; // already on draft's talk page
+			$.each( wikiProjectMap, ( lowercaseTemplateName, obj ) => {
 				if ( obj.alreadyOnPage ) {
 					existingWikiProjects.push( obj );
 				}
 			} );
-			var hasWikiProjects = Object.keys( wikiProjectMap ).length > 0;
+			const hasWikiProjects = Object.keys( wikiProjectMap ).length > 0;
 			if ( !hasWikiProjects ) {
 				mw.notify( 'Could not load WikiProject list!' );
 			}
-			var wikiProjectObjs = Object.keys( wikiProjectMap ).map( function ( key ) {
-				return wikiProjectMap[ key ];
-			} );
+			const wikiProjectObjs = Object.keys( wikiProjectMap ).map( ( key ) => wikiProjectMap[ key ] );
 
 			loadView( 'accept', {
 				newTitle: afchSubmission.shortTitle,
@@ -1597,7 +1586,7 @@
 				// Only offer to patrol the page if not already patrolled (in other words, if
 				// the "Mark as patrolled" link can be found in the DOM)
 				showPatrolOption: !!$afch.find( '.patrollink' ).length
-			}, function () {
+			}, () => {
 				$afch.find( '#newAssessment' ).chosen( {
 					allow_single_deselect: true,
 					disable_search: true,
@@ -1607,8 +1596,8 @@
 
 				// If draft is assessed as stub, show stub sorting
 				// interface using User:SD0001/StubSorter.js
-				$afch.find( '#newAssessment' ).change( function () {
-					var isClassStub = $( this ).val() === 'stub';
+				$afch.find( '#newAssessment' ).on( 'change', function () {
+					const isClassStub = $( this ).val() === 'stub';
 					$afch.find( '#stubSorterWrapper' ).toggleClass( 'hidden', !isClassStub );
 					if ( isClassStub ) {
 						if ( mw.config.get( 'wgDBname' ) !== 'enwiki' ) {
@@ -1618,13 +1607,13 @@
 
 						if ( $afch.find( '#stubSorterContainer' ).html() === '' ) {
 							mw.hook( 'StubSorter_activate' ).fire( $afch.find( '#stubSorterContainer' ) );
-							var promise = $.when();
-							var wasStubSorterActivated = $afch.find( '#stubSorterContainer' ).html() !== '';
+							let promise = $.when();
+							const wasStubSorterActivated = $afch.find( '#stubSorterContainer' ).html() !== '';
 							if ( !wasStubSorterActivated ) {
 								promise = mw.loader.getScript( 'https://en.wikipedia.org/w/index.php?title=User:SD0001/StubSorter.js&action=raw&ctype=text/javascript' );
 							}
 
-							promise.then( function () {
+							promise.then( () => {
 								if ( !wasStubSorterActivated ) {
 									mw.hook( 'StubSorter_activate' ).fire( $afch.find( '#stubSorterContainer' ) );
 								}
@@ -1649,8 +1638,8 @@
 				// Extend the chosen menu for new WikiProjects. We hackily show a
 				// "Click to manually add {{PROJECT}}" link -- sadly, jquery.chosen
 				// doesn't support this natively.
-				$afch.find( '#newWikiProjects_chzn input' ).keyup( function () {
-					var $chzn = $afch.find( '#newWikiProjects_chzn' ),
+				$afch.find( '#newWikiProjects_chzn input' ).on( 'keyup', function () {
+					const $chzn = $afch.find( '#newWikiProjects_chzn' ),
 						$input = $( this ),
 						newProject = $input.val(),
 						$noResults = $chzn.find( 'li.no-results' );
@@ -1663,8 +1652,8 @@
 							.append(
 								$( '<a>' )
 									.text( 'Click to manually add {{' + newProject + '}} to the page\'s WikiProject list.' )
-									.click( function () {
-										var $wikiprojects = $afch.find( '#newWikiProjects' );
+									.on( 'click', () => {
+										const $wikiprojects = $afch.find( '#newWikiProjects' );
 
 										$( '<option>' )
 											.attr( 'value', newProject )
@@ -1688,8 +1677,8 @@
 				// Since jquery.chosen doesn't natively support dynamic results,
 				// we sneakily inject some dynamic suggestions instead. Consider
 				// switching to something like Select2 to avoid this hackery...
-				$afch.find( '#newCategories_chosen input' ).keyup( function ( e ) {
-					var $input = $( this ),
+				$afch.find( '#newCategories_chosen input' ).on( 'keyup', function ( e ) {
+					const $input = $( this ),
 						prefix = $input.val(),
 						$categories = $afch.find( '#newCategories' );
 
@@ -1704,7 +1693,7 @@
 					$input.css( 'width', '100%' );
 					$input.parent().css( 'width', '100%' );
 
-					AFCH.api.getCategoriesByPrefix( prefix ).done( function ( categories ) {
+					AFCH.api.getCategoriesByPrefix( prefix ).done( ( categories ) => {
 
 						// Reset the text box width again
 						$input.css( 'width', '100%' );
@@ -1720,7 +1709,7 @@
 						$categories.children().not( ':selected' ).remove();
 
 						// Now, add the new suggestions
-						$.each( categories, function ( _, category ) {
+						$.each( categories, ( _, category ) => {
 							$( '<option>' )
 								.attr( 'value', category )
 								.text( category )
@@ -1738,7 +1727,7 @@
 				} );
 
 				// Show bio options if Biography option checked
-				$afch.find( '#isBiography' ).change( function () {
+				$afch.find( '#isBiography' ).on( 'change', function () {
 					$afch.find( '#bioOptionsWrapper' ).toggleClass( 'hidden', !this.checked );
 				} );
 				if ( alreadyHasWPBio ) {
@@ -1746,12 +1735,12 @@
 				}
 
 				function prefillBiographyDetails() {
-					var titleParts;
+					let titleParts;
 
 					// Prefill `LastName, FirstName` for Biography if the page title is two words
 					// after removing any trailing parentheticals (likely disambiguation), and
 					// therefore probably safe to asssume in a `FirstName LastName` format.
-					var title = afchSubmission.shortTitle.replace( / \([\s\S]*?\)$/g, '' );
+					const title = afchSubmission.shortTitle.replace( / \([\s\S]*?\)$/g, '' );
 					titleParts = title.split( ' ' );
 					if ( titleParts.length === 2 ) {
 						$afch.find( '#subjectName' ).val( titleParts[ 1 ] + ', ' + titleParts[ 0 ] );
@@ -1760,14 +1749,14 @@
 				prefillBiographyDetails();
 
 				// If subject is dead, show options for death details
-				$afch.find( '#lifeStatus' ).change( function () {
+				$afch.find( '#lifeStatus' ).on( 'change', function () {
 					$afch.find( '#deathWrapper' ).toggleClass( 'hidden', $( this ).val() !== 'dead' );
 				} );
 
 				// Show an error if the page title already exists in the mainspace,
 				// or if the title is create-protected and user is not an admin
-				$afch.find( '#newTitle' ).keyup( function () {
-					var page,
+				$afch.find( '#newTitle' ).on( 'keyup', function () {
+					let page,
 						linkToPage,
 						$field = $( this ),
 						$status = $afch.find( '#titleStatus' ),
@@ -1793,7 +1782,7 @@
 					AFCH.api.get( {
 						action: 'query',
 						titles: 'Talk:' + page.rawTitle
-					} ).done( function ( data ) {
+					} ).done( ( data ) => {
 						if ( !data.query.pages.hasOwnProperty( '-1' ) ) {
 							$status.html( 'The talk page for "' + linkToPage + '" exists.' );
 						}
@@ -1812,21 +1801,21 @@
 							inprop: 'protection',
 							titles: page.rawTitle
 						} )
-					).then( function ( rawBlacklist, rawInfo ) {
-						var errorHtml, buttonText;
+					).then( ( rawBlacklist, rawInfo ) => {
+						let errorHtml, buttonText;
 
 						// Get just the result, not the Promise object
-						var blacklistResult = rawBlacklist[ 0 ],
+						let blacklistResult = rawBlacklist[ 0 ],
 							infoResult = rawInfo[ 0 ];
 
-						var pageAlreadyExists = !infoResult.query.pages.hasOwnProperty( '-1' );
+						const pageAlreadyExists = !infoResult.query.pages.hasOwnProperty( '-1' );
 
-						var pages = infoResult && infoResult.query && infoResult.query.pages && infoResult.query.pages;
-						var firstPageInObject = Object.values( pages )[ 0 ];
-						var pageIsRedirect = firstPageInObject && ( 'redirect' in firstPageInObject );
+						const pages = infoResult && infoResult.query && infoResult.query.pages && infoResult.query.pages;
+						const firstPageInObject = Object.values( pages )[ 0 ];
+						const pageIsRedirect = firstPageInObject && ( 'redirect' in firstPageInObject );
 
 						if ( pageAlreadyExists && pageIsRedirect ) {
-							var linkToRedirect = AFCH.jQueryToHtml( AFCH.makeLinkElementToPage( page.rawTitle, null, null, true ) );
+							const linkToRedirect = AFCH.jQueryToHtml( AFCH.makeLinkElementToPage( page.rawTitle, null, null, true ) );
 							errorHtml = '<br />Whoops, the page "' + linkToRedirect + '" already exists and is a redirect. <span id="afch-redirect-notification">Do you want to tag it for speedy deletion so you can accept this draft later? <a id="afch-redirect-tag-speedy">Yes</a> / <a id="afch-redirect-abort">No</a></span>';
 							buttonText = 'The proposed title already exists';
 						} else if ( pageAlreadyExists ) {
@@ -1836,7 +1825,7 @@
 							// If the page doesn't exist but IS create-protected and the
 							// current reviewer is not an admin, also display an error
 							// FIXME: offer one-click request unprotection?
-							$.each( infoResult.query.pages[ '-1' ].protection, function ( _, entry ) {
+							$.each( infoResult.query.pages[ '-1' ].protection, ( _, entry ) => {
 								if ( entry.type === 'create' && entry.level === 'sysop' && $.inArray( 'sysop', mw.config.get( 'wgUserGroups' ) ) === -1 ) {
 									errorHtml = 'Darn it, "' + linkToPage + '" is create-protected. You will need to request unprotection before accepting.';
 									buttonText = 'The proposed title is create-protected';
@@ -1863,12 +1852,12 @@
 						$status.html( errorHtml );
 
 						// Add listener for the "Do you want to tag it for speedy deletion so you can accept this draft later?" "yes" link.
-						$( '#afch-redirect-tag-speedy' ).on( 'click', function () {
+						$( '#afch-redirect-tag-speedy' ).on( 'click', () => {
 							handleAcceptOverRedirect( page.rawTitle );
 						} );
 
 						// Add listener for the "Do you want to tag it for speedy deletion so you can accept this draft later?" "no" link.
-						$( '#afch-redirect-abort' ).on( 'click', function () {
+						$( '#afch-redirect-abort' ).on( 'click', () => {
 							$( '#afch-redirect-notification' ).hide();
 						} );
 
@@ -1895,15 +1884,15 @@
 	}
 
 	function showDeclineOptions() {
-		loadView( 'decline', {}, function () {
-			var $reasons, $commonSection, declineCounts,
+		loadView( 'decline', {}, () => {
+			let $reasons, $commonSection, declineCounts,
 				pristineState = $afch.find( '#declineInputWrapper' ).html();
 
 			// pos is either 1 or 2, based on whether the chosen reason that
 			// is triggering this update is first or second in the multi-select
 			// control
 			function updateTextfield( newPrompt, newPlaceholder, newValue, pos ) {
-				var wrapper = $afch.find( '#textfieldWrapper' + ( pos === 2 ? '2' : '' ) );
+				const wrapper = $afch.find( '#textfieldWrapper' + ( pos === 2 ? '2' : '' ) );
 
 				// Update label and placeholder
 				wrapper.find( 'label' ).text( newPrompt );
@@ -1923,14 +1912,10 @@
 			declineCounts = AFCH.userData.get( 'decline-counts', false );
 
 			if ( declineCounts ) {
-				var declineList = $.map( declineCounts, function ( _, key ) {
-					return key;
-				} );
+				const declineList = $.map( declineCounts, ( _, key ) => key );
 
 				// Sort list in descending order (most-used at beginning)
-				declineList.sort( function ( a, b ) {
-					return declineCounts[ b ] - declineCounts[ a ];
-				} );
+				declineList.sort( ( a, b ) => declineCounts[ b ] - declineCounts[ a ] );
 
 				$reasons = $afch.find( '#declineReason' );
 				$commonSection = $( '<optgroup>' )
@@ -1938,8 +1923,8 @@
 					.insertBefore( $reasons.find( 'optgroup' ).first() );
 
 				// Show the 5 most used options
-				$.each( declineList.splice( 0, 5 ), function ( _, rationale ) {
-					var $relevant = $reasons.find( 'option[value="' + rationale + '"]' );
+				$.each( declineList.splice( 0, 5 ), ( _, rationale ) => {
+					const $relevant = $reasons.find( 'option[value="' + rationale + '"]' );
 					$relevant.clone( true ).appendTo( $commonSection );
 				} );
 			}
@@ -1966,8 +1951,8 @@
 			$afch.find( '#rejectReason_chosen' ).css( 'width', '350px' );
 
 			// And now add the handlers for when a specific decline reason is selected
-			$afch.find( '#declineReason' ).change( function () {
-				var reason = $afch.find( '#declineReason' ).val(),
+			$afch.find( '#declineReason' ).on( 'change', () => {
+				const reason = $afch.find( '#declineReason' ).val(),
 					candidateDupeName = ( afchSubmission.shortTitle !== 'sandbox' ) ? afchSubmission.shortTitle : '',
 					prevDeclineComment = $afch.find( '#declineTextarea' ).val(),
 					declineHandlers = {
@@ -1975,8 +1960,8 @@
 							$afch.find( '#cvUrlWrapper' ).removeClass( 'hidden' );
 							$afch.add( '#csdWrapper' ).removeClass( 'hidden' );
 
-							$afch.find( '#cvUrlTextarea' ).keyup( function () {
-								var text = $( this ).val(),
+							$afch.find( '#cvUrlTextarea' ).on( 'keyup', function () {
+								let text = $( this ).val(),
 									numUrls = text ? text.split( '\n' ).length : 0,
 									submitButton = $afch.find( '#afchSubmitForm' );
 								if ( numUrls >= 1 && numUrls <= 3 ) {
@@ -1995,7 +1980,7 @@
 							} );
 
 							// Check if there's an OTRS notice
-							new AFCH.Page( 'Draft talk:' + afchSubmission.shortTitle ).getText( /* usecache */ false ).done( function ( text ) {
+							new AFCH.Page( 'Draft talk:' + afchSubmission.shortTitle ).getText( /* usecache */ false ).done( ( text ) => {
 								if ( /ConfirmationOTRS/.test( text ) ) {
 									$afch.find( '#declineInputWrapper' ).append(
 										$( '<div>' )
@@ -2059,7 +2044,7 @@
 							size: 'large',
 							type: 'block'
 						} ).css( 'padding', '20px' ) );
-					AFCH.getReason( reason ).done( function ( html ) {
+					AFCH.getReason( reason ).done( ( html ) => {
 						$( '#previewContainer' ).html( html );
 					} );
 				}
@@ -2068,27 +2053,27 @@
 				// option, and the submit form button
 				$afch.find( '#declineTextarea' ).add( '#notifyWrapper' ).add( '#afchSubmitForm' )
 					.toggleClass( 'hidden', !reason || !reason.length )
-					.on( 'keyup', mw.util.debounce( 500, function () {
+					.on( 'keyup', mw.util.debounce( 500, () => {
 						previewComment( $( '#declineTextarea' ), $( '#declineInputPreview' ) );
 					} ) );
 			} ); // End change handler for the decline reason select box
 
 			// And the the handlers for when a specific REJECT reason is selected
-			$afch.find( '#rejectReason' ).change( function () {
-				var reason = $afch.find( '#rejectReason' ).val();
+			$afch.find( '#rejectReason' ).on( 'change', () => {
+				const reason = $afch.find( '#rejectReason' ).val();
 
 				// If a reason has been specified, show the textarea, notify
 				// option, and the submit form button
 				$afch.find( '#rejectTextarea' ).add( '#notifyWrapper' ).add( '#afchSubmitForm' )
 					.toggleClass( 'hidden', !reason || !reason.length )
-					.on( 'keyup', mw.util.debounce( 500, function () {
+					.on( 'keyup', mw.util.debounce( 500, () => {
 						previewComment( $( '#rejectTextarea' ), $( '#rejectInputPreview' ) );
 					} ) );
 			} ); // End change handler for the reject reason select box
 
 			// Attach the preview event listener
-			$afch.find( '#previewTrigger' ).click( function () {
-				var reason = $afch.find( '#declineReason' ).val();
+			$afch.find( '#previewTrigger' ).on( 'click', function () {
+				const reason = $afch.find( '#declineReason' ).val();
 				if ( this.textContent == '(preview)' && reason ) {
 					$( '#previewContainer' )
 						.empty()
@@ -2096,7 +2081,7 @@
 							size: 'large',
 							type: 'block'
 						} ).css( 'padding', '20px' ) );
-					var reasonDeferreds = reason.map( AFCH.getReason );
+					const reasonDeferreds = reason.map( AFCH.getReason );
 					$.when.apply( $, reasonDeferreds ).then( function () {
 						$( '#previewContainer' )
 							.html( Array.prototype.slice.call( arguments )
@@ -2110,8 +2095,8 @@
 			} );
 
 			// Attach the decline vs reject radio button listener
-			$afch.find( 'input[type=radio][name=declineReject]' ).click( function () {
-				var declineOrReject = $afch.find( 'input[name=declineReject]:checked' ).val();
+			$afch.find( 'input[type=radio][name=declineReject]' ).on( 'click', () => {
+				const declineOrReject = $afch.find( 'input[name=declineReject]:checked' ).val();
 				$afch.find( '#declineReasonWrapper' ).toggleClass( 'hidden', declineOrReject === 'reject' );
 				$afch.find( '#rejectReasonWrapper' ).toggleClass( 'hidden', declineOrReject === 'decline' );
 				$afch.find( '#declineInputWrapper' ).toggleClass( 'hidden', declineOrReject === 'reject' );
@@ -2131,12 +2116,12 @@
 	}
 
 	function previewComment( $textarea, $previewArea ) {
-		var commentText = $textarea.val();
+		const commentText = $textarea.val();
 		if ( commentText ) {
 			AFCH.api.parse( '{{AfC comment|1=' + addSignature( commentText ) + '}}', {
 				pst: true,
 				title: mw.config.get( 'wgPageName' )
-			} ).then( function ( html ) {
+			} ).then( ( html ) => {
 				$previewArea.html( html );
 			} );
 		} else {
@@ -2149,12 +2134,12 @@
 			action: 'query',
 			list: 'blocks',
 			bkusers: userName
-		} ).then( function ( data ) {
-			var blocks = data.query.blocks;
-			var blockData = null;
-			var currentTime = new Date().toISOString();
+		} ).then( ( data ) => {
+			const blocks = data.query.blocks;
+			let blockData = null;
+			const currentTime = new Date().toISOString();
 
-			for ( var i = 0; i < blocks.length; i++ ) {
+			for ( let i = 0; i < blocks.length; i++ ) {
 				if ( blocks[ i ].expiry === 'infinity' || blocks[ i ].expiry > currentTime ) {
 					blockData = blocks[ i ];
 					break;
@@ -2162,7 +2147,7 @@
 			}
 
 			return blockData;
-		} ).catch( function ( err ) {
+		} ).catch( ( err ) => {
 			console.log( 'abort ' + err );
 			return null;
 		} );
@@ -2171,14 +2156,14 @@
 	function showCommentOptions() {
 		loadView( 'comment', {} );
 
-		var $submitButton = $( '#afchSubmitForm' );
+		const $submitButton = $( '#afchSubmitForm' );
 		$submitButton.hide();
 
-		$( '#commentText' ).on( 'keyup', mw.util.debounce( 500, function () {
+		$( '#commentText' ).on( 'keyup', mw.util.debounce( 500, () => {
 			previewComment( $( '#commentText' ), $( '#commentPreview' ) );
 
 			// Hide the submit button if there is no comment typed in
-			var comment = $( '#commentText' ).val();
+			const comment = $( '#commentText' ).val();
 			if ( comment.length > 0 ) {
 				$submitButton.show();
 			} else {
@@ -2190,11 +2175,11 @@
 	}
 
 	function showSubmitOptions() {
-		var customSubmitters = [];
+		const customSubmitters = [];
 
 		// Iterate over the submitters and add them to the custom submitters list,
 		// displayed in the "submit as" dropdown.
-		$.each( afchSubmission.submitters, function ( index, submitter ) {
+		$.each( afchSubmission.submitters, ( index, submitter ) => {
 			customSubmitters.push( {
 				name: submitter,
 				description: submitter + ( index === 0 ? ' (most recent submitter)' : ' (past submitter)' ),
@@ -2204,7 +2189,7 @@
 
 		loadView( 'submit', {
 			customSubmitters: customSubmitters
-		}, function () {
+		}, () => {
 
 			// Reset the status indicators for the username & errors
 			function resetStatus() {
@@ -2217,8 +2202,8 @@
 			}
 
 			// Show the other textbox when `other` is selected in the menu
-			$afch.find( '#submitType' ).change( function () {
-				var isOtherSelected = $afch.find( '#submitType' ).val() === 'other';
+			$afch.find( '#submitType' ).on( 'change', () => {
+				const isOtherSelected = $afch.find( '#submitType' ).val() === 'other';
 
 				if ( isOtherSelected ) {
 					$afch.find( '#submitterNameWrapper' ).removeClass( 'hidden' );
@@ -2230,8 +2215,8 @@
 				resetStatus();
 
 				// Show an error if there's no such user
-				$afch.find( '#submitterName' ).keyup( function () {
-					var field = $( this ),
+				$afch.find( '#submitterName' ).on( 'keyup', function () {
+					const field = $( this ),
 						status = $( '#submitterNameStatus' ),
 						submitButton = $afch.find( '#afchSubmitForm' ),
 						submitter = field.val();
@@ -2260,7 +2245,7 @@
 						action: 'query',
 						list: 'users',
 						ususers: submitter
-					} ).done( function ( data ) {
+					} ).done( ( data ) => {
 						if ( data.query.users[ 0 ].missing !== undefined ) {
 							field.addClass( 'bad-input' );
 							status.text( 'No user named "' + submitter + '".' );
@@ -2298,8 +2283,8 @@
 		} );
 
 		// Mark the draft as under review.
-		afchPage.getText( false ).then( function ( rawText ) {
-			var text = new AFCH.Text( rawText );
+		afchPage.getText( false ).then( ( rawText ) => {
+			const text = new AFCH.Text( rawText );
 			afchSubmission.setStatus( 'r', {
 				reviewer: AFCH.consts.user,
 				reviewts: '{{subst:REVISIONTIMESTAMP}}'
@@ -2315,13 +2300,13 @@
 	}
 
 	function handleAccept( data ) {
-		var newText = data.afchText;
+		let newText = data.afchText;
 
 		AFCH.actions.movePage( afchPage.rawTitle, data.newTitle,
 			'Publishing accepted [[Wikipedia:Articles for creation|Articles for creation]] submission',
 			{ movetalk: true } ) // Also move associated talk page if exists (e.g. `Draft_talk:`)
-			.done( function ( moveData ) {
-				var $patrolLink,
+			.done( ( moveData ) => {
+				let $patrolLink,
 					newPage = new AFCH.Page( moveData.to ),
 					talkPage = newPage.getTalkPage(),
 					recentPage = new AFCH.Page( 'Wikipedia:Articles for creation/recent' );
@@ -2330,7 +2315,7 @@
 				// -------
 
 				// get comments left by reviewers to put on talk page
-				var comments = [];
+				let comments = [];
 				if ( data.copyComments ) {
 					comments = newText.getAfcComments();
 				}
@@ -2346,7 +2331,7 @@
 
 				// Add biography details
 				if ( data.isBiography ) {
-					var deathYear = 'LIVING';
+					let deathYear = 'LIVING';
 					if ( data.lifeStatus === 'dead' ) {
 						deathYear = data.deathYear || 'MISSING';
 					} else if ( data.lifeStatus === 'unknown' ) {
@@ -2387,7 +2372,7 @@
 				// TALK PAGE
 				// ---------
 
-				talkPage.getText().done( function ( talkText ) {
+				talkPage.getText().done( ( talkText ) => {
 					talkText = AFCH.addTalkPageBanners(
 						talkText,
 						data.newAssessment,
@@ -2398,7 +2383,7 @@
 						data.subjectName
 					);
 
-					var summary = 'Placing [[Wikipedia:Articles for creation|Articles for creation]] banner, and possibly other banners';
+					const summary = 'Placing WikiProject banners';
 
 					if ( comments && comments.length > 0 ) {
 						talkText = talkText.trim() + '\n\n== Comments left by AfC reviewers ==\n' + comments.join( '\n\n' );
@@ -2414,7 +2399,7 @@
 				// ----------------
 
 				if ( data.notifyUser ) {
-					afchSubmission.getSubmitter().done( function ( submitter ) {
+					afchSubmission.getSubmitter().done( ( submitter ) => {
 						AFCH.actions.notifyUser( submitter, {
 							message: AFCH.msg.get( 'accepted-submission',
 								{ $1: newPage, $2: data.newAssessment } ),
@@ -2428,8 +2413,8 @@
 
 				var reviewer = AFCH.consts.user;
 				$.when( recentPage.getText(), afchSubmission.getSubmitter() )
-					.then( function ( text, submitter ) {
-						var newRecentText = text,
+					.then( ( text, submitter ) => {
+						let newRecentText = text,
 							matches = text.match( /{{afc contrib.*?}}\s*/gi ),
 							newTemplate = '{{afc contrib|' + data.newAssessment + '|' + newPage + '|' + submitter + '|' + reviewer + '}}\n';
 
@@ -2451,7 +2436,7 @@
 				// LOG TO USERSPACE
 				// ----------
 
-				afchSubmission.getSubmitter().done( function ( submitter ) {
+				afchSubmission.getSubmitter().done( ( submitter ) => {
 					AFCH.actions.logAfc( {
 						title: afchPage.rawTitle,
 						actionType: 'accept',
@@ -2462,7 +2447,7 @@
 	}
 
 	function handleDecline( data ) {
-		var declineCounts,
+		let declineCounts,
 			isDecline = data.declineRejectWrapper === 'decline', // true=decline, false=reject
 			text = data.afchText,
 			declineReason = data.declineReason[ 0 ],
@@ -2525,7 +2510,7 @@
 
 		// Copyright violations get {{db-g12}}'d as well
 		if ( declineReason === 'cv' || declineReason2 === 'cv' ) {
-			var cvUrls = data.cvUrlTextarea.split( '\n' ).slice( 0, 3 ),
+			let cvUrls = data.cvUrlTextarea.split( '\n' ).slice( 0, 3 ),
 				urlParam = '';
 
 			if ( data.csdSubmission ) {
@@ -2559,7 +2544,7 @@
 		text.cleanUp();
 
 		// Build edit summary
-		var editSummary = ( isDecline ? 'Declining' : 'Rejecting' ) + ' submission: ',
+		let editSummary = ( isDecline ? 'Declining' : 'Rejecting' ) + ' submission: ',
 			lengthLimit = declineReason2 ? 120 : 180;
 		if ( declineReason === 'reason' ) {
 
@@ -2592,21 +2577,21 @@
 		} );
 
 		if ( data.notifyUser ) {
-			afchSubmission.getSubmitter().done( function ( submitter ) {
-				var userTalk = new AFCH.Page( ( new mw.Title( submitter, 3 ) ).getPrefixedText() ),
+			afchSubmission.getSubmitter().done( ( submitter ) => {
+				const userTalk = new AFCH.Page( ( new mw.Title( submitter, 3 ) ).getPrefixedText() ),
 					shouldTeahouse = data.inviteToTeahouse ? $.Deferred() : false;
 
 				// Check categories on the page to ensure that if the user has already been
 				// invited to the Teahouse, we don't invite them again.
 				if ( data.inviteToTeahouse ) {
-					userTalk.getCategories( /* useApi */ true ).done( function ( categories ) {
-						var hasTeahouseCat = false,
+					userTalk.getCategories( /* useApi */ true ).done( ( categories ) => {
+						let hasTeahouseCat = false,
 							teahouseCategories = [
 								'Category:Wikipedians who have received a Teahouse invitation',
 								'Category:Wikipedians who have received a Teahouse invitation through AfC'
 							];
 
-						$.each( categories, function ( _, cat ) {
+						$.each( categories, ( _, cat ) => {
 							if ( teahouseCategories.indexOf( cat ) !== -1 ) {
 								hasTeahouseCat = true;
 								return false;
@@ -2617,8 +2602,8 @@
 					} );
 				}
 
-				$.when( shouldTeahouse ).then( function ( teahouse ) {
-					var message;
+				$.when( shouldTeahouse ).then( ( teahouse ) => {
+					let message;
 					if ( isDecline ) {
 						message = AFCH.msg.get( 'declined-submission', {
 							$1: AFCH.consts.pagename,
@@ -2657,7 +2642,7 @@
 		}
 
 		// Log AfC if enabled and CSD if necessary
-		afchSubmission.getSubmitter().done( function ( submitter ) {
+		afchSubmission.getSubmitter().done( ( submitter ) => {
 			AFCH.actions.logAfc( {
 				title: afchPage.rawTitle,
 				actionType: isDecline ? 'decline' : 'reject',
@@ -2685,10 +2670,10 @@
 			prop: 'revisions',
 			revids: mw.config.get( 'wgCurRevisionId' ),
 			formatversion: 2
-		} ).then( function ( data ) {
+		} ).then( ( data ) => {
 			// convert timestamp format from 2024-05-03T09:40:20Z to 1714729221
-			var currentRevisionTimestampTZ = data.query.pages[ 0 ].revisions[ 0 ].timestamp;
-			var currentRevisionSeconds = ( new Date( currentRevisionTimestampTZ ).getTime() ) / 1000;
+			const currentRevisionTimestampTZ = data.query.pages[ 0 ].revisions[ 0 ].timestamp;
+			let currentRevisionSeconds = ( new Date( currentRevisionTimestampTZ ).getTime() ) / 1000;
 
 			// add one second. we don't want the current revision to be in our list of revisions
 			currentRevisionSeconds++;
@@ -2702,8 +2687,8 @@
 				formatversion: 2,
 				rvstart: currentRevisionSeconds,
 				rvdir: 'newer'
-			} ).then( function ( data ) {
-				var revisionsSinceTimestamp = data.query.pages[ 0 ].revisions;
+			} ).then( ( data ) => {
+				const revisionsSinceTimestamp = data.query.pages[ 0 ].revisions;
 				if ( revisionsSinceTimestamp && revisionsSinceTimestamp.length > 0 ) {
 					return true;
 				}
@@ -2716,17 +2701,17 @@
 		$( '#afchSubmitForm' ).hide();
 
 		// Putting this here instead of in tpl-submissions.html to reduce code duplication
-		var editConflictHtml = 'Edit conflict! Your changes were not saved. Please check the <a id="afchHistoryLink" href="">page history</a>. To avoid overwriting the other person\'s edits, please refresh this page and start again.';
+		const editConflictHtml = 'Edit conflict! Your changes were not saved. Please check the <a id="afchHistoryLink" href="">page history</a>. To avoid overwriting the other person\'s edits, please refresh this page and start again.';
 		$( '#afchEditConflict' ).html( editConflictHtml );
 
-		var historyLink = new mw.Uri( mw.util.getUrl( mw.config.get( 'wgPageName' ), { action: 'history' } ) );
+		const historyLink = new mw.Uri( mw.util.getUrl( mw.config.get( 'wgPageName' ), { action: 'history' } ) );
 		$( '#afchHistoryLink' ).prop( 'href', historyLink );
 
 		$( '#afchEditConflict' ).show();
 	}
 
 	function handleComment( data ) {
-		var text = data.afchText;
+		const text = data.afchText;
 
 		afchSubmission.addNewComment( data.commentText );
 		text.updateAfcTemplates( afchSubmission.makeWikicode() );
@@ -2739,7 +2724,7 @@
 		} );
 
 		if ( data.notifyUser ) {
-			afchSubmission.getSubmitter().done( function ( submitter ) {
+			afchSubmission.getSubmitter().done( ( submitter ) => {
 				AFCH.actions.notifyUser( submitter, {
 					message: AFCH.msg.get( 'comment-on-submission',
 						{ $1: AFCH.consts.pagename } ),
@@ -2750,7 +2735,7 @@
 	}
 
 	function handleSubmit( data ) {
-		var text = data.afchText,
+		const text = data.afchText,
 			submitter = $.Deferred(),
 			submitType = data.submitType;
 
@@ -2759,7 +2744,7 @@
 		} else if ( submitType === 'self' ) {
 			submitter.resolve( AFCH.consts.user );
 		} else if ( submitType === 'creator' ) {
-			afchPage.getCreator().done( function ( user ) {
+			afchPage.getCreator().done( ( user ) => {
 				submitter.resolve( user );
 			} );
 		} else {
@@ -2767,7 +2752,7 @@
 			submitter.resolve( data.submitType );
 		}
 
-		submitter.done( function ( submitter ) {
+		submitter.done( ( submitter ) => {
 			afchSubmission.setStatus( '', { u: submitter } );
 
 			text.updateAfcTemplates( afchSubmission.makeWikicode() );
@@ -2785,8 +2770,8 @@
 	function handleCleanup() {
 		prepareForProcessing( 'Cleaning' );
 
-		afchPage.getText( false ).done( function ( rawText ) {
-			var text = new AFCH.Text( rawText );
+		afchPage.getText( false ).done( ( rawText ) => {
+			const text = new AFCH.Text( rawText );
 
 			// Even though we didn't modify them, still update the templates,
 			// because the order may have changed/been corrected
@@ -2803,12 +2788,12 @@
 	}
 
 	function handleMark( unmark ) {
-		var actionText = ( unmark ? 'Unmarking' : 'Marking' );
+		const actionText = ( unmark ? 'Unmarking' : 'Marking' );
 
 		prepareForProcessing( actionText, 'mark' );
 
-		afchPage.getText( false ).done( function ( rawText ) {
-			var text = new AFCH.Text( rawText );
+		afchPage.getText( false ).done( ( rawText ) => {
+			const text = new AFCH.Text( rawText );
 
 			if ( unmark ) {
 				afchSubmission.setStatus( '', { reviewer: false, reviewts: false } );
@@ -2832,7 +2817,7 @@
 	function handleG13() {
 		// We start getting the creator now (for notification later) because ajax is
 		// radical and handles simultaneous requests, but we don't let it delay tagging
-		var gotCreator = afchPage.getCreator();
+		const gotCreator = afchPage.getCreator();
 
 		// Update the display
 		prepareForProcessing( 'Requesting', 'g13' );
@@ -2841,8 +2826,8 @@
 		$.when(
 			afchPage.getText( false ),
 			afchPage.getLastModifiedDate()
-		).then( function ( rawText, lastModified ) {
-			var text = new AFCH.Text( rawText );
+		).then( ( rawText, lastModified ) => {
+			const text = new AFCH.Text( rawText );
 
 			// Add the deletion tag and clean up for good measure
 			text.prepend( '{{db-g13|ts=' + AFCH.dateToMwTimestamp( lastModified ) + '}}\n' );
@@ -2855,17 +2840,17 @@
 			} );
 
 			// Now notify the page creator as well as any and all previous submitters
-			$.when( gotCreator ).then( function ( creator ) {
-				var usersToNotify = [ creator ];
+			$.when( gotCreator ).then( ( creator ) => {
+				const usersToNotify = [ creator ];
 
-				$.each( afchSubmission.submitters, function ( _, submitter ) {
+				$.each( afchSubmission.submitters, ( _, submitter ) => {
 					// Don't notify the same user multiple times
 					if ( usersToNotify.indexOf( submitter ) === -1 ) {
 						usersToNotify.push( submitter );
 					}
 				} );
 
-				$.each( usersToNotify, function ( _, user ) {
+				$.each( usersToNotify, ( _, user ) => {
 					AFCH.actions.notifyUser( user, {
 						message: AFCH.msg.get( 'g13-submission',
 							{ $1: AFCH.consts.pagename } ),
@@ -2884,11 +2869,11 @@
 	}
 
 	function handlePostponeG13( data ) {
-		var postponeCode,
+		let postponeCode,
 			text = data.afchText,
 			rawText = text.get(),
 			postponeRegex = /\{\{AfC postpone G13\s*(?:\|\s*(\d*)\s*)?\}\}/ig;
-		var match = postponeRegex.exec( rawText );
+		const match = postponeRegex.exec( rawText );
 
 		// First add the postpone template
 		if ( match ) {

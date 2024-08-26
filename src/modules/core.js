@@ -8,7 +8,7 @@
 		 * @param {any} thing(s)
 		 */
 		log: function () {
-			var args = Array.prototype.slice.call( arguments );
+			const args = Array.prototype.slice.call( arguments );
 
 			if ( AFCH.consts.beta && console && console.log ) {
 				args.unshift( 'AFCH:' );
@@ -38,7 +38,7 @@
 		 * destroy functions by running AFCH.addDestroyFunction( fn )
 		 */
 		destroy: function () {
-			$.each( AFCH._destroyFunctions, function ( _, fn ) {
+			$.each( AFCH._destroyFunctions, ( _, fn ) => {
 				fn();
 			} );
 
@@ -113,15 +113,15 @@
 		 * if not, display an error and destroy AFCH
 		 */
 		checkWhitelist: function () {
-			var user = AFCH.consts.user,
+			const user = AFCH.consts.user,
 				whitelist = new AFCH.Page( AFCH.consts.whitelistTitle );
-			whitelist.getText().done( function ( text ) {
+			whitelist.getText().done( ( text ) => {
 
 				// sanitizedUser is user, but escaped for use in the regex.
 				// Otherwise a user named ... would always be able to use
 				// the script, so long as there was a user whose name was
 				// three characters long on the list!
-				var $howToDisable,
+				let $howToDisable,
 					sanitizedUser = user.replace( /[-[\]/{}()*+?.\\^$|]/g, '\\$&' ),
 					userSysop = $.inArray( 'sysop', mw.config.get( 'wgUserGroups' ) ) > -1,
 					userNPP = $.inArray( 'patroller', mw.config.get( 'wgUserGroups' ) ) > -1,
@@ -137,14 +137,14 @@
 							.append( 'If you wish to disable the helper script, ' )
 							.append( $( '<a>' )
 								.text( 'click here' )
-								.click( function () {
+								.on( 'click', () => {
 									// Submit the API request to disable the gadget.
 									// Note: We don't use `AFCH.api` here, because AFCH has already
 									// been destroyed due to the user not being on the whitelist!
 									( new mw.Api() ).postWithEditToken( {
 										action: 'options',
 										change: 'gadget-afchelper=0'
-									} ).done( function () {
+									} ).done( () => {
 										mw.notify( 'AFCH has been disabled successfully. If you wish to re-enable it in the ' +
 											'future, you can do so via your Preferences by checking "Yet Another AFC Helper Script".' );
 									} );
@@ -195,7 +195,7 @@
 				return false;
 			}
 
-			var promise = $.when();
+			let promise = $.when();
 
 			if ( AFCH.consts.beta ) {
 				// Load minified css
@@ -212,7 +212,7 @@
 			}
 
 			// And finally load the subscript
-			promise.then( function () {
+			promise.then( () => {
 				$.getScript( AFCH.consts.baseurl + '/' + type + '.js' );
 			} );
 
@@ -225,7 +225,7 @@
 		 * @param {string} name
 		 */
 		Page: function ( name ) {
-			var pg = this;
+			const pg = this;
 
 			this.title = new mw.Title( name );
 			this.rawTitle = this.title.getPrefixedText();
@@ -238,10 +238,10 @@
 			};
 
 			this.edit = function ( options ) {
-				var deferred = $.Deferred();
+				const deferred = $.Deferred();
 
 				AFCH.actions.editPage( this.rawTitle, options )
-					.done( function ( data ) {
+					.done( ( data ) => {
 						deferred.resolve( data );
 					} );
 
@@ -257,7 +257,7 @@
 			 * @return {jQuery.Deferred} resolves when data set successfully
 			 */
 			this._revisionApiRequest = function ( usecache ) {
-				var deferred = $.Deferred();
+				const deferred = $.Deferred();
 
 				if ( usecache && pg.hasAdditionalData ) {
 					return deferred.resolve();
@@ -267,7 +267,7 @@
 					hide: true,
 					moreProps: 'timestamp|user|ids',
 					moreParameters: { rvgeneratexml: true }
-				} ).done( function ( pagetext, data ) {
+				} ).done( ( pagetext, data ) => {
 					// Set internal data
 					pg.pageText = pagetext;
 					pg.additionalData.lastModified = new Date( data.timestamp );
@@ -291,9 +291,9 @@
 			 * @return {string}
 			 */
 			this.getText = function ( usecache ) {
-				var deferred = $.Deferred();
+				const deferred = $.Deferred();
 
-				this._revisionApiRequest( usecache ).done( function () {
+				this._revisionApiRequest( usecache ).done( () => {
 					deferred.resolve( pg.pageText );
 				} );
 
@@ -310,15 +310,15 @@
 			 *                       }
 			 */
 			this.getTemplates = function () {
-				var $templateDom, templates = [],
+				let $templateDom, templates = [],
 					deferred = $.Deferred();
 
-				this._revisionApiRequest( true ).done( function () {
+				this._revisionApiRequest( true ).done( () => {
 					$templateDom = $( $.parseXML( pg.additionalData.rawTemplateModel ) ).find( 'root' );
 
 					// We only want top level templates
 					$templateDom.children( 'template' ).each( function () {
-						var $el = $( this ),
+						const $el = $( this ),
 							data = {
 								target: $el.children( 'title' ).text(),
 								params: {}
@@ -336,7 +336,7 @@
 						 * @return {string}
 						 */
 						function parseValue( $v ) {
-							var text = AFCH.jQueryToHtml( $v );
+							let text = AFCH.jQueryToHtml( $v );
 
 							// Convert templates to look more template-y
 							text = text.replace( /<template>/g, '{{' );
@@ -352,7 +352,7 @@
 						}
 
 						$el.children( 'part' ).each( function () {
-							var $part = $( this ),
+							const $part = $( this ),
 								$name = $part.children( 'name' ),
 								// Use the name if set, or fall back to index if implicitly numbered
 								name = $.trim( $name.text() || $name.attr( 'index' ) ),
@@ -380,22 +380,20 @@
 			 * @return {Array}
 			 */
 			this.getCategories = function ( useApi, includeCategoryLinks ) {
-				var deferred = $.Deferred(),
+				const deferred = $.Deferred(),
 					text = this.pageText;
 
 				if ( useApi ) {
-					AFCH.api.getCategories( this.title ).done( function ( categories ) {
+					AFCH.api.getCategories( this.title ).done( ( categories ) => {
 						// The api returns mw.Title objects, so we convert them to simple
 						// strings before resolving the deferred.
-						deferred.resolve( categories ? $.map( categories, function ( cat ) {
-							return cat.getPrefixedText();
-						} ) : [] );
+						deferred.resolve( categories ? $.map( categories, ( cat ) => cat.getPrefixedText() ) : [] );
 					} );
 					return deferred;
 				}
 
-				this._revisionApiRequest( true ).done( function () {
-					var catRegex = new RegExp( '\\[\\[' + ( includeCategoryLinks ? ':?' : '' ) + 'Category:(.*?)\\s*\\]\\]', 'gi' ),
+				this._revisionApiRequest( true ).done( () => {
+					let catRegex = new RegExp( '\\[\\[' + ( includeCategoryLinks ? ':?' : '' ) + 'Category:(.*?)\\s*\\]\\]', 'gi' ),
 						match = catRegex.exec( text ),
 						categories = [];
 
@@ -417,15 +415,13 @@
 					prop: 'description',
 					titles: this.rawTitle,
 					formatversion: 2
-				} ).then( function ( json ) {
-					return json.query.pages[ 0 ].description || '';
-				} );
+				} ).then( ( json ) => json.query.pages[ 0 ].description || '' );
 			};
 
 			this.getLastModifiedDate = function () {
-				var deferred = $.Deferred();
+				const deferred = $.Deferred();
 
-				this._revisionApiRequest( true ).done( function () {
+				this._revisionApiRequest( true ).done( () => {
 					deferred.resolve( pg.additionalData.lastModified );
 				} );
 
@@ -433,9 +429,9 @@
 			};
 
 			this.getLastEditor = function () {
-				var deferred = $.Deferred();
+				const deferred = $.Deferred();
 
-				this._revisionApiRequest( true ).done( function () {
+				this._revisionApiRequest( true ).done( () => {
 					deferred.resolve( pg.additionalData.lastEditor );
 				} );
 
@@ -443,7 +439,7 @@
 			};
 
 			this.getCreator = function () {
-				var request, deferred = $.Deferred();
+				let request, deferred = $.Deferred();
 
 				if ( this.additionalData.creator ) {
 					deferred.resolve( this.additionalData.creator );
@@ -462,8 +458,8 @@
 
 				// FIXME: Handle failure more gracefully
 				AFCH.api.get( request )
-					.done( function ( data ) {
-						var rev, id = data.query.pageids[ 0 ];
+					.done( ( data ) => {
+						let rev, id = data.query.pageids[ 0 ];
 						if ( id && data.query.pages[ id ] ) {
 							rev = data.query.pages[ id ].revisions[ 0 ];
 							pg.additionalData.creator = rev.user;
@@ -477,13 +473,13 @@
 			};
 
 			this.exists = function () {
-				var deferred = $.Deferred();
+				const deferred = $.Deferred();
 
 				AFCH.api.get( {
 					action: 'query',
 					prop: 'info',
 					titles: this.rawTitle
-				} ).done( function ( data ) {
+				} ).done( ( data ) => {
 					// A nonexistent page will be indexed as '-1'
 					if ( data.query.pages.hasOwnProperty( '-1' ) ) {
 						deferred.resolve( false );
@@ -501,7 +497,7 @@
 			 * @return {AFCH.Page}
 			 */
 			this.getTalkPage = function () {
-				var title, ns = this.title.getNamespaceId();
+				let title, ns = this.title.getNamespaceId();
 
 				// Odd-numbered namespaces are already talk namespaces
 				if ( ns % 2 !== 0 ) {
@@ -529,7 +525,7 @@
 			 * @return {jQuery.Deferred} Resolves with pagetext and full data available as parameters
 			 */
 			getPageText: function ( pagename, options ) {
-				var status, request, rvprop = 'content',
+				let status, request, rvprop = 'content',
 					deferred = $.Deferred();
 
 				if ( !options.hide ) {
@@ -555,8 +551,8 @@
 				$.extend( request, options.moreParameters || {} );
 
 				AFCH.api.get( request )
-					.done( function ( data ) {
-						var rev, id = data.query.pageids[ 0 ];
+					.done( ( data ) => {
+						let rev, id = data.query.pageids[ 0 ];
 						if ( id && data.query.pages ) {
 							// The page might not exist; resolve with an empty string
 							if ( id === '-1' ) {
@@ -573,7 +569,7 @@
 							status.update( 'Error getting $1: ' + JSON.stringify( data ) );
 						}
 					} )
-					.fail( function ( err ) {
+					.fail( ( err ) => {
 						deferred.reject( err );
 						status.update( 'Error getting $1: ' + JSON.stringify( err ) );
 					} );
@@ -599,7 +595,7 @@
 			 * @return {jQuery.Deferred} Resolves if saved with all data
 			 */
 			editPage: function ( pagename, options ) {
-				var status, request, deferred = $.Deferred();
+				let status, request, deferred = $.Deferred();
 
 				if ( !options ) {
 					options = {};
@@ -665,11 +661,11 @@
 				}
 
 				AFCH.api.postWithEditToken( request )
-					.done( function ( data ) {
-						var $diffLink;
-						var api = options.subscribe ? 'discussiontoolsedit' : 'edit';
+					.done( ( data ) => {
+						let $diffLink;
+						const api = options.subscribe ? 'discussiontoolsedit' : 'edit';
 						// The success string is capitalized by one API and not the other
-						var success = options.subscribe ? 'success' : 'Success';
+						const success = options.subscribe ? 'success' : 'Success';
 
 						if ( data && data[ api ] && data[ api ].result && data[ api ].result === success ) {
 							deferred.resolve( data );
@@ -691,7 +687,7 @@
 							status.update( 'Error while saving $1: ' + JSON.stringify( data ) );
 						}
 					} )
-					.fail( function ( err ) {
+					.fail( ( err ) => {
 						deferred.reject( err );
 						status.update( 'Error while saving $1: ' + JSON.stringify( err ) );
 					} );
@@ -710,7 +706,7 @@
 			 * @return {jQuery.Deferred} Resolves with success/failure
 			 */
 			movePage: function ( oldTitle, newTitle, reason, additionalParameters, hide ) {
-				var status, request, deferred = $.Deferred();
+				let status, request, deferred = $.Deferred();
 
 				if ( !hide ) {
 					status = new AFCH.status.Element( 'Moving $1 to $2...', {
@@ -739,7 +735,7 @@
 				}
 
 				AFCH.api.postWithEditToken( request ) // Move token === edit token
-					.done( function ( data ) {
+					.done( ( data ) => {
 						if ( data && data.move ) {
 							status.update( 'Moved $1 to $2' );
 							deferred.resolve( data.move );
@@ -749,7 +745,7 @@
 							deferred.reject( data.error );
 						}
 					} )
-					.fail( function ( err ) {
+					.fail( ( err ) => {
 						status.update( 'Error moving $1 to $2: ' + JSON.stringify( err ) );
 						deferred.reject( err );
 					} );
@@ -769,10 +765,10 @@
 			 * @return {jQuery.Deferred} Resolves with success/failure
 			 */
 			notifyUser: function ( user, options ) {
-				var deferred = $.Deferred(),
+				const deferred = $.Deferred(),
 					userTalkPage = new AFCH.Page( new mw.Title( user, 3 ).getPrefixedText() ); // 3 = user talk namespace
 
-				userTalkPage.exists().done( function ( exists ) {
+				userTalkPage.exists().done( ( exists ) => {
 					userTalkPage.edit( {
 						contents: ( exists ? '' : '{{Talk header}}' ) + '\n\n' + options.message,
 						summary: options.summary || 'Notifying user',
@@ -782,10 +778,10 @@
 						followRedirects: true,
 						subscribe: AFCH.prefs.autoSubscribe
 					} )
-						.done( function () {
+						.done( () => {
 							deferred.resolve();
 						} )
-						.fail( function () {
+						.fail( () => {
 							deferred.reject();
 						} );
 				} );
@@ -803,7 +799,7 @@
 			 * @return {jQuery.Deferred|void} resolves false if the page did not exist, otherwise resolves/rejects with data from the edit
 			 */
 			logCSD: function ( options ) {
-				var deferred = $.Deferred(),
+				const deferred = $.Deferred(),
 					logPage = new AFCH.Page( 'User:' + mw.config.get( 'wgUserName' ) + '/' +
 						( window.Twinkle && window.Twinkle.getPref( 'speedyLogPageName' ) || 'CSD log' ) );
 
@@ -812,7 +808,7 @@
 					return;
 				}
 
-				logPage.getText().done( function ( logText ) {
+				logPage.getText().done( ( logText ) => {
 
 					// Don't edit if the page has doesn't exist or has no text
 					if ( !logText ) {
@@ -820,14 +816,14 @@
 						return;
 					}
 
-					var appendText = AFCH.actions.addLogHeaderIfNeeded( logText );
+					let appendText = AFCH.actions.addLogHeaderIfNeeded( logText );
 
 					appendText += '\n# [[:' + options.title + ']]: ' + options.reason;
 
 					if ( options.usersNotified && options.usersNotified.length ) {
 						appendText += '; notified {{user|1=' + options.usersNotified.shift() + '}}';
 
-						$.each( options.usersNotified, function ( _, user ) {
+						$.each( options.usersNotified, ( _, user ) => {
 							appendText += ', {{user|1=' + user + '}}';
 						} );
 					}
@@ -839,9 +835,9 @@
 						mode: 'appendtext',
 						summary: 'Logging speedy deletion nomination of [[' + options.title + ']]',
 						statusText: 'Logging speedy deletion nomination to'
-					} ).done( function ( data ) {
+					} ).done( ( data ) => {
 						deferred.resolve( data );
-					} ).fail( function ( data ) {
+					} ).fail( ( data ) => {
 						deferred.reject( data );
 					} );
 				} );
@@ -850,7 +846,7 @@
 			},
 
 			logAfc: function ( options ) {
-				var deferred = $.Deferred(),
+				const deferred = $.Deferred(),
 					logPage = new AFCH.Page( 'User:' + mw.config.get( 'wgUserName' ) + '/AfC log' );
 
 				// Abort if user disabled in preferences
@@ -858,14 +854,14 @@
 					return;
 				}
 
-				logPage.getText().done( function ( logText ) {
+				logPage.getText().done( ( logText ) => {
 					// Build log message
-					var header = AFCH.actions.addLogHeaderIfNeeded( logText );
-					var action = '\n# ' + options.actionType.charAt( 0 ).toUpperCase() + options.actionType.slice( 1 ) +
+					const header = AFCH.actions.addLogHeaderIfNeeded( logText );
+					const action = '\n# ' + options.actionType.charAt( 0 ).toUpperCase() + options.actionType.slice( 1 ) +
 										( options.actionType === 'decline' ? '' : 'e' ) + 'd';
-					var title = ' [[:' + options.title + ']]';
+					const title = ' [[:' + options.title + ']]';
 
-					var declineReason = '';
+					let declineReason = '';
 					if ( options.actionType === 'decline' ) {
 						// Custom is stored as 'reason' (because of template weirdness?), convert if necessary
 						options.declineReason = ( options.declineReason === 'reason' ) ? 'custom' : options.declineReason;
@@ -874,8 +870,8 @@
 						declineReason = ' (' + options.declineReason + ( options.declineReason2 ? ' & ' + options.declineReason2 : '' ) + ')';
 					}
 
-					var byUser = ' by [[User:' + options.submitter + '|]]';
-					var sig = ' ~~~~~\n';
+					const byUser = ' by [[User:' + options.submitter + '|]]';
+					const sig = ' ~~~~~\n';
 
 					// Make log edit
 					logPage.edit( {
@@ -883,9 +879,9 @@
 						mode: 'appendtext',
 						summary: 'Logging ' + options.actionType + ' of [[' + options.title + ']]',
 						statusText: 'Logging ' + options.actionType + ' to'
-					} ).done( function ( data ) {
+					} ).done( ( data ) => {
 						deferred.resolve( data );
-					} ).fail( function ( data ) {
+					} ).fail( ( data ) => {
 						deferred.reject( data );
 					} );
 				} );
@@ -901,7 +897,7 @@
 			 * @return {string} headerText
 			 */
 			addLogHeaderIfNeeded: function ( logText ) {
-				var date = new Date(),
+				let date = new Date(),
 					monthNames = [ 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December' ],
 					headerRe = new RegExp( '^==+\\s*' + monthNames[ date.getUTCMonth() ] + '\\s+' + date.getUTCFullYear() + '\\s*==+', 'm' ),
 					headerText = '';
@@ -922,7 +918,7 @@
 			 * @return {jQuery.Deferred}
 			 */
 			patrolRcid: function ( rcid, title ) {
-				var request, deferred = $.Deferred(),
+				let request, deferred = $.Deferred(),
 					status = new AFCH.status.Element( 'Patrolling $1...',
 						{ $1: AFCH.makeLinkElementToPage( title ) || 'page with id #' + rcid } );
 
@@ -937,7 +933,7 @@
 					return deferred;
 				}
 
-				AFCH.api.postWithToken( 'patrol', request ).done( function ( data ) {
+				AFCH.api.postWithToken( 'patrol', request ).done( ( data ) => {
 					if ( data.patrol && data.patrol.rcid ) {
 						status.update( 'Patrolled $1' );
 						deferred.resolve( data );
@@ -945,7 +941,7 @@
 						status.update( 'Failed to patrol $1: ' + JSON.stringify( data.patrol ) );
 						deferred.reject( data );
 					}
-				} ).fail( function ( data ) {
+				} ).fail( ( data ) => {
 					status.update( 'Failed to patrol $1: ' + JSON.stringify( data ) );
 					deferred.reject( data );
 				} );
@@ -999,7 +995,7 @@
 					}
 
 					// First run the substutions
-					$.each( this.substitutions, function ( key, value ) {
+					$.each( this.substitutions, ( key, value ) => {
 						// If we are passed a jQuery object, convert it to regular HTML first
 						if ( value.jquery ) {
 							value = AFCH.jQueryToHtml( value );
@@ -1062,11 +1058,11 @@
 			 * @return {string} Message value
 			 */
 			get: function ( key, substitutions ) {
-				var text = AFCH.msg.store[ key ] || '<' + key + '>';
+				let text = AFCH.msg.store[ key ] || '<' + key + '>';
 
 				// Perform substitutions if necessary
 				if ( substitutions ) {
-					$.each( substitutions, function ( original, replacement ) {
+					$.each( substitutions, ( original, replacement ) => {
 						text = text.replace(
 							// Escape the original substitution key, then make it a global regex
 							new RegExp( original.replace( /[-/\\^$*+?.()|[\]{}]/g, '\\$&' ), 'g' ),
@@ -1134,7 +1130,7 @@
 			 * @return {jQuery.Deferred} success
 			 */
 			set: function ( key, value ) {
-				var deferred = $.Deferred(),
+				const deferred = $.Deferred(),
 					fullKey = AFCH.userData._prefix + key,
 					fullValue = JSON.stringify( value );
 
@@ -1153,7 +1149,7 @@
 					action: 'options',
 					optionname: fullKey,
 					optionvalue: fullValue
-				} ).done( function ( data ) {
+				} ).done( ( data ) => {
 					deferred.resolve( data );
 				} );
 
@@ -1168,7 +1164,7 @@
 			 * @return {Mixed} value
 			 */
 			get: function ( key, fallback ) {
-				var value,
+				let value,
 					fullKey = AFCH.userData._prefix + key,
 					cachedWindow = AFCH.userData._optsCache[ fullKey ],
 					cachedLocal = window.localStorage && window.localStorage[ fullKey ];
@@ -1199,7 +1195,7 @@
 		 * @type {Object}
 		 */
 		Preferences: function () {
-			var prefs = this;
+			const prefs = this;
 
 			/**
 			 * Default values for user preferences; details for each preference can be
@@ -1227,7 +1223,7 @@
 			 * Initializes the preferences modification dialog
 			 */
 			this.initDialog = function () {
-				var $spinner = $.createSpinner( {
+				const $spinner = $.createSpinner( {
 					size: 'large',
 					type: 'block'
 				} ).css( 'padding', '20px' );
@@ -1272,7 +1268,7 @@
 						type: 'GET',
 						url: AFCH.consts.baseurl + '/tpl-preferences.js',
 						dataType: 'text'
-					} ).done( function ( data ) {
+					} ).done( ( data ) => {
 						prefs.views = new AFCH.Views( data );
 						prefs.renderMain();
 					} );
@@ -1297,7 +1293,7 @@
 
 				// Manually handle selecting the desired value in <select> menus
 				this.$dialog.find( 'select' ).each( function () {
-					var $select = $( this ),
+					const $select = $( this ),
 						id = $select.attr( 'id' ),
 						value = prefs.prefStore[ id ];
 					$select.find( 'option[value="' + value + '"]' ).prop( 'selected', true );
@@ -1316,7 +1312,7 @@
 				$.extend( this.prefStore, AFCH.getFormValues( this.$dialog.find( '.afch-input' ) ) );
 
 				// Set the new userData value
-				AFCH.userData.set( 'preferences', this.prefStore ).done( function () {
+				AFCH.userData.set( 'preferences', this.prefStore ).done( () => {
 					// When we're done, close the dialog and notify the user
 					prefs.$dialog.dialog( 'close' );
 					mw.notify( 'AFCH: Preferences saved successfully! They will take effect when the current page is ' +
@@ -1335,7 +1331,7 @@
 					.text( linkText || 'Update preferences' )
 					.addClass( 'preferences-link link' )
 					.appendTo( $element )
-					.click( function () {
+					.on( 'click', () => {
 						prefs.initDialog();
 						prefs.$dialog.dialog( 'open' );
 					} );
@@ -1360,18 +1356,18 @@
 			};
 
 			this.renderView = function ( name, data ) {
-				var view = this.views[ name ],
+				const view = this.views[ name ],
 					template = Hogan.compile( view );
 
 				return template.render( data );
 			};
 
 			this.loadFromSrc = function ( src ) {
-				var viewRegex = /<!--\s(.*?)\s-->\r?\n([\s\S]*?)<!--\s\/(.*?)\s-->/g,
+				let viewRegex = /<!--\s(.*?)\s-->\r?\n([\s\S]*?)<!--\s\/(.*?)\s-->/g,
 					match = viewRegex.exec( src );
 
 				while ( match !== null ) {
-					var key = match[ 1 ],
+					const key = match[ 1 ],
 						content = match[ 2 ];
 
 					this.setView( key, content );
@@ -1397,7 +1393,7 @@
 			this.previousState = false;
 
 			this.loadView = function ( view, data ) {
-				var code = this.views.renderView( view, data );
+				const code = this.views.renderView( view, data );
 
 				// Update the view cache
 				this.previousState = this.$element.clone( true );
@@ -1419,7 +1415,7 @@
 		 * @return {Mixed}
 		 */
 		getAndDelete: function ( object, key ) {
-			var v = object[ key ];
+			const v = object[ key ];
 			delete object[ key ];
 			return v;
 		},
@@ -1431,7 +1427,7 @@
 		 * @param {Mixed} value
 		 */
 		removeFromArray: function ( array, value ) {
-			var index = $.inArray( value, array );
+			let index = $.inArray( value, array );
 			while ( index !== -1 ) {
 				array.splice( index, 1 );
 				index = $.inArray( value, array );
@@ -1451,10 +1447,10 @@
 		 * @return {Object} object of values, with the ids as keys
 		 */
 		getFormValues: function ( $selector ) {
-			var data = {};
+			const data = {};
 
-			$selector.each( function ( _, element ) {
-				var value, allTexts,
+			$selector.each( ( _, element ) => {
+				let value, allTexts,
 					$element = $( element );
 
 				if ( element.type === 'checkbox' ) {
@@ -1499,16 +1495,16 @@
 		 * @return {jQuery} <a> element
 		 */
 		makeLinkElementToPage: function ( pagename, displayTitle, newTab, dontFollowRedirects ) {
-			var actualTitle = pagename.replace( /_/g, ' ' );
+			const actualTitle = pagename.replace( /_/g, ' ' );
 
 			// newTab is an optional parameter.
 			newTab = ( typeof newTab === 'undefined' ) ? true : newTab;
 
-			var options = {};
+			let options = {};
 			if ( dontFollowRedirects ) {
 				options = { redirect: 'no' };
 			}
-			var url = mw.util.getUrl( actualTitle, options );
+			const url = mw.util.getUrl( actualTitle, options );
 
 			return $( '<a>' )
 				.attr( 'href', url )
@@ -1526,7 +1522,7 @@
 		 * @return {jQuery} <a> element
 		 */
 		makeLinkElementToCategory: function ( pagename, displayTitle ) {
-			var linkElement = AFCH.makeLinkElementToPage( 'Special:RandomInCategory/' + pagename, displayTitle, false ),
+			const linkElement = AFCH.makeLinkElementToPage( 'Special:RandomInCategory/' + pagename, displayTitle, false ),
 				request = {
 					action: 'query',
 					titles: 'Category:' + pagename,
@@ -1541,9 +1537,9 @@
 			linkSpan.append( $( '<span>' ).attr( 'id', countSpanId ) );
 
 			AFCH.api.get( request )
-				.done( function ( data ) {
+				.done( ( data ) => {
 					if ( data.query.pages && !data.query.pages[ '-1' ] ) {
-						var pageKey = Object.keys( data.query.pages )[ 0 ],
+						const pageKey = Object.keys( data.query.pages )[ 0 ],
 							pagesCount = data.query.pages[ pageKey ].categoryinfo.pages;
 						$( '#' + countSpanId ).text( ' (' + pagesCount + ')' );
 
@@ -1562,12 +1558,12 @@
 		 * @return {string}
 		 */
 		convertWikilinksToHTML: function ( wikicode ) {
-			var newCode = wikicode,
+			let newCode = wikicode,
 				wikilinkRegex = /\[\[(.*?)\s*(?:\|\s*(.*?))?\]\]/g,
 				wikilinkMatch = wikilinkRegex.exec( wikicode );
 
 			while ( wikilinkMatch ) {
-				var title = wikilinkMatch[ 1 ],
+				const title = wikilinkMatch[ 1 ],
 					displayTitle = wikilinkMatch[ 2 ],
 					newLink = AFCH.makeLinkElementToPage( title, displayTitle );
 
@@ -1593,19 +1589,19 @@
 			// Hard to write a regex that doesn't catastrophic backtrack while still saving multiple categories and multiple blank lines. So we'll do this the old-fashioned way...
 
 			// Divide wikitext into lines
-			var lines = wikicode.split( '\n' );
+			let lines = wikicode.split( '\n' );
 
 			// Buffers
-			var linesToKeep = [];
-			var i;
+			const linesToKeep = [];
+			let i;
 
 			// Crawl the list of lines backward (bottom up)
-			var count = lines.length;
+			let count = lines.length;
 			for ( i = count - 1; i >= 0; i-- ) {
-				var line = lines[ i ];
-				var isWhitespace = line.match( /^\s*$/ );
-				var isCategory = line.match( /^\s*\[\[:?Category:/i );
-				var isHeading = line.match( /^==[^=]+==$/i );
+				const line = lines[ i ];
+				const isWhitespace = line.match( /^\s*$/ );
+				const isCategory = line.match( /^\s*\[\[:?Category:/i );
+				const isHeading = line.match( /^==[^=]+==$/i );
 
 				if ( isWhitespace || isCategory ) {
 					linesToKeep.push( line );
@@ -1624,8 +1620,8 @@
 			// Add the categories and blank lines back
 			// Need to iterate backward, same as the loop above
 			count = linesToKeep.length;
-			for ( var j = count - 1; j >= 0; j-- ) {
-				var lineToKeep = linesToKeep[ j ];
+			for ( let j = count - 1; j >= 0; j-- ) {
+				const lineToKeep = linesToKeep[ j ];
 				lines.push( lineToKeep );
 			}
 
@@ -1652,34 +1648,33 @@
 		 */
 		addTalkPageBanners: function ( wikicode, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName ) {
 			// build an array of all banners already on page
-			var bannerTemplates = 'wikiproject (?!banner)|football|oka';
-			var bannerTemplateRegEx = new RegExp( '{{(?:' + bannerTemplates + ')[^}]+}}', 'gi' );
-			var banners = wikicode.match( bannerTemplateRegEx ) || [];
+			const bannerTemplates = 'wikiproject (?!banner)|football|oka';
+			const bannerTemplateRegEx = new RegExp( '{{(?:' + bannerTemplates + ')[^}]*}}', 'gi' );
+			let banners = wikicode.match( bannerTemplateRegEx ) || [];
 
 			// delete all banners already on page
-			banners.forEach( function ( v ) {
+			banners.forEach( ( v ) => {
 				wikicode = wikicode.replace( v, '' );
 			} );
 
 			// delete shell already on page
-			var bannerShellTemplates = 'WikiProject banner shell|WikiProjectBanners|WikiProject Banners|WPB|WPBS|WikiProject cooperation shell|Wikiprojectbannershell|WikiProject Banner Shell|Wpb|WPBannerShell|Wpbs|Wikiprojectbanners|WP Banner Shell|WP banner shell|Bannershell|Wikiproject banner shell|WIkiProjectBanner Shell|WikiProjectBannerShell|WikiProject BannerShell|Coopshell|WikiprojectBannerShell|WikiProject Shell|Scope shell|Project shell|WikiProject shell|WikiProject banner|Wpbannershell|Multiple wikiprojects|Wikiproject banner holder|Project banner holder|WikiProject banner shell\\/test1|Article assessment|WikiProject bannershell';
-			var bannerShellRegEx = new RegExp( '{{(?:' + bannerShellTemplates + ')[^}]*}}', 'is' );
+			const bannerShellTemplates = 'WikiProject banner shell|WikiProjectBanners|WikiProject Banners|WPB|WPBS|WikiProject cooperation shell|Wikiprojectbannershell|WikiProject Banner Shell|Wpb|WPBannerShell|Wpbs|Wikiprojectbanners|WP Banner Shell|WP banner shell|Bannershell|Wikiproject banner shell|WIkiProjectBanner Shell|WikiProjectBannerShell|WikiProject BannerShell|Coopshell|WikiprojectBannerShell|WikiProject Shell|Scope shell|Project shell|WikiProject shell|WikiProject banner|Wpbannershell|Multiple wikiprojects|Wikiproject banner holder|Project banner holder|WikiProject banner shell\\/test1|Article assessment|WikiProject bannershell';
+			const bannerShellRegEx = new RegExp( '{{(?:' + bannerShellTemplates + ')[^}]*}}', 'is' );
 			wikicode = wikicode.replace( bannerShellRegEx, '' );
 
 			// trim. makes unit tests more stable
 			wikicode = wikicode.trim();
 
-			// add AFC banner to array
-			banners.push(
+			// Add AFC banner to array.
+			// Put at top for historical reasons. People are used to it being there.
+			banners.unshift(
 				'{{subst:WPAFC/article' +
 				( revId ? '|oldid=' + revId : '' ) +
 				'}}'
 			);
 
 			// delete existing biography banner. when accepting, reviewer is forced to choose if it's a biography or not, so we'll add (or not add) our own biography banner later
-			banners = banners.filter( function ( value ) {
-				return !value.match( /^{{WikiProject Biography/i );
-			} );
+			banners = banners.filter( ( value ) => !value.match( /^{{WikiProject Biography/i ) );
 
 			// add biography banner to array
 			if ( isBiography ) {
@@ -1697,7 +1692,7 @@
 			}
 
 			// add banners selected in UI to array
-			for ( var key in newWikiProjects ) {
+			for ( const key in newWikiProjects ) {
 				banners.push( '{{' + newWikiProjects[ key ] + '}}' );
 			}
 
@@ -1705,16 +1700,15 @@
 			banners = AFCH.removeDuplicateBanners( banners );
 
 			// delete |class= from banners in array
-			banners = banners.map( function ( value ) {
-				return value.replace( /\s*\|\s*class\s*=\s*[^|}]*([\n|}])/, '$1' );
-			} );
+			banners = banners.map( ( value ) => value.replace( /\s*\|\s*class\s*=\s*[^|}]*([\n|}])/, '$1' ) );
 
 			// Convert array back to wikitext and append to top of talk page.
 			// Always add a shell even if it's just wrapping one banner, for code simplification reasons.
 			// Add |class= to shell.
+			// Add |1=. Improves readability when lots of other parameters present.
 			wikicode = '{{WikiProject banner shell' +
 				( newAssessment ? '|class=' + newAssessment : '' ) +
-				'|\n' +
+				'|1=\n' +
 				banners.join( '\n' ) +
 				'\n}}\n' +
 				wikicode;
@@ -1735,10 +1729,10 @@
 		 * @return {Array} banners [ '{{WikiProject Australia}}' ]
 		 */
 		removeDuplicateBanners: function ( banners ) {
-			var uniqueBanners = [];
-			var bannerMap = {};
-			banners.forEach( function ( banner ) {
-				var bannerKey = banner.toLowerCase().match( /{{[^|}]+/ )[ 0 ];
+			const uniqueBanners = [];
+			const bannerMap = {};
+			banners.forEach( ( banner ) => {
+				const bannerKey = banner.toLowerCase().match( /{{[^|}]+/ )[ 0 ];
 				if ( !bannerMap[ bannerKey ] ) {
 					uniqueBanners.push( banner );
 					bannerMap[ bannerKey ] = true;
@@ -1756,7 +1750,7 @@
 		 * @return {string}
 		 */
 		relativeTimeSince: function ( old, now ) {
-			var oldDate = typeof old === 'object' ? old : AFCH.mwTimestampToDate( old ),
+			let oldDate = typeof old === 'object' ? old : AFCH.mwTimestampToDate( old ),
 				nowDate = typeof now === 'object' ? now : new Date(),
 				msPerMinute = 60 * 1000,
 				msPerHour = msPerMinute * 60,
@@ -1816,7 +1810,7 @@
 			toggleState( $( elementSelector ).is( ':visible' ) );
 
 			// Add the new click handler
-			$( document ).on( 'click', toggleSelector, function () {
+			$( document ).on( 'click', toggleSelector, () => {
 				toggleState( $( elementSelector ).hasClass( 'hidden' ) );
 			} );
 		},
@@ -1842,7 +1836,7 @@
 		 * @return {Date|number}
 		 */
 		parseForTimestamp: function ( string, mwstyle ) {
-			var exp, match, date;
+			let exp, match, date;
 
 			exp = new RegExp( '(\\d{1,2}):(\\d{2}), (\\d{1,2}) ' +
 				'(January|February|March|April|May|June|July|August|September|October|November|December) ' +
@@ -1876,7 +1870,7 @@
 		 * @return {Date|boolean} if unable to parse, returns false
 		 */
 		mwTimestampToDate: function ( string ) {
-			var date, dateMatches = /(\d{4})(\d\d)(\d\d)(\d\d)(\d\d)(\d\d)/.exec( string );
+			let date, dateMatches = /(\d{4})(\d\d)(\d\d)(\d\d)(\d\d)(\d\d)/.exec( string );
 
 			// If it *isn't* actually a MediaWiki-style timestamp, pass directly to date
 			if ( dateMatches === null ) {
@@ -1933,11 +1927,11 @@
 		 * @return {jQuery.Deferred} Resolves with the requested HTML
 		 */
 		getReason: function ( code ) {
-			var deferred = $.Deferred();
+			const deferred = $.Deferred();
 
 			$.post( 'https://en.wikipedia.org/api/rest_v1/transform/wikitext/to/html',
 				'wikitext={{AFC submission/comments|' + code + '}}&body_only=true',
-				function ( data ) {
+				( data ) => {
 					deferred.resolve( data );
 				}
 			);
