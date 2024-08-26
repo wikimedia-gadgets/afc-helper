@@ -2411,11 +2411,12 @@
 				// AFC/RECENT
 				// ----------
 
+				const reviewer = AFCH.consts.user;
 				$.when( recentPage.getText(), afchSubmission.getSubmitter() )
 					.then( ( text, submitter ) => {
 						let newRecentText = text,
 							matches = text.match( /{{afc contrib.*?}}\s*/gi ),
-							newTemplate = '{{afc contrib|' + data.newAssessment + '|' + newPage + '|' + submitter + '}}\n';
+							newTemplate = '{{afc contrib|' + data.newAssessment + '|' + newPage + '|' + submitter + '|' + reviewer + '}}\n';
 
 						// Remove the older entries (at bottom of the page) if necessary
 						// to ensure we keep only 10 entries at any given point in time
