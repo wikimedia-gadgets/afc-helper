@@ -2411,7 +2411,7 @@
 				// AFC/RECENT
 				// ----------
 
-				var reviewer = AFCH.consts.user;
+				const reviewer = AFCH.consts.user;
 				$.when( recentPage.getText(), afchSubmission.getSubmitter() )
 					.then( ( text, submitter ) => {
 						let newRecentText = text,
