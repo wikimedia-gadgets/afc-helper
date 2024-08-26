@@ -1669,7 +1669,7 @@
 			// Put at top for historical reasons. People are used to it being there.
 			banners.unshift(
 				'{{subst:WPAFC/article' +
-				( revId ? '|oldid=' + revId : '' ) +
+				( revId ? ' |oldid=' + revId : '' ) +
 				'}}'
 			);
 
@@ -1679,15 +1679,15 @@
 			// add biography banner to array
 			if ( isBiography ) {
 				banners.push(
-					'{{WikiProject Biography|living=' +
+					'{{WikiProject Biography |living=' +
 					( lifeStatus !== 'unknown' ? ( lifeStatus === 'living' ? 'yes' : 'no' ) : '' ) +
-					'|listas=' + subjectName +
+					' |listas=' + subjectName +
 					'}}'
 				);
 			}
 
 			// add disambiguation banner to array
-			if ( newAssessment === 'disambig' ) {
+			if ( newAssessment === 'Disambig' ) {
 				banners.push( '{{WikiProject Disambiguation}}' );
 			}
 
@@ -1707,8 +1707,8 @@
 			// Add |class= to shell.
 			// Add |1=. Improves readability when lots of other parameters present.
 			wikicode = '{{WikiProject banner shell' +
-				( newAssessment ? '|class=' + newAssessment : '' ) +
-				'|1=\n' +
+				( newAssessment ? ' |class=' + newAssessment : '' ) +
+				' |1=\n' +
 				banners.join( '\n' ) +
 				'\n}}\n' +
 				wikicode;
@@ -1732,7 +1732,9 @@
 			const uniqueBanners = [];
 			const bannerMap = {};
 			banners.forEach( ( banner ) => {
-				const bannerKey = banner.toLowerCase().match( /{{[^|}]+/ )[ 0 ];
+				let bannerKey = banner.toLowerCase().match( /{{[^|}]+/ )[ 0 ];
+				// get rid of whitespace at the end of the template name
+				bannerKey = bannerKey.trim();
 				if ( !bannerMap[ bannerKey ] ) {
 					uniqueBanners.push( banner );
 					bannerMap[ bannerKey ] = true;
