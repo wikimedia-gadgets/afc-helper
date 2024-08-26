@@ -1669,7 +1669,7 @@
 			// Put at top for historical reasons. People are used to it being there.
 			banners.unshift(
 				'{{subst:WPAFC/article' +
-				( revId ? '|oldid=' + revId : '' ) +
+				( revId ? ' |oldid=' + revId : '' ) +
 				'}}'
 			);
 
@@ -1679,9 +1679,9 @@
 			// add biography banner to array
 			if ( isBiography ) {
 				banners.push(
-					'{{WikiProject Biography|living=' +
+					'{{WikiProject Biography |living=' +
 					( lifeStatus !== 'unknown' ? ( lifeStatus === 'living' ? 'yes' : 'no' ) : '' ) +
-					'|listas=' + subjectName +
+					' |listas=' + subjectName +
 					'}}'
 				);
 			}
@@ -1707,8 +1707,8 @@
 			// Add |class= to shell.
 			// Add |1=. Improves readability when lots of other parameters present.
 			wikicode = '{{WikiProject banner shell' +
-				( newAssessment ? '|class=' + newAssessment : '' ) +
-				'|1=\n' +
+				( newAssessment ? ' |class=' + newAssessment : '' ) +
+				' |1=\n' +
 				banners.join( '\n' ) +
 				'\n}}\n' +
 				wikicode;
