@@ -3,8 +3,8 @@
 	// Check that we're in the right namespace and on the right page
 	switch ( mw.config.get( 'wgNamespaceNumber' ) ) {
 		case 4: // Wikipedia
-		case 5: // Wikipedia talk
-			var pageName = mw.config.get( 'wgTitle' );
+		case 5: { // Wikipedia talk
+			const pageName = mw.config.get( 'wgTitle' );
 			// return nothing for now, all drafts are now under Draft namespace
 			// currently only the article submission script is running here.
 			// to be used when script(s) for other modules such as category and
@@ -13,6 +13,7 @@
 				return;
 			}
 			break;
+		}
 		case 2: // User
 		case 118: // Draft
 			break;
@@ -35,8 +36,8 @@
 	AFCH.consts.baseurl = AFCH.consts.scriptpath +
 		'?action=raw&ctype=text/javascript&title=MediaWiki:Gadget-afch.js';
 
-	$.getScript( AFCH.consts.baseurl + '/core.js' ).done( function () {
-		var loaded = AFCH.load( 'submissions' ); // perhaps eventually there will be more modules besides just 'submissions'
+	$.getScript( AFCH.consts.baseurl + '/core.js' ).done( () => {
+		const loaded = AFCH.load( 'submissions' ); // perhaps eventually there will be more modules besides just 'submissions'
 		if ( !loaded ) {
 			mw.notify( 'AFCH could not be loaded: ' + ( AFCH.error || 'unknown error' ),
 				{ title: 'AFCH error' } );
