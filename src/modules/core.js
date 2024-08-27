@@ -1676,14 +1676,22 @@
 			// delete existing biography banner. when accepting, reviewer is forced to choose if it's a biography or not, so we'll add (or not add) our own biography banner later
 			banners = banners.filter( ( value ) => !value.match( /^{{WikiProject Biography/i ) );
 
-			// add biography banner to array
+			// add biography banner to array. and add |living= and |listas= to banner shell
+			let bannerShellExtraParams = '';
 			if ( isBiography ) {
 				banners.push(
-					'{{WikiProject Biography |living=' +
-					( lifeStatus !== 'unknown' ? ( lifeStatus === 'living' ? 'yes' : 'no' ) : '' ) +
-					' |listas=' + subjectName +
-					'}}'
+					'{{WikiProject Biography}}'
 				);
+
+				if ( lifeStatus === 'living' ) {
+					bannerShellExtraParams += ' |living=yes';
+				} else if ( lifeStatus === 'dead' ) {
+					bannerShellExtraParams += ' |living=no';
+				}
+
+				if ( subjectName ) {
+					bannerShellExtraParams += ' |listas=' + subjectName;
+				}
 			}
 
 			// add disambiguation banner to array
@@ -1708,6 +1716,7 @@
 			// Add |1=. Improves readability when lots of other parameters present.
 			wikicode = '{{WikiProject banner shell' +
 				( newAssessment ? ' |class=' + newAssessment : '' ) +
+				bannerShellExtraParams +
 				' |1=\n' +
 				banners.join( '\n' ) +
 				'\n}}\n' +
