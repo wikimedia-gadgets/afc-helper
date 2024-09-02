@@ -382,9 +382,25 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		const subjectName = '';
 		const output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
 		expect( output ).toBe(
-`{{WikiProject banner shell |class=Disambig |1=
+`{{WikiProject banner shell |1=
 {{subst:WPAFC/article |oldid=592681}}
 {{WikiProject Disambiguation}}
+}}`
+		);
+	} );
+
+	it( 'don\'t write a |class= if the banner shell can auto detect it. Examples: Template, Portal, Disambig, etc.', () => {
+		const wikicode = '';
+		const newAssessment = 'Template';
+		const revId = 592681;
+		const isBiography = false;
+		const newWikiProjects = [];
+		const lifeStatus = 'unknown';
+		const subjectName = '';
+		const output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
+		expect( output ).toBe(
+`{{WikiProject banner shell |1=
+{{subst:WPAFC/article |oldid=592681}}
 }}`
 		);
 	} );
