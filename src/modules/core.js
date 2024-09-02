@@ -1710,6 +1710,11 @@
 			// delete |class= from banners in array
 			banners = banners.map( ( value ) => value.replace( /\s*\|\s*class\s*=\s*[^|}]*([\n|}])/, '$1' ) );
 
+			// The banner shell automatically detects several classes. If it's one of these auto detected classes, write |class= blank instead of writing the class.
+			if ( [ 'Disambig', 'Template', 'Redirect', 'Portal', 'Project', 'NA' ].indexOf( newAssessment ) !== -1 ) {
+				newAssessment = '';
+			}
+
 			// Convert array back to wikitext and append to top of talk page.
 			// Always add a shell even if it's just wrapping one banner, for code simplification reasons.
 			// Add |class= to shell.
