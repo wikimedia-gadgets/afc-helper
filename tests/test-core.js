@@ -286,8 +286,8 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 {{WikiProject Film}}
 {{WikiProject Women}}
 {{WikiProject Television}}
-{{WikiProject Biography}}
 {{WikiProject Romania}}
+{{WikiProject Biography}}
 }}`
 		);
 	} );
@@ -328,9 +328,9 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		expect( output ).toBe(
 `{{WikiProject banner shell |class=B |living=yes |listas=Jones, Bob |1=
 {{subst:WPAFC/article |oldid=592496}}
-{{WikiProject Biography}}
 {{WikiProject Africa}}
 {{WikiProject Alabama}}
+{{WikiProject Biography}}
 }}`
 		);
 	} );
@@ -423,6 +423,61 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 {{translated page|pl|Katowice Załęże|version=|small=no|insertversion=|section=}}`
 		);
 	} );
+
+	it( 'when WikiProject Musicians is present, it should convert to {{WikiProject Biography |musician-work-group=yes}}', () => {
+		const wikicode = ``;
+		const newAssessment = '';
+		const revId = 592681;
+		const isBiography = true;
+		const newWikiProjects = [ 'WikiProject Musicians' ];
+		const lifeStatus = 'unknown';
+		const subjectName = '';
+		const output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
+		expect( output ).toBe(
+`{{WikiProject banner shell |1=
+{{subst:WPAFC/article |oldid=592681}}
+{{WikiProject Biography |musician-work-group=yes}}
+}}`
+		);
+	} );
+
+	it( 'when WikiProject Musicians is present, it should convert to {{WikiProject Biography |musician-work-group=yes}}, case sensitive', () => {
+		const wikicode =
+`{{WikiProject Biography}}
+{{WikiProject Musicians}}`;
+		const newAssessment = '';
+		const revId = 592681;
+		const isBiography = true;
+		const newWikiProjects = [ 'WikiProject Musicians' ];
+		const lifeStatus = 'unknown';
+		const subjectName = '';
+		const output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
+		expect( output ).toBe(
+`{{WikiProject banner shell |1=
+{{subst:WPAFC/article |oldid=592681}}
+{{WikiProject Biography |musician-work-group=yes}}
+}}`
+		);
+	} );
+
+	it( 'when WikiProject Musicians is present, it should convert to {{WikiProject Biography |musician-work-group=yes}}, case insensitive', () => {
+		const wikicode =
+`{{wikiproject biography}}
+{{wikiproject musicians}}`;
+		const newAssessment = '';
+		const revId = 592681;
+		const isBiography = true;
+		const newWikiProjects = [ 'WikiProject Musicians' ];
+		const lifeStatus = 'unknown';
+		const subjectName = '';
+		const output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
+		expect( output ).toBe(
+`{{WikiProject banner shell |1=
+{{subst:WPAFC/article |oldid=592681}}
+{{WikiProject Biography |musician-work-group=yes}}
+}}`
+		);
+	} );
 } );
 
 describe( 'AFCH.removeDuplicateBanners', () => {
@@ -480,5 +535,44 @@ describe( 'AFCH.removeDuplicateBanners', () => {
 		expect( output ).toEqual( [
 			'{{WikiProject Military history |Indian-task-force=yes}}'
 		] );
+	} );
+} );
+
+describe( 'AFCH.deleteArrayValueCaseInsensitive', () => {
+	it( 'delete 1, case sensitive', () => {
+		const array = [ 'Test1', 'Test2', 'Test3' ];
+		const value = 'Test2';
+		const output = AFCH.deleteArrayValueCaseInsensitive( array, value );
+		expect( output ).toEqual( [ 'Test1', 'Test3' ] );
+	} );
+
+	it( 'delete 1, case insensitive', () => {
+		const array = [ 'Test1', 'Test2', 'Test3' ];
+		const value = 'test2';
+		const output = AFCH.deleteArrayValueCaseInsensitive( array, value );
+		expect( output ).toEqual( [ 'Test1', 'Test3' ] );
+	} );
+} );
+
+describe( 'AFCH.hasArrayValueCaseInsensitive', () => {
+	it( 'has 1, case sensitive', () => {
+		const array = [ 'Test1', 'Test2', 'Test3' ];
+		const value = 'Test2';
+		const output = AFCH.hasArrayValueCaseInsensitive( array, value );
+		expect( output ).toBe( true );
+	} );
+
+	it( 'has 1, case insensitive', () => {
+		const array = [ 'Test1', 'Test2', 'Test3' ];
+		const value = 'test2';
+		const output = AFCH.hasArrayValueCaseInsensitive( array, value );
+		expect( output ).toBe( true );
+	} );
+
+	it( 'has 0', () => {
+		const array = [ 'Test1', 'Test2', 'Test3' ];
+		const value = 'Test4';
+		const output = AFCH.hasArrayValueCaseInsensitive( array, value );
+		expect( output ).toBe( false );
 	} );
 } );

@@ -1673,27 +1673,6 @@
 				'}}'
 			);
 
-			// delete existing biography banner. when accepting, reviewer is forced to choose if it's a biography or not, so we'll add (or not add) our own biography banner later
-			banners = banners.filter( ( value ) => !value.match( /^{{WikiProject Biography/i ) );
-
-			// add biography banner to array. and add |living= and |listas= to banner shell
-			let bannerShellExtraParams = '';
-			if ( isBiography ) {
-				banners.push(
-					'{{WikiProject Biography}}'
-				);
-
-				if ( lifeStatus === 'living' ) {
-					bannerShellExtraParams += ' |living=yes';
-				} else if ( lifeStatus === 'dead' ) {
-					bannerShellExtraParams += ' |living=no';
-				}
-
-				if ( subjectName ) {
-					bannerShellExtraParams += ' |listas=' + subjectName;
-				}
-			}
-
 			// add disambiguation banner to array
 			if ( newAssessment === 'Disambig' ) {
 				banners.push( '{{WikiProject Disambiguation}}' );
@@ -1715,6 +1694,42 @@
 				newAssessment = '';
 			}
 
+			// Some banners such as {{WikiProject Musicians}}, when subst'd later by AnomieBOT, end up as something like {{WikiProject Biography |musician-work-group=yes}}. Do this ourselves to save a step and to prevent two {{WikiProject Biography}} banners.
+			const bannersThatRedirectToBiographyBanner = {
+				'{{WikiProject Musicians}}': ' |musician-work-group=yes',
+				'{{WikiProject Sportspeople}}': ' |sports-work-group=yes'
+			};
+			let workGroupString = '';
+			for ( const banner in bannersThatRedirectToBiographyBanner ) {
+				const workGroup = bannersThatRedirectToBiographyBanner[ banner ];
+				const hasBanner = AFCH.hasArrayValueCaseInsensitive( banners, banner );
+				if ( hasBanner ) {
+					banners = AFCH.deleteArrayValueCaseInsensitive( banners, banner );
+					workGroupString += workGroup;
+				}
+			}
+
+			// delete existing biography banner. when accepting, reviewer is forced to choose if it's a biography or not, so we'll add (or not add) our own biography banner later
+			banners = banners.filter( ( value ) => !value.match( /^{{WikiProject Biography/i ) );
+
+			// add biography banner to array. and add |living= and |listas= to banner shell
+			let bannerShellExtraParams = '';
+			if ( isBiography ) {
+				banners.push(
+					`{{WikiProject Biography${ workGroupString }}}`
+				);
+
+				if ( lifeStatus === 'living' ) {
+					bannerShellExtraParams += ' |living=yes';
+				} else if ( lifeStatus === 'dead' ) {
+					bannerShellExtraParams += ' |living=no';
+				}
+
+				if ( subjectName ) {
+					bannerShellExtraParams += ' |listas=' + subjectName;
+				}
+			}
+
 			// Convert array back to wikitext and append to top of talk page.
 			// Always add a shell even if it's just wrapping one banner, for code simplification reasons.
 			// Add |class= to shell.
@@ -1734,6 +1749,14 @@
 			wikicode = wikicode.trim();
 
 			return wikicode;
+		},
+
+		deleteArrayValueCaseInsensitive( array, value ) {
+			return array.filter( ( item ) => item.toLowerCase() !== value.toLowerCase() );
+		},
+
+		hasArrayValueCaseInsensitive( array, value ) {
+			return array.some( ( item ) => item.toLowerCase() === value.toLowerCase() );
 		},
 
 		/**
