@@ -533,7 +533,7 @@
 
 		if ( isAccept ) {
 			// Remove {{Draft categories}}
-			text = text.replace( /\{\{Draft categories\s*\|((?:\s*\[\[:?Category:[ \S]+?\]\]\s*)*)\s*\}\}/gi, '$1' );
+			text = text.replace( /\{\{(?:Draft categories|Draftcat)\s*\|((?:\s*\[\[:?Category:[ \S]+?\]\]\s*)*)\s*\}\}/gi, '$1' );
 
 			// Remove {{Draft article}} (and {{Draft}}).
 			// Not removed if the |text= parameter is present, which could contain
