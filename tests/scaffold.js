@@ -50,12 +50,12 @@ const resetToBase = function () {
 	// Set the base document content using jsdom
 	document.documentElement.innerHtml = basePageHtml;
 	AFCH = undefined;
-	const jQuery = $ = require( 'jquery' );
+	jQuery = $ = require( 'jquery' );
 };
 
 resetToBase();
 
-const resetToAFCApplicablePage = function () {
+resetToAFCApplicablePage = function () {
 	resetToBase();
 	setPageTitle( 'Draft:Foo' );
 	require( './../src/afch.js' );
