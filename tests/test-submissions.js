@@ -37,7 +37,7 @@ describe( 'AFCH.Text.cleanUp', () => {
 	it( 'should not clean up {{Draft categories|[[Category:Test]]}} when isAccept is false', () => {
 		const wikicode = '{{Draft categories|[[Category:Test]]}}';
 		const isAccept = false;
-		const expectedOutput = '{{Draft categories|[[Category:Test]]}}';
+		const expectedOutput = '{{Draft categories|[[:Category:Test]]}}';
 		const output = ( new AFCH.Text( wikicode ) ).cleanUp( isAccept );
 		expect( output ).toBe( expectedOutput );
 	} );
@@ -53,7 +53,7 @@ describe( 'AFCH.Text.cleanUp', () => {
 	it( 'should not clean up {{draft categories|[[Category:Test]]}} (case insensitive) when isAccept is false', () => {
 		const wikicode = '{{draft categories|[[Category:Test]]}}';
 		const isAccept = false;
-		const expectedOutput = '{{draft categories|[[Category:Test]]}}';
+		const expectedOutput = '{{draft categories|[[:Category:Test]]}}';
 		const output = ( new AFCH.Text( wikicode ) ).cleanUp( isAccept );
 		expect( output ).toBe( expectedOutput );
 	} );
@@ -69,7 +69,7 @@ describe( 'AFCH.Text.cleanUp', () => {
 	it( 'should not clean up {{Draftcat|[[Category:Test]]}} when isAccept is false', () => {
 		const wikicode = '{{Draftcat|[[Category:Test]]}}';
 		const isAccept = false;
-		const expectedOutput = '{{Draftcat|[[Category:Test]]}}';
+		const expectedOutput = '{{Draftcat|[[:Category:Test]]}}';
 		const output = ( new AFCH.Text( wikicode ) ).cleanUp( isAccept );
 		expect( output ).toBe( expectedOutput );
 	} );
