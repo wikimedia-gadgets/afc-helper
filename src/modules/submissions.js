@@ -4,7 +4,7 @@
 		afchPage, afchSubmission, afchViews, afchViewer;
 
 	// Die if reviewing a nonexistent page or a userjs/css page
-	if ( !inUnitTestEnvironment ) {
+	if ( typeof inUnitTestEnvironment === 'undefined' ) {
 		if ( mw.config.get( 'wgArticleId' ) === 0 ||
 			mw.config.get( 'wgPageContentModel' ) !== 'wikitext' ) {
 			return;
@@ -752,7 +752,7 @@
 		}
 	};
 
-	if ( !inUnitTestEnvironment ) {
+	if ( typeof inUnitTestEnvironment === 'undefined' ) {
 		// Add the launch link
 		$afchLaunchLink = $( mw.util.addPortletLink( AFCH.prefs.launchLinkPosition, '#', 'Review (AFCH)',
 			'afch-launch', 'Review submission using afc-helper', '1' ) );
