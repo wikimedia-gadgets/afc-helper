@@ -4,9 +4,11 @@
 		afchPage, afchSubmission, afchViews, afchViewer;
 
 	// Die if reviewing a nonexistent page or a userjs/css page
-	if ( mw.config.get( 'wgArticleId' ) === 0 ||
-		mw.config.get( 'wgPageContentModel' ) !== 'wikitext' ) {
-		return;
+	if ( typeof inUnitTestEnvironment === 'undefined' ) {
+		if ( mw.config.get( 'wgArticleId' ) === 0 ||
+			mw.config.get( 'wgPageContentModel' ) !== 'wikitext' ) {
+			return;
+		}
 	}
 
 	/**
@@ -750,25 +752,27 @@
 		}
 	};
 
-	// Add the launch link
-	$afchLaunchLink = $( mw.util.addPortletLink( AFCH.prefs.launchLinkPosition, '#', 'Review (AFCH)',
-		'afch-launch', 'Review submission using afc-helper', '1' ) );
+	if ( typeof inUnitTestEnvironment === 'undefined' ) {
+		// Add the launch link
+		$afchLaunchLink = $( mw.util.addPortletLink( AFCH.prefs.launchLinkPosition, '#', 'Review (AFCH)',
+			'afch-launch', 'Review submission using afc-helper', '1' ) );
 
-	if ( AFCH.prefs.autoOpen &&
-		// Don't autoload in userspace -- too many false positives
-		AFCH.consts.pagename.indexOf( 'User:' ) !== 0 &&
-		// Only autoload if viewing or editing the page
-		[ 'view', 'edit', null ].indexOf( AFCH.getParam( 'action' ) ) !== -1 &&
-		!AFCH.getParam( 'diff' ) && !AFCH.getParam( 'oldid' ) ) {
-		// Launch the script immediately if preference set
-		createAFCHInstance();
-	} else {
-		// Otherwise, wait for a click (`one` to prevent spawning multiple panels)
-		$afchLaunchLink.one( 'click', createAFCHInstance );
+		if ( AFCH.prefs.autoOpen &&
+			// Don't autoload in userspace -- too many false positives
+			AFCH.consts.pagename.indexOf( 'User:' ) !== 0 &&
+			// Only autoload if viewing or editing the page
+			[ 'view', 'edit', null ].indexOf( AFCH.getParam( 'action' ) ) !== -1 &&
+			!AFCH.getParam( 'diff' ) && !AFCH.getParam( 'oldid' ) ) {
+			// Launch the script immediately if preference set
+			createAFCHInstance();
+		} else {
+			// Otherwise, wait for a click (`one` to prevent spawning multiple panels)
+			$afchLaunchLink.one( 'click', createAFCHInstance );
+		}
+
+		// Mark launch link for the old helper script as "old" if present on page
+		$( '#p-cactions #ca-afcHelper > a' ).append( ' (old)' );
 	}
-
-	// Mark launch link for the old helper script as "old" if present on page
-	$( '#p-cactions #ca-afcHelper > a' ).append( ' (old)' );
 
 	// If AFCH is destroyed via AFCH.destroy(),
 	// remove the $afch window and the launch link

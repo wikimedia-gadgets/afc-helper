@@ -34,6 +34,8 @@ resetToAFCApplicablePage = function () {
 	require( './../src/afch.js' );
 };
 
+inUnitTestEnvironment = true;
+
 jest.autoMockOff();
 
 // Mocked later
