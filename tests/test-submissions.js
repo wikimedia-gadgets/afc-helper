@@ -18,7 +18,7 @@ describe( 'AFCH', () => {
 	} );
 } );
 
-describe( 'AFCH.Text.cleanUp', () => {
+describe( 'AFCH.Text.cleanUp()', () => {
 	it( 'should handle empty input', () => {
 		const wikicode = '';
 		const isAccept = true;
