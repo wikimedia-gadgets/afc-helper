@@ -8,8 +8,8 @@ require( './scaffold.js' );
 
 resetToAFCApplicablePage();
 
-requireScript( 'modules/core.js' );
-requireScript( 'modules/submissions.js' );
+require( './../src/modules/core.js' );
+require( './../src/modules/submissions.js' );
 
 // It's always good to start simple :)
 describe( 'AFCH', () => {
