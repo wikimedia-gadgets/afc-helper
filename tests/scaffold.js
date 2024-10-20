@@ -8,7 +8,7 @@
 
 jest.autoMockOff();
 
-fs = require( 'fs' );
+const fs = require( 'fs' );
 
 // Mocked later
 mediaWiki = mw = {};
@@ -34,11 +34,7 @@ mw.loader = {
 
 const basePageHtml = fs.readFileSync( './tests/test-frame.html' ).toString();
 
-requireScript = function ( name ) {
-	return require( './../src/' + name );
-};
-
-setPageTitle = function ( title ) {
+const setPageTitle = function ( title ) {
 	mw.config.get.mockImplementation( ( requested ) => {
 		if ( requested === 'wgPageName' ) {
 			return title;
@@ -50,7 +46,7 @@ setPageTitle = function ( title ) {
 	} );
 };
 
-resetToBase = function () {
+const resetToBase = function () {
 	// Set the base document content using jsdom
 	document.documentElement.innerHtml = basePageHtml;
 	AFCH = undefined;
@@ -62,5 +58,5 @@ resetToBase();
 resetToAFCApplicablePage = function () {
 	resetToBase();
 	setPageTitle( 'Draft:Foo' );
-	requireScript( 'afch.js' );
+	require( './../src/afch.js' );
 };
