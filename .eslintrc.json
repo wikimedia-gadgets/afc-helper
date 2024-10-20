@@ -53,6 +53,7 @@
 		"no-shadow": "off",
 		"no-undef": "warn",
 		"no-underscore-dangle": "off",
+		"no-unused-vars": "warn",
 		"prefer-const": "warn",
 		"security/detect-non-literal-regexp": "off",
 		"security/detect-unsafe-regex": "off",
