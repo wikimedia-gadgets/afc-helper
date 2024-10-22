@@ -2586,7 +2586,7 @@
 			afchSubmission.getSubmitter().done( ( submitter ) => {
 				const userTalk = new AFCH.Page( ( new mw.Title( submitter, 3 ) ).getPrefixedText() ),
 					shouldTeahouse = data.inviteToTeahouse ? $.Deferred() : false;
-				        shouldWelcomeUser = data.sendWelcomeDraft ? $.Deferred() : false;
+                                        shouldWelcomeUser = data.sendWelcomeDraft ? $.Deferred() : false;
 				// Check categories on the page to ensure that if the user has already been
 				// invited to the Teahouse, we don't invite them again.
 				if ( data.inviteToTeahouse ) {
@@ -2606,23 +2606,22 @@
 
 						shouldTeahouse.resolve( !hasTeahouseCat );
 					} );
-				}
-                                // Check if the user has already been welcomed.
+					// Check if the user has already been welcomed.
 				if ( data.sendWelcomeDraft ) {
-					userTalk.getCategories(true).done((categories) => {
+					userTalk.getCategories( /* useApi */ true ).done( ( categories ) => {
 						let hasWelcomeDraftCat = false,
 							welcomeDraftCategories = [
 								'Category:Wikipedians who have received a AfC welcome message'
-								];
+							];
 						$.each( categories, ( _, cat ) => {
 							if ( welcomeDraftCategories.indexOf( cat ) !== -1 ) {
 								hasWelcomeDraftCat = true;
 								return false;
 							}
-						});
+						} );
 						
-						shouldWelcomeUser.resolve(!hasWelcomeDraftCat);
-					});
+						shouldWelcomeUser.resolve( !hasWelcomeDraftCat );
+					} );
 				}
 				$.when( shouldTeahouse, shouldWelcomeUser ).then( ( teahouse, welcomeDraft ) => {
 					let message;
