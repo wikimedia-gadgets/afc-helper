@@ -1265,7 +1265,9 @@
 			// $1 = article name
 			'g13-submission': '{{subst:Db-afc-notice|$1}} ~~~~',
 
-			'teahouse-invite': '{{subst:Wikipedia:Teahouse/AFC invitation|sign=~~~~}}'
+			'teahouse-invite': '{{subst:Wikipedia:Teahouse/AFC invitation|sign=~~~~}}',
+
+			'welcomedraft-user': '{{subst:Welcome draft}} ~~~~'
 		} );
 	}
 
@@ -2584,7 +2586,7 @@
 			afchSubmission.getSubmitter().done( ( submitter ) => {
 				const userTalk = new AFCH.Page( ( new mw.Title( submitter, 3 ) ).getPrefixedText() ),
 					shouldTeahouse = data.inviteToTeahouse ? $.Deferred() : false;
-
+				        shouldWelcomeUser = data.sendWelcomeDraft ? $.Deferred() : false;
 				// Check categories on the page to ensure that if the user has already been
 				// invited to the Teahouse, we don't invite them again.
 				if ( data.inviteToTeahouse ) {
@@ -2605,11 +2607,31 @@
 						shouldTeahouse.resolve( !hasTeahouseCat );
 					} );
 				}
-
-				$.when( shouldTeahouse ).then( ( teahouse ) => {
+                                // Check if the user has already been welcomed.
+				if ( data.sendWelcomeDraft ) {
+					userTalk.getCategories(true).done((categories) => {
+						let hasWelcomeDraftCat = false,
+							welcomeDraftCategories = [
+								'Category:Wikipedians who have received a AfC welcome message'
+								];
+						$.each( categories, ( _, cat ) => {
+							if ( welcomeDraftCategories.indexOf( cat ) !== -1 ) {
+								hasWelcomeDraftCat = true;
+								return false;
+							}
+						});
+						
+						shouldWelcomeUser.resolve(!hasWelcomeDraftCat);
+					});
+				}
+				$.when( shouldTeahouse, shouldWelcomeUser ).then( ( teahouse, welcomeDraft ) => {
 					let message;
+
+					if ( welcomeDraft ) {
+						message = AFCH.msg.get( 'welcomedraft-user' ) + '\n\n';
+					}
 					if ( isDecline ) {
-						message = AFCH.msg.get( 'declined-submission', {
+						message += AFCH.msg.get( 'declined-submission', {
 							$1: AFCH.consts.pagename,
 							$2: afchSubmission.shortTitle,
 							$3: ( declineReason === 'cv' || declineReason2 === 'cv' ) ?
@@ -2622,7 +2644,7 @@
 								'' : data.declineTextarea
 						} );
 					} else {
-						message = AFCH.msg.get( 'rejected-submission', {
+						message += AFCH.msg.get( 'rejected-submission', {
 							$1: AFCH.consts.pagename,
 							$2: afchSubmission.shortTitle,
 							$3: data.rejectReason[ 0 ],
