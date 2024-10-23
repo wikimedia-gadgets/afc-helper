@@ -1491,10 +1491,10 @@
 			loadWikiProjectList(),
 			new AFCH.Page( 'Draft talk:' + afchSubmission.shortTitle ).getTemplates()
 		).then( ( wikiProjects, templates ) => {
-			let templateNames = templates.map( ( template ) => template.target.trim().toLowerCase() );
+			const templateNames = templates.map( ( template ) => template.target.trim().toLowerCase() );
 
 			// Turn the WikiProject list into an Object to make lookups faster
-			let wikiProjectMap = {};
+			const wikiProjectMap = {};
 			for ( let projIdx = 0; projIdx < wikiProjects.length; projIdx++ ) {
 				wikiProjectMap[ wikiProjects[ projIdx ].templateName.toLowerCase() ] = {
 					displayName: wikiProjects[ projIdx ].displayName,
@@ -1512,7 +1512,7 @@
 				};
 			}
 
-			let otherTemplates = [];
+			const otherTemplates = [];
 			for ( let tplIdx = 0; tplIdx < templateNames.length; tplIdx++ ) {
 				if ( wikiProjectMap.hasOwnProperty( templateNames[ tplIdx ] ) ) {
 					wikiProjectMap[ templateNames[ tplIdx ] ].alreadyOnPage = true;
@@ -1535,10 +1535,10 @@
 				} ).then( ( data ) => {
 					let existingWPBioTemplateName = null;
 					if ( data.query && data.query.redirects && data.query.redirects.length > 0 ) {
-						let redirs = data.query.redirects;
+						const redirs = data.query.redirects;
 						for ( let redirIdx = 0; redirIdx < redirs.length; redirIdx++ ) {
-							let redir = redirs[ redirIdx ].to.slice( 'Template:'.length ).toLowerCase();
-							let originalName = redirs[ redirIdx ].from.slice( 'Template:'.length );
+							const redir = redirs[ redirIdx ].to.slice( 'Template:'.length ).toLowerCase();
+							const originalName = redirs[ redirIdx ].from.slice( 'Template:'.length );
 							if ( wikiProjectMap.hasOwnProperty( redir ) ) {
 								wikiProjectMap[ redir ].alreadyOnPage = true;
 								wikiProjectMap[ redir ].realTemplateName = originalName;
@@ -1967,7 +1967,7 @@
 							$afch.add( '#csdWrapper' ).removeClass( 'hidden' );
 
 							$afch.find( '#cvUrlTextarea' ).on( 'keyup', function () {
-								let text = $( this ).val(),
+								const text = $( this ).val(),
 									numUrls = text ? text.split( '\n' ).length : 0,
 									submitButton = $afch.find( '#afchSubmitForm' );
 								if ( numUrls >= 1 && numUrls <= 3 ) {
@@ -2586,7 +2586,7 @@
 			afchSubmission.getSubmitter().done( ( submitter ) => {
 				const userTalk = new AFCH.Page( ( new mw.Title( submitter, 3 ) ).getPrefixedText() ),
 					shouldTeahouse = data.inviteToTeahouse ? $.Deferred() : false;
-                                        shouldWelcomeUser = data.sendWelcomeDraft ? $.Deferred() : false;
+				shouldWelcomeUser = data.sendWelcomeDraft ? $.Deferred() : false;
 				// Check categories on the page to ensure that if the user has already been
 				// invited to the Teahouse, we don't invite them again.
 				if ( data.inviteToTeahouse ) {
@@ -2607,63 +2607,64 @@
 						shouldTeahouse.resolve( !hasTeahouseCat );
 					} );
 					// Check if the user has already been welcomed.
-				if ( data.sendWelcomeDraft ) {
-					userTalk.getCategories( /* useApi */ true ).done( ( categories ) => {
-						let hasWelcomeDraftCat = false,
-							welcomeDraftCategories = [
-								'Category:Wikipedians who have received a AfC welcome message'
-							];
-						$.each( categories, ( _, cat ) => {
-							if ( welcomeDraftCategories.indexOf( cat ) !== -1 ) {
-								hasWelcomeDraftCat = true;
-								return false;
-							}
+					if ( data.sendWelcomeDraft ) {
+						userTalk.getCategories( /* useApi */ true ).done( ( categories ) => {
+							let hasWelcomeDraftCat = false,
+								welcomeDraftCategories = [
+									'Category:Wikipedians who have received a AfC welcome message'
+								];
+							$.each( categories, ( _, cat ) => {
+								if ( welcomeDraftCategories.indexOf( cat ) !== -1 ) {
+									hasWelcomeDraftCat = true;
+									return false;
+								}
+							} );
+
+							shouldWelcomeUser.resolve( !hasWelcomeDraftCat );
 						} );
-						
-						shouldWelcomeUser.resolve( !hasWelcomeDraftCat );
+					}
+					$.when( shouldTeahouse, shouldWelcomeUser ).then( ( teahouse, welcomeDraft ) => {
+						let message;
+
+						if ( welcomeDraft ) {
+							message = AFCH.msg.get( 'welcomedraft-user' ) + '\n\n';
+						}
+						if ( isDecline ) {
+							message += AFCH.msg.get( 'declined-submission', {
+								$1: AFCH.consts.pagename,
+								$2: afchSubmission.shortTitle,
+								$3: ( declineReason === 'cv' || declineReason2 === 'cv' ) ?
+									'yes' : 'no',
+								$4: declineReason,
+								$5: newParams[ '3' ] || '',
+								$6: declineReason2 || '',
+								$7: newParams.details2 || '',
+								$8: ( declineReason === 'reason' || declineReason2 === 'reason' ) ?
+									'' : data.declineTextarea
+							} );
+						} else {
+							message += AFCH.msg.get( 'rejected-submission', {
+								$1: AFCH.consts.pagename,
+								$2: afchSubmission.shortTitle,
+								$3: data.rejectReason[ 0 ],
+								$4: '',
+								$5: data.rejectReason[ 1 ] || '',
+								$6: '',
+								$7: data.rejectTextarea
+							} );
+						}
+
+						if ( teahouse ) {
+							message += '\n\n' + AFCH.msg.get( 'teahouse-invite' );
+						}
+
+						AFCH.actions.notifyUser( submitter, {
+							message: message,
+							summary: 'Notification: Your [[' + AFCH.consts.pagename + '|Articles for Creation submission]] has been ' + ( isDecline ? 'declined' : 'rejected' )
+						} );
 					} );
 				}
-				$.when( shouldTeahouse, shouldWelcomeUser ).then( ( teahouse, welcomeDraft ) => {
-					let message;
-
-					if ( welcomeDraft ) {
-						message = AFCH.msg.get( 'welcomedraft-user' ) + '\n\n';
-					}
-					if ( isDecline ) {
-						message += AFCH.msg.get( 'declined-submission', {
-							$1: AFCH.consts.pagename,
-							$2: afchSubmission.shortTitle,
-							$3: ( declineReason === 'cv' || declineReason2 === 'cv' ) ?
-								'yes' : 'no',
-							$4: declineReason,
-							$5: newParams[ '3' ] || '',
-							$6: declineReason2 || '',
-							$7: newParams.details2 || '',
-							$8: ( declineReason === 'reason' || declineReason2 === 'reason' ) ?
-								'' : data.declineTextarea
-						} );
-					} else {
-						message += AFCH.msg.get( 'rejected-submission', {
-							$1: AFCH.consts.pagename,
-							$2: afchSubmission.shortTitle,
-							$3: data.rejectReason[ 0 ],
-							$4: '',
-							$5: data.rejectReason[ 1 ] || '',
-							$6: '',
-							$7: data.rejectTextarea
-						} );
-					}
-
-					if ( teahouse ) {
-						message += '\n\n' + AFCH.msg.get( 'teahouse-invite' );
-					}
-
-					AFCH.actions.notifyUser( submitter, {
-						message: message,
-						summary: 'Notification: Your [[' + AFCH.consts.pagename + '|Articles for Creation submission]] has been ' + ( isDecline ? 'declined' : 'rejected' )
-					} );
-				} );
-			}
+			} );
 		}
 
 		// Log AfC if enabled and CSD if necessary
