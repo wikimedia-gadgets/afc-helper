@@ -2663,7 +2663,7 @@
 						summary: 'Notification: Your [[' + AFCH.consts.pagename + '|Articles for Creation submission]] has been ' + ( isDecline ? 'declined' : 'rejected' )
 					} );
 				} );
-				} );
+			}
 		}
 
 		// Log AfC if enabled and CSD if necessary
