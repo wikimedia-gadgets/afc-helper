@@ -2611,7 +2611,7 @@
 						userTalk.getCategories( /* useApi */ true ).done( ( categories ) => {
 							let hasWelcomeDraftCat = false,
 								welcomeDraftCategories = [
-									'Category:Wikipedians who have received a AfC welcome message'
+									'Category:Wikipedians who have received an AfC welcome message'
 								];
 							$.each( categories, ( _, cat ) => {
 								if ( welcomeDraftCategories.indexOf( cat ) !== -1 ) {
