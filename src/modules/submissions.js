@@ -2615,6 +2615,7 @@
 							const welcomeDraftCategories = [
 								'Category:Wikipedians who have received an AfC welcome message'
 							];
+
 							$.each( categories, ( _, cat ) => {
 								if ( welcomeDraftCategories.indexOf( cat ) !== -1 ) {
 									hasWelcomeDraftCat = true;
@@ -2626,11 +2627,11 @@
 						} );
 					}
 
-					$.when( shouldTeahouse, shouldWelcomeUser ).then( ( teahouse, welcomeDraft ) => {
-						let message;
+					$.when( shouldTeahouse, shouldWelcomeUser ).then( ( teahouse, welcome ) => {
+						let message = '';
 
-						if ( welcomeDraft ) {
-							message = AFCH.msg.get( 'welcomedraft-user' ) + '\n\n';
+						if ( welcome ) {
+							message += AFCH.msg.get( 'welcomedraft-user' ) + '\n\n';
 						}
 						if ( isDecline ) {
 							message += AFCH.msg.get( 'declined-submission', {
