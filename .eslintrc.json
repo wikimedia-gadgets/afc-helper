@@ -47,7 +47,6 @@
 		"no-jquery/no-sizzle": "warn",
 		"no-jquery/no-slide": "warn",
 		"no-jquery/no-trim": "warn",
-		"no-jquery/variable-pattern": "warn",
 		"no-new": "warn",
 		"no-prototype-builtins": "off",
 		"no-shadow": "off",

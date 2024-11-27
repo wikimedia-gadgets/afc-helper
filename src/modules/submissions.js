@@ -1896,19 +1896,19 @@
 			// is triggering this update is first or second in the multi-select
 			// control
 			function updateTextfield( newPrompt, newPlaceholder, newValue, pos ) {
-				const wrapper = $afch.find( '#textfieldWrapper' + ( pos === 2 ? '2' : '' ) );
+				const $wrapper = $afch.find( '#textfieldWrapper' + ( pos === 2 ? '2' : '' ) );
 
 				// Update label and placeholder
-				wrapper.find( 'label' ).text( newPrompt );
-				wrapper.find( 'input' ).attr( 'placeholder', newPlaceholder );
+				$wrapper.find( 'label' ).text( newPrompt );
+				$wrapper.find( 'input' ).attr( 'placeholder', newPlaceholder );
 
 				// Update default textfield value (perhaps)
 				if ( typeof newValue !== 'undefined' ) {
-					wrapper.find( 'input' ).val( newValue );
+					$wrapper.find( 'input' ).val( newValue );
 				}
 
 				// And finally show the textfield
-				wrapper.removeClass( 'hidden' );
+				$wrapper.removeClass( 'hidden' );
 			}
 
 			// Copy most-used options to top of decline dropdown
@@ -1967,16 +1967,16 @@
 							$afch.find( '#cvUrlTextarea' ).on( 'keyup', function () {
 								let text = $( this ).val(),
 									numUrls = text ? text.split( '\n' ).length : 0,
-									submitButton = $afch.find( '#afchSubmitForm' );
+									$submitButton = $afch.find( '#afchSubmitForm' );
 								if ( numUrls >= 1 && numUrls <= 3 ) {
 									$( this ).removeClass( 'bad-input' );
-									submitButton
+									$submitButton
 										.removeClass( 'disabled' )
 										.css( 'pointer-events', 'auto' )
 										.text( 'Decline submission' );
 								} else {
 									$( this ).addClass( 'bad-input' );
-									submitButton
+									$submitButton
 										.addClass( 'disabled' )
 										.css( 'pointer-events', 'none' )
 										.text( 'Please enter between one and three URLs!' );
@@ -2220,10 +2220,10 @@
 
 				// Show an error if there's no such user
 				$afch.find( '#submitterName' ).on( 'keyup', function () {
-					const field = $( this ),
-						status = $( '#submitterNameStatus' ),
-						submitButton = $afch.find( '#afchSubmitForm' ),
-						submitter = field.val();
+					const $field = $( this ),
+						$status = $( '#submitterNameStatus' ),
+						$submitButton = $afch.find( '#afchSubmitForm' ),
+						submitter = $field.val();
 
 					// Reset form
 					resetStatus();
@@ -2235,9 +2235,9 @@
 
 					// Check if the user string starts with "User:", because Template:AFC submission dies horribly if it does
 					if ( submitter.lastIndexOf( 'User:', 0 ) === 0 ) {
-						field.addClass( 'bad-input' );
-						status.text( 'Remove "User:" from the beginning.' );
-						submitButton
+						$field.addClass( 'bad-input' );
+						$status.text( 'Remove "User:" from the beginning.' );
+						$submitButton
 							.addClass( 'disabled' )
 							.css( 'pointer-events', 'none' )
 							.text( 'Invalid user name' );
@@ -2251,9 +2251,9 @@
 						ususers: submitter
 					} ).done( ( data ) => {
 						if ( data.query.users[ 0 ].missing !== undefined ) {
-							field.addClass( 'bad-input' );
-							status.text( 'No user named "' + submitter + '".' );
-							submitButton
+							$field.addClass( 'bad-input' );
+							$status.text( 'No user named "' + submitter + '".' );
+							$submitButton
 								.addClass( 'disabled' )
 								.css( 'pointer-events', 'none' )
 								.text( 'No such user' );
