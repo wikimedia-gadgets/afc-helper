@@ -2586,7 +2586,7 @@
 			afchSubmission.getSubmitter().done( ( submitter ) => {
 				const userTalk = new AFCH.Page( ( new mw.Title( submitter, 3 ) ).getPrefixedText() ),
 					shouldTeahouse = data.inviteToTeahouse ? $.Deferred() : false,
-					shouldWelcomeUser = data.sendWelcomeDraft ? $.Deferred() : false;
+					shouldWelcomeUser = data.sendWelcome ? $.Deferred() : false;
 
 				// Check categories on the page to ensure that if the user has already been
 				// invited to the Teahouse, we don't invite them again.
@@ -2609,7 +2609,7 @@
 					} );
 
 					// Check if the user has already been welcomed.
-					if ( data.sendWelcomeDraft ) {
+					if ( data.sendWelcome ) {
 						userTalk.getCategories( /* useApi */ true ).done( ( categories ) => {
 							let hasWelcomeDraftCat = false;
 							const welcomeDraftCategories = [
