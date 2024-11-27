@@ -1647,6 +1647,9 @@
 		 * @return {Object} wikicode
 		 */
 		addTalkPageBanners: function ( wikicode, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName ) {
+			// delete |class={{{class}}} throughout the page. this is a bit too broad, but is easier than rewriting the below regexes to deal with nested templates
+			wikicode = wikicode.replace( /\s*\|\s*class\s*=\s*\{\{\{class\}\}\}/i, '' );
+
 			// build an array of all banners already on page
 			const bannerTemplates = 'wikiproject (?!banner)|football|oka';
 			const bannerTemplateRegEx = new RegExp( '{{(?:' + bannerTemplates + ')[^}]*}}', 'gi' );

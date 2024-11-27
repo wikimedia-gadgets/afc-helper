@@ -423,6 +423,90 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 {{translated page|pl|Katowice Załęże|version=|small=no|insertversion=|section=}}`
 		);
 	} );
+
+	it( 'line break between | and 1=', () => {
+		const wikicode =
+`{{WikiProject banner shell|
+1=
+{{WikiProject Chicago}}
+}}`;
+		const newAssessment = 'B';
+		const revId = 592681;
+		const isBiography = true;
+		const newWikiProjects = [];
+		const lifeStatus = 'unknown';
+		const subjectName = '';
+		const output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
+		expect( output ).toBe(
+`{{WikiProject banner shell |class=B |1=
+{{subst:WPAFC/article |oldid=592681}}
+{{WikiProject Chicago}}
+{{WikiProject Biography}}
+}}`
+		);
+	} );
+
+	it( 'has task forces', () => {
+		const wikicode =
+`{{WikiProject banner shell|1=
+{{WikiProject Chicago}}
+{{WikiProject United States|KY=yes|KY-importance=|category=}}
+{{WikiProject Former countries|AH-taskforce=yes|AH-taskforce-importance=}}
+{{WikiProject Indiana Historical Society}}
+{{WikiProject Architecture}}
+{{WikiProject Jewish history}}
+}}`;
+		const newAssessment = 'B';
+		const revId = 592681;
+		const isBiography = true;
+		const newWikiProjects = [];
+		const lifeStatus = 'unknown';
+		const subjectName = '';
+		const output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
+		expect( output ).toBe(
+`{{WikiProject banner shell |class=B |1=
+{{subst:WPAFC/article |oldid=592681}}
+{{WikiProject Chicago}}
+{{WikiProject United States|KY=yes|KY-importance=|category=}}
+{{WikiProject Former countries|AH-taskforce=yes|AH-taskforce-importance=}}
+{{WikiProject Indiana Historical Society}}
+{{WikiProject Architecture}}
+{{WikiProject Jewish history}}
+{{WikiProject Biography}}
+}}`
+		);
+	} );
+
+	it( 'has |class={{{class}}}', () => {
+		const wikicode =
+`{{WikiProject banner shell|1=
+{{WikiProject Chicago}}
+{{WikiProject United States|KY=yes|KY-importance=|category=}}
+{{WikiProject Former countries|class={{{class}}}|AH-taskforce=yes|AH-taskforce-importance=}}
+{{WikiProject Indiana Historical Society}}
+{{WikiProject Architecture}}
+{{WikiProject Jewish history}}
+}}`;
+		const newAssessment = 'B';
+		const revId = 592681;
+		const isBiography = true;
+		const newWikiProjects = [];
+		const lifeStatus = 'unknown';
+		const subjectName = '';
+		const output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
+		expect( output ).toBe(
+`{{WikiProject banner shell |class=B |1=
+{{subst:WPAFC/article |oldid=592681}}
+{{WikiProject Chicago}}
+{{WikiProject United States|KY=yes|KY-importance=|category=}}
+{{WikiProject Former countries|AH-taskforce=yes|AH-taskforce-importance=}}
+{{WikiProject Indiana Historical Society}}
+{{WikiProject Architecture}}
+{{WikiProject Jewish history}}
+{{WikiProject Biography}}
+}}`
+		);
+	} );
 } );
 
 describe( 'AFCH.removeDuplicateBanners', () => {
