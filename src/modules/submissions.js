@@ -2585,17 +2585,18 @@
 		if ( data.notifyUser ) {
 			afchSubmission.getSubmitter().done( ( submitter ) => {
 				const userTalk = new AFCH.Page( ( new mw.Title( submitter, 3 ) ).getPrefixedText() ),
-					shouldTeahouse = data.inviteToTeahouse ? $.Deferred() : false;
-				shouldWelcomeUser = data.sendWelcomeDraft ? $.Deferred() : false;
+					shouldTeahouse = data.inviteToTeahouse ? $.Deferred() : false,
+					shouldWelcomeUser = data.sendWelcomeDraft ? $.Deferred() : false;
+
 				// Check categories on the page to ensure that if the user has already been
 				// invited to the Teahouse, we don't invite them again.
 				if ( data.inviteToTeahouse ) {
 					userTalk.getCategories( /* useApi */ true ).done( ( categories ) => {
-						let hasTeahouseCat = false,
-							teahouseCategories = [
-								'Category:Wikipedians who have received a Teahouse invitation',
-								'Category:Wikipedians who have received a Teahouse invitation through AfC'
-							];
+						let hasTeahouseCat = false;
+						const teahouseCategories = [
+							'Category:Wikipedians who have received a Teahouse invitation',
+							'Category:Wikipedians who have received a Teahouse invitation through AfC'
+						];
 
 						$.each( categories, ( _, cat ) => {
 							if ( teahouseCategories.indexOf( cat ) !== -1 ) {
@@ -2606,13 +2607,14 @@
 
 						shouldTeahouse.resolve( !hasTeahouseCat );
 					} );
+
 					// Check if the user has already been welcomed.
 					if ( data.sendWelcomeDraft ) {
 						userTalk.getCategories( /* useApi */ true ).done( ( categories ) => {
-							let hasWelcomeDraftCat = false,
-								welcomeDraftCategories = [
-									'Category:Wikipedians who have received an AfC welcome message'
-								];
+							let hasWelcomeDraftCat = false;
+							const welcomeDraftCategories = [
+								'Category:Wikipedians who have received an AfC welcome message'
+							];
 							$.each( categories, ( _, cat ) => {
 								if ( welcomeDraftCategories.indexOf( cat ) !== -1 ) {
 									hasWelcomeDraftCat = true;
@@ -2623,6 +2625,7 @@
 							shouldWelcomeUser.resolve( !hasWelcomeDraftCat );
 						} );
 					}
+
 					$.when( shouldTeahouse, shouldWelcomeUser ).then( ( teahouse, welcomeDraft ) => {
 						let message;
 
