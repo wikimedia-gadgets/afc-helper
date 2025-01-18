@@ -277,11 +277,11 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		const revId = 592507;
 		const isBiography = true;
 		const newWikiProjects = [ 'WikiProject Romania' ];
-		const lifeStatus = 'living';
+		const lifeStatus = 'blp';
 		const subjectName = 'Lazarut, Raluca';
 		const output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
 		expect( output ).toBe(
-`{{WikiProject banner shell |living=yes |listas=Lazarut, Raluca |1=
+`{{WikiProject banner shell |blp=yes |listas=Lazarut, Raluca |1=
 {{subst:WPAFC/article |oldid=592507}}
 {{WikiProject Film}}
 {{WikiProject Women}}
@@ -322,11 +322,11 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		const revId = 592496;
 		const isBiography = true;
 		const newWikiProjects = [ 'WikiProject Africa', 'WikiProject Alabama' ];
-		const lifeStatus = 'living';
+		const lifeStatus = 'blp';
 		const subjectName = 'Jones, Bob';
 		const output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
 		expect( output ).toBe(
-`{{WikiProject banner shell |class=B |living=yes |listas=Jones, Bob |1=
+`{{WikiProject banner shell |class=B |blp=yes |listas=Jones, Bob |1=
 {{subst:WPAFC/article |oldid=592496}}
 {{WikiProject Biography}}
 {{WikiProject Africa}}
@@ -345,7 +345,7 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		const subjectName = '';
 		const output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
 		expect( output ).toBe(
-`{{WikiProject banner shell |living=no |1=
+`{{WikiProject banner shell |blp=no |1=
 {{subst:WPAFC/article |oldid=592496}}
 {{WikiProject Biography}}
 }}`
@@ -354,7 +354,7 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 
 	it.skip( 'talk page has {{wikiproject biography}}, and user selects that it\'s not a biography, so should remove {{wikiproject biography}}', () => {
 		const wikicode =
-`{{wikiproject biography|living=yes|class=B|listas=Jones, Bob}}
+`{{wikiproject biography|blp=yes|class=B|listas=Jones, Bob}}
 {{WikiProject Somalia}}`;
 		const newAssessment = '';
 		const revId = 592496;
