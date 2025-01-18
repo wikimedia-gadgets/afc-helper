@@ -1642,7 +1642,7 @@
 		 * @param {number} revId Revision ID of the draft that is being accepted
 		 * @param {boolean} isBiography Value of the "Is the article a biography?" check box
 		 * @param {Array} newWikiProjects Value of the "Add WikiPrjects" part of the form. The <input> is a chips interface called jquery.chosen. Note that if there are existing WikiProject banners on the page, the form will auto-add those to the "Add WikiProjects" part of the form when it first loads.
-		 * @param {string} lifeStatus Value of "Is the subject alive?" dropdown list ("unknown", "living", "dead")
+		 * @param {string} lifeStatus Value of "Is the subject alive?" dropdown list ("unknown", "blp", "dead")
 		 * @param {string} subjectName Value of the "Subject name (last, first)" text input, or "" if blank
 		 * @return {Object} wikicode
 		 */
@@ -1679,17 +1679,17 @@
 			// delete existing biography banner. when accepting, reviewer is forced to choose if it's a biography or not, so we'll add (or not add) our own biography banner later
 			banners = banners.filter( ( value ) => !value.match( /^{{WikiProject Biography/i ) );
 
-			// add biography banner to array. and add |living= and |listas= to banner shell
+			// add biography banner to array. and add |blp= and |listas= to banner shell
 			let bannerShellExtraParams = '';
 			if ( isBiography ) {
 				banners.push(
 					'{{WikiProject Biography}}'
 				);
 
-				if ( lifeStatus === 'living' ) {
-					bannerShellExtraParams += ' |living=yes';
+				if ( lifeStatus === 'blp' ) {
+					bannerShellExtraParams += ' |blp=yes';
 				} else if ( lifeStatus === 'dead' ) {
-					bannerShellExtraParams += ' |living=no';
+					bannerShellExtraParams += ' |blp=no';
 				}
 
 				if ( subjectName ) {
