@@ -1679,7 +1679,7 @@
 			// delete existing biography banner. when accepting, reviewer is forced to choose if it's a biography or not, so we'll add (or not add) our own biography banner later
 			banners = banners.filter( ( value ) => !value.match( /^{{WikiProject Biography/i ) );
 
-			// add biography banner to array. and add |living= and |listas= to banner shell
+			// add biography banner to array. and add |blp= and |listas= to banner shell
 			let bannerShellExtraParams = '';
 			if ( isBiography ) {
 				banners.push(
@@ -1687,9 +1687,9 @@
 				);
 
 				if ( lifeStatus === 'living' ) {
-					bannerShellExtraParams += ' |living=yes';
+					bannerShellExtraParams += ' |blp=yes';
 				} else if ( lifeStatus === 'dead' ) {
-					bannerShellExtraParams += ' |living=no';
+					bannerShellExtraParams += ' |blp=no';
 				}
 
 				if ( subjectName ) {
