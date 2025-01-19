@@ -277,7 +277,7 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		const revId = 592507;
 		const isBiography = true;
 		const newWikiProjects = [ 'WikiProject Romania' ];
-		const lifeStatus = 'blp';
+		const lifeStatus = 'living';
 		const subjectName = 'Lazarut, Raluca';
 		const output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
 		expect( output ).toBe(
@@ -322,7 +322,7 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		const revId = 592496;
 		const isBiography = true;
 		const newWikiProjects = [ 'WikiProject Africa', 'WikiProject Alabama' ];
-		const lifeStatus = 'blp';
+		const lifeStatus = 'living';
 		const subjectName = 'Jones, Bob';
 		const output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
 		expect( output ).toBe(
