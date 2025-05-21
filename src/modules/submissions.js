@@ -1831,7 +1831,7 @@
 							// FIXME: offer one-click request unprotection?
 							$.each( infoResult.query.pages[ '-1' ].protection, ( _, entry ) => {
 								if ( entry.type === 'create' && entry.level === 'sysop' && $.inArray( 'sysop', mw.config.get( 'wgUserGroups' ) ) === -1 ) {
-									const linkToRfup = AFCH.jQueryToHtml( AFCH.makeLinkElementToPage( 'WP:RFUP' ));
+									const linkToRfup = AFCH.jQueryToHtml( AFCH.makeLinkElementToPage( 'WP:RFUP' ) );
 									errorHtml = 'Darn it, "' + linkToPage + '" is create-protected. You will need to request unprotection from the protecting admin on their talk page or at ' + linkToRfup + '.';
 									buttonText = 'The proposed title is create-protected';
 								}
