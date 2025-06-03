@@ -1940,7 +1940,7 @@
 				no_results_text: 'Whoops, no reasons matched your search. Type "custom" to add a custom rationale instead.',
 				search_contains: true,
 				inherit_select_classes: true,
-				max_selected_options: 2
+				max_selected_options: 3
 			} );
 
 			// Set up jquery.chosen for the reject reason
