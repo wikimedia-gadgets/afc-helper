@@ -519,19 +519,20 @@
 	};
 
 	AFCH.Text.prototype.cleanUp = function ( isAccept ) {
-		let text = this.text,
-			commentRegex,
-			commentsToRemove = [
-				'Please don\'t change anything and press save',
-				'Carry on from here, and delete this comment.',
-				'Please leave this line alone!',
-				'Important, do not remove this line before (template|article) has been created.',
-				'Just press the "Save page" button below without changing anything! Doing so will submit your article submission for review. ' +
-					'Once you have saved this page you will find a new yellow \'Review waiting\' box at the bottom of your submission page. ' +
-					'If you have submitted your page previously,(?: either)? the old pink \'Submission declined\' template or the old grey ' +
-					'\'Draft\' template will still appear at the top of your submission page, but you should ignore (them|it). Again, please ' +
-					'don\'t change anything in this text box. Just press the "Save page" button below.'
-			];
+		let text = this.text;
+		const commentsToRemove = [
+			'Please don\'t change anything and press save',
+			'Carry on from here, and delete this comment.',
+			'Please leave this line alone!',
+			'Important, do not remove this line before (template|article) has been created.',
+			'Important, do not remove anything above this line before (template|article) has been created.',
+			'Do not remove this line!',
+			'Just press the "Save page" button below without changing anything! Doing so will submit your article submission for review. ' +
+				'Once you have saved this page you will find a new yellow \'Review waiting\' box at the bottom of your submission page. ' +
+				'If you have submitted your page previously,(?: either)? the old pink \'Submission declined\' template or the old grey ' +
+				'\'Draft\' template will still appear at the top of your submission page, but you should ignore (them|it). Again, please ' +
+				'don\'t change anything in this text box. Just press the "Save page" button below.'
+		];
 
 		if ( isAccept ) {
 			// Remove {{Draft categories}}
@@ -560,7 +561,7 @@
 			} );
 
 			// Add to the list of comments to remove
-			$.merge( commentsToRemove, [
+			commentsToRemove.push(
 				'Enter template purpose and instructions here.',
 				'Enter the content and\\/or code of the template here.',
 				'EDIT BELOW THIS LINE',
@@ -568,7 +569,7 @@
 				'See http://en.wikipedia.org/wiki/Wikipedia:Footnotes on how to create references using\\<ref\\>\\<\\/ref\\> tags, these references will then appear here automatically',
 				'(After listing your sources please cite them using inline citations and place them after the information they cite.|Inline citations added to your article will automatically display here.) ' +
 					'(Please see|See) ((https?://)?en.wikipedia.org/wiki/(Wikipedia|WP):REFB|\\[\\[Wikipedia:REFB\\]\\]) for instructions on how to add citations.'
-			] );
+			);
 		} else {
 			// If not yet accepted, comment out cats
 			text = text.replace( /\[\[Category:/gi, '[[:Category:' );
@@ -579,7 +580,7 @@
 		text = AFCH.removeEmptySectionAtEnd( text );
 
 		// Assemble a master regexp and remove all now-unneeded comments (commentsToRemove)
-		commentRegex = new RegExp( '<!-{2,}\\s*(' + commentsToRemove.join( '|' ) + ')\\s*-{2,}>', 'gi' );
+		const commentRegex = new RegExp( '<!-{2,}\\s*(' + commentsToRemove.join( '|' ) + ')\\s*-{2,}>', 'gi' );
 		text = text.replace( commentRegex, '' );
 
 		// Remove initial request artifact
@@ -603,37 +604,38 @@
 		// Replace {{http://example.com/foo}} with "* http://example.com/foo" (common newbie error)
 		text = text.replace( /\n\{\{(http[s]?|ftp[s]?|irc|gopher|telnet):\/\/(.*?)\}\}/gi, '\n* $1://$3' );
 
-		// Convert http://-style links to other wikipages to wikicode syntax
-		// FIXME: Break this out into its own core function? Will it be used elsewhere?
-		function convertExternalLinksToWikilinks( text ) {
-			let linkRegex = /\[{1,2}(?:https?:)?\/\/(?:en.wikipedia.org\/wiki|enwp.org)\/([^\s|\][]+)(?:\s|\|)?((?:\[\[[^[\]]*\]\]|[^\][])*)\]{1,2}/ig,
-				linkMatch = linkRegex.exec( text ),
-				title, displayTitle, newLink;
-
-			while ( linkMatch ) {
-				title = decodeURI( linkMatch[ 1 ] ).replace( /_/g, ' ' );
-				displayTitle = decodeURI( linkMatch[ 2 ] ).replace( /_/g, ' ' );
-
-				// Don't include the displayTitle if it is equal to the title
-				if ( displayTitle && title !== displayTitle ) {
-					newLink = '[[' + title + '|' + displayTitle + ']]';
-				} else {
-					newLink = '[[' + title + ']]';
-				}
-
-				text = text.replace( linkMatch[ 0 ], newLink );
-				linkMatch = linkRegex.exec( text );
-			}
-
-			return text;
-		}
-
-		text = convertExternalLinksToWikilinks( text );
+		text = this.convertExternalLinksToWikilinks( text );
 
 		this.text = text;
 		this.removeExcessNewlines();
 
 		return this.text;
+	};
+
+	/**
+	 * Convert http://-style links to other wikipages to wikicode syntax
+	 */
+	AFCH.Text.prototype.convertExternalLinksToWikilinks = function ( text ) {
+		const linkRegex = /\[{1,2}(?:https?:)?\/\/(?:en.wikipedia.org\/wiki|enwp.org)\/([^\s|\][]+)(?:\s|\|)?((?:\[\[[^[\]]*\]\]|[^\][])*)\]{1,2}/ig;
+		let linkMatch = linkRegex.exec( text ),
+			title, displayTitle, newLink;
+
+		while ( linkMatch ) {
+			title = decodeURI( linkMatch[ 1 ] ).replace( /_/g, ' ' );
+			displayTitle = decodeURI( linkMatch[ 2 ] ).replace( /_/g, ' ' );
+
+			// Don't include the displayTitle if it is equal to the title
+			if ( displayTitle && title !== displayTitle ) {
+				newLink = '[[' + title + '|' + displayTitle + ']]';
+			} else {
+				newLink = '[[' + title + ']]';
+			}
+
+			text = text.replace( linkMatch[ 0 ], newLink );
+			linkMatch = linkRegex.exec( text );
+		}
+
+		return text;
 	};
 
 	AFCH.Text.prototype.removeExcessNewlines = function () {
