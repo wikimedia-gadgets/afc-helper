@@ -105,4 +105,46 @@ describe( 'AFCH.Text.cleanUp', () => {
 		const output = ( new AFCH.Text( wikicode ) ).cleanUp( isAccept );
 		expect( output ).toBe( expectedOutput );
 	} );
+
+	it( 'should remove <!-- Important, do not remove this line... -->', () => {
+		const wikicode =
+`{{AfC submission|t||ts=20220716175214|u=Guillermind81|ns=118|demo=}}<!-- Important, do not remove this line before article has been created. -->
+{{short description|Astronomical treatise by Christiaan Huygens}}
+`;
+		const isAccept = true;
+		const expectedOutput =
+`{{AfC submission|t||ts=20220716175214|u=Guillermind81|ns=118|demo=}}
+{{short description|Astronomical treatise by Christiaan Huygens}}
+`;
+		const output = ( new AFCH.Text( wikicode ) ).cleanUp( isAccept );
+		expect( output ).toBe( expectedOutput );
+	} );
+
+	it( 'should remove <!-- Important, do not remove anything above this line... -->', () => {
+		const wikicode =
+`{{AfC submission|t||ts=20220716175214|u=Guillermind81|ns=118|demo=}}<!-- Important, do not remove anything above this line before article has been created. -->
+{{short description|Astronomical treatise by Christiaan Huygens}}
+`;
+		const isAccept = true;
+		const expectedOutput =
+`{{AfC submission|t||ts=20220716175214|u=Guillermind81|ns=118|demo=}}
+{{short description|Astronomical treatise by Christiaan Huygens}}
+`;
+		const output = ( new AFCH.Text( wikicode ) ).cleanUp( isAccept );
+		expect( output ).toBe( expectedOutput );
+	} );
+
+	it( 'should remove <!-- Do not remove this line! -->', () => {
+		const wikicode =
+`{{AFC submission|||u=172.116.210.112|ns=118|ts=20210128174245}}
+<!-- Do not remove this line! -->{{short description|Upcoming American supernatural horror film}}
+`;
+		const isAccept = true;
+		const expectedOutput =
+`{{AFC submission|||u=172.116.210.112|ns=118|ts=20210128174245}}
+{{short description|Upcoming American supernatural horror film}}
+`;
+		const output = ( new AFCH.Text( wikicode ) ).cleanUp( isAccept );
+		expect( output ).toBe( expectedOutput );
+	} );
 } );
