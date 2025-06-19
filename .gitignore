@@ -11,3 +11,4 @@ pywikibot-*
 throttle.ctrl
 user-*
 venv/
+scripts/credentials.json
