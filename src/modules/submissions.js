@@ -524,9 +524,6 @@
 			'Please don\'t change anything and press save',
 			'Carry on from here, and delete this comment.',
 			'Please leave this line alone!',
-			'Important, do not remove this line before (template|article) has been created.',
-			'Important, do not remove anything above this line before (template|article) has been created.',
-			'Do not remove this line!',
 			'Just press the "Save page" button below without changing anything! Doing so will submit your article submission for review. ' +
 				'Once you have saved this page you will find a new yellow \'Review waiting\' box at the bottom of your submission page. ' +
 				'If you have submitted your page previously,(?: either)? the old pink \'Submission declined\' template or the old grey ' +
@@ -568,7 +565,10 @@
 				'Metadata: see \\[\\[Wikipedia:Persondata\\]\\].',
 				'See http://en.wikipedia.org/wiki/Wikipedia:Footnotes on how to create references using\\<ref\\>\\<\\/ref\\> tags, these references will then appear here automatically',
 				'(After listing your sources please cite them using inline citations and place them after the information they cite.|Inline citations added to your article will automatically display here.) ' +
-					'(Please see|See) ((https?://)?en.wikipedia.org/wiki/(Wikipedia|WP):REFB|\\[\\[Wikipedia:REFB\\]\\]) for instructions on how to add citations.'
+					'(Please see|See) ((https?://)?en.wikipedia.org/wiki/(Wikipedia|WP):REFB|\\[\\[Wikipedia:REFB\\]\\]) for instructions on how to add citations.',
+				'Important, do not remove this line before (template|article) has been created.',
+				'Important, do not remove anything above this line before (template|article) has been created.',
+				'Do not remove this line!'
 			);
 		} else {
 			// If not yet accepted, comment out cats
