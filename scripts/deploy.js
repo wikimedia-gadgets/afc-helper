@@ -48,7 +48,7 @@ function resolveApiUrl(site) {
         .option('-u, --username <username>', 'Wiki login username')
         .option('-p, --password <password>', 'Wiki login password')
         .option('-a, --accessToken <token>', 'OAuth2 access token (in place of username and password)')
-        .option('-b, --base <root>', 'Base page name', 'MediaWiki:Gadget-')
+        .option('-b, --base <base>', 'Base page name', 'MediaWiki:Gadget-')
         .option('-f, --force', 'Add --force flag while running grunt build')
         .allowUnknownOption(false)
         .parse(process.argv);
@@ -83,9 +83,10 @@ function resolveApiUrl(site) {
     const branch = (await git.branch()).current;
     const sha1 = (await git.revparse(['HEAD']));
     const header = `/* Uploaded from https://github.com/wikimedia-gadgets/afc-helper, commit: ${sha1} (${branch}) */\n`;
-    const isMainGadget = (conf.site === 'enwiki') && (conf.base === 'MediaWiki:Gadget-');
+    const hostname = new URL(apiUrl).hostname;
+    const isMainGadget = (hostname === 'en.wikipedia.org') && (conf.base === 'MediaWiki:Gadget-');
 
-    console.log(`Deploying to ${new URL(apiUrl).hostname} with base ${conf.base} ...`);
+    console.log(`Deploying to ${hostname} with base ${conf.base} ...`);
 
     // Login
     let bot;
@@ -110,6 +111,7 @@ function resolveApiUrl(site) {
         const pageTitle = conf.base + pageName;
 
         let content = header + fs.readFileSync(filePath, 'utf8');
+        content = content.replace(/MediaWiki:Gadget-/g, conf.base);
         if (isMainGadget) {
             content = content.replace('AFCH.consts.beta = true;', 'AFCH.consts.beta = false;');
         }
@@ -124,5 +126,5 @@ function resolveApiUrl(site) {
         }
     }
 
-    console.log(`AFCH uploaded to ${new URL(apiUrl).hostname} successfully!`);
+    console.log(`AFCH uploaded to ${hostname} successfully!`);
 })();
