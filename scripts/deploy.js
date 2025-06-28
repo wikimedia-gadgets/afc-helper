@@ -82,7 +82,6 @@ function resolveApiUrl(site) {
     const git = simpleGit();
     const branch = (await git.branch()).current;
     const sha1 = (await git.revparse(['HEAD']));
-    const header = `/* Uploaded from https://github.com/wikimedia-gadgets/afc-helper, commit: ${sha1} (${branch}) */\n`;
     const hostname = new URL(apiUrl).hostname;
     const isMainGadget = (hostname === 'en.wikipedia.org') && (conf.base === 'MediaWiki:Gadget-');
 
@@ -110,7 +109,7 @@ function resolveApiUrl(site) {
         const filePath = path.join(__dirname, '../build', fileName);
         const pageTitle = conf.base + pageName;
 
-        let content = header + fs.readFileSync(filePath, 'utf8');
+        let content = fs.readFileSync(filePath, 'utf8');
         content = content.replace(/MediaWiki:Gadget-/g, conf.base);
         if (isMainGadget) {
             content = content.replace('AFCH.consts.beta = true;', 'AFCH.consts.beta = false;');
