@@ -1,0 +1,1 @@
+* afchelper [ResourceLoader |dependencies=mediawiki.api, mediawiki.util, mediawiki.user, jquery.chosen, jquery.spinner, jquery.ui |namespaces=2, 118] |afchelper.js |afchelper.css
