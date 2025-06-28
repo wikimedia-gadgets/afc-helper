@@ -31,10 +31,10 @@
 
 	// These next two statements (setting beta and baseurl) may be modified
 	// by the uploading script! If you change them, check that the uploading
-	// script at scripts/upload.py doesn't break.
+	// script at scripts/deploy.js doesn't break.
 	AFCH.consts.beta = true;
 	AFCH.consts.baseurl = AFCH.consts.scriptpath +
-		'?action=raw&ctype=text/javascript&title=MediaWiki:Gadget-afch.js';
+		'?action=raw&ctype=text/javascript&title=MediaWiki:Gadget-afchelper.js';
 
 	$.getScript( AFCH.consts.baseurl + '/core.js' ).done( () => {
 		const loaded = AFCH.load( 'submissions' ); // perhaps eventually there will be more modules besides just 'submissions'
