@@ -1,5 +1,5 @@
 // <nowiki>
-( function ( AFCH, $, mw ) {
+( function () {
 	let $afchLaunchLink, $afch, $afchWrapper,
 		afchPage, afchSubmission, afchViews, afchViewer;
 
@@ -2910,5 +2910,5 @@
 		} );
 	}
 
-}( AFCH, jQuery, mediaWiki ) );
+}() );
 // </nowiki>

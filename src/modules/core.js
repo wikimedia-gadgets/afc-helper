@@ -1,5 +1,5 @@
 // <nowiki>
-( function ( AFCH, $, mw ) {
+( function () {
 	$.extend( AFCH, {
 
 		/**
@@ -1952,5 +1952,5 @@
 
 	} );
 
-}( AFCH, jQuery, mediaWiki ) );
+}() );
 // </nowiki>
