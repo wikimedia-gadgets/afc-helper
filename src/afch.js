@@ -5,7 +5,7 @@
 	// But in server.js, we don't get this gadget check, so we need to check it manually. Else you'll get AFCH appearing on the Main Page :)
 	const userNamespace = 2;
 	const draftNamespace = 118;
-	if ( ![draftNamespace, userNamespace].includes( mw.config.get( 'wgNamespaceNumber' ) ) ) {
+	if ( ![ draftNamespace, userNamespace ].includes( mw.config.get( 'wgNamespaceNumber' ) ) ) {
 		return;
 	}
 
