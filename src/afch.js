@@ -3,9 +3,9 @@
 	// Check that we're in a namespace that uses AFCH.
 	// In the gadget, this is checked by the gadgets extension and this check is not needed, since we defined namespaces in MediaWiki:Gadgets-definition.
 	// But in server.js, we don't get this gadget check, so we need to check it manually. Else you'll get AFCH appearing on the Main Page :)
-	const draftNamespace = 118;
 	const userNamespace = 2;
-	if ( [draftNamespace, userNamespace].includes( mw.config.get( 'wgNamespaceNumber' ) ) ) {
+	const draftNamespace = 118;
+	if ( ![draftNamespace, userNamespace].includes( mw.config.get( 'wgNamespaceNumber' ) ) ) {
 		return;
 	}
 
