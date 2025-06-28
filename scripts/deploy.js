@@ -16,6 +16,7 @@ const TARGETS = {
     'templates/tpl-preferences.html': 'afchelper.js/tpl-preferences.js',
     'templates/tpl-submissions.html': 'afchelper.js/tpl-submissions.js',
 };
+const EDIT_SUMMARY_ADVERT = ' (deploy.js)';
 
 function readCredentials() {
     const filePath = path.join(__dirname, 'credentials.json');
@@ -115,7 +116,7 @@ function resolveApiUrl(site) {
         if (isMainGadget) {
             content = content.replace('AFCH.consts.beta = true;', 'AFCH.consts.beta = false;');
         }
-        const editSummary = `Updating AFCH: ${branch} @ ${sha1.slice(0, 6)}`
+        const editSummary = `Updating AFCH: ${branch} @ ${sha1.slice(0, 6)} ${EDIT_SUMMARY_ADVERT}`
 
         console.log(`Deploying build/${fileName} to ${pageTitle} ...`);
         const saveResponse = await bot.save(pageTitle, content, editSummary);
