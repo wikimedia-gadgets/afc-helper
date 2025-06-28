@@ -1,24 +1,12 @@
 // <nowiki>
 ( function () {
-	// Check that we're in the right namespace and on the right page
-	switch ( mw.config.get( 'wgNamespaceNumber' ) ) {
-		case 4: // Wikipedia
-		case 5: { // Wikipedia talk
-			const pageName = mw.config.get( 'wgTitle' );
-			// return nothing for now, all drafts are now under Draft namespace
-			// currently only the article submission script is running here.
-			// to be used when script(s) for other modules such as category and
-			// redirect requests are reintergrated into here.
-			if ( pageName !== 'Articles for creation/sandbox' ) {
-				return;
-			}
-			break;
-		}
-		case 2: // User
-		case 118: // Draft
-			break;
-		default:
-			return;
+	// Check that we're in a namespace that uses AFCH.
+	// In the gadget, namespaces are checked by the gadgets extension, and the below check is not needed, since we defined namespaces in MediaWiki:Gadgets-definition.
+	// But in server.js, we don't get this gadget check, so we need to check it below. Else you'll get AFCH appearing on the Main Page :)
+	const userNamespace = 2;
+	const draftNamespace = 118;
+	if ( ![ draftNamespace, userNamespace ].includes( mw.config.get( 'wgNamespaceNumber' ) ) ) {
+		return;
 	}
 
 	// Initialize the AFCH object
