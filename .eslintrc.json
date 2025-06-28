@@ -47,6 +47,7 @@
 		"no-global-assign": "warn",
 		"no-implicit-globals": "warn",
 		"no-jquery/no-animate": "warn",
+		"no-jquery/no-done-fail": "warn",
 		"no-jquery/no-each-util": "warn",
 		"no-jquery/no-grep": "warn",
 		"no-jquery/no-in-array": "warn",
