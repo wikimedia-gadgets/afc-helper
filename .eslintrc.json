@@ -20,10 +20,7 @@
 		{
 			"files": [
 				"tests/*"
-			],
-			"parserOptions": {
-				"ecmaVersion": 6
-			}
+			]
 		}
 	],
 	"rules": {
@@ -41,8 +38,6 @@
 		"unicorn/prefer-string-slice": "off",
 
 		"eqeqeq": "warn",
-		"es-x/no-array-prototype-includes": "warn",
-		"es-x/no-object-values": "warn",
 		"es-x/no-regexp-s-flag": "warn",
 		"no-global-assign": "warn",
 		"no-implicit-globals": "warn",
