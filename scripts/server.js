@@ -52,7 +52,7 @@ http.createServer({}, async function (req, res) {
 	});
 	var reqTitle = reqUrl.searchParams.get("title");
 
-	// This is the reverse of what happens to filenames in scripts/upload.py
+	// This is probably the reverse of what happens to filenames in scripts/deploy.js
 	var content = '';
 	if(reqTitle.endsWith("core.js")) {
 		content += readFile(HOGAN_FILE) + ';';

@@ -25,7 +25,7 @@ Tests are stored in the `tests` directory and are run automatically on new commi
 ### Deploying
 Interface administrators can [click here](https://en.wikipedia.org/wiki/Wikipedia:WikiProject_Articles_for_creation/Helper_script/Deploying) for a detailed work instruction of how to deploy to English Wikipedia.
 
-To deploy AFC Helper to a wiki, use `scripts/upload.py`.
+To deploy AFC Helper to a wiki, use `scripts/deploy.js`.
 
 ### Dependencies
 Below is a list of dependencies and what they are involved with, so you know what to test when updating dependencies.
