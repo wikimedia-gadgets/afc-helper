@@ -51,12 +51,6 @@
 		 * @return {boolean} Whether or not all setup functions executed successfully
 		 */
 		setup: function () {
-			// Check requirements
-			if ( 'ajax' in $.support && !$.support.ajax ) {
-				AFCH.error = 'AFCH requires AJAX';
-				return false;
-			}
-
 			AFCH.api = new mw.Api();
 
 			// Set up the preferences interface
@@ -191,9 +185,7 @@
 		 * @return {boolean}
 		 */
 		load: function ( type ) {
-			if ( !AFCH.setup() ) {
-				return false;
-			}
+			AFCH.setup();
 
 			let promise = $.when();
 
