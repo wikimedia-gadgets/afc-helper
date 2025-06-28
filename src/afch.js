@@ -1,19 +1,9 @@
 // <nowiki>
 ( function () {
-	// Check that we're in the right namespace and on the right page
+	// Check that we're in the right namespace
+	// In the gadget, this is checked by ResourceLoader and not needed.
+	// But in server.js, we need to check it manually. Else you'll get AFCH appearing on the Main Page :)
 	switch ( mw.config.get( 'wgNamespaceNumber' ) ) {
-		case 4: // Wikipedia
-		case 5: { // Wikipedia talk
-			const pageName = mw.config.get( 'wgTitle' );
-			// return nothing for now, all drafts are now under Draft namespace
-			// currently only the article submission script is running here.
-			// to be used when script(s) for other modules such as category and
-			// redirect requests are reintergrated into here.
-			if ( pageName !== 'Articles for creation/sandbox' ) {
-				return;
-			}
-			break;
-		}
 		case 2: // User
 		case 118: // Draft
 			break;
