@@ -13,7 +13,8 @@
   "scripts": {
     "test": "grunt test",
     "lint": "grunt lint",
-    "deploy": "node scripts/deploy.js"
+    "deploy": "node scripts/deploy.js",
+    "start": "node scripts/server.js"
   },
   "dependencies": {
     "hogan.js": "^3.0.2"
