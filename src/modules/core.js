@@ -83,8 +83,8 @@
 				// Current user
 				user: mw.user.getName(),
 
-				// Edit summary ad
-				summaryAd: ' ([[WP:AFCH|AFCH]])',
+				// Edit tag
+				tag: 'AFCH',
 
 				// Require users to be on whitelist to use the script
 				// Testwiki users don't need to be on it
@@ -618,8 +618,9 @@
 						action: 'edit',
 						title: pagename,
 						text: options.contents,
-						summary: options.summary + AFCH.consts.summaryAd,
-						redirect: options.followRedirects
+						summary: options.summary,
+						redirect: options.followRedirects,
+						tags: AFCH.consts.tag
 					};
 				} else {
 					// Because it is easier to do subscriptions with it, use the discussiontoolsedit API instead of the edit API
@@ -629,8 +630,9 @@
 						page: pagename,
 						sectiontitle: '',
 						wikitext: options.contents.trim(),
-						summary: options.summary + AFCH.consts.summaryAd,
-						autosubscribe: 'yes'
+						summary: options.summary,
+						autosubscribe: 'yes',
+						tags: AFCH.consts.tag
 					};
 				}
 
@@ -721,7 +723,8 @@
 					action: 'move',
 					from: oldTitle,
 					to: newTitle,
-					reason: reason + AFCH.consts.summaryAd
+					reason: reason,
+					tags: AFCH.consts.tag
 				}, additionalParameters );
 
 				if ( AFCH.prefs.noWatch ) {
