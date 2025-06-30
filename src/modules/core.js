@@ -83,8 +83,13 @@
 				// Current user
 				user: mw.user.getName(),
 
-				// Edit summary ad
-				summaryAd: ' ([[WP:AFCH|AFCH]])',
+				// Edit summary ad (if tag is disabled)
+				// summaryAd: ' ([[WP:AFCH|AFCH]])',
+				// tag: false,
+
+				// Edit tag (if ad is disabled)
+				summaryAd: '',
+				tag: 'AFCH',
 
 				// Require users to be on whitelist to use the script
 				// Testwiki users don't need to be on it
@@ -660,6 +665,10 @@
 					return deferred;
 				}
 
+				if ( AFCH.consts.tag ) {
+					request.tags = AFCH.consts.tag;
+				}
+
 				AFCH.api.postWithEditToken( request )
 					.done( ( data ) => {
 						let $diffLink;
@@ -732,6 +741,10 @@
 					AFCH.log( request );
 					deferred.resolve( { to: newTitle } );
 					return deferred;
+				}
+
+				if ( AFCH.consts.tag ) {
+					request.tags = AFCH.consts.tag;
 				}
 
 				AFCH.api.postWithEditToken( request ) // Move token === edit token
