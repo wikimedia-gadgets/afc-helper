@@ -10,13 +10,18 @@ module.exports = function ( grunt ) {
 		},
 
 		concat: {
-			options: {
-				separator: ';',
-				banner: '// <nowiki>\n'
-			},
 			dependencies: {
+				options: {
+					separator: ';',
+					banner: '// <nowiki>\n'
+				},
 				files: {
 					'build/modules/core.js': [ 'node_modules/hogan.js/build/gh-pages/builds/2.0.0/hogan-2.0.0.js', 'build/modules/core.js' ]
+				}
+			},
+			styling: {
+				files: {
+					'build/afch.css': [ 'build/less/general.css', 'build/less/submissions.css' ]
 				}
 			}
 		},
@@ -43,14 +48,6 @@ module.exports = function ( grunt ) {
 			}
 		},
 
-		cssmin: {
-			build: {
-				files: {
-					'build/afch.css': [ 'build/**/*.css' ]
-				}
-			}
-		},
-
 		eslint: {
 			target: [ 'src/**/*.js', 'contrib/**/*.js', 'tests/**/*.js', 'Gruntfile.js' ]
 		},
@@ -65,7 +62,6 @@ module.exports = function ( grunt ) {
 	grunt.loadNpmTasks( 'grunt-contrib-clean' );
 	grunt.loadNpmTasks( 'grunt-contrib-concat' );
 	grunt.loadNpmTasks( 'grunt-contrib-copy' );
-	grunt.loadNpmTasks( 'grunt-contrib-cssmin' );
 	grunt.loadNpmTasks( 'grunt-contrib-less' );
 	grunt.loadNpmTasks( 'grunt-eslint' );
 	grunt.loadNpmTasks( 'grunt-exec' );
@@ -85,7 +81,7 @@ module.exports = function ( grunt ) {
 	grunt.registerTask(
 		'styling',
 		'Compiles LESS files to CSS and minifies them into one file.',
-		[ 'less', 'cssmin', 'clean:styling' ]
+		[ 'less', 'concat:styling', 'clean:styling' ]
 	);
 
 	grunt.registerTask(
