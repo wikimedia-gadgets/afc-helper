@@ -58,11 +58,8 @@ module.exports = function ( grunt ) {
 					'build/afch.css': [ 'build/**/*.css' ]
 				}
 			}
-		},
+		}
 
-		eslint: {
-			target: [ 'src/**/*.js', 'contrib/**/*.js', 'tests/**/*.js', 'Gruntfile.js' ]
-		},
 	} );
 
 	grunt.loadNpmTasks( 'grunt-autoprefixer' );
@@ -71,13 +68,6 @@ module.exports = function ( grunt ) {
 	grunt.loadNpmTasks( 'grunt-contrib-copy' );
 	grunt.loadNpmTasks( 'grunt-contrib-cssmin' );
 	grunt.loadNpmTasks( 'grunt-contrib-less' );
-	grunt.loadNpmTasks( 'grunt-eslint' );
-
-	grunt.registerTask(
-		'lint',
-		'Tests files for code style and code quality.',
-		[ 'eslint' ]
-	);
 
 	grunt.registerTask(
 		'styling',
@@ -88,7 +78,7 @@ module.exports = function ( grunt ) {
 	grunt.registerTask(
 		'build',
 		'Moves files to the /build directory, and minifies CSS.',
-		[ 'clean:build', 'lint', 'copy', 'concat:dependencies', 'styling' ]
+		[ 'clean:build', 'copy', 'concat:dependencies', 'styling' ]
 	);
 
 	grunt.registerTask( 'default', [ 'build' ] );
