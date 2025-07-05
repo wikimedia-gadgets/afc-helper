@@ -43,15 +43,6 @@ module.exports = function ( grunt ) {
 			}
 		},
 
-		autoprefixer: {
-			build: {
-				expand: true,
-				cwd: 'build',
-				src: [ '**/*.css' ],
-				dest: 'build'
-			}
-		},
-
 		cssmin: {
 			build: {
 				files: {
@@ -62,7 +53,6 @@ module.exports = function ( grunt ) {
 
 	} );
 
-	grunt.loadNpmTasks( 'grunt-autoprefixer' );
 	grunt.loadNpmTasks( 'grunt-contrib-clean' );
 	grunt.loadNpmTasks( 'grunt-contrib-concat' );
 	grunt.loadNpmTasks( 'grunt-contrib-copy' );
@@ -72,7 +62,7 @@ module.exports = function ( grunt ) {
 	grunt.registerTask(
 		'styling',
 		'Compiles LESS files to CSS and minifies them into one file.',
-		[ 'less', 'autoprefixer', 'cssmin', 'clean:styling' ]
+		[ 'less', 'cssmin', 'clean:styling' ]
 	);
 
 	grunt.registerTask(
