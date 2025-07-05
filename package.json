@@ -11,7 +11,7 @@
     "url": "https://github.com/wikimedia-gadgets/afc-helper.git"
   },
   "scripts": {
-    "test": "grunt test",
+    "test": "jest",
     "lint": "grunt lint",
     "deploy": "node scripts/deploy.js",
     "start": "node scripts/server.js"
@@ -30,7 +30,6 @@
     "grunt-contrib-cssmin": "^4.0.0",
     "grunt-contrib-less": "^3.0.0",
     "grunt-eslint": "^24.3.0",
-    "grunt-exec": "^3.0.0",
     "jest-cli": "^27.0.6",
     "jquery": "^3.6.0",
     "mwn": "^3.0.1",
