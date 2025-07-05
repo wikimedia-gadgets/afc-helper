@@ -1,2 +1,3 @@
 scripts/server.js
 scripts/deploy.js
+.eslintrc.json

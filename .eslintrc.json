@@ -24,6 +24,7 @@
 		}
 	],
 	"rules": {
+		// default rules we don't like
 		"camelcase": "off",
 		"max-len": "off",
 		"no-console": "off",
@@ -37,6 +38,10 @@
 		"security/detect-unsafe-regex": "off",
 		"unicorn/prefer-string-slice": "off",
 
+		// non-default rules we do like
+		"no-nested-ternary": "error",
+		
+		// rules we should probably fix someday
 		"eqeqeq": "warn",
 		"es-x/no-regexp-s-flag": "warn",
 		"no-global-assign": "warn",
