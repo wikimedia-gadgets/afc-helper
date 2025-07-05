@@ -35,12 +35,5 @@
     "jquery": "^3.6.0",
     "mwn": "^3.0.1",
     "simple-git": "^3.28.0"
-  },
-  "jest": {
-    "testEnvironment": "jsdom",
-    "testMatch": [
-      "**/tests/**/test-*.[jt]s?(x)",
-      "**/?(*.)+(spec|test).[jt]s?(x)"
-    ]
   }
 }
