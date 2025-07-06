@@ -46,6 +46,7 @@
 div.gradient-button, .gradient-button {
 	cursor: pointer;
 	text-decoration: none;
+	-webkit-user-select: none;
 	user-select: none;
 	transition: box-shadow .1s ease-in-out;
 
@@ -64,6 +65,7 @@ div.gradient-button, .gradient-button {
 	&.disabled {
 		background-color: @lightgray;
 		text-decoration: none;
+		-webkit-user-select: none;
 		user-select: none;
 		cursor: not-allowed;
 
