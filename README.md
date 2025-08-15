@@ -41,3 +41,11 @@ Below is a list of dependencies and what they are involved with, so you know wha
 ### License
 
 `afc-helper` is licensed under the GNU General Public License version 3; see LICENSE for more information.
+
+### How to add a decline reason
+
+- Create a maintenance category for it at [[Category:AfC submissions declined as XYZ]]. Populate the page with initial wikitext (especially `{{Wikipedia category|hidden=yes|tracking=yes}}` so that it is not deleted as an empty category). [Example.](https://en.wikipedia.org/w/index.php?title=Category:AfC_submissions_declined_as_resume-like&action=edit)
+- Add it to [[Template:AfC submission/comments]]. [Example.](https://en.wikipedia.org/w/index.php?title=Template:AfC_submission/comments&curid=19469148&diff=1305864144&oldid=1304678058)
+- Add it to [[Template:AfC submission/comments/doc]]. [Example.](https://en.wikipedia.org/w/index.php?title=Template:AfC_submission/comments/doc&curid=39614945&diff=1305864471&oldid=1291414231)
+- Add it to [[Template:AfC submission/comments/testcases]]. [Example.](https://en.wikipedia.org/w/index.php?title=Template:AfC_submission/comments/testcases&curid=40093415&diff=1305869528&oldid=1281911402)
+- Write an AFCH patch that adds it to AFCH. [Example.](https://github.com/wikimedia-gadgets/afc-helper/pull/395/files)
