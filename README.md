@@ -49,3 +49,5 @@ Below is a list of dependencies and what they are involved with, so you know wha
 - Add it to [[Template:AfC submission/comments/doc]]. [Example.](https://en.wikipedia.org/w/index.php?title=Template:AfC_submission/comments/doc&curid=39614945&diff=1305864471&oldid=1291414231)
 - Add it to [[Template:AfC submission/comments/testcases]]. [Example.](https://en.wikipedia.org/w/index.php?title=Template:AfC_submission/comments/testcases&curid=40093415&diff=1305869528&oldid=1281911402)
 - Write an AFCH patch that adds it to AFCH. [Example.](https://github.com/wikimedia-gadgets/afc-helper/pull/395/files)
+    - If that patch has multiple codes (for example, llm and ai both refer to the artifical intelligence decline reason), add "(alias: llm)" or similar to the end of it, so that all codes show up in search results.
+    - Example: `<option value="ai">ai - Submission appears to be a large language model output (alias: llm)</option>`
