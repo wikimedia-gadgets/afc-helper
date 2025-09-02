@@ -2489,11 +2489,12 @@
 		AFCH.userData.set( 'decline-counts', declineCounts );
 
 		// If the first reason is a custom decline, we include the declineTextarea in the {{AFC submission}} template
+		const customRationale = data.declineTextarea;
 		if ( declineReason === 'reason' ) {
-			newParams[ '3' ] = data.declineTextarea;
+			newParams[ '3' ] = customRationale;
 		} else if ( declineReason2 === 'reason' ) {
-			newParams.details2 = data.declineTextarea;
-		} else if ( isDecline && data.declineTextarea ) {
+			newParams.details2 = customRationale;
+		} else if ( isDecline && customRationale ) {
 
 			// But otherwise if addtional text has been entered we just add it as a new comment
 			afchSubmission.addNewComment( data.declineTextarea );
@@ -2551,29 +2552,26 @@
 		text.cleanUp();
 
 		// Build edit summary
-		let editSummary = ( isDecline ? 'Declining' : 'Rejecting' ) + ' submission: ',
-			lengthLimit = declineReason2 ? 120 : 180;
-		if ( declineReason === 'reason' ) {
-
-			// If this is a custom decline, use the text in the edit summary
-			editSummary += data.declineTextarea.substring( 0, lengthLimit );
-
-			// If we had to trunucate, indicate that
-			if ( data.declineTextarea.length > lengthLimit ) {
-				editSummary += '...';
-			}
-		} else {
-			editSummary += isDecline ? data.declineReasonTexts[ 0 ] : data.rejectReasonTexts[ 0 ];
+		let editSummary = ( isDecline ? 'Declining' : 'Rejecting' ) + ' submission',
+			lengthLimit = declineReason2 ? 120 : 180,
+			firstReasonHasSummary = false;
+		// Don't bother trying to add the custom decline reason to the edit summary
+		// if it's some essay.
+		if ( declineReason === 'reason' && customRationale.length < lengthLimit ) {
+			firstReasonHasSummary = true;
+			editSummary += `: ${ customRationale }`;
+		} else if ( declineReason !== 'reason' ) {
+			firstReasonHasSummary = true;
+			editSummary += `: ${ isDecline ? data.declineReasonTexts[ 0 ] : data.rejectReasonTexts[ 0 ] }`;
 		}
 
 		if ( declineReason2 ) {
-			editSummary += ' and ';
-			if ( declineReason2 === 'reason' ) {
-				editSummary += data.declineTextarea.substring( 0, lengthLimit );
-				if ( data.declineTextarea.length > lengthLimit ) {
-					editSummary += '...';
-				}
-			} else {
+			if ( declineReason2 === 'reason' && customRationale.length < lengthLimit ) {
+				// We know we have an edit summary blurb for the first decline reason
+				// if we're here. (Can't decline with 'custom' twice!)
+				editSummary += ` and ${ customRationale }`;
+			} else if ( declineReason2 !== 'reason' ) {
+				editSummary += firstReasonHasSummary ? ' and ' : ': ';
 				editSummary += data.declineReasonTexts[ 1 ];
 			}
 		}
@@ -2622,7 +2620,7 @@
 							$6: declineReason2 || '',
 							$7: newParams.details2 || '',
 							$8: ( declineReason === 'reason' || declineReason2 === 'reason' ) ?
-								'' : data.declineTextarea
+								'' : customRationale
 						} );
 					} else {
 						message = AFCH.msg.get( 'rejected-submission', {
