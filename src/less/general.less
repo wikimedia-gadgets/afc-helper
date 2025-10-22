@@ -14,6 +14,9 @@
 @blue: #0074D9;
 @red: #FF4136;
 
+/*Dark mode variable colours*/
+@darkmodeblack: var(--background-color-base);/* White in light mode*/
+
 /* General styles */
 
 .hidden {
@@ -49,6 +52,7 @@ div.gradient-button, .gradient-button {
 	-webkit-user-select: none;
 	user-select: none;
 	transition: box-shadow .1s ease-in-out;
+	color: @sexyblack;
 
 	&:hover {
 		text-decoration: none;
