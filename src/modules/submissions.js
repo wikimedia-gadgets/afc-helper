@@ -1938,7 +1938,7 @@
 
 			// Set up jquery.chosen for the decline reason
 			$afch.find( '#declineReason' ).chosen( {
-				placeholder_text_single: 'Select a decline reason...',
+				placeholder_text_multiple: 'Select one or more decline reasons...',
 				no_results_text: 'Whoops, no reasons matched your search. Type "custom" to add a custom rationale instead.',
 				search_contains: true,
 				inherit_select_classes: true,
@@ -1947,7 +1947,7 @@
 
 			// Set up jquery.chosen for the reject reason
 			$afch.find( '#rejectReason' ).chosen( {
-				placeholder_text_single: 'Select a reject reason...',
+				placeholder_text_multiple: 'Select one or more reject reasons...',
 				search_contains: true,
 				inherit_select_classes: true,
 				max_selected_options: 2
