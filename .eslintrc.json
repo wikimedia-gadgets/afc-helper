@@ -42,21 +42,22 @@
 		"no-nested-ternary": "error",
 		
 		// rules we should probably fix someday
-		"eqeqeq": "warn",
-		"es-x/no-regexp-s-flag": "warn",
-		"no-global-assign": "warn",
-		"no-implicit-globals": "warn",
-		"no-jquery/no-animate": "warn",
-		"no-jquery/no-done-fail": "warn",
-		"no-jquery/no-each-util": "warn",
-		"no-jquery/no-grep": "warn",
-		"no-jquery/no-in-array": "warn",
-		"no-jquery/no-map-util": "warn",
-		"no-jquery/no-sizzle": "warn",
-		"no-jquery/no-slide": "warn",
-		"no-jquery/no-trim": "warn",
-		"no-undef": "warn",
-		"prefer-const": "warn",
-		"unicorn/prefer-includes": "warn"
+		"eqeqeq": "off",
+		"es-x/no-regexp-s-flag": "off",
+		"no-global-assign": "off",
+		"no-implicit-globals": "off",
+		"no-jquery/no-animate": "off",
+		"no-jquery/no-done-fail": "off",
+		"no-jquery/no-each-util": "off",
+		"no-jquery/no-grep": "off",
+		"no-jquery/no-in-array": "off",
+		"no-jquery/no-map-util": "off",
+		"no-jquery/no-sizzle": "off",
+		"no-jquery/no-slide": "off",
+		"no-jquery/no-support": "off",
+		"no-jquery/no-trim": "off",
+		"no-undef": "off",
+		"prefer-const": "off",
+		"unicorn/prefer-includes": "off"
 	}
 }

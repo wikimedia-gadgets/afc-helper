@@ -614,6 +614,9 @@
 
 	/**
 	 * Convert http://-style links to other wikipages to wikicode syntax
+	 *
+	 * @param {string} text
+	 * @return {string}
 	 */
 	AFCH.Text.prototype.convertExternalLinksToWikilinks = function ( text ) {
 		const linkRegex = /\[{1,2}(?:https?:)?\/\/(?:en.wikipedia.org\/wiki|enwp.org)\/([^\s|\][]+)(?:\s|\|)?((?:\[\[[^[\]]*\]\]|[^\][])*)\]{1,2}/ig;
