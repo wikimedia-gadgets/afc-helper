@@ -12,7 +12,7 @@
   },
   "scripts": {
     "test": "jest",
-    "lint": "eslint src tests Gruntfile.js",
+    "lint": "eslint src tests Gruntfile.js --max-warnings=0",
     "deploy": "node scripts/deploy.js",
     "start": "node scripts/server.js"
   },
