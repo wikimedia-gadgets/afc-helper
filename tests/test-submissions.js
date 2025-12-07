@@ -190,3 +190,33 @@ describe( 'AFCH.Text.cleanUp', () => {
 		expect( output ).toBe( expectedOutput );
 	} );
 } );
+
+describe( 'AFCH.Text.removeAfcTemplates', () => {
+	it( 'should do nothing to normal text', () => {
+		const wikicode = 'Test';
+		const expectedOutput = 'Test';
+		const output = ( new AFCH.Text( wikicode ) ).removeAfcTemplates();
+		expect( output ).toBe( expectedOutput );
+	} );
+
+	it( 'should remove unsubmitted draft templates', () => {
+		const wikicode = '{{AfC submission|t}}';
+		const expectedOutput = '';
+		const output = ( new AFCH.Text( wikicode ) ).removeAfcTemplates();
+		expect( output ).toBe( expectedOutput );
+	} );
+
+	it( 'should remove declined draft templates', () => {
+		const wikicode = '{{AFC submission|d|neo|u=Carljames19844|ns=118|decliner=AlphaBetaGamma|declinets=20251205094917|ts=20251205094647}}';
+		const expectedOutput = '';
+		const output = ( new AFCH.Text( wikicode ) ).removeAfcTemplates();
+		expect( output ).toBe( expectedOutput );
+	} );
+
+	it( 'should remove {{AfC submission/draft}}', () => {
+		const wikicode = '{{AfC submission/draft}}';
+		const expectedOutput = '';
+		const output = ( new AFCH.Text( wikicode ) ).removeAfcTemplates( wikicode );
+		expect( output ).toBe( expectedOutput );
+	} );
+} );
