@@ -6,7 +6,7 @@
 
 /* eslint-env jest, node */
 
-const resetToBase = function () {
+function resetToBase() {
 	const fileSystem = require( 'fs' );
 	const basePageHtml = fileSystem.readFileSync( './tests/test-frame.html' ).toString();
 	// Set the base document content using jsdom
@@ -14,9 +14,9 @@ const resetToBase = function () {
 	AFCH = undefined;
 	$ = require( 'jquery' );
 	jQuery = $;
-};
+}
 
-const setPageTitle = function ( title ) {
+function setPageTitle( title ) {
 	mw.config.get.mockImplementation( ( requested ) => {
 		if ( requested === 'wgPageName' ) {
 			return title;
@@ -26,8 +26,9 @@ const setPageTitle = function ( title ) {
 			}
 		}
 	} );
-};
+}
 
+/** This intentionally has global scope. Is called at the top of each test page. */
 resetToAFCApplicablePage = function () {
 	resetToBase();
 	setPageTitle( 'Draft:Foo' );
