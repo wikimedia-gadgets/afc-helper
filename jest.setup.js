@@ -25,11 +25,7 @@ mw.config.get.mockImplementation( ( requested ) => {
 
 mw.loader = {
 	using: function () {
-		return {
-			then: function ( callback ) {
-				callback();
-			}
-		};
+		return Promise.resolve();
 	}
 };
 
