@@ -3,6 +3,7 @@
  */
 
 /* eslint-env jest */
+/* eslint-disable quotes */
 
 // It's always good to start simple :)
 describe( 'AFCH', () => {
