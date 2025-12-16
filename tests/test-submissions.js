@@ -4,13 +4,6 @@
 
 /* eslint-env jest */
 
-require( './scaffold.js' );
-
-resetToAFCApplicablePage();
-
-require( './../src/modules/core.js' );
-require( './../src/modules/submissions.js' );
-
 // It's always good to start simple :)
 describe( 'AFCH', () => {
 	it( 'is an object', () => {
