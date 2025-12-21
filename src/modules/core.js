@@ -3,9 +3,7 @@
 	$.extend( AFCH, {
 
 		/**
-		 * Log anything to the console
-		 *
-		 * @param {any} thing(s)
+		 * Log anything to the console. Takes any number of parameters.
 		 */
 		log: function () {
 			const args = Array.prototype.slice.call( arguments );
