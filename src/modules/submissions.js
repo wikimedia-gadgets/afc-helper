@@ -87,9 +87,9 @@
 	};
 
 	/**
-	 * Internal function
-	 *
-	 * @param {Array} templates list of templates to parse
+	 * @internal
+	 * @param {Array<Object>} templates list of templates to parse
+	 * @return {Array<Object>} [ this.templates, this.comments ]
 	 */
 	AFCH.Submission.prototype.loadDataFromTemplates = function ( templates ) {
 		// Represent each AfC submission template as an object.
@@ -98,7 +98,7 @@
 
 		$.each( templates, ( _, template ) => {
 			const name = template.target.toLowerCase();
-			if ( name === 'afc submission' ) {
+			if ( name === 'afc submission' || name === 'afc submission/draft' ) {
 				submissionTemplates.push( {
 					status: ( AFCH.getAndDelete( template.params, '1' ) || '' ).toLowerCase(),
 					timestamp: AFCH.getAndDelete( template.params, 'ts' ) || '',
@@ -116,6 +116,9 @@
 
 		this.templates = submissionTemplates;
 		this.comments = commentTemplates;
+
+		// Return these for unit testing
+		return [ this.templates, this.comments ];
 	};
 
 	/**

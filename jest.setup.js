@@ -8,33 +8,7 @@
 
 inUnitTestEnvironment = true;
 
-mw = {};
-mediaWiki = {};
-
-mw.config = {
-	get: jest.fn()
-};
-
-mw.config.get.mockImplementation( ( requested ) => {
-	if ( requested === 'wgPageName' ) {
-		return 'Draft:Foo';
-	} else if ( requested === 'wgNamespaceNumber' ) {
-		return 118;
-	}
-} );
-
-mw.loader = {
-	using: function () {
-		return Promise.resolve();
-	}
-};
-
-mw.user = {
-	getName: jest.fn()
-};
-
-$ = require( 'jquery' );
-jQuery = $;
+window.AFCH = {};
 
 require( './src/afch.js' );
 require( './src/modules/core.js' );

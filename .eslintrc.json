@@ -44,6 +44,7 @@
 		// rules we should probably fix someday
 		"eqeqeq": "off",
 		"es-x/no-regexp-s-flag": "off",
+		"mediawiki/no-storage": "off",
 		"no-global-assign": "off",
 		"no-implicit-globals": "off",
 		"no-jquery/no-animate": "off",

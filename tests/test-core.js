@@ -12,10 +12,6 @@ describe( 'AFCH', () => {
 	} );
 } );
 
-describe( 'AFCH.Page', () => {
-	// FIXME...
-} );
-
 describe( 'AFCH.removeEmptySectionAtEnd', () => {
 	it( 'no headings', () => {
 		const wikicode = 'Test';
@@ -286,30 +282,6 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		);
 	} );
 
-	// FIXME
-	it.skip( 'remove an existing WikiProject', () => {
-		const wikicode =
-`{{WikiProject Women}}
-{{WikiProject Women's sport}}
-{{WikiProject Somalia}}`;
-		const newAssessment = '';
-		const revId = 592507;
-		const isBiography = false;
-		// user de-selected WikiProject Somalia
-		const newWikiProjects = [ 'WikiProject Women', 'WikiProject Women\'s sport' ];
-		const lifeStatus = 'unknown';
-		const subjectName = '';
-		const output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
-		expect( output ).toBe(
-`{{WikiProject banner shell |1=
-{{subst:WPAFC/article |oldid=592507}}
-{{WikiProject Women}}
-{{WikiProject Women's sport}}
-{{WikiProject Somalia}}
-}}`
-		);
-	} );
-
 	it( 'accept form is a biography with all fields filled in', () => {
 		const wikicode = '';
 		const newAssessment = 'B';
@@ -342,26 +314,6 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 `{{WikiProject banner shell |blp=no |1=
 {{subst:WPAFC/article |oldid=592496}}
 {{WikiProject Biography}}
-}}`
-		);
-	} );
-
-	it.skip( 'talk page has {{wikiproject biography}}, and user selects that it\'s not a biography, so should remove {{wikiproject biography}}', () => {
-		const wikicode =
-`{{wikiproject biography|blp=yes|class=B|listas=Jones, Bob}}
-{{WikiProject Somalia}}`;
-		const newAssessment = '';
-		const revId = 592496;
-		const isBiography = false;
-		// FIXME: if isBiography = false, WikiProject Biography should not be making it into this array
-		const newWikiProjects = [ 'WikiProject Biography', 'WikiProject Somalia' ];
-		const lifeStatus = 'unknown';
-		const subjectName = '';
-		const output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
-		expect( output ).toBe(
-`{{WikiProject banner shell |1=
-{{subst:WPAFC/article |oldid=592496}}
-{{WikiProject Somalia}}
 }}`
 		);
 	} );
