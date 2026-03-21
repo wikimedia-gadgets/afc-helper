@@ -1113,7 +1113,7 @@
 						.appendTo( $warningDiv );
 
 					// ...and now convert the link into a toggle which simply hides/shows the div
-					AFCH.makeToggle( '.deletion-log-toggle', '.deletion-log', 'View deletion log', 'Hide deletion log' );
+					AFCH.makeToggle( '.deletion-log-toggle', '.deletion-log', '(View deletion log)', '(Hide deletion log)' );
 
 					return false;
 				} );
@@ -1163,7 +1163,8 @@
 				if ( numberOfComments ) {
 					addWarning( 'The page contains ' + ( oneComment ? 'an' : '' ) + ' HTML comment' + ( oneComment ? '' : 's' ) +
 						' longer than 30 characters.', 'View comment' + ( oneComment ? '' : 's' ), function () {
-						const $warningDiv = $( this ).parent(),
+						const $toggleLink = $( this ).addClass( 'long-comment-toggle' ),
+							$warningDiv = $toggleLink.parent(),
 							$commentsWrapper = $( '<div>' )
 								.addClass( 'long-comments' )
 								.appendTo( $warningDiv );
@@ -1178,7 +1179,7 @@
 
 						// Now change the "View comment" link to behave as a normal toggle for .long-comments
 						AFCH.makeToggle( '.long-comment-toggle', '.long-comments',
-							'View comment' + ( oneComment ? '' : 's' ), 'Hide comment' + ( oneComment ? '' : 's' ) );
+							'(View comment' + ( oneComment ? '' : 's' ) + ')', '(Hide comment' + ( oneComment ? '' : 's' ) + ')' );
 
 						return false;
 					} );
