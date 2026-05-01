@@ -574,7 +574,7 @@
 				'Do not remove this line!'
 			);
 		} else {
-			// We want to neutralize categories, except categories inside of the template {{Draft categories}}, by adding a colon to the beginning of the wikilink.
+			// We want to disable categories, except categories inside of the template {{Draft categories}}, by adding a colon to the beginning of the wikilink.
 			// Replace {{Draft categories}} with a placeholder.
 			const protectedDraftCategories = [];
 			text = text.replace( /\{\{(?:Draft categories|Draftcat)\b[\s\S]*?\}\}(?:\r?\n)/gi, ( match ) => {
@@ -582,7 +582,7 @@
 				protectedDraftCategories.push( match );
 				return placeholder;
 			} );
-			// Neutralize categories by adding a colon to the beginning of the wikilink.
+			// Disable categories by adding a colon to the beginning of the wikilink.
 			text = text.replace( /\[\[Category:/gi, '[[:Category:' );
 			// Replace the placeholder with the original wikicode.
 			protectedDraftCategories.forEach( ( draftCategories, index ) => {
