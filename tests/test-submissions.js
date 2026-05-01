@@ -183,6 +183,88 @@ describe( 'AFCH.Text.cleanUp', () => {
 		const output = ( new AFCH.Text( wikicode ) ).cleanUp( isAccept );
 		expect( output ).toBe( expectedOutput );
 	} );
+
+	it( 'should handle {{Draft categories}} - one line', () => {
+		const wikicode =
+`{{Draft categories|[[Category:Jurassic Park characters]]}}
+`;
+		const isAccept = false;
+		const expectedOutput =
+`{{Draft categories|[[Category:Jurassic Park characters]]}}
+`;
+		const output = ( new AFCH.Text( wikicode ) ).cleanUp( isAccept );
+		expect( output ).toBe( expectedOutput );
+	} );
+
+	it( 'should handle {{Draft categories}} - multiple lines 1', () => {
+		const wikicode =
+`{{Draft categories|[[Category:Jurassic Park characters]]
+[[Category:Fictional clones]]}}
+`;
+		const isAccept = false;
+		const expectedOutput =
+`{{Draft categories|[[Category:Jurassic Park characters]]
+[[Category:Fictional clones]]}}
+`;
+		const output = ( new AFCH.Text( wikicode ) ).cleanUp( isAccept );
+		expect( output ).toBe( expectedOutput );
+	} );
+
+	it( 'should handle {{Draft categories}} - multiple lines 2', () => {
+		const wikicode =
+`{{Draft categories|
+[[Category:Jurassic Park characters]]
+[[Category:Fictional clones]]}}
+`;
+		const isAccept = false;
+		const expectedOutput =
+`{{Draft categories|
+[[Category:Jurassic Park characters]]
+[[Category:Fictional clones]]}}
+`;
+		const output = ( new AFCH.Text( wikicode ) ).cleanUp( isAccept );
+		expect( output ).toBe( expectedOutput );
+	} );
+
+	it( 'should handle {{Draft categories}} - multiple {{Draft categories}}', () => {
+		const wikicode =
+`[[Category:Test1]]
+
+{{Draft categories|
+[[Category:Adam]]
+[[Category:Bob]]
+}}
+
+[[Category:Test2]]
+
+{{Draft categories|
+[[Category:Claire]]
+[[Category:David]]
+}}
+
+[[Category:Test3]]
+`;
+		const isAccept = false;
+		const expectedOutput =
+`[[:Category:Test1]]
+
+{{Draft categories|
+[[Category:Adam]]
+[[Category:Bob]]
+}}
+
+[[:Category:Test2]]
+
+{{Draft categories|
+[[Category:Claire]]
+[[Category:David]]
+}}
+
+[[:Category:Test3]]
+`;
+		const output = ( new AFCH.Text( wikicode ) ).cleanUp( isAccept );
+		expect( output ).toBe( expectedOutput );
+	} );
 } );
 
 describe( 'AFCH.Text.removeAfcTemplates', () => {
