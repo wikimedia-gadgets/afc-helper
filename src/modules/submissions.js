@@ -574,8 +574,20 @@
 				'Do not remove this line!'
 			);
 		} else {
-			// If not yet accepted, comment out cats
+			// We want to disable categories, except categories inside of the template {{Draft categories}}, by adding a colon to the beginning of the wikilink.
+			// Replace {{Draft categories}} with a placeholder.
+			const protectedDraftCategories = [];
+			text = text.replace( /\{\{(?:Draft categories|Draftcat)\b[\s\S]*?\}\}(?:\r?\n)/gi, ( match ) => {
+				const placeholder = '__AFCH_DRAFT_CATS_' + protectedDraftCategories.length + '__';
+				protectedDraftCategories.push( match );
+				return placeholder;
+			} );
+			// Disable categories by adding a colon to the beginning of the wikilink.
 			text = text.replace( /\[\[Category:/gi, '[[:Category:' );
+			// Replace the placeholder with the original wikicode.
+			protectedDraftCategories.forEach( ( draftCategories, index ) => {
+				text = text.replace( '__AFCH_DRAFT_CATS_' + index + '__', draftCategories );
+			} );
 		}
 
 		// Remove empty section at the end (caused by "Resubmit" button on "declined" template)
