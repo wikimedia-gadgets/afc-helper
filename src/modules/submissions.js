@@ -2077,7 +2077,7 @@
 
 				// If a reason has been specified, show the textarea, notify
 				// option, and the submit form button
-				$afch.find( '#declineTextarea' ).add( '#notifyWrapper' ).add( '#afchSubmitForm' )
+				$afch.find( '#declineTextarea' ).add( '#declineNotifyWrapper' ).add( '#afchSubmitForm' )
 					.toggleClass( 'hidden', !reason || !reason.length )
 					.on( 'keyup', mw.util.debounce( 500, () => {
 						previewComment( $( '#declineTextarea' ), $( '#declineInputPreview' ) );
@@ -2090,7 +2090,7 @@
 
 				// If a reason has been specified, show the textarea, notify
 				// option, and the submit form button
-				$afch.find( '#rejectTextarea' ).add( '#notifyWrapper' ).add( '#afchSubmitForm' )
+				$afch.find( '#rejectTextarea' ).add( '#rejectNotifyWrapper' ).add( '#afchSubmitForm' )
 					.toggleClass( 'hidden', !reason || !reason.length )
 					.on( 'keyup', mw.util.debounce( 500, () => {
 						previewComment( $( '#rejectTextarea' ), $( '#rejectInputPreview' ) );
@@ -2127,6 +2127,8 @@
 				$afch.find( '#rejectReasonWrapper' ).toggleClass( 'hidden', declineOrReject === 'decline' );
 				$afch.find( '#declineInputWrapper' ).toggleClass( 'hidden', declineOrReject === 'reject' );
 				$afch.find( '#rejectInputWrapper' ).toggleClass( 'hidden', declineOrReject === 'decline' );
+				$afch.find( '#declineNotifyWrapper' ).toggleClass( 'hidden2', declineOrReject === 'reject' );
+				$afch.find( '#rejectNotifyWrapper' ).toggleClass( 'hidden2', declineOrReject === 'decline' );
 			} );
 		} ); // End loadView callback
 
@@ -2605,7 +2607,7 @@
 		if ( data.notifyUser ) {
 			afchSubmission.getSubmitter().done( ( submitter ) => {
 				const userTalk = new AFCH.Page( ( new mw.Title( submitter, 3 ) ).getPrefixedText() ),
-					shouldTeahouse = data.inviteToTeahouse ? $.Deferred() : false;
+					shouldTeahouse = data.inviteToTeahouse && isDecline ? $.Deferred() : false;
 
 				// Check categories on the page to ensure that if the user has already been
 				// invited to the Teahouse, we don't invite them again.
