@@ -31,7 +31,7 @@ const setPageTitle = function ( title ) {
 resetToAFCApplicablePage = function () {
 	resetToBase();
 	setPageTitle( 'Draft:Foo' );
-	require( './../src/afch.js' );
+	require( './src/afch.js' );
 };
 
 inUnitTestEnvironment = true;
@@ -62,3 +62,8 @@ mw.loader = {
 };
 
 resetToBase();
+
+resetToAFCApplicablePage();
+
+require( './src/modules/core.js' );
+require( './src/modules/submissions.js' );
