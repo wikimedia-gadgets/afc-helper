@@ -1950,7 +1950,7 @@
 			const deferred = $.Deferred();
 
 			$.post( 'https://en.wikipedia.org/api/rest_v1/transform/wikitext/to/html',
-				'wikitext={{AFC submission/comments|' + code + '}}&body_only=true',
+				'wikitext={{AfC submission/comments|' + code + '}}&body_only=true',
 				( data ) => {
 					deferred.resolve( data );
 				}
