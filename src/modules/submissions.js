@@ -122,7 +122,7 @@
 	};
 
 	/**
-	 * Sort the internal lists of AFC submission and Afc comment templates
+	 * Sort the internal lists of AfC submission and Afc comment templates
 	 */
 	AFCH.Submission.prototype.sortAndParseInternalData = function () {
 		let sub = this,
@@ -242,7 +242,7 @@
 
 		// Submission templates go first
 		$.each( this.templates, ( _, template ) => {
-			let tout = '{{AFC submission|' + template.status,
+			let tout = '{{AfC submission|' + template.status,
 				paramKeys = [];
 
 			// FIXME: Think about if we really want this elaborate-ish
@@ -320,7 +320,7 @@
 
 		// Then comment templates
 		$.each( this.comments, ( _, comment ) => {
-			output.push( '\n{{AFC comment|1=' + comment.text + '}}' );
+			output.push( '\n{{AfC comment|1=' + comment.text + '}}' );
 		} );
 
 		// If there were comments, add a horizontal rule beneath them
@@ -345,7 +345,7 @@
 		}
 
 		// Userspace drafts must have
-		// one or more AFC submission templates to be eligible
+		// one or more AfC submission templates to be eligible
 		if ( this.page.title.getNamespaceId() == 2 &&
 			this.templates.length === 0 ) {
 			return deferred.resolve( false );
@@ -684,7 +684,7 @@
 		// Remove horizontal rules that were added by AFCH after the comments
 		this.text = this.text.replace( /^----+$/gm, '' );
 
-		// Remove excess newlines created by AFC templates
+		// Remove excess newlines created by AfC templates
 		this.removeExcessNewlines();
 
 		return this.text;
@@ -1281,12 +1281,12 @@
 				'[[$1|$2]] ({{subst:CURRENTMONTHNAME}} {{subst:CURRENTDAY}}) ==\n{{subst:Afc reject|full=$1|reason=$3|details=$4|reason2=$5|details2=$6|comment=$7|sig=yes}}',
 
 			// $1 = article name
-			'comment-on-submission': '{{subst:AFC notification|comment|article=$1}}',
+			'comment-on-submission': '{{subst:AfC notification|comment|article=$1}}',
 
 			// $1 = article name
 			'g13-submission': '{{subst:Db-afc-notice|$1}} ~~~~',
 
-			'teahouse-invite': '{{subst:Wikipedia:Teahouse/AFC invitation|sign=~~~~}}'
+			'teahouse-invite': '{{subst:Wikipedia:Teahouse/AfC invitation|sign=~~~~}}'
 		} );
 	}
 
@@ -2257,7 +2257,7 @@
 						return;
 					}
 
-					// Check if the user string starts with "User:", because Template:AFC submission dies horribly if it does
+					// Check if the user string starts with "User:", because Template:AfC submission dies horribly if it does
 					if ( submitter.lastIndexOf( 'User:', 0 ) === 0 ) {
 						$field.addClass( 'bad-input' );
 						$status.text( 'Remove "User:" from the beginning.' );
@@ -2509,7 +2509,7 @@
 
 		AFCH.userData.set( 'decline-counts', declineCounts );
 
-		// If the first reason is a custom decline, we include the declineTextarea in the {{AFC submission}} template
+		// If the first reason is a custom decline, we include the declineTextarea in the {{AfC submission}} template
 		if ( declineReason === 'reason' ) {
 			newParams[ '3' ] = data.declineTextarea;
 		} else if ( declineReason2 === 'reason' ) {
