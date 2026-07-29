@@ -577,7 +577,15 @@
 			// We want to disable categories, except categories inside of the template {{Draft categories}}, by adding a colon to the beginning of the wikilink.
 			// Replace {{Draft categories}} with a placeholder.
 			const protectedDraftCategories = [];
-			text = text.replace( /\{\{(?:Draft categories|Draftcat)\b[\s\S]*?\}\}(?:\r?\n)/gi, ( match ) => {
+			text = text.replace( /\{\{(?:Draft categories|Draftcat)\b[\s\S]*?\}\}(?:\r?\n)?/gi, ( match ) => {
+				const hasTrailingNewline = /\r?\n$/.test( match ),
+					hasInternalNewline = /\r?\n/.test( hasTrailingNewline ? match.slice( 0, -1 ) : match ),
+					hasCategoryWithSpaces = /\[\[:?Category:[^\]\r\n]*\s+[^\]\r\n]*\]\]/i.test( match );
+
+				if ( !( hasTrailingNewline || hasInternalNewline || hasCategoryWithSpaces ) ) {
+					return match;
+				}
+
 				const placeholder = '__AFCH_DRAFT_CATS_' + protectedDraftCategories.length + '__';
 				protectedDraftCategories.push( match );
 				return placeholder;
