@@ -309,6 +309,59 @@ describe( 'AFCH.Text.cleanUp - isAccept = false', () => {
 	} );
 } );
 
+describe( 'AFCH.Text.addUncategorizedIfNeeded', () => {
+	it( 'should append {{Uncategorized}} when there are no categories', () => {
+		const wikicode = 'Article text.';
+		const output = ( new AFCH.Text( wikicode ) ).addUncategorizedIfNeeded();
+		expect( output ).toBe(
+			'Article text.\n{{Uncategorized|date={{subst:CURRENTMONTHNAME}} {{subst:CURRENTYEAR}}}}'
+		);
+	} );
+
+	it( 'should not append {{Uncategorized}} when [[Category:]] is present', () => {
+		const wikicode = 'Article text.\n[[Category:Foo]]';
+		const output = ( new AFCH.Text( wikicode ) ).addUncategorizedIfNeeded();
+		expect( output ).toBe( wikicode );
+	} );
+
+	it( 'should not append {{Uncategorized}} when [[:Category:]] is present', () => {
+		const wikicode = 'Article text.\n[[:Category:Foo]]';
+		const output = ( new AFCH.Text( wikicode ) ).addUncategorizedIfNeeded();
+		expect( output ).toBe( wikicode );
+	} );
+
+	it( 'should not append {{Uncategorized}} after Draft categories are unwrapped', () => {
+		const text = new AFCH.Text( 'Article text. {{Draft categories|[[Category:Test]]}}' );
+		text.cleanUp( /* isAccept */ true );
+		const output = text.addUncategorizedIfNeeded();
+		expect( output ).toBe( 'Article text. [[Category:Test]]' );
+	} );
+} );
+
+describe( 'AFCH.Text.addOrphanIfNeeded', () => {
+	it( 'should prepend {{Orphan}} when there is no short description', () => {
+		const wikicode = 'Article text.';
+		const output = ( new AFCH.Text( wikicode ) ).addOrphanIfNeeded();
+		expect( output ).toBe(
+			'{{Orphan|date={{subst:CURRENTMONTHNAME}} {{subst:CURRENTYEAR}}}}\nArticle text.'
+		);
+	} );
+
+	it( 'should insert {{Orphan}} after {{Short description}}', () => {
+		const wikicode = '{{Short description|A subject}}\nArticle text.';
+		const output = ( new AFCH.Text( wikicode ) ).addOrphanIfNeeded();
+		expect( output ).toBe(
+			'{{Short description|A subject}}\n{{Orphan|date={{subst:CURRENTMONTHNAME}} {{subst:CURRENTYEAR}}}}\nArticle text.'
+		);
+	} );
+
+	it( 'should not add {{Orphan}} when already present', () => {
+		const wikicode = '{{Orphan|date=January 2024}}\nArticle text.';
+		const output = ( new AFCH.Text( wikicode ) ).addOrphanIfNeeded();
+		expect( output ).toBe( wikicode );
+	} );
+} );
+
 describe( 'AFCH.Text.removeAfcTemplates', () => {
 	it( 'should do nothing to normal text', () => {
 		const wikicode = 'Test';
