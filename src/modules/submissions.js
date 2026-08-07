@@ -750,6 +750,18 @@
 		return this.text;
 	};
 
+	/**
+	 * Append {{Uncategorized}} if the page has no category wikilinks.
+	 *
+	 * @return {string}
+	 */
+	AFCH.Text.prototype.addUncategorizedIfNeeded = function () {
+		if ( !/\[\[:?Category:/i.test( this.text ) ) {
+			this.append( '\n{{Uncategorized|date={{subst:CURRENTMONTHNAME}} {{subst:CURRENTYEAR}}}}' );
+		}
+		return this.text;
+	};
+
 	AFCH.Text.prototype.updateShortDescription = function ( existingShortDescription, newShortDescription ) {
 		const shortDescTemplateExists = /\{\{[Ss]hort ?desc(ription)?\s*\|/.test( this.text );
 		const shortDescExists = !!existingShortDescription;
@@ -2380,7 +2392,8 @@
 						'|2=' + deathYear +
 						'|3=' + data.subjectName + '}}'
 					);
-
+				} else {
+					newText.addUncategorizedIfNeeded();
 				}
 
 				// Stub sorting
