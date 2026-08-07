@@ -2446,13 +2446,13 @@
 					}
 
 					// Stub sorting
-					let cleanedText = newText.get();
+					newText = newText.get();
 					if ( typeof window.StubSorter_create_edit === 'function' ) {
-						cleanedText = window.StubSorter_create_edit( cleanedText, data[ 'stub-sorter-select' ] || [] ).text;
+						newText = window.StubSorter_create_edit( newText, data[ 'stub-sorter-select' ] || [] ).text;
 					}
 
 					newPage.edit( {
-						contents: cleanedText,
+						contents: newText,
 						summary: 'Cleaning up accepted [[Wikipedia:Articles for creation|Articles for creation]] submission'
 					} );
 				} );
