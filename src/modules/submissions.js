@@ -762,6 +762,31 @@
 		return this.text;
 	};
 
+	/**
+	 * Insert {{Orphan}} near the top if not already present.
+	 * Places it after {{Short description}} when that template starts the page;
+	 * otherwise prepends.
+	 *
+	 * @return {string}
+	 */
+	AFCH.Text.prototype.addOrphanIfNeeded = function () {
+		if ( /\{\{[Oo]rphan\b/.test( this.text ) ) {
+			return this.text;
+		}
+
+		const orphanTemplate = '{{Orphan|date={{subst:CURRENTMONTHNAME}} {{subst:CURRENTYEAR}}}}\n';
+		const shortDescMatch = this.text.match( /^\{\{[Ss]hort ?desc(ription)?\s*\|[^}]*\}\}\n?/ );
+
+		if ( shortDescMatch ) {
+			const insertAt = shortDescMatch[ 0 ].length;
+			this.text = this.text.slice( 0, insertAt ) + orphanTemplate + this.text.slice( insertAt );
+		} else {
+			this.prepend( orphanTemplate );
+		}
+
+		return this.text;
+	};
+
 	AFCH.Text.prototype.updateShortDescription = function ( existingShortDescription, newShortDescription ) {
 		const shortDescTemplateExists = /\{\{[Ss]hort ?desc(ription)?\s*\|/.test( this.text );
 		const shortDescExists = !!existingShortDescription;
@@ -2201,6 +2226,25 @@
 		} );
 	}
 
+	/**
+	 * Whether the given title has any non-redirect mainspace backlinks.
+	 * On API failure, returns true (fail open) so {{Orphan}} is not added.
+	 *
+	 * @param {string} title
+	 * @return {jQuery.Promise<boolean>}
+	 */
+	function pageHasMainspaceBacklinks( title ) {
+		return AFCH.api.get( {
+			action: 'query',
+			list: 'backlinks',
+			bltitle: title,
+			blnamespace: 0,
+			blfilterredir: 'nonredirects',
+			bllimit: 1
+		} ).then( ( data ) => data.query.backlinks.length > 0 )
+			.catch( () => true );
+	}
+
 	function showCommentOptions() {
 		loadView( 'comment', {} );
 
@@ -2396,15 +2440,21 @@
 					newText.addUncategorizedIfNeeded();
 				}
 
-				// Stub sorting
-				newText = newText.get();
-				if ( typeof window.StubSorter_create_edit === 'function' ) {
-					newText = window.StubSorter_create_edit( newText, data[ 'stub-sorter-select' ] || [] ).text;
-				}
+				pageHasMainspaceBacklinks( moveData.to ).then( ( hasBacklinks ) => {
+					if ( !hasBacklinks ) {
+						newText.addOrphanIfNeeded();
+					}
 
-				newPage.edit( {
-					contents: newText,
-					summary: 'Cleaning up accepted [[Wikipedia:Articles for creation|Articles for creation]] submission'
+					// Stub sorting
+					let cleanedText = newText.get();
+					if ( typeof window.StubSorter_create_edit === 'function' ) {
+						cleanedText = window.StubSorter_create_edit( cleanedText, data[ 'stub-sorter-select' ] || [] ).text;
+					}
+
+					newPage.edit( {
+						contents: cleanedText,
+						summary: 'Cleaning up accepted [[Wikipedia:Articles for creation|Articles for creation]] submission'
+					} );
 				} );
 
 				// Patrol the new page if desired
