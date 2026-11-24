@@ -2485,6 +2485,7 @@
 	function handleDecline( data ) {
 		let declineCounts,
 			isDecline = data.declineRejectWrapper === 'decline', // true=decline, false=reject
+			notifyUser = isDecline ? data.declineNotifyUser : data.rejectNotifyUser,
 			text = data.afchText,
 			declineReason = data.declineReason[ 0 ],
 			declineReason2 = data.declineReason.length > 1 ? data.declineReason[ 1 ] : null,
@@ -2612,14 +2613,14 @@
 			summary: editSummary
 		} );
 
-		if ( data.notifyUser ) {
+		if ( notifyUser ) {
 			afchSubmission.getSubmitter().done( ( submitter ) => {
 				const userTalk = new AFCH.Page( ( new mw.Title( submitter, 3 ) ).getPrefixedText() ),
 					shouldTeahouse = data.inviteToTeahouse && isDecline ? $.Deferred() : false;
 
 				// Check categories on the page to ensure that if the user has already been
 				// invited to the Teahouse, we don't invite them again.
-				if ( data.inviteToTeahouse ) {
+				if ( shouldTeahouse ) {
 					userTalk.getCategories( /* useApi */ true ).done( ( categories ) => {
 						let hasTeahouseCat = false,
 							teahouseCategories = [
@@ -2692,7 +2693,7 @@
 					title: afchPage.rawTitle,
 					reason: declineReason === 'cv' ? '[[WP:G12]] ({{tl|db-copyvio}})' :
 						'{{tl|db-reason}} ([[WP:AFC|Articles for creation]])',
-					usersNotified: data.notifyUser ? [ submitter ] : []
+					usersNotified: notifyUser ? [ submitter ] : []
 				} );
 			}
 		} );
