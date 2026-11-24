@@ -780,6 +780,91 @@
 		}
 	};
 
+	/**
+	 * Adds/updates biography categories (birth year, death year, living
+	 * people) and DEFAULTSORT via {{subst:L}}, without creating duplicate
+	 * categories if matching ones already exist on the page. Also cleans up
+	 * "missing" placeholder categories once a real year has been supplied,
+	 * and replaces a stale DEFAULTSORT if it doesn't match the given name.
+	 *
+	 * @param {string} rawBirthYear birth year, or '' if unknown
+	 * @param {string} deathYear death year, or 'LIVING'/'MISSING'/'UNKNOWN'
+	 * @param {string} subjectName DEFAULTSORT sortkey
+	 * @return {string}
+	 */
+	AFCH.Text.prototype.addBiographyCategoriesAndDefaultSort = function ( rawBirthYear, deathYear, subjectName ) {
+		let text = this.text;
+
+		// Normalize blank birth year to 'MISSING', matching what {{L}} expects
+		const birthYear = rawBirthYear || 'MISSING',
+			// Figure out which categories {{L}} is about to generate, so we
+			// can check for + remove any duplicates already on the page
+			predictedCats = getLTemplateCategories( birthYear, deathYear );
+
+		// Check if DEFAULTSORT already exists on the page, and whether its
+		// value already matches what the reviewer entered in the form
+		const defaultsortRegex = /\{\{\s*DEFAULTSORT\s*:\s*([^}]+)\}\}/i,
+			defaultsortMatch = text.match( defaultsortRegex ),
+			hasDefaultsort = !!defaultsortMatch,
+			existingSortkey = hasDefaultsort ? defaultsortMatch[ 1 ].trim() : null,
+			defaultsortMatchesIntent = hasDefaultsort &&
+				( !subjectName || existingSortkey === subjectName.trim() );
+
+		// Check if every predicted category is already present, verbatim
+		let allCategoriesAlreadyPresent = true;
+		$.each( predictedCats, ( _, catName ) => {
+			if ( !categoryExistsInWikitext( text, catName ) ) {
+				allCategoriesAlreadyPresent = false;
+				return false; // break out of $.each
+			}
+		} );
+
+		// If the page already reflects the intended state, don't touch it --
+		// avoids pointless remove-then-readd diff churn
+		if ( allCategoriesAlreadyPresent && defaultsortMatchesIntent ) {
+			this.text = text;
+			return this.text;
+		}
+
+		// Remove categories that {{L}} is about to regenerate, so subst
+		// doesn't produce duplicates
+		text = removeCategoriesFromWikitext( text, predictedCats );
+
+		// also remove stale "missing" placeholder categories in case the
+		// reviewer just filled in a value that used to be missing
+		let alsoStrip = [];
+		if ( birthYear !== 'MISSING' ) {
+			alsoStrip.push( 'Year of birth missing', 'Year of birth missing (living people)' );
+		}
+		if ( deathYear !== 'MISSING' && deathYear !== 'UNKNOWN' ) {
+			alsoStrip.push( 'Year of death missing' );
+		}
+		if ( alsoStrip.length ) {
+			text = removeCategoriesFromWikitext( text, alsoStrip );
+		}
+
+		// If an existing DEFAULTSORT is present but wrong, remove it so the
+		// template's version replaces it instead of the two coexisting
+		if ( hasDefaultsort && !defaultsortMatchesIntent ) {
+			text = text.replace( defaultsortRegex, '' );
+		}
+
+		// Build the L template
+		let Ltemplate = '{{subst:L' +
+			'|1=' + rawBirthYear +
+			'|2=' + deathYear;
+
+		// Only add parameter 3 (DEFAULTSORT) if a correct one doesn't already exist
+		if ( !hasDefaultsort || !defaultsortMatchesIntent ) {
+			Ltemplate += '|3=' + subjectName;
+		}
+
+		Ltemplate += '}}';
+
+		this.text = text + '\n' + Ltemplate;
+		return this.text;
+	};
+
 	if ( typeof inUnitTestEnvironment === 'undefined' ) {
 		// Add the launch link
 		$afchLaunchLink = $( mw.util.addPortletLink( AFCH.prefs.launchLinkPosition, '#', 'Review (AFCH)',
@@ -2165,6 +2250,50 @@
 		}
 	}
 
+	function getLTemplateCategories( birthYear, deathYear ) {
+		let categories = [],
+			birthMissing = !birthYear || birthYear.toUpperCase() === 'MISSING',
+			isLiving = deathYear === 'LIVING',
+			deathMissing = !deathYear || deathYear.toUpperCase() === 'MISSING';
+
+		if ( birthMissing && isLiving ) {
+			categories.push( 'Year of birth missing (living people)' );
+		} else if ( birthMissing ) {
+			categories.push( 'Year of birth missing' );
+		} else {
+			categories.push( birthYear + ' births' );
+		}
+
+		if ( isLiving ) {
+			categories.push( 'Living people' );
+		} else if ( deathMissing ) {
+			categories.push( 'Year of death missing' );
+		} else {
+			categories.push( deathYear + ' deaths' );
+		}
+
+		return categories;
+	}
+
+	function categoryExistsInWikitext( wikitext, catName ) {
+		const escaped = catName.replace( /[.*+?^${}()|[\]\\]/g, '\\$&' ),
+			catRegex = new RegExp( '\\[\\[:?Category:\\s*' + escaped + '\\s*(\\|[^\\]]*)?\\]\\]', 'i' );
+		return catRegex.test( wikitext );
+	}
+
+	function removeCategoriesFromWikitext( wikitext, categoryNames ) {
+		let text = wikitext;
+		$.each( categoryNames, ( _, catName ) => {
+			const escaped = catName.replace( /[.*+?^${}()|[\]\\]/g, '\\$&' ),
+				catRegex = new RegExp(
+					'\\[\\[:?Category:\\s*' + escaped + '\\s*(\\|[^\\]]*)?\\]\\]\\n?',
+					'gi'
+				);
+			text = text.replace( catRegex, '' );
+		} );
+		return text;
+	}
+
 	function checkIfUserIsBlocked( userName ) {
 		return AFCH.api.get( {
 			action: 'query',
@@ -2373,14 +2502,8 @@
 					} else if ( data.lifeStatus === 'unknown' ) {
 						deathYear = 'UNKNOWN';
 					}
-					// {{subst:L}}, which generates DEFAULTSORT as well as
-					// adds the appropriate birth/death year categories
-					newText.append( '\n{{subst:L' +
-						'|1=' + data.birthYear +
-						'|2=' + deathYear +
-						'|3=' + data.subjectName + '}}'
-					);
 
+					newText.addBiographyCategoriesAndDefaultSort( data.birthYear, deathYear, data.subjectName );
 				}
 
 				// Stub sorting
