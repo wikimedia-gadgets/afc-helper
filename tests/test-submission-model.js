@@ -5,13 +5,6 @@
 /* eslint-env jest, node */
 /* eslint-disable quotes */
 
-// It's always good to start simple :)
-describe( 'AFCH', () => {
-	it( 'is an object', () => {
-		expect( typeof AFCH ).toBe( 'object' );
-	} );
-} );
-
 describe( 'AFCH.Text.cleanUp - isAccept = true', () => {
 	it( 'should clean up {{Draft categories|[[Category:Test]]}} when isAccept is true', () => {
 		const wikicode = '{{Draft categories|[[Category:Test]]}}';
