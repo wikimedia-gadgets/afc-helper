@@ -12,4 +12,9 @@ window.AFCH = {};
 
 require( './src/afch.js' );
 require( './src/modules/core.js' );
+require( './src/modules/page.js' );
+require( './src/modules/actions.js' );
+require( './src/modules/core-utils.js' );
+require( './src/modules/submission-model.js' );
+require( './src/modules/text.js' );
 require( './src/modules/submissions.js' );

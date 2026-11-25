@@ -13,6 +13,20 @@ const http = require('http');
 const process = require('process');
 
 const HOGAN_FILE = 'node_modules/hogan.js/build/gh-pages/builds/2.0.0/hogan-2.0.0.js';
+const SCRIPT_FILES = {
+	'core-utils.js': 'src/modules/core-utils.js',
+	'page.js': 'src/modules/page.js',
+	'actions.js': 'src/modules/actions.js',
+	'submission-model.js': 'src/modules/submission-model.js',
+	'text.js': 'src/modules/text.js',
+	'submissions.js': 'src/modules/submissions.js',
+	'tpl-preferences.js': 'src/templates/tpl-preferences.html',
+	'tpl-submissions.js': 'src/templates/tpl-submissions.html',
+	'core.js': 'src/modules/core.js'
+};
+// A script suffix is the ending part of a requested script filename that matches one of the keys in SCRIPT_FILES.
+// For example, if the requested filename is "afch-core.js", the script suffix would be "core.js".
+const SCRIPT_SUFFIXES = Object.keys(SCRIPT_FILES).sort( ( a, b ) => b.length - a.length );
 
 if(!fs.existsSync(HOGAN_FILE)) {
 	console.log('No file found at ' + HOGAN_FILE + ' - downloading it with "npm install"...');
@@ -53,26 +67,21 @@ http.createServer({}, async function (req, res) {
 	var reqTitle = reqUrl.searchParams.get("title");
 
 	// This is probably the reverse of what happens to filenames in scripts/deploy.js
-	var content = '';
-	if(reqTitle.endsWith("core.js")) {
+	let content = '';
+	const scriptSuffix = SCRIPT_SUFFIXES.find( ( suffix ) => reqTitle.endsWith( suffix ) );
+	if ( scriptSuffix === 'core.js' ) {
 		content += readFile(HOGAN_FILE) + ';';
-		content += readFile("src/modules/core.js");
+		content += readFile( SCRIPT_FILES[ scriptSuffix ] );
 		// enable mockItUp by default for testing
 		content = content.replace(
 			'mockItUp: AFCH.consts.mockItUp || false,',
 			'mockItUp: AFCH.consts.mockItUp || true,'
 		);
-	} else if(reqTitle.endsWith("submissions.js")) {
-		if(reqTitle.endsWith("tpl-submissions.js")) {
-			content += readFile("src/templates/tpl-submissions.html");
-		} else {
-			content += readFile("src/modules/submissions.js");
-		}
-	} else if(reqTitle.endsWith("tpl-preferences.js")) {
-		content += readFile("src/templates/tpl-preferences.html");
-	} else if(reqTitle.endsWith(".css")) {
+	} else if ( scriptSuffix ) {
+		content += readFile( SCRIPT_FILES[ scriptSuffix ] );
+	} else if ( reqTitle.endsWith( '.css' ) ) {
 		content += readFile("build/afch.css");
-	} else if(reqTitle.endsWith(".js")) {
+	} else if ( reqTitle.endsWith( '.js' ) ) {
 		// Assume all other JS files are the root. This probably isn't ideal.
 		content += readFile("src/afch.js");
 		content = content.replace(

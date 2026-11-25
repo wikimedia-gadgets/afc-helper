@@ -24,8 +24,35 @@
 	AFCH.consts.baseurl = AFCH.consts.scriptpath +
 		'?action=raw&ctype=text/javascript&title=MediaWiki:Gadget-afchelper.js';
 
-	$.getScript( AFCH.consts.baseurl + '/core.js' ).done( () => {
-		const loaded = AFCH.load( 'submissions' ); // perhaps eventually there will be more modules besides just 'submissions'
+	AFCH._scriptFiles = {
+		// Bootstrap files establish the core APIs and loader before modules can initialize.
+		bootstrap: [
+			'core.js',
+			'page.js',
+			'actions.js',
+			'core-utils.js'
+		],
+		// Modules are feature entry points selected by AFCH.load().
+		modules: {
+			submissions: 'submissions.js'
+		},
+		// Submodules are ordered dependencies loaded before their feature module.
+		submodules: {
+			submissions: [
+				'submission-model.js',
+				'text.js'
+			]
+		}
+	};
+
+	AFCH._loadScripts = function ( files ) {
+		return files.reduce( ( promise, file ) => promise.then( () => $.getScript(
+			AFCH.consts.baseurl + '/' + file
+		) ), $.Deferred().resolve() );
+	};
+
+	AFCH._loadScripts( AFCH._scriptFiles.bootstrap ).done( () => {
+		const loaded = AFCH.load();
 		if ( !loaded ) {
 			mw.notify( 'AFCH could not be loaded: ' + ( AFCH.error || 'unknown error' ),
 				{ title: 'AFCH error' } );
