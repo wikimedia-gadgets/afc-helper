@@ -27,18 +27,13 @@ Interface administrators can [click here](https://en.wikipedia.org/wiki/Wikipedi
 
 To deploy AFC Helper to a wiki, use `scripts/deploy.js`.
 
-The gadget uses a traditional ResourceLoader module. Its JavaScript pages must be
-listed in this order in `MediaWiki:Gadgets-definition`:
+The gadget uses a traditional ResourceLoader module. Its JavaScript pages must be listed in this order in `MediaWiki:Gadgets-definition`:
 
 ```
 * afchelper [dependencies=mediawiki.api,mediawiki.util,mediawiki.user,mediawiki.Title,mediawiki.Uri,mediawiki.storage,jquery.chosen,jquery.spinner,jquery.ui|namespaces=2,118] |afchelper.js |afchelper-core.js |afchelper-page.js |afchelper-actions.js |afchelper-core-utils.js |afchelper-submission-model.js |afchelper-text.js |afchelper-submissions.js |afchelper.css
 ```
 
-Coordinate deployment and the definition update: the old definition points to
-different script pages, and mixing versions can also break template loading.
-The template pages deployed by `scripts/deploy.js` are fetched as text and do
-not belong in the definition. The development server supplies the equivalent
-ordered scripts, dependencies, and CSS for the existing `Setup-afch-dev.js` workflow.
+Coordinate deployment and the definition update: the old definition points to different script pages, and mixing versions can also break template loading. The template pages deployed by `scripts/deploy.js` are fetched as text and do not belong in the definition. The development server supplies the equivalent ordered scripts, dependencies, and CSS for the existing `Setup-afch-dev.js` workflow.
 
 ### Dependencies
 Below is a list of dependencies and what they are involved with, so you know what to test when updating dependencies.
