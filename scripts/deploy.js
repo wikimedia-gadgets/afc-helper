@@ -11,6 +11,7 @@ const TARGETS = {
     // Mapping of files in build directory to unprefixed page names
     'afch.js': 'afchelper.js',
     'afch.css': 'afchelper.css',
+    'js/hogan.js': 'afchelper-hogan.js',
     'js/core.js': 'afchelper-core.js',
     'js/core-utils.js': 'afchelper-core-utils.js',
     'js/page.js': 'afchelper-page.js',

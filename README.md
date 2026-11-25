@@ -23,17 +23,13 @@ We have unit tests! `afc-helper` uses [Jest](https://github.com/facebook/jest) f
 Tests are stored in the `tests` directory and are run automatically on new commits via GitHub Actions.
 
 ### Deploying
-Interface administrators can [click here](https://en.wikipedia.org/wiki/Wikipedia:WikiProject_Articles_for_creation/Helper_script/Deploying) for a detailed work instruction of how to deploy to English Wikipedia.
-
-To deploy AFC Helper to a wiki, use `scripts/deploy.js`.
+Use https://gadget-deploy.toolforge.org/, or do `npm run deploy`.
 
 The gadget uses a traditional ResourceLoader module. Its JavaScript pages must be listed in this order in `MediaWiki:Gadgets-definition`:
 
 ```
-* afchelper [dependencies=mediawiki.api,mediawiki.util,mediawiki.user,mediawiki.Title,mediawiki.Uri,mediawiki.storage,jquery.chosen,jquery.spinner,jquery.ui|namespaces=2,118] |afchelper.js |afchelper-core.js |afchelper-page.js |afchelper-actions.js |afchelper-core-utils.js |afchelper-submission-model.js |afchelper-text.js |afchelper-submissions.js |afchelper.css
+* afchelper [dependencies=mediawiki.api,mediawiki.util,mediawiki.user,mediawiki.Title,mediawiki.Uri,mediawiki.storage,jquery.chosen,jquery.spinner,jquery.ui|namespaces=2,118] |afchelper.js |afchelper-hogan.js |afchelper-core.js |afchelper-page.js |afchelper-actions.js |afchelper-core-utils.js |afchelper-submission-model.js |afchelper-text.js |afchelper-submissions.js |afchelper.css
 ```
-
-Coordinate deployment and the definition update: the old definition points to different script pages, and mixing versions can also break template loading. The template pages deployed by `scripts/deploy.js` are fetched as text and do not belong in the definition. The development server supplies the equivalent ordered scripts, dependencies, and CSS for the existing `Setup-afch-dev.js` workflow.
 
 ### Dependencies
 Below is a list of dependencies and what they are involved with, so you know what to test when updating dependencies.

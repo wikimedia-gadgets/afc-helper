@@ -4,8 +4,7 @@
 // Serves the script from localhost for development purposes.
 // Note that we serve the un-built JS files from src/ instead of the built JS
 // files from build/. This avoids having to run the build process every time.
-// The build process does almost nothing for JS (as it just concatenates the
-// hogan file).
+// The build process copies the JS files and the Hogan dependency.
 
 const child_process = require('child_process');
 const fs = require('fs');
@@ -14,6 +13,7 @@ const process = require('process');
 
 const HOGAN_FILE = 'node_modules/hogan.js/build/gh-pages/builds/2.0.0/hogan-2.0.0.js';
 const SCRIPT_FILES = {
+	'hogan.js': HOGAN_FILE,
 	'core-utils.js': 'src/js/core-utils.js',
 	'page.js': 'src/js/page.js',
 	'actions.js': 'src/js/actions.js',
@@ -85,7 +85,6 @@ http.createServer({}, async function (req, res) {
 	let content = '';
 	const scriptSuffix = SCRIPT_SUFFIXES.find( ( suffix ) => reqTitle.endsWith( suffix ) );
 	if ( scriptSuffix === 'core.js' ) {
-		content += readFile(HOGAN_FILE) + ';';
 		content += readFile( SCRIPT_FILES[ scriptSuffix ] );
 		// enable mockItUp by default for testing
 		content = content.replace(

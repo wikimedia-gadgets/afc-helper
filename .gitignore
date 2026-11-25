@@ -5,6 +5,7 @@
 apicache-py3/
 apicache/
 build
+hogan.js
 logs/
 node_modules
 pywikibot-*
