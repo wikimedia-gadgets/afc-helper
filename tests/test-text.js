@@ -1,5 +1,5 @@
 /**
- * Tests for src/modules/text.js
+ * Tests for src/js/text.js
  */
 
 /* eslint-env jest, node */

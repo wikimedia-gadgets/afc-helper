@@ -1,5 +1,5 @@
 /**
- * Tests for src/modules/page.js
+ * Tests for src/js/page.js
  */
 
 /* eslint-env jest */
