@@ -66,6 +66,8 @@ http.createServer({}, async function (req, res) {
 		content += readFile("src/modules/core-utils.js");
 	} else if(reqTitle.endsWith("page.js")) {
 		content += readFile("src/modules/page.js");
+	} else if(reqTitle.endsWith("actions.js")) {
+		content += readFile("src/modules/actions.js");
 	} else if(reqTitle.endsWith("submission-model.js")) {
 		content += readFile("src/modules/submission-model.js");
 	} else if(reqTitle.endsWith("submissions.js")) {
