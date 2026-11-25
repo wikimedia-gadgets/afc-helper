@@ -185,7 +185,8 @@
 		/**
 		 * Loads the subscript and dependencies
 		 *
-		 * @param {string} type Which type of script to load: 'redirects' or 'ffu' or 'submissions'
+		 * @param {string} [type] Module name or configured entrypoint filename to load.
+		 *                       If omitted, loads all configured modules.
 		 * @return {boolean}
 		 */
 		load: function ( type ) {
@@ -209,18 +210,18 @@
 				] );
 			}
 
-			// And finally load the subscript
-			promise.then( () => {
-				if ( type === 'submissions' ) {
-					$.getScript( AFCH.consts.baseurl + '/submission-model.js' ).then( () => {
-						$.getScript( AFCH.consts.baseurl + '/text.js' ).then( () => {
-							$.getScript( AFCH.consts.baseurl + '/submissions.js' );
-						} );
-					} );
-				} else {
-					$.getScript( AFCH.consts.baseurl + '/' + type + '.js' );
-				}
-			} );
+			// And finally load the subscripts
+			const modules = AFCH._scriptFiles.modules,
+				moduleTypes = typeof type === 'undefined' ? Object.keys( modules ) : [ type ],
+				scripts = moduleTypes.reduce( ( files, moduleType ) => {
+					const moduleName = Object.keys( modules ).find( ( name ) => name === moduleType ||
+						modules[ name ] === moduleType );
+
+					return moduleName ?
+						files.concat( AFCH._scriptFiles.submodules[ moduleName ] || [], modules[ moduleName ] ) :
+						files.concat( moduleType + '.js' );
+				}, [] );
+			promise.then( () => AFCH._loadScripts( scripts ) );
 
 			return true;
 		},
