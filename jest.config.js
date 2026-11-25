@@ -5,9 +5,5 @@ module.exports = {
 		'mock-mediawiki',
 		'<rootDir>/jest.setup.js'
 	],
-	testEnvironment: 'jsdom',
-	testMatch: [
-		'**/tests/**/test-*.[jt]s?(x)',
-		'**/?(*.)+(spec|test).[jt]s?(x)'
-	]
+	testEnvironment: 'jsdom'
 };
