@@ -1,19 +1,12 @@
 // <nowiki>
 ( function ( AFCH, $, mw ) {
 	if ( typeof inUnitTestEnvironment === 'undefined' ) {
+		// Small optimization. Don't load the submission module if not needed on this page.
 		if ( mw.config.get( 'wgArticleId' ) === 0 ||
 			mw.config.get( 'wgPageContentModel' ) !== 'wikitext' ) {
 			return;
 		}
 	}
-
-	AFCH.addSignature = function ( text ) {
-		text = text.trim();
-		if ( text.indexOf( '~~~~' ) === -1 ) {
-			text += ' ~~~~';
-		}
-		return text;
-	};
 
 	/**
 	 * Represents an AfC submission -- its status as well as comments.

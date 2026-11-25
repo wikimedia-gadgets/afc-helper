@@ -2,6 +2,20 @@
 ( function ( AFCH, $, mw ) {
 	$.extend( AFCH, {
 		/**
+		 * Add a signature to text if it does not already have one.
+		 *
+		 * @param {string} text
+		 * @return {string}
+		 */
+		addSignature: function ( text ) {
+			text = text.trim();
+			if ( text.indexOf( '~~~~' ) === -1 ) {
+				text += ' ~~~~';
+			}
+			return text;
+		},
+
+		/**
 		 * Removes a key from a given object and returns the value of the key
 		 *
 		 * @param {Object} object

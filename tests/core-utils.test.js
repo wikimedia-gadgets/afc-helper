@@ -5,6 +5,24 @@
 /* eslint-env jest */
 /* eslint-disable indent, quotes */
 
+describe( 'AFCH.addSignature', () => {
+	it( 'adds a signature to unsigned text', () => {
+		expect( AFCH.addSignature( 'Comment' ) ).toBe( 'Comment ~~~~' );
+	} );
+
+	it( 'trims leading and trailing whitespace', () => {
+		expect( AFCH.addSignature( '  Comment  ' ) ).toBe( 'Comment ~~~~' );
+	} );
+
+	it( 'does not add another signature to signed text', () => {
+		expect( AFCH.addSignature( '  Comment ~~~~  ' ) ).toBe( 'Comment ~~~~' );
+	} );
+
+	it( 'signs an empty string', () => {
+		expect( AFCH.addSignature( '' ) ).toBe( ' ~~~~' );
+	} );
+} );
+
 describe( 'AFCH.removeEmptySectionAtEnd', () => {
 	it( 'no headings', () => {
 		const wikicode = 'Test';
