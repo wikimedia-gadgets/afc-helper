@@ -7,6 +7,96 @@
 const fs = require( 'fs' );
 const path = require( 'path' );
 
+async function waitFor( predicate ) {
+	for ( let i = 0; i < 100; i++ ) {
+		if ( predicate() ) {
+			return;
+		}
+		await new Promise( ( resolve ) => {
+			setTimeout( resolve, 10 );
+		} );
+	}
+	throw new Error( 'Timed out waiting for AFCH' );
+}
+
+describe( 'gadget startup', () => {
+	let originalFlag, originalAFCH, originalPrefs, originalError, config, setup, addLink;
+
+	beforeEach( () => {
+		originalFlag = inUnitTestEnvironment;
+		originalAFCH = window.AFCH;
+		originalPrefs = AFCH.prefs;
+		originalError = AFCH.error;
+		inUnitTestEnvironment = undefined;
+		AFCH.prefs = { autoOpen: false, launchLinkPosition: 'p-cactions' };
+		config = { wgNamespaceNumber: 118, wgArticleId: 1, wgPageContentModel: 'wikitext' };
+		jest.spyOn( mw.config, 'get' ).mockImplementation( ( key ) => config[ key ] );
+		setup = jest.spyOn( AFCH, 'setup' ).mockReturnValue( true );
+		addLink = jest.spyOn( mw.util, 'addPortletLink' ).mockImplementation( () => $( '<a>' )[ 0 ] );
+		jest.spyOn( AFCH, 'addDestroyFunction' ).mockImplementation( () => {} );
+		jest.spyOn( mw, 'notify' ).mockImplementation( () => {} );
+	} );
+
+	afterEach( () => {
+		jest.restoreAllMocks();
+		window.AFCH = originalAFCH;
+		AFCH.prefs = originalPrefs;
+		AFCH.error = originalError;
+		inUnitTestEnvironment = originalFlag;
+	} );
+
+	function loadSubmissions() {
+		jest.isolateModules( () => {
+			require( '../src/js/submissions.js' );
+		} );
+	}
+
+	it( 'sets up before adding the launch link', async () => {
+		addLink.mockImplementation( () => {
+			expect( setup ).toHaveBeenCalledTimes( 1 );
+			return $( '<a>' )[ 0 ];
+		} );
+		loadSubmissions();
+		await waitFor( () => addLink.mock.calls.length );
+	} );
+
+	it( 'reports setup failure without adding the launch link', async () => {
+		AFCH.error = 'setup failed';
+		setup.mockReturnValue( false );
+		loadSubmissions();
+		await waitFor( () => mw.notify.mock.calls.length );
+		expect( mw.notify ).toHaveBeenCalledWith( 'AFCH could not be loaded: setup failed', { title: 'AFCH error' } );
+		expect( addLink ).not.toHaveBeenCalled();
+	} );
+
+	it.each( [
+		[ 'nonexistent page', 'wgArticleId', 0 ],
+		[ 'non-wikitext page', 'wgPageContentModel', 'javascript' ]
+	] )( 'does not add the launch link on a %s', async ( description, key, value ) => {
+		config[ key ] = value;
+		loadSubmissions();
+		await waitFor( () => setup.mock.calls.length );
+		expect( addLink ).not.toHaveBeenCalled();
+	} );
+
+	it( 'does not initialize outside the allowed namespaces', () => {
+		config.wgNamespaceNumber = 0;
+		loadSubmissions();
+		expect( setup ).not.toHaveBeenCalled();
+		expect( addLink ).not.toHaveBeenCalled();
+	} );
+
+	it( 'does not add a link if setup synchronously destroys AFCH', async () => {
+		setup.mockImplementation( () => {
+			window.AFCH = false;
+			return true;
+		} );
+		loadSubmissions();
+		await waitFor( () => setup.mock.calls.length );
+		expect( addLink ).not.toHaveBeenCalled();
+	} );
+} );
+
 describe( 'decline and reject notifications', () => {
 	let originalSubmission, OriginalPage, originalFlag, originalHogan, originalChosen, originalSpinner,
 		originalConsts, originalPrefs, originalPreferences, originalApi, editPage, getCategories;
@@ -30,7 +120,7 @@ describe( 'decline and reject notifications', () => {
 		$.createSpinner = () => $( '<div>' );
 
 		document.body.innerHTML = '<div id="mw-content-text"></div>';
-		AFCH.consts = { pagename: 'Draft:Example', user: 'Reviewer', baseurl: '' };
+		AFCH.consts = { pagename: 'Draft:Example', user: 'Reviewer', baseurl: originalConsts.baseurl };
 		AFCH.prefs = { autoOpen: false };
 		AFCH.preferences = { initLink: jest.fn() };
 		AFCH.api = { get: jest.fn() };
@@ -48,6 +138,7 @@ describe( 'decline and reject notifications', () => {
 			return page;
 		};
 		jest.spyOn( mw.util, 'addPortletLink' ).mockImplementation( () => $( '<a>' ).attr( 'id', 'afch-launch' ).appendTo( document.body )[ 0 ] );
+		jest.spyOn( AFCH, 'setup' ).mockReturnValue( true );
 		const getConfig = mw.config.get.bind( mw.config );
 		jest.spyOn( mw.config, 'get' ).mockImplementation( ( key ) => {
 			const values = {
@@ -104,17 +195,15 @@ describe( 'decline and reject notifications', () => {
 		$.createSpinner = originalSpinner;
 	} );
 
-	async function waitFor( predicate ) {
-		for ( let i = 0; i < 100; i++ ) {
-			if ( predicate() ) {
-				return;
-			}
-			await new Promise( ( resolve ) => {
-				setTimeout( resolve, 10 );
-			} );
-		}
-		throw new Error( 'Timed out waiting for the review form' );
-	}
+	it( 'requests the submissions template at its deployed page name', async () => {
+		await waitFor( () => $( '#afch-launch' ).length );
+		$( '#afch-launch' ).trigger( 'click' );
+		await waitFor( () => $( '#afchDecline' ).length );
+		expect( $.ajax ).toHaveBeenCalledWith( expect.objectContaining( {
+			url: expect.stringContaining( 'title=MediaWiki:Gadget-afchelper-tpl-submissions.js' ),
+			dataType: 'text'
+		} ) );
+	} );
 
 	it.each( [
 		[ 'decline', false ],
@@ -122,6 +211,7 @@ describe( 'decline and reject notifications', () => {
 		[ 'reject', false ],
 		[ 'reject', true ]
 	] )( '%s with notify=%s respects the selected checkbox', async ( action, notify ) => {
+		await waitFor( () => $( '#afch-launch' ).length );
 		$( '#afch-launch' ).trigger( 'click' );
 		await waitFor( () => $( '#afchDecline' ).length );
 		$( '#afchDecline' ).trigger( 'click' );

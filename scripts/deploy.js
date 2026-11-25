@@ -11,15 +11,15 @@ const TARGETS = {
     // Mapping of files in build directory to unprefixed page names
     'afch.js': 'afchelper.js',
     'afch.css': 'afchelper.css',
-    'js/core.js': 'afchelper.js/core.js',
-    'js/core-utils.js': 'afchelper.js/core-utils.js',
-    'js/page.js': 'afchelper.js/page.js',
-    'js/actions.js': 'afchelper.js/actions.js',
-    'js/submission-model.js': 'afchelper.js/submission-model.js',
-    'js/text.js': 'afchelper.js/text.js',
-    'js/submissions.js': 'afchelper.js/submissions.js',
-    'templates/tpl-preferences.html': 'afchelper.js/tpl-preferences.js',
-    'templates/tpl-submissions.html': 'afchelper.js/tpl-submissions.js',
+    'js/core.js': 'afchelper-core.js',
+    'js/core-utils.js': 'afchelper-core-utils.js',
+    'js/page.js': 'afchelper-page.js',
+    'js/actions.js': 'afchelper-actions.js',
+    'js/submission-model.js': 'afchelper-submission-model.js',
+    'js/text.js': 'afchelper-text.js',
+    'js/submissions.js': 'afchelper-submissions.js',
+    'templates/tpl-preferences.html': 'afchelper-tpl-preferences.js',
+    'templates/tpl-submissions.html': 'afchelper-tpl-submissions.js',
 };
 
 function readCredentials() {

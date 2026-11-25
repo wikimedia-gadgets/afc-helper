@@ -10,42 +10,26 @@ describe( 'AFCH', () => {
 		expect( typeof AFCH ).toBe( 'object' );
 	} );
 
-	it( 'loads all configured modules and their submodules when no type is specified', async () => {
-		const originalConsts = AFCH.consts,
-			originalScriptFiles = AFCH._scriptFiles,
-			originalLoadScripts = AFCH._loadScripts,
-			setupSpy = jest.spyOn( AFCH, 'setup' ).mockReturnValue( true ),
-			loadScripts = jest.fn( () => $.Deferred().resolve() );
-
-		AFCH.consts = { beta: false };
-		AFCH._scriptFiles = {
-			modules: {
-				submissions: 'submissions.js',
-				ffu: 'ffu.js'
-			},
-			submodules: {
-				submissions: [ 'submission-model.js', 'text.js' ]
-			}
+	it( 'requests the preferences template at its deployed page name', () => {
+		const originalSpinner = $.createSpinner,
+			originalDialog = $.fn.dialog;
+		$.createSpinner = () => $( '<div>' );
+		$.fn.dialog = function () {
+			return this;
 		};
-		AFCH._loadScripts = loadScripts;
+		jest.spyOn( AFCH.userData, 'get' ).mockReturnValue( {} );
+		const ajax = jest.spyOn( $, 'ajax' ).mockReturnValue( $.Deferred() );
 
 		try {
-			expect( AFCH.load() ).toBe( true );
-			await new Promise( ( resolve ) => {
-				setTimeout( resolve, 0 );
-			} );
-
-			expect( loadScripts ).toHaveBeenCalledWith( [
-				'submission-model.js',
-				'text.js',
-				'submissions.js',
-				'ffu.js'
-			] );
+			new AFCH.Preferences().initDialog();
+			expect( ajax ).toHaveBeenCalledWith( expect.objectContaining( {
+				url: expect.stringContaining( 'title=MediaWiki:Gadget-afchelper-tpl-preferences.js' ),
+				dataType: 'text'
+			} ) );
 		} finally {
-			AFCH.consts = originalConsts;
-			AFCH._scriptFiles = originalScriptFiles;
-			AFCH._loadScripts = originalLoadScripts;
-			setupSpy.mockRestore();
+			jest.restoreAllMocks();
+			$.createSpinner = originalSpinner;
+			$.fn.dialog = originalDialog;
 		}
 	} );
 } );
