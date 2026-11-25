@@ -12,6 +12,7 @@ const TARGETS = {
     'afch.js': 'afchelper.js',
     'afch.css': 'afchelper.css',
     'modules/core.js': 'afchelper.js/core.js',
+    'modules/submission-model.js': 'afchelper.js/submission-model.js',
     'modules/submissions.js': 'afchelper.js/submissions.js',
     'templates/tpl-preferences.html': 'afchelper.js/tpl-preferences.js',
     'templates/tpl-submissions.html': 'afchelper.js/tpl-submissions.js',

@@ -62,6 +62,8 @@ http.createServer({}, async function (req, res) {
 			'mockItUp: AFCH.consts.mockItUp || false,',
 			'mockItUp: AFCH.consts.mockItUp || true,'
 		);
+	} else if(reqTitle.endsWith("submission-model.js")) {
+		content += readFile("src/modules/submission-model.js");
 	} else if(reqTitle.endsWith("submissions.js")) {
 		if(reqTitle.endsWith("tpl-submissions.js")) {
 			content += readFile("src/templates/tpl-submissions.html");

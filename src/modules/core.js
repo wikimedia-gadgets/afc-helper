@@ -211,7 +211,13 @@
 
 			// And finally load the subscript
 			promise.then( () => {
-				$.getScript( AFCH.consts.baseurl + '/' + type + '.js' );
+				if ( type === 'submissions' ) {
+					$.getScript( AFCH.consts.baseurl + '/submission-model.js' ).then( () => {
+						$.getScript( AFCH.consts.baseurl + '/submissions.js' );
+					} );
+				} else {
+					$.getScript( AFCH.consts.baseurl + '/' + type + '.js' );
+				}
 			} );
 
 			return true;
