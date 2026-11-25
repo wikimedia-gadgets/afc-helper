@@ -3,15 +3,26 @@
 	let $afchLaunchLink, $afch, $afchWrapper,
 		afchPage, afchSubmission, afchViews, afchViewer;
 
-	// Die if reviewing a nonexistent page or a userjs/css page
 	if ( typeof inUnitTestEnvironment === 'undefined' ) {
-		if ( mw.config.get( 'wgArticleId' ) === 0 ||
-			mw.config.get( 'wgPageContentModel' ) !== 'wikitext' ) {
+		if ( ![ 2, 118 ].includes( mw.config.get( 'wgNamespaceNumber' ) ) ) {
 			return;
 		}
+		$( () => {
+			if ( !AFCH.setup() ) {
+				mw.notify( 'AFCH could not be loaded: ' + ( AFCH.error || 'unknown error' ),
+					{ title: 'AFCH error' } );
+				return;
+			}
+			// Do not offer review on nonexistent pages or non-wikitext pages.
+			if ( !window.AFCH || mw.config.get( 'wgArticleId' ) === 0 ||
+				mw.config.get( 'wgPageContentModel' ) !== 'wikitext' ) {
+				return;
+			}
+			init();
+		} );
 	}
 
-	if ( typeof inUnitTestEnvironment === 'undefined' ) {
+	function init() {
 		// Add the launch link
 		$afchLaunchLink = $( mw.util.addPortletLink( AFCH.prefs.launchLinkPosition, '#', 'Review (AFCH)',
 			'afch-launch', 'Review submission using afc-helper', '1' ) );
@@ -31,19 +42,16 @@
 
 		// Mark launch link for the old helper script as "old" if present on page
 		$( '#p-cactions #ca-afcHelper > a' ).append( ' (old)' );
+
+		// If AFCH is destroyed via AFCH.destroy(), remove the window and launch link.
+		AFCH.addDestroyFunction( () => {
+			$afchLaunchLink.remove();
+
+			if ( $afch && $afch.jquery ) {
+				$afch.remove();
+			}
+		} );
 	}
-
-	// If AFCH is destroyed via AFCH.destroy(),
-	// remove the $afch window and the launch link
-	AFCH.addDestroyFunction( () => {
-		$afchLaunchLink.remove();
-
-		// The $afch window might not exist yet; make
-		// sure it does before trying to remove it :)
-		if ( $afch && $afch.jquery ) {
-			$afch.remove();
-		}
-	} );
 
 	function createAFCHInstance() {
 		/**

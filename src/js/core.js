@@ -183,50 +183,6 @@
 		},
 
 		/**
-		 * Loads the subscript and dependencies
-		 *
-		 * @param {string} [type] Module name or configured entrypoint filename to load.
-		 *                       If omitted, loads all configured modules.
-		 * @return {boolean}
-		 */
-		load: function ( type ) {
-			if ( !AFCH.setup() ) {
-				return false;
-			}
-
-			let promise = $.when();
-
-			if ( AFCH.consts.beta ) {
-				// Load minified css
-				mw.loader.load( AFCH.consts.scriptpath + '?action=raw&ctype=text/css&title=MediaWiki:Gadget-afchelper.css', 'text/css' );
-				promise = mw.loader.using( [
-					'jquery.chosen',
-					'jquery.spinner',
-					'jquery.ui',
-
-					'mediawiki.api',
-					'mediawiki.util',
-					'mediawiki.user'
-				] );
-			}
-
-			// And finally load the subscripts
-			const modules = AFCH._scriptFiles.modules,
-				moduleTypes = typeof type === 'undefined' ? Object.keys( modules ) : [ type ],
-				scripts = moduleTypes.reduce( ( files, moduleType ) => {
-					const moduleName = Object.keys( modules ).find( ( name ) => name === moduleType ||
-						modules[ name ] === moduleType );
-
-					return moduleName ?
-						files.concat( AFCH._scriptFiles.submodules[ moduleName ] || [], modules[ moduleName ] ) :
-						files.concat( moduleType + '.js' );
-				}, [] );
-			promise.then( () => AFCH._loadScripts( scripts ) );
-
-			return true;
-		},
-
-		/**
 		 * Series of functions for logging statuses and whatnot
 		 */
 		status: {

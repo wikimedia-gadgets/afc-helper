@@ -24,6 +24,21 @@ const SCRIPT_FILES = {
 	'tpl-submissions.js': 'src/templates/tpl-submissions.html',
 	'core.js': 'src/js/core.js'
 };
+const GADGET_SCRIPTS = [
+	'src/afch.js',
+	HOGAN_FILE,
+	'src/js/core.js',
+	'src/js/page.js',
+	'src/js/actions.js',
+	'src/js/core-utils.js',
+	'src/js/submission-model.js',
+	'src/js/text.js',
+	'src/js/submissions.js'
+];
+const DEPENDENCIES = [
+	'mediawiki.api', 'mediawiki.util', 'mediawiki.user', 'mediawiki.Title',
+	'mediawiki.Uri', 'mediawiki.storage', 'jquery.chosen', 'jquery.spinner', 'jquery.ui'
+];
 // A script suffix is the ending part of a requested script filename that matches one of the keys in SCRIPT_FILES.
 // For example, if the requested filename is "afch-core.js", the script suffix would be "core.js".
 const SCRIPT_SUFFIXES = Object.keys(SCRIPT_FILES).sort( ( a, b ) => b.length - a.length );
@@ -82,12 +97,28 @@ http.createServer({}, async function (req, res) {
 	} else if ( reqTitle.endsWith( '.css' ) ) {
 		content += readFile("build/afch.css");
 	} else if ( reqTitle.endsWith( '.js' ) ) {
-		// Assume all other JS files are the root. This probably isn't ideal.
-		content += readFile("src/afch.js");
+		// Serve the scripts together in the same order as the gadget definition.
+		content = GADGET_SCRIPTS.map(readFile).join('\n;\n');
 		content = content.replace(
 			"AFCH.consts.scriptpath = mw.config.get( 'wgServer' ) + mw.config.get( 'wgScript' );",
 			`AFCH.consts.scriptpath = 'http://localhost:${port}';`
 		);
+		content = content.replace(
+			'mockItUp: AFCH.consts.mockItUp || false,',
+			'mockItUp: AFCH.consts.mockItUp || true,'
+		);
+		content = `(function () {
+			if (![2, 118].includes(mw.config.get('wgNamespaceNumber'))) {
+				return;
+			}
+			mw.loader.load('http://localhost:${port}/?ctype=text/css&title=MediaWiki:Gadget-afchelper.css', 'text/css');
+			$.when($.ready, mw.loader.using(${JSON.stringify(DEPENDENCIES)})).done(function () {
+				${content}
+			}).fail(function (error) {
+				console.error('AFCH dependencies failed to load', error);
+				mw.notify('AFCH could not load its dependencies. See the browser console.', { title: 'AFCH error' });
+			});
+		}());`;
 	} else {
 		console.error(`bad filename: ${reqTitle}`);
 	}
