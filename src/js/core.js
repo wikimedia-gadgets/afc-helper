@@ -498,7 +498,7 @@
 					// Otherwise, load the template file and *then* render
 					$.ajax( {
 						type: 'GET',
-						url: AFCH.consts.baseurl + '/tpl-preferences.js',
+						url: AFCH.consts.baseurl + '-tpl-preferences.js',
 						dataType: 'text'
 					} ).done( ( data ) => {
 						prefs.views = new AFCH.Views( data );

@@ -13,6 +13,6 @@
 	// script at scripts/deploy.js doesn't break.
 	AFCH.consts.beta = true;
 	AFCH.consts.baseurl = AFCH.consts.scriptpath +
-		'?action=raw&ctype=text/javascript&title=MediaWiki:Gadget-afchelper.js';
+		'?action=raw&ctype=text/javascript&title=MediaWiki:Gadget-afchelper';
 }() );
 // </nowiki>

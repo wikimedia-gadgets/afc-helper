@@ -122,7 +122,7 @@
 		// Store this to a variable so we can wait for its success
 		const loadViews = $.ajax( {
 			type: 'GET',
-			url: AFCH.consts.baseurl + '/tpl-submissions.js',
+			url: AFCH.consts.baseurl + '-tpl-submissions.js',
 			dataType: 'text'
 		} ).done( ( data ) => {
 			afchViews = new AFCH.Views( data );

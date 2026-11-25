@@ -120,7 +120,7 @@ describe( 'decline and reject notifications', () => {
 		$.createSpinner = () => $( '<div>' );
 
 		document.body.innerHTML = '<div id="mw-content-text"></div>';
-		AFCH.consts = { pagename: 'Draft:Example', user: 'Reviewer', baseurl: '' };
+		AFCH.consts = { pagename: 'Draft:Example', user: 'Reviewer', baseurl: originalConsts.baseurl };
 		AFCH.prefs = { autoOpen: false };
 		AFCH.preferences = { initLink: jest.fn() };
 		AFCH.api = { get: jest.fn() };
@@ -193,6 +193,16 @@ describe( 'decline and reject notifications', () => {
 		global.Hogan = originalHogan;
 		$.fn.chosen = originalChosen;
 		$.createSpinner = originalSpinner;
+	} );
+
+	it( 'requests the submissions template at its deployed page name', async () => {
+		await waitFor( () => $( '#afch-launch' ).length );
+		$( '#afch-launch' ).trigger( 'click' );
+		await waitFor( () => $( '#afchDecline' ).length );
+		expect( $.ajax ).toHaveBeenCalledWith( expect.objectContaining( {
+			url: expect.stringContaining( 'title=MediaWiki:Gadget-afchelper-tpl-submissions.js' ),
+			dataType: 'text'
+		} ) );
 	} );
 
 	it.each( [
