@@ -213,7 +213,9 @@
 			promise.then( () => {
 				if ( type === 'submissions' ) {
 					$.getScript( AFCH.consts.baseurl + '/submission-model.js' ).then( () => {
-						$.getScript( AFCH.consts.baseurl + '/submissions.js' );
+						$.getScript( AFCH.consts.baseurl + '/text.js' ).then( () => {
+							$.getScript( AFCH.consts.baseurl + '/submissions.js' );
+						} );
 					} );
 				} else {
 					$.getScript( AFCH.consts.baseurl + '/' + type + '.js' );

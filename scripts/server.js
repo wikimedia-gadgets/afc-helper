@@ -70,6 +70,8 @@ http.createServer({}, async function (req, res) {
 		content += readFile("src/modules/actions.js");
 	} else if(reqTitle.endsWith("submission-model.js")) {
 		content += readFile("src/modules/submission-model.js");
+	} else if(reqTitle.endsWith("text.js")) {
+		content += readFile("src/modules/text.js");
 	} else if(reqTitle.endsWith("submissions.js")) {
 		if(reqTitle.endsWith("tpl-submissions.js")) {
 			content += readFile("src/templates/tpl-submissions.html");
