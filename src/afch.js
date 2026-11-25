@@ -25,13 +25,14 @@
 		'?action=raw&ctype=text/javascript&title=MediaWiki:Gadget-afchelper.js';
 
 	$.getScript( AFCH.consts.baseurl + '/core.js' ).done( () => {
-		$.getScript( AFCH.consts.baseurl + '/core-utils.js' ).done( () => {
-			// submissions-model.js is loaded in the code of AFCH.load. It's hard-coded in there.
-			const loaded = AFCH.load( 'submissions' );
-			if ( !loaded ) {
-				mw.notify( 'AFCH could not be loaded: ' + ( AFCH.error || 'unknown error' ),
-					{ title: 'AFCH error' } );
-			}
+		$.getScript( AFCH.consts.baseurl + '/page.js' ).done( () => {
+			$.getScript( AFCH.consts.baseurl + '/core-utils.js' ).done( () => {
+				const loaded = AFCH.load( 'submissions' ); // perhaps eventually there will be more modules besides just 'submissions'
+				if ( !loaded ) {
+					mw.notify( 'AFCH could not be loaded: ' + ( AFCH.error || 'unknown error' ),
+						{ title: 'AFCH error' } );
+				}
+			} );
 		} );
 	} );
 }() );
