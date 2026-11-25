@@ -1,5 +1,5 @@
 /**
- * Tests for src/js/submissions.js
+ * Tests for src/modules/submissions.js
  */
 
 /* eslint-env jest, node */
@@ -61,7 +61,7 @@ describe( 'decline and reject notifications', () => {
 		} );
 
 		jest.isolateModules( () => {
-			require( '../src/js/submissions.js' );
+			require( '../src/modules/submissions.js' );
 		} );
 
 		jest.spyOn( AFCH.Submission.prototype, 'parse' ).mockImplementation( function () {

@@ -11,10 +11,10 @@ inUnitTestEnvironment = true;
 window.AFCH = {};
 
 require( './src/afch.js' );
-require( './src/js/core.js' );
-require( './src/js/page.js' );
-require( './src/js/actions.js' );
-require( './src/js/core-utils.js' );
-require( './src/js/submission-model.js' );
-require( './src/js/text.js' );
-require( './src/js/submissions.js' );
+require( './src/modules/core.js' );
+require( './src/modules/page.js' );
+require( './src/modules/actions.js' );
+require( './src/modules/core-utils.js' );
+require( './src/modules/submission-model.js' );
+require( './src/modules/text.js' );
+require( './src/modules/submissions.js' );

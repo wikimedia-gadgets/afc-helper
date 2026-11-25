@@ -16,7 +16,7 @@ module.exports = function ( grunt ) {
 			},
 			dependencies: {
 				files: {
-					'build/js/core.js': [ 'node_modules/hogan.js/build/gh-pages/builds/2.0.0/hogan-2.0.0.js', 'build/js/core.js' ]
+					'build/modules/core.js': [ 'node_modules/hogan.js/build/gh-pages/builds/2.0.0/hogan-2.0.0.js', 'build/modules/core.js' ]
 				}
 			}
 		},

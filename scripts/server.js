@@ -14,15 +14,15 @@ const process = require('process');
 
 const HOGAN_FILE = 'node_modules/hogan.js/build/gh-pages/builds/2.0.0/hogan-2.0.0.js';
 const SCRIPT_FILES = {
-	'core-utils.js': 'src/js/core-utils.js',
-	'page.js': 'src/js/page.js',
-	'actions.js': 'src/js/actions.js',
-	'submission-model.js': 'src/js/submission-model.js',
-	'text.js': 'src/js/text.js',
-	'submissions.js': 'src/js/submissions.js',
+	'core-utils.js': 'src/modules/core-utils.js',
+	'page.js': 'src/modules/page.js',
+	'actions.js': 'src/modules/actions.js',
+	'submission-model.js': 'src/modules/submission-model.js',
+	'text.js': 'src/modules/text.js',
+	'submissions.js': 'src/modules/submissions.js',
 	'tpl-preferences.js': 'src/templates/tpl-preferences.html',
 	'tpl-submissions.js': 'src/templates/tpl-submissions.html',
-	'core.js': 'src/js/core.js'
+	'core.js': 'src/modules/core.js'
 };
 // A script suffix is the ending part of a requested script filename that matches one of the keys in SCRIPT_FILES.
 // For example, if the requested filename is "afch-core.js", the script suffix would be "core.js".

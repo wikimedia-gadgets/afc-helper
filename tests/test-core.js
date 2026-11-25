@@ -1,5 +1,5 @@
 /**
- * Tests for src/js/core.js
+ * Tests for src/modules/core.js
  */
 
 /* eslint-env jest */
