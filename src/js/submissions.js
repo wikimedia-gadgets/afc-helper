@@ -755,7 +755,7 @@
 
 		const existingWikiProjectsPromise = $.when(
 			loadWikiProjectList(),
-			new AFCH.Page( 'Draft talk:' + afchSubmission.shortTitle ).getTemplates()
+			new AFCH.Page( 'Draft talk:' + afchSubmission.shortTitle ).getTemplates( true )
 		).then( ( wikiProjects, templates ) => {
 			let templateNames = templates.map( ( template ) => template.target.trim().toLowerCase() );
 
@@ -778,7 +778,8 @@
 				};
 			}
 
-			let otherTemplates = [];
+			let otherTemplates = [],
+				unlistedProjects = [];
 			for ( let tplIdx = 0; tplIdx < templateNames.length; tplIdx++ ) {
 				if ( wikiProjectMap.hasOwnProperty( templateNames[ tplIdx ] ) ) {
 					wikiProjectMap[ templateNames[ tplIdx ] ].alreadyOnPage = true;
@@ -786,6 +787,16 @@
 					alreadyHasWPBio = true;
 				} else {
 					otherTemplates.push( templateNames[ tplIdx ] );
+					// In the "Add WikiProjects" box, show WikiProjects on the talk page, even if they aren't present in the master list of suggested WikiProjects at Wikipedia:WikiProject_Articles_for_creation/WikiProject_templates.json
+					const name = templates[ tplIdx ].target.trim();
+					if ( /^wikiproject\s+/i.test( name ) &&
+						!/^wikiproject\s+(?:banners?(?:\s*(?:shell|holder)(?:\/test1)?)?|cooperation shell|shell)$/i.test( name ) ) {
+						unlistedProjects.push( {
+							displayName: name.replace( /^wikiproject\s+/i, '' ),
+							templateName: name,
+							alreadyOnPage: true
+						} );
+					}
 				}
 			}
 
@@ -800,6 +811,7 @@
 					redirects: 'true'
 				} ).then( ( data ) => {
 					let existingWPBioTemplateName = null;
+					const resolvedTemplates = [];
 					if ( data.query && data.query.redirects && data.query.redirects.length > 0 ) {
 						let redirs = data.query.redirects;
 						for ( let redirIdx = 0; redirIdx < redirs.length; redirIdx++ ) {
@@ -808,12 +820,20 @@
 							if ( wikiProjectMap.hasOwnProperty( redir ) ) {
 								wikiProjectMap[ redir ].alreadyOnPage = true;
 								wikiProjectMap[ redir ].realTemplateName = originalName;
+								resolvedTemplates.push( originalName.toLowerCase() );
 							} else if ( redir === 'wikiproject biography' ) {
 								alreadyHasWPBio = true;
 								existingWPBioTemplateName = originalName;
+								resolvedTemplates.push( originalName.toLowerCase() );
 							}
 						}
 					}
+					unlistedProjects.forEach( ( project ) => {
+						const name = project.templateName.toLowerCase();
+						if ( resolvedTemplates.indexOf( name ) === -1 ) {
+							wikiProjectMap[ name ] = project;
+						}
+					} );
 					return {
 						alreadyHasWPBio: alreadyHasWPBio,
 						wikiProjectMap: wikiProjectMap,

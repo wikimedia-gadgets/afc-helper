@@ -205,6 +205,94 @@ describe( 'decline and reject notifications', () => {
 		} ) );
 	} );
 
+	it( 'preselects WikiProjects inside and outside a banner shell', async () => {
+		const Page = AFCH.Page;
+		AFCH.Page = function ( title ) {
+			const page = new Page( title );
+			page.getShortDescription = () => $.Deferred().resolve( '' );
+			if ( title === 'Draft talk:Example' ) {
+				page.hasAdditionalData = true;
+				page.additionalData.rawTemplateModel = `<root>
+<template><title>WikiProject banner shell</title><part><name index="1"/><value>
+<template><title>WikiProject Chemicals </title><part><name>importance</name><equals>=</equals><value>low</value></part></template>
+<template><title>WikiProject Chemistry redirect</title></template>
+<template><title>WikiProject Biography</title></template>
+</value></part></template>
+<template><title>WikiProject China</title></template>
+</root>`;
+			}
+			return page;
+		};
+		jest.spyOn( mw.storage, 'getObject' ).mockReturnValue( [
+			{ displayName: 'Chemicals', templateName: 'WikiProject Chemicals' },
+			{ displayName: 'China', templateName: 'WikiProject China' },
+			{ displayName: 'Chemistry', templateName: 'WikiProject Chemistry' },
+			{ displayName: 'Germany', templateName: 'WikiProject Germany' }
+		] );
+		AFCH.api.post = jest.fn().mockReturnValue( $.Deferred().resolve( {
+			query: { redirects: [ { from: 'Template:WikiProject Chemistry redirect', to: 'Template:WikiProject Chemistry' } ] }
+		} ) );
+
+		await waitFor( () => $( '#afch-launch' ).length );
+		$( '#afch-launch' ).trigger( 'click' );
+		await waitFor( () => $( '#afchAccept' ).length );
+		$( '#afchAccept' ).trigger( 'click' );
+		await waitFor( () => $( '#newWikiProjects' ).length );
+
+		expect( $( '#newWikiProjects' ).val() ).toEqual( [
+			'WikiProject Chemicals', 'WikiProject China', 'WikiProject Chemistry'
+		] );
+		expect( $( '#isBiography' ).prop( 'checked' ) ).toBe( true );
+	} );
+
+	it.each( [ true, false ] )( 'preselects unlisted banners when 2010s is %s in the project list', async ( has2010s ) => {
+		const Page = AFCH.Page;
+		AFCH.Page = function ( title ) {
+			const page = new Page( title );
+			page.getShortDescription = () => $.Deferred().resolve( '' );
+			if ( title === 'Draft talk:Example' ) {
+				page.hasAdditionalData = true;
+				page.additionalData.rawTemplateModel = `<root>
+<template><title>WikiProject Belgium</title></template>
+<template><title>WikiProject banner shell</title><part><name>class</name><equals>=</equals><value>GA</value></part><part><name>1</name><equals>=</equals><value>
+<template><title>WikiProject Guild of Copy Editors</title><part><name>user</name><equals>=</equals><value>Lfstevens</value></part><part><name>date</name><equals>=</equals><value>25 December 2021</value></part></template>
+<template><title>WikiProject COVID-19</title></template>
+<template><title>WikiProject Medicine</title></template>
+<template><title>WikiProject Viruses</title></template>
+<template><title>WikiProject Disaster management</title></template>
+<template><title>WikiProject Death</title></template>
+<template><title>WikiProject China</title></template>
+<template><title>WikiProject 2010s</title></template>
+</value></part></template>
+<template><title>WikiProject Afghanistan</title></template>
+</root>`;
+			}
+			return page;
+		};
+		const projectNames = [ 'Belgium', 'COVID-19', 'Medicine', 'Viruses', 'Disaster management', 'Death', 'China', 'Afghanistan' ];
+		if ( has2010s ) {
+			projectNames.push( '2010s' );
+		}
+		jest.spyOn( mw.storage, 'getObject' ).mockReturnValue( projectNames.map( ( name ) => ( {
+			displayName: name,
+			templateName: 'WikiProject ' + name
+		} ) ) );
+		AFCH.api.post = jest.fn().mockReturnValue( $.Deferred().resolve( { query: { pages: [] } } ) );
+
+		await waitFor( () => $( '#afch-launch' ).length );
+		$( '#afch-launch' ).trigger( 'click' );
+		await waitFor( () => $( '#afchAccept' ).length );
+		$( '#afchAccept' ).trigger( 'click' );
+		await waitFor( () => $( '#newWikiProjects' ).length );
+
+		expect( $( '#newWikiProjects' ).val().sort() ).toEqual( [
+			'Afghanistan', 'Belgium', 'COVID-19', 'China', 'Death', 'Disaster management',
+			'Guild of Copy Editors', 'Medicine', 'Viruses', '2010s'
+		].map( ( name ) => 'WikiProject ' + name ).sort() );
+		expect( $( '#newWikiProjects option[value="WikiProject banner shell"]' ).length ).toBe( 0 );
+		expect( $( '#newWikiProjects option[value="WikiProject Guild of Copy Editors"]' ).text() ).toBe( 'Guild of Copy Editors' );
+	} );
+
 	it.each( [
 		[ 'decline', false ],
 		[ 'decline', true ],

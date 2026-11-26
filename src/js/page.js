@@ -85,21 +85,22 @@
 			/**
 			 * Gets templates on the page
 			 *
+			 * @param {boolean} includeNested Whether to include templates inside other templates
 			 * @return {Array} array of objects, each representing a template like
 			 *                       {
 			 *                           target: 'templateName',
 			 *                           params: { 1: 'foo', test: 'go to the {{bar}}' }
 			 *                       }
 			 */
-			this.getTemplates = function () {
+			this.getTemplates = function ( includeNested ) {
 				let $templateDom, templates = [],
 					deferred = $.Deferred();
 
 				this._revisionApiRequest( true ).done( () => {
 					$templateDom = $( $.parseXML( pg.additionalData.rawTemplateModel ) ).find( 'root' );
 
-					// We only want top level templates
-					$templateDom.children( 'template' ).each( function () {
+					const $templates = includeNested ? $templateDom.find( 'template' ) : $templateDom.children( 'template' );
+					$templates.each( function () {
 						const $el = $( this ),
 							data = {
 								target: $el.children( 'title' ).text(),
