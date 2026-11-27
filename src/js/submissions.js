@@ -1528,8 +1528,63 @@
 		} );
 	}
 
+	function getBiographyCategories( birthYear, deathYear, lifeStatus ) {
+		const birth = birthYear.trim(),
+			categories = [];
+		let death = 'LIVING';
+		if ( lifeStatus === 'dead' ) {
+			death = ( deathYear || 'MISSING' ).trim();
+		} else if ( lifeStatus === 'unknown' ) {
+			death = 'UNKNOWN';
+		}
+
+		const birthStatus = birth.toUpperCase(),
+			deathStatus = death.toUpperCase();
+		if ( [ '', 'UNKNOWN', 'MISSING' ].includes( birthStatus ) ) {
+			categories.push( 'Year of birth missing' +
+				( [ '', 'LIVING' ].includes( deathStatus ) ? ' (living people)' : '' ) );
+		} else {
+			categories.push( birth + ' births' );
+		}
+
+		if ( [ '', 'LIVING' ].includes( deathStatus ) ) {
+			categories.push( 'Living people' );
+		} else if ( deathStatus === 'MISSING' ) {
+			categories.push( 'Year of death missing' );
+		} else if ( deathStatus !== 'UNKNOWN' ) {
+			categories.push( death + ' deaths' );
+		}
+
+		return categories;
+	}
+
+	function getBiographyDefaultSort( name ) {
+		const subjectName = name.trim();
+		return subjectName ? '{{DEFAULTSORT:' + subjectName + '}}' : null;
+	}
+
+	function getUniqueCategories( categories ) {
+		const seenCategories = new Set();
+		return categories.filter( ( category ) => {
+			let name = category.split( '|' )[ 0 ].replace( /_/g, ' ' ).replace( /\s+/g, ' ' ).trim();
+			name = name.charAt( 0 ).toUpperCase() + name.slice( 1 );
+			if ( seenCategories.has( name ) ) {
+				return false;
+			}
+			seenCategories.add( name );
+			return true;
+		} );
+	}
+
 	function handleAccept( data ) {
 		let newText = data.afchText;
+		const categories = ( data.newCategories || [] ).slice();
+		let defaultSort = null;
+		if ( data.isBiography ) {
+			categories.push( ...getBiographyCategories( data.birthYear, data.deathYear, data.lifeStatus ) );
+			defaultSort = getBiographyDefaultSort( data.subjectName );
+		}
+		const uniqueCategories = getUniqueCategories( categories );
 
 		AFCH.actions.movePage( afchPage.rawTitle, data.newTitle,
 			'Publishing accepted [[Wikipedia:Articles for creation|Articles for creation]] submission',
@@ -1551,30 +1606,15 @@
 
 				newText.removeAfcTemplates();
 
-				newText.updateCategories( data.newCategories );
-
 				newText.updateShortDescription( data.existingShortDescription, data.shortDescription );
 
 				// Clean the page
 				newText.cleanUp( /* isAccept */ true );
 
-				// Add biography details
-				if ( data.isBiography ) {
-					let deathYear = 'LIVING';
-					if ( data.lifeStatus === 'dead' ) {
-						deathYear = data.deathYear || 'MISSING';
-					} else if ( data.lifeStatus === 'unknown' ) {
-						deathYear = 'UNKNOWN';
-					}
-					// {{subst:L}}, which generates DEFAULTSORT as well as
-					// adds the appropriate birth/death year categories
-					newText.append( '\n{{subst:L' +
-						'|1=' + data.birthYear +
-						'|2=' + deathYear +
-						'|3=' + data.subjectName + '}}'
-					);
-
+				if ( defaultSort ) {
+					newText.append( '\n' + defaultSort );
 				}
+				newText.updateCategories( uniqueCategories );
 
 				// Stub sorting
 				newText = newText.get();

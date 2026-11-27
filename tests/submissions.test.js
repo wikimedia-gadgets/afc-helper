@@ -207,6 +207,151 @@ describe( 'submission actions', () => {
 	} );
 
 	describe( 'accept workflow', () => {
+		it.each( [
+			{
+				description: 'disabled and wrapped categories',
+				draftCategories: '{{Draft categories|[[Category:1900 births|Example]]\n[[Category:Living people]]}}\n[[:Category:Writers]]',
+				selectedCategories: [ '1900 births|Example', 'Living people', 'Writers' ],
+				lifeStatus: 'living',
+				birthYear: '1900',
+				deathYear: '',
+				subjectName: 'Example, Person',
+				expectedCategories: [ '[[Category:1900 births|Example]]', '[[Category:Living people]]', '[[Category:Writers]]' ],
+				finalSelection: null
+			},
+			{
+				description: 'normalized and newly generated categories',
+				draftCategories: '[[Category:1900_births]]',
+				selectedCategories: [ '1900_births' ],
+				lifeStatus: 'dead',
+				birthYear: '1900',
+				deathYear: '1980',
+				subjectName: 'Example, Person',
+				expectedCategories: [ '[[Category:1900_births]]', '[[Category:1980 deaths]]' ],
+				finalSelection: null
+			},
+			{
+				description: 'missing year categories',
+				draftCategories: '[[Category:Year of birth missing (living people)]]\n[[:Category:Living people]]',
+				selectedCategories: [ 'Year of birth missing (living people)', 'Living people' ],
+				lifeStatus: 'living',
+				birthYear: '',
+				deathYear: '',
+				subjectName: 'Example, Person',
+				expectedCategories: [ '[[Category:Year of birth missing (living people)]]', '[[Category:Living people]]' ],
+				finalSelection: null
+			},
+			{
+				description: 'a deselected wrapped category',
+				draftCategories: '{{Draftcat|[[Category:Writers]] [[Category:1900 births]]}}',
+				selectedCategories: [ 'Writers', '1900 births' ],
+				lifeStatus: 'unknown',
+				birthYear: '1900',
+				deathYear: '',
+				subjectName: 'Example, Person',
+				expectedCategories: [ '[[Category:1900 births]]' ],
+				finalSelection: [ '1900 births' ]
+			},
+			{
+				description: 'unknown birth and life status without a sort key',
+				draftCategories: '',
+				selectedCategories: [],
+				lifeStatus: 'unknown',
+				birthYear: ' unknown ',
+				deathYear: '',
+				subjectName: ' ',
+				expectedCategories: [ '[[Category:Year of birth missing]]' ],
+				finalSelection: null
+			},
+			{
+				description: 'missing birth and death years',
+				draftCategories: '',
+				selectedCategories: [],
+				lifeStatus: 'dead',
+				birthYear: ' mIssIng ',
+				deathYear: '',
+				subjectName: ' Person, Example ',
+				expectedCategories: [ '[[Category:Year of birth missing]]', '[[Category:Year of death missing]]' ],
+				finalSelection: null
+			},
+			{
+				description: 'a whitespace-only death year',
+				draftCategories: '',
+				selectedCategories: [],
+				lifeStatus: 'dead',
+				birthYear: '',
+				deathYear: '  ',
+				subjectName: 'Example, Person',
+				expectedCategories: [ '[[Category:Year of birth missing (living people)]]', '[[Category:Living people]]' ],
+				finalSelection: null
+			},
+			{
+				description: 'a case-insensitive death status',
+				draftCategories: '',
+				selectedCategories: [],
+				lifeStatus: 'dead',
+				birthYear: '1900',
+				deathYear: 'unknown',
+				subjectName: 'Example, Person',
+				expectedCategories: [ '[[Category:1900 births]]' ],
+				finalSelection: null
+			}
+		] )( 'merges biography categories with $description', async ( {
+			draftCategories, selectedCategories, lifeStatus, birthYear, deathYear, subjectName, expectedCategories, finalSelection
+		} ) => {
+			const Page = AFCH.Page;
+			AFCH.Page = function ( title ) {
+				const page = new Page( title );
+				page.getShortDescription = () => $.Deferred().resolve( '' );
+				if ( title === 'Draft:Example' ) {
+					const categoryPage = new OriginalPage( title );
+					categoryPage.pageText = draftCategories;
+					categoryPage.hasAdditionalData = true;
+					page.getText = () => $.Deferred().resolve( '{{AfC submission||u=Author}}\n' + draftCategories );
+					page.getCategories = categoryPage.getCategories.bind( categoryPage );
+				} else if ( title === 'Draft talk:Example' ) {
+					page.getTemplates = () => $.Deferred().resolve( [] );
+				} else if ( title === 'Example' ) {
+					page.getTalkPage = () => new AFCH.Page( 'Talk:Example' );
+				} else if ( title === 'Wikipedia:Articles for creation/recent' ) {
+					page.getText = () => $.Deferred().resolve( '{{afc contrib|existing}}' );
+				}
+				return page;
+			};
+			jest.spyOn( mw.storage, 'getObject' ).mockReturnValue( [] );
+			jest.spyOn( AFCH.actions, 'movePage' ).mockReturnValue( $.Deferred().resolve( { to: 'Example' } ) );
+			AFCH.api.post = jest.fn();
+
+			await waitFor( () => $( '#afch-launch' ).length );
+			$( '#afch-launch' ).trigger( 'click' );
+			await waitFor( () => $( '#afchAccept' ).length );
+			$( '#afchAccept' ).trigger( 'click' );
+			await waitFor( () => $( '#newCategories' ).length );
+			expect( $( '#newCategories' ).val() ).toEqual( selectedCategories );
+			if ( finalSelection ) {
+				$( '#newCategories' ).val( finalSelection ).trigger( 'change' );
+			}
+			$( '#isBiography' ).prop( 'checked', true ).trigger( 'change' );
+			$( '#lifeStatus' ).val( lifeStatus ).trigger( 'change' );
+			$( '#birthYear' ).val( birthYear );
+			$( '#deathYear' ).val( deathYear );
+			$( '#subjectName' ).val( subjectName );
+			$( '#notifyUser' ).prop( 'checked', false );
+			$( '#afchSubmitForm' ).trigger( 'click' );
+
+			await waitFor( () => editPage.mock.calls.some( ( call ) => call[ 0 ] === 'Example' ) );
+			const articleText = editPage.mock.calls.find( ( call ) => call[ 0 ] === 'Example' )[ 1 ].contents;
+			expect( articleText.match( /\[\[Category:[^\]]+\]\]/g ) ).toEqual( expectedCategories );
+			if ( subjectName.trim() ) {
+				expect( articleText ).toContain( '{{DEFAULTSORT:' + subjectName.trim() + '}}' );
+			} else {
+				expect( articleText ).not.toContain( '{{DEFAULTSORT:' );
+			}
+			expect( articleText ).not.toMatch( /\{\{Draft categories|\[\[:Category:/i );
+			expect( AFCH.api.post ).not.toHaveBeenCalled();
+			await waitFor( () => editPage.mock.calls.some( ( call ) => call[ 0 ] === 'Wikipedia:Articles for creation/recent' ) );
+		} );
+
 		it( 'preselects WikiProjects inside and outside a banner shell', async () => {
 			const Page = AFCH.Page;
 			AFCH.Page = function ( title ) {
@@ -383,6 +528,8 @@ describe( 'submission actions', () => {
 			$( '#afchSubmitForm' ).trigger( 'click' );
 
 			await waitFor( () => editPage.mock.calls.some( ( call ) => call[ 0 ] === 'Talk:Example' ) );
+			const articleText = editPage.mock.calls.find( ( call ) => call[ 0 ] === 'Example' )[ 1 ].contents;
+			expect( articleText ).not.toMatch( /DEFAULTSORT|Category:(?:Living people|Year of birth missing)/ );
 			const talkEdit = editPage.mock.calls.find( ( call ) => call[ 0 ] === 'Talk:Example' )[ 1 ].contents;
 			expect( talkEdit.includes( '{{WikiProject Chemicals | importance = low }}' ) ).toBe( keepsChemicals );
 			expect( talkEdit ).toContain( '{{Other banner|importance=low}}' );
