@@ -21,6 +21,7 @@ const SCRIPT_FILES = {
 	'submission-model.js': 'src/js/submission-model.js',
 	'submission-text.js': 'src/js/submission-text.js',
 	'submission-warnings.js': 'src/js/submission-warnings.js',
+	'submission-forms.js': 'src/js/submission-forms.js',
 	'preferences.js': 'src/js/preferences.js',
 	'submissions.js': 'src/js/submissions.js',
 	'tpl-preferences.js': 'src/templates/tpl-preferences.html',
@@ -39,6 +40,7 @@ const GADGET_SCRIPTS = [
 	'src/js/submission-model.js',
 	'src/js/submission-text.js',
 	'src/js/submission-warnings.js',
+	'src/js/submission-forms.js',
 	'src/js/submissions.js'
 ];
 const DEPENDENCIES = [
