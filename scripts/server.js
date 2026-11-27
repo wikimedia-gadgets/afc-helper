@@ -15,6 +15,7 @@ const HOGAN_FILE = 'node_modules/hogan.js/build/gh-pages/builds/2.0.0/hogan-2.0.
 const SCRIPT_FILES = {
 	'hogan.js': HOGAN_FILE,
 	'core-utils.js': 'src/js/core-utils.js',
+	'wikitext-utils.js': 'src/js/wikitext-utils.js',
 	'page.js': 'src/js/page.js',
 	'api-actions.js': 'src/js/api-actions.js',
 	'submission-model.js': 'src/js/submission-model.js',
@@ -32,6 +33,7 @@ const GADGET_SCRIPTS = [
 	'src/js/page.js',
 	'src/js/api-actions.js',
 	'src/js/core-utils.js',
+	'src/js/wikitext-utils.js',
 	'src/js/preferences.js',
 	'src/js/submission-model.js',
 	'src/js/submission-text.js',

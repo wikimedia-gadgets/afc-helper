@@ -14,6 +14,7 @@ const TARGETS = {
     'js/hogan.js': 'afchelper-hogan.js',
     'js/core.js': 'afchelper-core.js',
     'js/core-utils.js': 'afchelper-core-utils.js',
+    'js/wikitext-utils.js': 'afchelper-wikitext-utils.js',
     'js/page.js': 'afchelper-page.js',
     'js/api-actions.js': 'afchelper-api-actions.js',
     'js/preferences.js': 'afchelper-preferences.js',
