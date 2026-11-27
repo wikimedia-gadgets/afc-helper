@@ -20,5 +20,6 @@ require( './src/js/preferences.js' );
 require( './src/js/submission-model.js' );
 require( './src/js/submission-text.js' );
 require( './src/js/submission-warnings.js' );
+require( './src/js/submission-actions.js' );
 require( './src/js/submission-forms.js' );
 require( './src/js/submissions.js' );
