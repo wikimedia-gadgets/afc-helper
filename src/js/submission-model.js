@@ -451,17 +451,30 @@
 
 	/**
 	 * Gets the submitter, or, if no specific submitter is available,
-	 * just the page creator
+	 * just the page creator. Handles renamed submitters.
 	 *
 	 * @return {jQuery.Deferred} resolves with user
 	 */
 	AFCH.Submission.prototype.getSubmitter = function () {
-		const deferred = $.Deferred(),
-			user = this.params.u;
+		const user = this.params.u;
 
-		// Recursively detect if the user has been renamed by checking the rename log
-		if ( user ) {
-			AFCH.api.get( {
+		if ( !user ) {
+			return this.page.getCreator();
+		}
+
+		return AFCH.api.get( {
+			action: 'query',
+			list: 'users',
+			formatversion: 2,
+			ususers: user
+		} ).then( ( resp ) => {
+			// A historical rename may refer to a different account that used this name.
+			if ( resp.query.users[ 0 ].missing === undefined ) {
+				return user;
+			}
+
+			// Look for renamed users in the log.
+			return AFCH.api.get( {
 				action: 'query',
 				list: 'logevents',
 				formatversion: 2,
@@ -472,22 +485,13 @@
 				const logevents = resp.query.logevents;
 
 				if ( logevents.length ) {
-					const newName = logevents[ 0 ].params.newuser;
-					this.params.u = newName;
-					this.getSubmitter().then( ( user ) => {
-						deferred.resolve( user );
-					} );
-				} else {
-					deferred.resolve( user );
+					this.params.u = logevents[ 0 ].params.newuser;
+					// Use recursion in case the user was renamed several times.
+					return this.getSubmitter();
 				}
+				return user;
 			} );
-		} else {
-			this.page.getCreator().done( ( user ) => {
-				deferred.resolve( user );
-			} );
-		}
-
-		return deferred;
+		} );
 	};
 
 }( AFCH, jQuery, mediaWiki ) );
