@@ -24,7 +24,7 @@ const SCRIPT_FILES = {
 	'submission-actions.js': 'src/js/submission-actions.js',
 	'submission-forms.js': 'src/js/submission-forms.js',
 	'preferences.js': 'src/js/preferences.js',
-	'submissions.js': 'src/js/submissions.js',
+	'submission-panel.js': 'src/js/submission-panel.js',
 	'tpl-preferences.js': 'src/templates/tpl-preferences.html',
 	'tpl-submissions.js': 'src/templates/tpl-submissions.html',
 	'core.js': 'src/js/core.js'
@@ -43,7 +43,7 @@ const GADGET_SCRIPTS = [
 	'src/js/submission-warnings.js',
 	'src/js/submission-actions.js',
 	'src/js/submission-forms.js',
-	'src/js/submissions.js'
+	'src/js/submission-panel.js'
 ];
 const DEPENDENCIES = [
 	'mediawiki.api', 'mediawiki.util', 'mediawiki.user', 'mediawiki.Title',

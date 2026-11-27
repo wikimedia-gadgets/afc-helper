@@ -22,4 +22,4 @@ require( './src/js/submission-text.js' );
 require( './src/js/submission-warnings.js' );
 require( './src/js/submission-actions.js' );
 require( './src/js/submission-forms.js' );
-require( './src/js/submissions.js' );
+require( './src/js/submission-panel.js' );

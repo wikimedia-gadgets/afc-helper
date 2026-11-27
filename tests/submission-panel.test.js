@@ -1,5 +1,5 @@
 /**
- * Tests for src/js/submissions.js
+ * Tests for src/js/submission-panel.js
  */
 
 /* eslint-env jest, node */
@@ -47,7 +47,7 @@ describe( 'gadget startup', () => {
 
 	function loadSubmissions() {
 		jest.isolateModules( () => {
-			require( '../src/js/submissions.js' );
+			require( '../src/js/submission-panel.js' );
 		} );
 	}
 
@@ -153,7 +153,7 @@ describe( 'submission actions', () => {
 		} );
 
 		jest.isolateModules( () => {
-			require( '../src/js/submissions.js' );
+			require( '../src/js/submission-panel.js' );
 		} );
 
 		jest.spyOn( AFCH.Submission.prototype, 'parse' ).mockImplementation( function () {

@@ -23,7 +23,7 @@ const TARGETS = {
     'js/submission-warnings.js': 'afchelper-submission-warnings.js',
     'js/submission-actions.js': 'afchelper-submission-actions.js',
     'js/submission-forms.js': 'afchelper-submission-forms.js',
-    'js/submissions.js': 'afchelper-submissions.js',
+    'js/submission-panel.js': 'afchelper-submission-panel.js',
     'templates/tpl-preferences.html': 'afchelper-tpl-preferences.js',
     'templates/tpl-submissions.html': 'afchelper-tpl-submissions.js',
 };
