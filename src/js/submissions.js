@@ -757,8 +757,6 @@
 			loadWikiProjectList(),
 			new AFCH.Page( 'Draft talk:' + afchSubmission.shortTitle ).getTemplates( true )
 		).then( ( wikiProjects, templates ) => {
-			let templateNames = templates.map( ( template ) => template.target.trim().toLowerCase() );
-
 			// Turn the WikiProject list into an Object to make lookups faster
 			let wikiProjectMap = {};
 			for ( let projIdx = 0; projIdx < wikiProjects.length; projIdx++ ) {
@@ -771,81 +769,27 @@
 
 			let alreadyHasWPBio = false;
 
-			if ( templates.length === 0 ) {
-				return {
-					alreadyHasWPBio: alreadyHasWPBio,
-					wikiProjectMap: wikiProjectMap
-				};
-			}
-
-			let otherTemplates = [],
-				unlistedProjects = [];
-			for ( let tplIdx = 0; tplIdx < templateNames.length; tplIdx++ ) {
-				if ( wikiProjectMap.hasOwnProperty( templateNames[ tplIdx ] ) ) {
-					wikiProjectMap[ templateNames[ tplIdx ] ].alreadyOnPage = true;
-				} else if ( templateNames[ tplIdx ] === 'wikiproject biography' ) {
+			templates.forEach( ( template ) => {
+				const name = template.target.trim(),
+					lowercaseName = name.toLowerCase();
+				if ( wikiProjectMap.hasOwnProperty( lowercaseName ) ) {
+					wikiProjectMap[ lowercaseName ].alreadyOnPage = true;
+				} else if ( lowercaseName === 'wikiproject biography' ) {
 					alreadyHasWPBio = true;
-				} else {
-					otherTemplates.push( templateNames[ tplIdx ] );
+				} else if ( /^wikiproject\s+/i.test( name ) &&
+					!/^wikiproject\s+(?:banners?(?:\s*(?:shell|holder)(?:\/test1)?)?|cooperation shell|shell)$/i.test( name ) ) {
 					// In the "Add WikiProjects" box, show WikiProjects on the talk page, even if they aren't present in the master list of suggested WikiProjects at Wikipedia:WikiProject_Articles_for_creation/WikiProject_templates.json
-					const name = templates[ tplIdx ].target.trim();
-					if ( /^wikiproject\s+/i.test( name ) &&
-						!/^wikiproject\s+(?:banners?(?:\s*(?:shell|holder)(?:\/test1)?)?|cooperation shell|shell)$/i.test( name ) ) {
-						unlistedProjects.push( {
-							displayName: name.replace( /^wikiproject\s+/i, '' ),
-							templateName: name,
-							alreadyOnPage: true
-						} );
-					}
-				}
-			}
-
-			// If any templates weren't in the WikiProject map, check if they were redirects
-			if ( otherTemplates.length > 0 ) {
-				let titles = otherTemplates.map( ( n ) => 'Template:' + n );
-				titles = titles.slice( 0, 50 ); // prevent API error by capping max # of titles at 50
-				titles = titles.join( '|' );
-				return AFCH.api.post( {
-					action: 'query',
-					titles: titles,
-					redirects: 'true'
-				} ).then( ( data ) => {
-					let existingWPBioTemplateName = null;
-					const resolvedTemplates = [];
-					if ( data.query && data.query.redirects && data.query.redirects.length > 0 ) {
-						let redirs = data.query.redirects;
-						for ( let redirIdx = 0; redirIdx < redirs.length; redirIdx++ ) {
-							let redir = redirs[ redirIdx ].to.slice( 'Template:'.length ).toLowerCase();
-							let originalName = redirs[ redirIdx ].from.slice( 'Template:'.length );
-							if ( wikiProjectMap.hasOwnProperty( redir ) ) {
-								wikiProjectMap[ redir ].alreadyOnPage = true;
-								wikiProjectMap[ redir ].realTemplateName = originalName;
-								resolvedTemplates.push( originalName.toLowerCase() );
-							} else if ( redir === 'wikiproject biography' ) {
-								alreadyHasWPBio = true;
-								existingWPBioTemplateName = originalName;
-								resolvedTemplates.push( originalName.toLowerCase() );
-							}
-						}
-					}
-					unlistedProjects.forEach( ( project ) => {
-						const name = project.templateName.toLowerCase();
-						if ( resolvedTemplates.indexOf( name ) === -1 ) {
-							wikiProjectMap[ name ] = project;
-						}
-					} );
-					return {
-						alreadyHasWPBio: alreadyHasWPBio,
-						wikiProjectMap: wikiProjectMap,
-						existingWPBioTemplateName: existingWPBioTemplateName
+					wikiProjectMap[ lowercaseName ] = {
+						displayName: name.replace( /^wikiproject\s+/i, '' ),
+						templateName: name,
+						alreadyOnPage: true
 					};
-				} );
-			} else {
-				return {
-					alreadyHasWPBio: alreadyHasWPBio,
-					wikiProjectMap: wikiProjectMap
-				};
-			}
+				}
+			} );
+			return {
+				alreadyHasWPBio: alreadyHasWPBio,
+				wikiProjectMap: wikiProjectMap
+			};
 		} );
 
 		$.when(
@@ -855,8 +799,7 @@
 			afchPage.getShortDescription()
 		).then( ( pageText, existingWikiProjectsResult, categories, shortDescription ) => {
 			const alreadyHasWPBio = existingWikiProjectsResult.alreadyHasWPBio,
-				wikiProjectMap = existingWikiProjectsResult.wikiProjectMap,
-				existingWPBioTemplateName = existingWikiProjectsResult.existingWPBioTemplateName;
+				wikiProjectMap = existingWikiProjectsResult.wikiProjectMap;
 			const existingWikiProjects = []; // already on draft's talk page
 			$.each( wikiProjectMap, ( lowercaseTemplateName, obj ) => {
 				if ( obj.alreadyOnPage ) {
@@ -1170,7 +1113,6 @@
 			addFormSubmitHandler( handleAccept, {
 				existingWikiProjects: existingWikiProjects,
 				alreadyHasWPBio: alreadyHasWPBio,
-				existingWPBioTemplateName: existingWPBioTemplateName,
 				existingShortDescription: shortDescription
 			} );
 		} );
@@ -1660,14 +1602,19 @@
 				// ---------
 
 				talkPage.getText().done( ( talkText ) => {
+					const selectedWikiProjects = data.newWikiProjects || [];
+					const removedWikiProjects = data.existingWikiProjects
+						.filter( ( project ) => !selectedWikiProjects.includes( project.templateName ) )
+						.map( ( project ) => project.templateName );
 					talkText = AFCH.addTalkPageBanners(
 						talkText,
 						data.newAssessment,
 						afchPage.additionalData.revId,
 						data.isBiography,
-						data.newWikiProjects,
+						selectedWikiProjects,
 						data.lifeStatus,
-						data.subjectName
+						data.subjectName,
+						removedWikiProjects
 					);
 
 					const summary = 'Placing WikiProject banners';

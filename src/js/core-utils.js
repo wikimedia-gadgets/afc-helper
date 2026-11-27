@@ -249,12 +249,17 @@
 		 * @param {string} newAssessment Value of "Article assessment" dropdown list, or "" if blank
 		 * @param {number} revId Revision ID of the draft that is being accepted
 		 * @param {boolean} isBiography Value of the "Is the article a biography?" check box
-		 * @param {Array} newWikiProjects Value of the "Add WikiPrjects" part of the form. The <input> is a chips interface called jquery.chosen. Note that if there are existing WikiProject banners on the page, the form will auto-add those to the "Add WikiProjects" part of the form when it first loads.
+		 * @param {Array} wikiProjectsToAddOrKeep Value of the "Add WikiPrjects" part of the form. The <input> is a chips interface called jquery.chosen. Note that if there are existing WikiProject banners on the page, the form will auto-add those to the "Add WikiProjects" part of the form when it first loads.
 		 * @param {string} lifeStatus Value of "Is the subject alive?" dropdown list ("unknown", "living", "dead")
 		 * @param {string} subjectName Value of the "Subject name (last, first)" text input, or "" if blank
+		 * @param {Array} [removedWikiProjects] Template names explicitly removed from the form
 		 * @return {Object} wikicode
 		 */
-		addTalkPageBanners: function ( wikicode, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName ) {
+		addTalkPageBanners: function ( wikicode, newAssessment, revId, isBiography, wikiProjectsToAddOrKeep, lifeStatus, subjectName, removedWikiProjects ) {
+			if ( removedWikiProjects && removedWikiProjects.length ) {
+				wikicode = AFCH.removeTemplates( wikicode, removedWikiProjects );
+			}
+
 			// delete |class={{{class}}} throughout the page. this is a bit too broad, but is easier than rewriting the below regexes to deal with nested templates
 			wikicode = wikicode.replace( /\s*\|\s*class\s*=\s*\{\{\{class\}\}\}/i, '' );
 
@@ -270,7 +275,8 @@
 
 			// delete shell already on page
 			const bannerShellTemplates = 'WikiProject banner shell|WikiProjectBanners|WikiProject Banners|WPB|WPBS|WikiProject cooperation shell|Wikiprojectbannershell|WikiProject Banner Shell|Wpb|WPBannerShell|Wpbs|Wikiprojectbanners|WP Banner Shell|WP banner shell|Bannershell|Wikiproject banner shell|WIkiProjectBanner Shell|WikiProjectBannerShell|WikiProject BannerShell|Coopshell|WikiprojectBannerShell|WikiProject Shell|Scope shell|Project shell|WikiProject shell|WikiProject banner|Wpbannershell|Multiple wikiprojects|Wikiproject banner holder|Project banner holder|WikiProject banner shell\\/test1|Article assessment|WikiProject bannershell';
-			const bannerShellRegEx = new RegExp( '{{(?:' + bannerShellTemplates + ')[^}]*}}', 'is' );
+			// Leave shells containing other templates intact rather than deleting their contents.
+			const bannerShellRegEx = new RegExp( '{{(?:' + bannerShellTemplates + ')[^{}]*}}', 'is' );
 			wikicode = wikicode.replace( bannerShellRegEx, '' );
 
 			// trim. makes unit tests more stable
@@ -311,8 +317,8 @@
 			}
 
 			// add banners selected in UI to array
-			for ( const key in newWikiProjects ) {
-				banners.push( '{{' + newWikiProjects[ key ] + '}}' );
+			for ( const key in wikiProjectsToAddOrKeep ) {
+				banners.push( '{{' + wikiProjectsToAddOrKeep[ key ] + '}}' );
 			}
 
 			// remove duplicate banners, case insensitive
@@ -345,6 +351,76 @@
 			wikicode = wikicode.trim();
 
 			return wikicode;
+		},
+
+		/**
+		 * Remove complete transclusions of the specified templates, including nested parameters.
+		 * Ignores comments and nowiki, pre, source, syntaxhighlight and math tags.
+		 * Removes the line break for standalone templates.
+		 *
+		 * @param {string} wikicode
+		 * @param {Array} names
+		 * @return {string}
+		 */
+		removeTemplates: function ( wikicode, names ) {
+			function normalizeName( name ) {
+				return name.replace( /_/g, ' ' ).replace( /\s+/g, ' ' ).trim().toLowerCase();
+			}
+
+			const removedNames = names.map( normalizeName );
+			const tokens = /<!--|<(?:nowiki|pre|source|syntaxhighlight|math)\b[^>]*>|\{\{\{|\{\{|\}\}\}|\}\}/gi;
+			const stack = [];
+			const ranges = [];
+			let token;
+			while ( ( token = tokens.exec( wikicode ) ) ) {
+				const text = token[ 0 ];
+				if ( text === '<!--' ) {
+					const end = wikicode.indexOf( '-->', tokens.lastIndex );
+					tokens.lastIndex = end === -1 ? wikicode.length : end + 3;
+				} else if ( text.charAt( 0 ) === '<' ) {
+					if ( !/\/\s*>$/.test( text ) ) {
+						const tag = text.match( /^<(\w+)/ )[ 1 ];
+						const close = new RegExp( '<\\/' + tag + '\\s*>', 'gi' );
+						close.lastIndex = tokens.lastIndex;
+						const end = close.exec( wikicode );
+						tokens.lastIndex = end ? close.lastIndex : wikicode.length;
+					}
+				} else if ( text === '{{{' || text === '{{' ) {
+					stack.push( { start: token.index, parameter: text === '{{{' } );
+				} else if ( stack.length ) {
+					const top = stack[ stack.length - 1 ];
+					if ( top.parameter && text === '}}' ) {
+						continue;
+					}
+					if ( !top.parameter && text === '}}}' ) {
+						tokens.lastIndex--;
+					}
+					stack.pop();
+					if ( !top.parameter ) {
+						const name = wikicode.slice( top.start + 2, tokens.lastIndex ).match( /^\s*(?:template\s*:\s*)?([^{}|]+?)(?=\s*(?:\||}}))/i );
+						if ( name && removedNames.indexOf( normalizeName( name[ 1 ] ) ) !== -1 ) {
+							ranges.push( { start: top.start, end: tokens.lastIndex } );
+						}
+					}
+				}
+			}
+
+			ranges.sort( ( a, b ) => a.start - b.start || b.end - a.end );
+			let result = '', offset = 0;
+			ranges.forEach( ( range ) => {
+				if ( range.start < offset ) {
+					return;
+				}
+				const lineStart = wikicode.lastIndexOf( '\n', range.start - 1 ) + 1;
+				if ( lineStart >= offset && /^[ \t]*$/.test( wikicode.slice( lineStart, range.start ) ) &&
+					/^\r?\n/.test( wikicode.slice( range.end ) ) ) {
+					range.start = lineStart;
+					range.end += wikicode.charAt( range.end ) === '\r' ? 2 : 1;
+				}
+				result += wikicode.slice( offset, range.start );
+				offset = range.end;
+			} );
+			return result + wikicode.slice( offset );
 		},
 
 		/**

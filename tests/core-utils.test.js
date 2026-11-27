@@ -123,15 +123,85 @@ describe( 'AFCH.removeEmptySectionAtEnd', () => {
 } );
 
 describe( 'AFCH.addTalkPageBanners', () => {
+	it.each( [
+		{
+			selected: [ 'WikiProject China', 'WikiProject Unlisted' ],
+			removed: [ 'WikiProject Chemicals' ],
+			expectedBanners: '{{WikiProject Unlisted|importance=low}}\n{{WikiProject China|importance=high}}'
+		},
+		{
+			selected: [ 'WikiProject China' ],
+			removed: [ 'WikiProject Chemicals', 'WikiProject Unlisted' ],
+			expectedBanners: '{{WikiProject China|importance=high}}'
+		}
+	] )( 'removes deselected banners and preserves selected banners', ( { selected, removed, expectedBanners } ) => {
+		const wikicode = `{{WikiProject banner shell|class=Stub|
+{{WikiProject Chemicals | importance = low }}
+{{WikiProject Unlisted|importance=low}}
+}}
+{{WikiProject China|importance=high}}`;
+		const output = AFCH.addTalkPageBanners(
+			wikicode, 'Stub', 123, false, selected, 'unknown', '', removed
+		);
+		expect( output ).toBe( `{{WikiProject banner shell |class=Stub |1=
+{{subst:WPAFC/article |oldid=123}}
+${ expectedBanners }
+}}` );
+	} );
+
+	it( 'removes duplicate transclusions including nested parameters', () => {
+		const wikicode = `{{WikiProject banner shell|1=
+{{WikiProject Chemicals|importance={{importance|low}}}}
+{{WikiProject Chemicals|x={{{parameter|default}}}}}
+{{wikiproject_chemicals | importance=high}}
+{{WikiProject Chemical engineering|importance=low}}
+}}`;
+		const output = AFCH.addTalkPageBanners(
+			wikicode, '', 123, false, [ 'WikiProject Chemical engineering' ], 'unknown', '', [ 'WikiProject Chemicals' ]
+		);
+		expect( output ).toBe( `{{WikiProject banner shell |1=
+{{subst:WPAFC/article |oldid=123}}
+{{WikiProject Chemical engineering|importance=low}}
+}}` );
+	} );
+
+	it( 'treats different template names independently', () => {
+		const wikicode = `{{WikiProject Chemicals|importance=low}}
+{{WikiProject Chemicals redirect|importance=high}}`;
+		const output = AFCH.addTalkPageBanners(
+			wikicode, '', 123, false, [ 'WikiProject Chemicals redirect' ], 'unknown', '', [ 'WikiProject Chemicals' ]
+		);
+		expect( output ).toBe( `{{WikiProject banner shell |1=
+{{subst:WPAFC/article |oldid=123}}
+{{WikiProject Chemicals redirect|importance=high}}
+}}` );
+	} );
+
+	it( 'preserves a shell containing an unrecognized template', () => {
+		const wikicode = `{{WikiProject banner shell|1=
+{{WikiProject Chemicals}}
+{{Other banner|importance=low}}
+}}`;
+		const output = AFCH.addTalkPageBanners(
+			wikicode, '', 123, false, [], 'unknown', '', [ 'WikiProject Chemicals' ]
+		);
+		expect( output ).toBe( `{{WikiProject banner shell |1=
+{{subst:WPAFC/article |oldid=123}}
+}}
+{{WikiProject banner shell|1=
+{{Other banner|importance=low}}
+}}` );
+	} );
+
 	it( 'talk page is blank', () => {
 		const wikicode = '';
 		const newAssessment = '';
 		const revId = 592485;
 		const isBiography = false;
-		const newWikiProjects = [];
+		const wikiProjectsToAddOrKeep = [];
 		const lifeStatus = 'unknown';
 		const subjectName = '';
-		const output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
+		const output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, wikiProjectsToAddOrKeep, lifeStatus, subjectName );
 		expect( output ).toBe(
 `{{WikiProject banner shell |1=
 {{subst:WPAFC/article |oldid=592485}}
@@ -146,10 +216,10 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		const newAssessment = '';
 		const revId = 592485;
 		const isBiography = false;
-		const newWikiProjects = [];
+		const wikiProjectsToAddOrKeep = [];
 		const lifeStatus = 'unknown';
 		const subjectName = '';
-		const output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
+		const output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, wikiProjectsToAddOrKeep, lifeStatus, subjectName );
 		expect( output ).toBe(
 `{{WikiProject banner shell |1=
 {{subst:WPAFC/article |oldid=592485}}
@@ -168,10 +238,10 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		const newAssessment = '';
 		const revId = 592485;
 		const isBiography = false;
-		const newWikiProjects = [];
+		const wikiProjectsToAddOrKeep = [];
 		const lifeStatus = 'unknown';
 		const subjectName = '';
-		const output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
+		const output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, wikiProjectsToAddOrKeep, lifeStatus, subjectName );
 		expect( output ).toBe(
 `{{WikiProject banner shell |1=
 {{subst:WPAFC/article |oldid=592485}}
@@ -189,10 +259,10 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		const newAssessment = '';
 		const revId = 592485;
 		const isBiography = false;
-		const newWikiProjects = [];
+		const wikiProjectsToAddOrKeep = [];
 		const lifeStatus = 'unknown';
 		const subjectName = '';
-		const output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
+		const output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, wikiProjectsToAddOrKeep, lifeStatus, subjectName );
 		expect( output ).toBe(
 `{{WikiProject banner shell |1=
 {{subst:WPAFC/article |oldid=592485}}
@@ -208,10 +278,10 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		const newAssessment = '';
 		const revId = 592485;
 		const isBiography = false;
-		const newWikiProjects = [];
+		const wikiProjectsToAddOrKeep = [];
 		const lifeStatus = 'unknown';
 		const subjectName = '';
-		const output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
+		const output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, wikiProjectsToAddOrKeep, lifeStatus, subjectName );
 		expect( output ).toBe(
 `{{WikiProject banner shell |1=
 {{subst:WPAFC/article |oldid=592485}}
@@ -228,10 +298,10 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		const newAssessment = '';
 		const revId = 592507;
 		const isBiography = false;
-		const newWikiProjects = [ 'WikiProject Somalia', 'WikiProject Women', 'WikiProject Women\'s sport' ];
+		const wikiProjectsToAddOrKeep = [ 'WikiProject Somalia', 'WikiProject Women', 'WikiProject Women\'s sport' ];
 		const lifeStatus = 'unknown';
 		const subjectName = '';
-		const output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
+		const output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, wikiProjectsToAddOrKeep, lifeStatus, subjectName );
 		expect( output ).toBe(
 `{{WikiProject banner shell |1=
 {{subst:WPAFC/article |oldid=592507}}
@@ -252,10 +322,10 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		const newAssessment = '';
 		const revId = 592507;
 		const isBiography = false;
-		const newWikiProjects = [ 'WikiProject Somalia', 'WikiProject Women', 'WikiProject Women\'s sport' ];
+		const wikiProjectsToAddOrKeep = [ 'WikiProject Somalia', 'WikiProject Women', 'WikiProject Women\'s sport' ];
 		const lifeStatus = 'unknown';
 		const subjectName = '';
-		const output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
+		const output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, wikiProjectsToAddOrKeep, lifeStatus, subjectName );
 		expect( output ).toBe(
 `{{WikiProject banner shell |1=
 {{subst:WPAFC/article |oldid=592507}}
@@ -277,10 +347,10 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		const newAssessment = '';
 		const revId = 592507;
 		const isBiography = true;
-		const newWikiProjects = [ 'WikiProject Romania' ];
+		const wikiProjectsToAddOrKeep = [ 'WikiProject Romania' ];
 		const lifeStatus = 'living';
 		const subjectName = 'Lazarut, Raluca';
-		const output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
+		const output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, wikiProjectsToAddOrKeep, lifeStatus, subjectName );
 		expect( output ).toBe(
 `{{WikiProject banner shell |blp=yes |listas=Lazarut, Raluca |1=
 {{subst:WPAFC/article |oldid=592507}}
@@ -298,10 +368,10 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		const newAssessment = 'B';
 		const revId = 592496;
 		const isBiography = true;
-		const newWikiProjects = [ 'WikiProject Africa', 'WikiProject Alabama' ];
+		const wikiProjectsToAddOrKeep = [ 'WikiProject Africa', 'WikiProject Alabama' ];
 		const lifeStatus = 'living';
 		const subjectName = 'Jones, Bob';
-		const output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
+		const output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, wikiProjectsToAddOrKeep, lifeStatus, subjectName );
 		expect( output ).toBe(
 `{{WikiProject banner shell |class=B |blp=yes |listas=Jones, Bob |1=
 {{subst:WPAFC/article |oldid=592496}}
@@ -317,10 +387,10 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		const newAssessment = '';
 		const revId = 592496;
 		const isBiography = true;
-		const newWikiProjects = [];
+		const wikiProjectsToAddOrKeep = [];
 		const lifeStatus = 'dead';
 		const subjectName = '';
-		const output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
+		const output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, wikiProjectsToAddOrKeep, lifeStatus, subjectName );
 		expect( output ).toBe(
 `{{WikiProject banner shell |blp=no |1=
 {{subst:WPAFC/article |oldid=592496}}
@@ -334,10 +404,10 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		const newAssessment = 'Disambig';
 		const revId = 592681;
 		const isBiography = false;
-		const newWikiProjects = [];
+		const wikiProjectsToAddOrKeep = [];
 		const lifeStatus = 'unknown';
 		const subjectName = '';
-		const output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
+		const output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, wikiProjectsToAddOrKeep, lifeStatus, subjectName );
 		expect( output ).toBe(
 `{{WikiProject banner shell |1=
 {{subst:WPAFC/article |oldid=592681}}
@@ -351,10 +421,10 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		const newAssessment = 'Template';
 		const revId = 592681;
 		const isBiography = false;
-		const newWikiProjects = [];
+		const wikiProjectsToAddOrKeep = [];
 		const lifeStatus = 'unknown';
 		const subjectName = '';
-		const output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
+		const output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, wikiProjectsToAddOrKeep, lifeStatus, subjectName );
 		expect( output ).toBe(
 `{{WikiProject banner shell |1=
 {{subst:WPAFC/article |oldid=592681}}
@@ -368,10 +438,10 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		const newAssessment = '';
 		const revId = 592681;
 		const isBiography = false;
-		const newWikiProjects = [];
+		const wikiProjectsToAddOrKeep = [];
 		const lifeStatus = 'unknown';
 		const subjectName = '';
-		const output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
+		const output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, wikiProjectsToAddOrKeep, lifeStatus, subjectName );
 		expect( output ).toBe(
 `{{WikiProject banner shell |1=
 {{subst:WPAFC/article |oldid=592681}}
@@ -390,10 +460,10 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		const newAssessment = 'B';
 		const revId = 592681;
 		const isBiography = true;
-		const newWikiProjects = [];
+		const wikiProjectsToAddOrKeep = [];
 		const lifeStatus = 'unknown';
 		const subjectName = '';
-		const output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
+		const output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, wikiProjectsToAddOrKeep, lifeStatus, subjectName );
 		expect( output ).toBe(
 `{{WikiProject banner shell |class=B |1=
 {{subst:WPAFC/article |oldid=592681}}
@@ -416,10 +486,10 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		const newAssessment = 'B';
 		const revId = 592681;
 		const isBiography = true;
-		const newWikiProjects = [];
+		const wikiProjectsToAddOrKeep = [];
 		const lifeStatus = 'unknown';
 		const subjectName = '';
-		const output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
+		const output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, wikiProjectsToAddOrKeep, lifeStatus, subjectName );
 		expect( output ).toBe(
 `{{WikiProject banner shell |class=B |1=
 {{subst:WPAFC/article |oldid=592681}}
@@ -447,10 +517,10 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 		const newAssessment = 'B';
 		const revId = 592681;
 		const isBiography = true;
-		const newWikiProjects = [];
+		const wikiProjectsToAddOrKeep = [];
 		const lifeStatus = 'unknown';
 		const subjectName = '';
-		const output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, newWikiProjects, lifeStatus, subjectName );
+		const output = AFCH.addTalkPageBanners( wikicode, newAssessment, revId, isBiography, wikiProjectsToAddOrKeep, lifeStatus, subjectName );
 		expect( output ).toBe(
 `{{WikiProject banner shell |class=B |1=
 {{subst:WPAFC/article |oldid=592681}}
@@ -462,6 +532,30 @@ I have a question. Can you help answer it? –[[User:Novem Linguae|<span style="
 {{WikiProject Jewish history}}
 {{WikiProject Biography}}
 }}`
+		);
+	} );
+} );
+
+describe( 'AFCH.removeTemplates', () => {
+	it( 'removes named templates from arbitrary wikitext', () => {
+		const wikicode = '{{Short description|Example}}\nArticle text with {{Citation needed|date={{date}}}}.\n{{Other}}';
+		expect( AFCH.removeTemplates( wikicode, [ 'Short description', 'Citation needed' ] ) )
+			.toBe( 'Article text with .\n{{Other}}' );
+	} );
+
+	it( 'does not remove examples in comments or literal tags, or adjacent text', () => {
+		const wikicode = `<!-- {{WikiProject Chemicals}} -->
+<nowiki>{{WikiProject Chemicals}}</nowiki>
+Before {{Template:WikiProject Chemicals|x={{nested}}}} after
+{{WikiProject Chemical engineering}}
+{{WikiProject Chemicals|importance=low}}
+Text`;
+		expect( AFCH.removeTemplates( wikicode, [ 'WikiProject Chemicals' ] ) ).toBe(
+			`<!-- {{WikiProject Chemicals}} -->
+<nowiki>{{WikiProject Chemicals}}</nowiki>
+Before  after
+{{WikiProject Chemical engineering}}
+Text`
 		);
 	} );
 } );
