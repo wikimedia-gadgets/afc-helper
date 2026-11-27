@@ -1921,7 +1921,8 @@
 				titles: [ mw.config.get( 'wgPageName' ) ],
 				formatversion: 2,
 				rvstart: currentRevisionSeconds,
-				rvdir: 'newer'
+				rvdir: 'newer',
+				rvexcludeuser: mw.config.get( 'wgUserName' )
 			} ).then( ( data ) => {
 				const revisionsSinceTimestamp = data.query.pages[ 0 ].revisions;
 				if ( revisionsSinceTimestamp && revisionsSinceTimestamp.length > 0 ) {

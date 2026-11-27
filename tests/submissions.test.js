@@ -146,7 +146,8 @@ describe( 'submission actions', () => {
 				wgPageContentModel: 'wikitext',
 				wgNamespaceNumber: 118,
 				wgCurRevisionId: 1,
-				wgPageName: 'Draft:Example'
+				wgPageName: 'Draft:Example',
+				wgUserName: 'Reviewer'
 			};
 			return Object.prototype.hasOwnProperty.call( values, key ) ? values[ key ] : getConfig( key );
 		} );
@@ -433,5 +434,89 @@ describe( 'submission actions', () => {
 				usersNotified: notify ? [ 'Author' ] : []
 			} ) );
 		} );
+	} );
+
+	it( 'allows a comment after the reviewer declines without reloading', async () => {
+		let hasOwnEdit = false;
+		editPage.mockImplementation( () => {
+			hasOwnEdit = true;
+		} );
+		AFCH.api.parse = jest.fn( () => $.Deferred().resolve( '' ) );
+		AFCH.api.get.mockImplementation( ( params ) => {
+			if ( params.revids ) {
+				return $.Deferred().resolve( {
+					query: { pages: [ { revisions: [ { timestamp: '2024-01-01T00:00:00Z' } ] } ] }
+				} );
+			}
+			if ( params.rvstart ) {
+				return $.Deferred().resolve( {
+					query: {
+						pages: [ {
+							revisions: hasOwnEdit && params.rvexcludeuser !== 'Reviewer' ?
+								[ { user: 'Reviewer' } ] : []
+						} ]
+					}
+				} );
+			}
+			return $.Deferred();
+		} );
+
+		await waitFor( () => $( '#afch-launch' ).length );
+		$( '#afch-launch' ).trigger( 'click' );
+		await waitFor( () => $( '#afchDecline' ).length );
+		$( '#afchDecline' ).trigger( 'click' );
+		await waitFor( () => $( '#declineReason' ).length );
+		$( '#declineReason' ).val( [ 'bio' ] ).trigger( 'change' );
+		$( '#declineNotifyUser' ).prop( 'checked', false );
+		$( '#afchSubmitForm' ).trigger( 'click' );
+
+		await waitFor( () => editPage.mock.calls.length === 1 || $( '#afchEditConflict' ).text() );
+		expect( editPage ).toHaveBeenCalledTimes( 1 );
+
+		$( '.back-link' ).trigger( 'click' );
+		await waitFor( () => $( '#afchComment' ).length );
+		$( '#afchComment' ).trigger( 'click' );
+		await waitFor( () => $( '#commentText' ).length );
+		$( '#commentText' ).val( 'Another comment' ).trigger( 'keyup' );
+		await new Promise( ( resolve ) => {
+			setTimeout( resolve, 550 );
+		} );
+		$( '#afchSubmitForm' ).trigger( 'click' );
+
+		await waitFor( () => editPage.mock.calls.length === 2 || $( '#afchEditConflict' ).text() );
+		expect( editPage ).toHaveBeenCalledTimes( 2 );
+		const revisionChecks = AFCH.api.get.mock.calls
+			.map( ( call ) => call[ 0 ] )
+			.filter( ( request ) => request.rvstart );
+		expect( revisionChecks ).toHaveLength( 2 );
+		expect( revisionChecks.map( ( request ) => request.rvexcludeuser ) ).toEqual( [ 'Reviewer', 'Reviewer' ] );
+		expect( $( '#afchEditConflict' ).text() ).toBe( '' );
+	} );
+
+	it( 'treats another user\'s edit as an edit conflict', async () => {
+		AFCH.api.get.mockImplementation( ( params ) => {
+			if ( params.revids ) {
+				return $.Deferred().resolve( {
+					query: { pages: [ { revisions: [ { timestamp: '2024-01-01T00:00:00Z' } ] } ] }
+				} );
+			}
+			if ( params.rvstart ) {
+				return $.Deferred().resolve( {
+					query: { pages: [ { revisions: [ { user: 'OtherUser' } ] } ] }
+				} );
+			}
+			return $.Deferred();
+		} );
+
+		await waitFor( () => $( '#afch-launch' ).length );
+		$( '#afch-launch' ).trigger( 'click' );
+		await waitFor( () => $( '#afchDecline' ).length );
+		$( '#afchDecline' ).trigger( 'click' );
+		await waitFor( () => $( '#declineReason' ).length );
+		$( '#declineReason' ).val( [ 'bio' ] ).trigger( 'change' );
+		$( '#afchSubmitForm' ).trigger( 'click' );
+
+		await waitFor( () => $( '#afchEditConflict' ).text() );
+		expect( editPage ).not.toHaveBeenCalled();
 	} );
 } );
