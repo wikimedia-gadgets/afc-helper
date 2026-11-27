@@ -1,5 +1,5 @@
 /**
- * Tests for src/js/submission-model.js
+ * Tests for src/js/submission.js
  */
 
 /* eslint-env jest, node */
