@@ -17,7 +17,7 @@ const TARGETS = {
     'js/page.js': 'afchelper-page.js',
     'js/api-actions.js': 'afchelper-api-actions.js',
     'js/submission-model.js': 'afchelper-submission-model.js',
-    'js/text.js': 'afchelper-text.js',
+    'js/submission-text.js': 'afchelper-submission-text.js',
     'js/submissions.js': 'afchelper-submissions.js',
     'templates/tpl-preferences.html': 'afchelper-tpl-preferences.js',
     'templates/tpl-submissions.html': 'afchelper-tpl-submissions.js',

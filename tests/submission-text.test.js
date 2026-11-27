@@ -1,5 +1,5 @@
 /**
- * Tests for src/js/text.js
+ * Tests for src/js/submission-text.js
  */
 
 /* eslint-env jest, node */

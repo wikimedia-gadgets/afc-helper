@@ -28,7 +28,7 @@ Use https://gadget-deploy.toolforge.org/, or do `npm run deploy`.
 The gadget uses a MediaWiki ResourceLoader module. Its JavaScript pages must be listed in this order in `MediaWiki:Gadgets-definition`:
 
 ```
-afchelper [dependencies=mediawiki.api, mediawiki.util, mediawiki.user, mediawiki.Title, mediawiki.Uri, mediawiki.storage, jquery.chosen, jquery.spinner, jquery.ui |namespaces=2, 118] |afchelper.js |afchelper-hogan.js |afchelper-core.js |afchelper-page.js |afchelper-api-actions.js |afchelper-core-utils.js |afchelper-submission-model.js |afchelper-text.js |afchelper-submissions.js |afchelper.css
+afchelper [dependencies=mediawiki.api, mediawiki.util, mediawiki.user, mediawiki.Title, mediawiki.Uri, mediawiki.storage, jquery.chosen, jquery.spinner, jquery.ui |namespaces=2, 118] |afchelper.js |afchelper-hogan.js |afchelper-core.js |afchelper-page.js |afchelper-api-actions.js |afchelper-core-utils.js |afchelper-submission-model.js |afchelper-submission-text.js |afchelper-submissions.js |afchelper.css
 ```
 
 ### Dependencies

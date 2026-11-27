@@ -16,5 +16,5 @@ require( './src/js/page.js' );
 require( './src/js/api-actions.js' );
 require( './src/js/core-utils.js' );
 require( './src/js/submission-model.js' );
-require( './src/js/text.js' );
+require( './src/js/submission-text.js' );
 require( './src/js/submissions.js' );
