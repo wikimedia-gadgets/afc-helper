@@ -439,7 +439,7 @@
 				autoOpen: false,
 				logCsd: true,
 				launchLinkPosition: 'p-cactions',
-				logAfc: false,
+				logAfc: true,
 				noWatch: false,
 				autoSubscribe: false
 			};
