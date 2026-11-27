@@ -324,6 +324,18 @@ describe( 'AFCH.Text.removeAfcTemplates', () => {
 		expect( output ).toBe( expectedOutput );
 	} );
 
+	it( 'should not duplicate AfC comments with a reply inside the template when updating', () => {
+		const comment = '{{AfC comment|1=Reviewer comment ~~~~\nResponse: I disagree.}}',
+			output = ( new AFCH.Text( comment ) ).updateAfcTemplates( comment );
+		expect( output.match( /\{\{\s*afc comment/gi ) ).toHaveLength( 1 );
+	} );
+
+	it( 'should remove AfC comments with additional parameters', () => {
+		const wikicode = '{{AfC comment|1=Reviewer comment 12:00, 1 January 2024 (UTC)|2=Author reply}}';
+		const output = ( new AFCH.Text( wikicode ) ).removeAfcTemplates();
+		expect( output ).toBe( '' );
+	} );
+
 	it( 'should remove {{AfC submission/draft}} templates', () => {
 		const wikicode = '{{AfC submission/draft}}';
 		const expectedOutput = '';
