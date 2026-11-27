@@ -13,7 +13,7 @@ window.AFCH = {};
 require( './src/afch.js' );
 require( './src/js/core.js' );
 require( './src/js/page.js' );
-require( './src/js/actions.js' );
+require( './src/js/api-actions.js' );
 require( './src/js/core-utils.js' );
 require( './src/js/submission-model.js' );
 require( './src/js/text.js' );

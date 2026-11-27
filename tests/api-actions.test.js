@@ -1,5 +1,5 @@
 /**
- * Tests for src/js/actions.js
+ * Tests for src/js/api-actions.js
  */
 
 /* eslint-env jest */
