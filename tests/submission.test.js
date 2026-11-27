@@ -141,6 +141,10 @@ describe( 'AFCH.Submission.addNewComment()', () => {
 describe( 'AFCH.Submission.getSubmitter()', () => {
 	let originalApi, submission;
 
+	function missingTalkPageResponse() {
+		return { query: { pages: { '-1': { missing: '' } } } };
+	}
+
 	beforeEach( () => {
 		originalApi = AFCH.api;
 		AFCH.api = { get: jest.fn() };
@@ -154,6 +158,9 @@ describe( 'AFCH.Submission.getSubmitter()', () => {
 	it( 'keeps an existing account name even if an older account had that name', async () => {
 		submission.params.u = 'Nahida';
 		AFCH.api.get.mockImplementation( ( request ) => {
+			if ( request.prop === 'info' ) {
+				return $.Deferred().resolve( missingTalkPageResponse() );
+			}
 			if ( request.list === 'users' ) {
 				return $.Deferred().resolve( { query: { users: [ { name: 'Nahida', userid: 1 } ] } } );
 			}
@@ -163,13 +170,16 @@ describe( 'AFCH.Submission.getSubmitter()', () => {
 		} );
 
 		await expect( submission.getSubmitter() ).resolves.toBe( 'Nahida' );
-		expect( AFCH.api.get ).toHaveBeenCalledTimes( 1 );
+		expect( AFCH.api.get ).toHaveBeenCalledTimes( 2 );
 		expect( submission.params.u ).toBe( 'Nahida' );
 	} );
 
 	it( 'follows a renamed account until it finds an existing account', async () => {
 		submission.params.u = 'OldName';
 		AFCH.api.get.mockImplementation( ( request ) => {
+			if ( request.prop === 'info' ) {
+				return $.Deferred().resolve( missingTalkPageResponse() );
+			}
 			if ( request.list === 'users' ) {
 				const user = request.ususers === 'CurrentName' ?
 					{ name: 'CurrentName', userid: 1 } : { name: request.ususers, missing: true };
@@ -185,20 +195,40 @@ describe( 'AFCH.Submission.getSubmitter()', () => {
 
 	it( 'preserves a missing name when there is no rename log', async () => {
 		submission.params.u = 'MissingName';
-		AFCH.api.get.mockImplementation( ( request ) => request.list === 'users' ?
-			$.Deferred().resolve( { query: { users: [ { name: 'MissingName', missing: true } ] } } ) :
-			$.Deferred().resolve( { query: { logevents: [] } } ) );
+		AFCH.api.get.mockImplementation( ( request ) => {
+			if ( request.prop === 'info' ) {
+				return $.Deferred().resolve( missingTalkPageResponse() );
+			}
+			return request.list === 'users' ?
+				$.Deferred().resolve( { query: { users: [ { name: 'MissingName', missing: true } ] } } ) :
+				$.Deferred().resolve( { query: { logevents: [] } } );
+		} );
 
 		await expect( submission.getSubmitter() ).resolves.toBe( 'MissingName' );
 	} );
 
 	it( 'preserves an IP submitter without looking up rename logs', async () => {
 		submission.params.u = '192.0.2.1';
-		AFCH.api.get.mockReturnValue( $.Deferred().resolve( {
-			query: { users: [ { name: '192.0.2.1', invalid: true } ] }
-		} ) );
+		AFCH.api.get.mockImplementation( ( request ) => request.prop === 'info' ?
+			$.Deferred().resolve( missingTalkPageResponse() ) :
+			$.Deferred().resolve( { query: { users: [ { name: '192.0.2.1', invalid: true } ] } } ) );
 
 		await expect( submission.getSubmitter() ).resolves.toBe( '192.0.2.1' );
+		expect( AFCH.api.get ).toHaveBeenCalledTimes( 2 );
+	} );
+
+	it( 'prefers an existing user talk redirect over username rename detection', async () => {
+		submission.params.u = 'NovemBot';
+		AFCH.api.get.mockReturnValue( $.Deferred().resolve( {
+			query: { pages: { 123: { pageid: 123, title: 'User talk:NovemBot', redirect: true } } }
+		} ) );
+
+		await expect( submission.getSubmitter() ).resolves.toBe( 'NovemBot' );
+		expect( AFCH.api.get ).toHaveBeenCalledWith( {
+			action: 'query',
+			prop: 'info',
+			titles: 'User talk:NovemBot'
+		} );
 		expect( AFCH.api.get ).toHaveBeenCalledTimes( 1 );
 	} );
 
@@ -210,15 +240,22 @@ describe( 'AFCH.Submission.getSubmitter()', () => {
 
 	it( 'propagates account lookup errors', async () => {
 		submission.params.u = 'Example';
-		AFCH.api.get.mockReturnValue( $.Deferred().reject( 'api-error' ) );
+		AFCH.api.get.mockImplementation( ( request ) => request.prop === 'info' ?
+			$.Deferred().resolve( missingTalkPageResponse() ) :
+			$.Deferred().reject( 'api-error' ) );
 		await expect( submission.getSubmitter() ).rejects.toBe( 'api-error' );
 	} );
 
 	it( 'propagates rename log lookup errors', async () => {
 		submission.params.u = 'Example';
-		AFCH.api.get.mockImplementation( ( request ) => request.list === 'users' ?
-			$.Deferred().resolve( { query: { users: [ { name: 'Example', missing: true } ] } } ) :
-			$.Deferred().reject( 'api-error' ) );
+		AFCH.api.get.mockImplementation( ( request ) => {
+			if ( request.prop === 'info' ) {
+				return $.Deferred().resolve( missingTalkPageResponse() );
+			}
+			return request.list === 'users' ?
+				$.Deferred().resolve( { query: { users: [ { name: 'Example', missing: true } ] } } ) :
+				$.Deferred().reject( 'api-error' );
+		} );
 		await expect( submission.getSubmitter() ).rejects.toBe( 'api-error' );
 	} );
 } );

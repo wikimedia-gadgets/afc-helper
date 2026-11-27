@@ -451,17 +451,36 @@
 
 	/**
 	 * Gets the submitter, or, if no specific submitter is available,
-	 * just the page creator. Handles renamed submitters.
+	 * just the page creator. Prefers an existing user talk page before
+	 * resolving renamed submitters.
 	 *
 	 * @return {jQuery.Deferred} resolves with user
 	 */
 	AFCH.Submission.prototype.getSubmitter = function () {
-		const user = this.params.u;
+		const userTalkNamespace = 3,
+			user = this.params.u,
+			userTalkTitle = user && new mw.Title( user, userTalkNamespace ).getPrefixedText();
 
 		if ( !user ) {
 			return this.page.getCreator();
 		}
 
+		return new AFCH.Page( userTalkTitle ).exists().then( ( talkPageExists ) => {
+			if ( talkPageExists ) {
+				return user;
+			}
+
+			return this.getNewestUsername( user );
+		} );
+	};
+
+	/**
+	 * Resolves a missing submitter username through checking the account-rename logs via the API. Recursively checks until it arrives at an existing account or no further renames are found.
+	 *
+	 * @param {string} user
+	 * @return {jQuery.Deferred} resolves with the current or unchanged username
+	 */
+	AFCH.Submission.prototype.getNewestUsername = function ( user ) {
 		return AFCH.api.get( {
 			action: 'query',
 			list: 'users',
@@ -481,8 +500,8 @@
 				letype: 'renameuser',
 				lelimit: 1,
 				letitle: 'User:' + user
-			} ).then( ( resp ) => {
-				const logevents = resp.query.logevents;
+			} ).then( ( renameResponse ) => {
+				const logevents = renameResponse.query.logevents;
 
 				if ( logevents.length ) {
 					this.params.u = logevents[ 0 ].params.newuser;

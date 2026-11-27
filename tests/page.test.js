@@ -59,6 +59,18 @@ describe( 'AFCH.Page', () => {
 		expect( page.toString() ).toBe( 'Example' );
 	} );
 
+	it( 'propagates errors when checking whether the page exists', async () => {
+		const error = 'api-error',
+			originalApi = AFCH.api;
+		AFCH.api = { get: jest.fn().mockReturnValue( $.Deferred().reject( error ) ) };
+
+		try {
+			await expect( new AFCH.Page( 'Example' ).exists() ).rejects.toBe( error );
+		} finally {
+			AFCH.api = originalApi;
+		}
+	} );
+
 	it( 'caches revision data after the first request', () => {
 		const revision = {
 			timestamp: '2024-01-01T00:00:00Z',

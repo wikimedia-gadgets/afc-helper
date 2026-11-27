@@ -5,6 +5,42 @@
 		 * Perform a specific action
 		 */
 		actions: {
+			failEdit: function ( err, deferred, status ) {
+				deferred.reject( err );
+				status.update( 'Error while saving $1: ' + JSON.stringify( err ) );
+			},
+
+			postEdit: function ( request, options, deferred, status ) {
+				AFCH.api.postWithEditToken( request )
+					.done( ( data ) => {
+						let $diffLink;
+						const api = options.subscribe ? 'discussiontoolsedit' : 'edit';
+						// The success string is capitalized by one API and not the other
+						const success = options.subscribe ? 'success' : 'Success';
+
+						if ( data && data[ api ] && data[ api ].result && data[ api ].result === success ) {
+							deferred.resolve( data );
+
+							if ( data[ api ].hasOwnProperty( 'nochange' ) ) {
+								status.update( 'No changes made to $1' );
+								return;
+							}
+
+							// Create a link to the diff of the edit
+							$diffLink = AFCH.makeLinkElementToPage(
+								'Special:Diff/' + data[ api ].newrevid, '(diff)'
+							).addClass( 'text-smaller' );
+
+							status.update( 'Saved $1 ' + AFCH.jQueryToHtml( $diffLink ) );
+						} else {
+							AFCH.actions.failEdit( data, deferred, status );
+						}
+					} )
+					.fail( ( err ) => {
+						AFCH.actions.failEdit( err, deferred, status );
+					} );
+			},
+
 			/**
 			 * Gets the full wikicode content of a page
 			 *
@@ -153,37 +189,31 @@
 					return deferred;
 				}
 
-				AFCH.api.postWithEditToken( request )
-					.done( ( data ) => {
-						let $diffLink;
-						const api = options.subscribe ? 'discussiontoolsedit' : 'edit';
-						// The success string is capitalized by one API and not the other
-						const success = options.subscribe ? 'success' : 'Success';
+				// Resolve redirects first so both edit APIs receive the final title. We could use the redirects parameter in the edit API only, but double checking redirects two different ways is complicated and makes the tests harder to read.
+				if ( options.followRedirects ) {
+					AFCH.api.get( {
+						action: 'query',
+						prop: 'info',
+						titles: pagename,
+						redirects: true
+					} ).done( ( data ) => {
+						const pages = data.query && data.query.pages,
+							pageIds = pages ? Object.keys( pages ) : [],
+							page = pageIds.length ? pages[ pageIds[ 0 ] ] : null;
 
-						if ( data && data[ api ] && data[ api ].result && data[ api ].result === success ) {
-							deferred.resolve( data );
-
-							if ( data[ api ].hasOwnProperty( 'nochange' ) ) {
-								status.update( 'No changes made to $1' );
-								return;
-							}
-
-							// Create a link to the diff of the edit
-							$diffLink = AFCH.makeLinkElementToPage(
-								'Special:Diff/' + data[ api ].newrevid, '(diff)'
-							).addClass( 'text-smaller' );
-
-							status.update( 'Saved $1 ' + AFCH.jQueryToHtml( $diffLink ) );
-						} else {
-							deferred.reject( data );
-							// FIXME: get detailed error info from API result??
-							status.update( 'Error while saving $1: ' + JSON.stringify( data ) );
+						if ( !page || !page.title ) {
+							AFCH.actions.failEdit( data, deferred, status );
+							return;
 						}
-					} )
-					.fail( ( err ) => {
-						deferred.reject( err );
-						status.update( 'Error while saving $1: ' + JSON.stringify( err ) );
+
+						request[ options.subscribe ? 'page' : 'title' ] = page.title;
+						AFCH.actions.postEdit( request, options, deferred, status );
+					} ).fail( ( err ) => {
+						AFCH.actions.failEdit( err, deferred, status );
 					} );
+				} else {
+					AFCH.actions.postEdit( request, options, deferred, status );
+				}
 
 				return deferred;
 			},
@@ -248,8 +278,8 @@
 			},
 
 			/**
-			 * Notifies a user. Follows redirects and appends a message
-			 * to the bottom of the user's talk page.
+			 * Posts a notification to the user's talk page, following redirects while editing.
+			 * Appends to the resolved page, creating a talk header if it is missing.
 			 *
 			 * @param {string} user
 			 * @param {Object} options object with properties
@@ -278,6 +308,8 @@
 						.fail( () => {
 							deferred.reject();
 						} );
+				} ).fail( ( err ) => {
+					deferred.reject( err );
 				} );
 
 				return deferred;

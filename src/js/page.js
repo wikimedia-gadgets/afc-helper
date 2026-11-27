@@ -269,6 +269,8 @@
 					} else {
 						deferred.resolve( true );
 					}
+				} ).fail( ( err ) => {
+					deferred.reject( err );
 				} );
 
 				return deferred;
