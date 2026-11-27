@@ -19,6 +19,7 @@ const SCRIPT_FILES = {
 	'api-actions.js': 'src/js/api-actions.js',
 	'submission-model.js': 'src/js/submission-model.js',
 	'submission-text.js': 'src/js/submission-text.js',
+	'preferences.js': 'src/js/preferences.js',
 	'submissions.js': 'src/js/submissions.js',
 	'tpl-preferences.js': 'src/templates/tpl-preferences.html',
 	'tpl-submissions.js': 'src/templates/tpl-submissions.html',
@@ -31,6 +32,7 @@ const GADGET_SCRIPTS = [
 	'src/js/page.js',
 	'src/js/api-actions.js',
 	'src/js/core-utils.js',
+	'src/js/preferences.js',
 	'src/js/submission-model.js',
 	'src/js/submission-text.js',
 	'src/js/submissions.js'
