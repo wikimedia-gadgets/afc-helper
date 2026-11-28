@@ -142,6 +142,11 @@
 						newText = window.StubSorter_create_edit( newText, data[ 'stub-sorter-select' ] || [] ).text;
 					}
 
+					if ( newPage.title.getNamespaceId() === 0 ) {
+						const articleText = new AFCH.Text( newText );
+						articleText.addUncategorizedTag();
+						newText = articleText.get();
+					}
 					newPage.edit( {
 						contents: newText,
 						summary: 'Cleaning up accepted [[Wikipedia:Articles for creation|Articles for creation]] submission'

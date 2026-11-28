@@ -19,6 +19,7 @@ const TARGETS = {
     'js/api-actions.js': 'afchelper-api-actions.js',
     'js/preferences.js': 'afchelper-preferences.js',
     'js/submission.js': 'afchelper-submission.js',
+    'js/mos-order-position-finder.js': 'afchelper-mos-order-position-finder.js',
     'js/submission-text.js': 'afchelper-submission-text.js',
     'js/submission-warnings.js': 'afchelper-submission-warnings.js',
     'js/submission-actions.js': 'afchelper-submission-actions.js',

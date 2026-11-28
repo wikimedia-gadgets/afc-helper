@@ -5,6 +5,83 @@
 /* eslint-env jest, node */
 /* eslint-disable quotes */
 
+describe( 'AFCH.Text.addWikitextToSection', () => {
+	it( 'inserts wikitext in the requested section', () => {
+		const text = new AFCH.Text( '{{Short description|Example}}\n{{Infobox person}}\nLead.\n\n[[Category:People]]' );
+		const result = text.addWikitextToSection( '{{Copy edit}}', 'maintenanceTags' );
+		expect( result ).toBe(
+			'{{Short description|Example}}\n\n{{Copy edit}}\n\n{{Infobox person}}\nLead.\n\n[[Category:People]]\n'
+		);
+		expect( text.get() ).toBe( result );
+	} );
+
+} );
+
+describe( 'AFCH.Text.getActiveWikitext', () => {
+	it( 'excludes comments and literal tags without modifying the original', () => {
+		const wikicode = '<!-- skip -->\n<nowiki>skip</nowiki>\nLead.';
+		const text = new AFCH.Text( wikicode );
+		expect( text.getActiveWikitext() ).toBe( '\n\nLead.' );
+		expect( text.get() ).toBe( wikicode );
+	} );
+} );
+
+describe( 'AFCH.Text.addUncategorizedTag', () => {
+	it( 'places uncategorized after defaultsort and before stubs', () => {
+		const text = new AFCH.Text( '{{Short description|Example}}\n{{About|Example}}\n{{Infobox person}}\nLead.\n\n{{DEFAULTSORT:Example}}\n{{example-stub}}' );
+		expect( text.addUncategorizedTag() ).toBe(
+			'{{Short description|Example}}\n{{About|Example}}\n' +
+			'{{Infobox person}}\nLead.\n\n{{DEFAULTSORT:Example}}\n\n' +
+			'{{Uncategorized|date={{subst:CURRENTMONTHNAME}} {{subst:CURRENTYEAR}}}}\n\n{{example-stub}}\n'
+		);
+	} );
+
+	it( 'replaces improve-categories with uncategorized', () => {
+		const text = new AFCH.Text( 'Lead.\n\n{{Improve categories}}\n{{example-stub}}' );
+		expect( text.addUncategorizedTag() ).toBe(
+			'Lead.\n\n{{Uncategorized|date={{subst:CURRENTMONTHNAME}} {{subst:CURRENTYEAR}}}}\n' +
+			'\n{{example-stub}}\n'
+		);
+	} );
+
+	it( 'removes improve-categories tags with nested parameters without disturbing other templates', () => {
+		const text = new AFCH.Text( 'Lead.\n\n{{Improve_categories|date=November 2020}}\n{{example-stub}}' );
+		expect( text.addUncategorizedTag() ).toBe(
+			'Lead.\n\n{{Uncategorized|date={{subst:CURRENTMONTHNAME}} {{subst:CURRENTYEAR}}}}\n\n{{example-stub}}\n'
+		);
+	} );
+
+	it( 'removes an existing uncategorized tag when categories are present', () => {
+		const text = new AFCH.Text( '{{Uncategorized|date=May 2020}}\nLead.\n[[Category:Example|Sort]]' );
+		expect( text.addUncategorizedTag() ).toBe( '' );
+		expect( text.get() ).toBe( 'Lead.\n[[Category:Example|Sort]]' );
+	} );
+
+	it( 'ignores commented and literal categories and tags', () => {
+		const text = new AFCH.Text( '<!-- {{Uncategorized}} [[Category:Example]] -->\n<nowiki>[[Category:Example]]</nowiki>\nLead.' );
+		const result = text.addUncategorizedTag();
+		expect( result ).toContain( '{{Uncategorized|date={{subst:CURRENTMONTHNAME}} {{subst:CURRENTYEAR}}}}' );
+	} );
+
+	it( 'does not tag a categorized article', () => {
+		const text = new AFCH.Text( 'Lead.\n[[Category:Example]]' );
+		expect( text.addUncategorizedTag() ).toBe( '' );
+		expect( text.get() ).toBe( 'Lead.\n[[Category:Example]]' );
+	} );
+
+	it( 'removes uncategorized tags while retaining examples in comments', () => {
+		const text = new AFCH.Text( '{{Uncategorized|date={{date|2020}}}}\n<!-- {{Uncategorized}} -->\nLead.\n[[Category:Example]]' );
+		expect( text.addUncategorizedTag() ).toBe( '' );
+		expect( text.get() ).toBe( '<!-- {{Uncategorized}} -->\nLead.\n[[Category:Example]]' );
+	} );
+
+	it( 'adds the uncategorized tag to an uncategorized article', () => {
+		const text = new AFCH.Text( 'Lead.' );
+		const result = text.addUncategorizedTag();
+		expect( result ).toContain( '{{Uncategorized|date=' );
+	} );
+} );
+
 describe( 'AFCH.Text.cleanUp - isAccept = true', () => {
 	it( 'should clean up {{Draft categories|[[Category:Test]]}} when isAccept is true', () => {
 		const wikicode = '{{Draft categories|[[Category:Test]]}}';

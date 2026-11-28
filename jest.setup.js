@@ -18,6 +18,7 @@ require( './src/js/core-utils.js' );
 require( './src/js/wikitext-utils.js' );
 require( './src/js/preferences.js' );
 require( './src/js/submission.js' );
+require( './src/js/mos-order-position-finder.js' );
 require( './src/js/submission-text.js' );
 require( './src/js/submission-warnings.js' );
 require( './src/js/submission-actions.js' );

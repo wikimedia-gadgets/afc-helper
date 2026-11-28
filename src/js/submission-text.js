@@ -263,6 +263,36 @@
 		return this.text;
 	};
 
+	/**
+	 * Insert wikitext in MOS order.
+	 *
+	 * @param {string} insertWikitext
+	 * @param {string} insertSection
+	 * @return {string} Updated wikitext
+	 */
+	AFCH.Text.prototype.addWikitextToSection = function ( insertWikitext, insertSection ) {
+		this.text = ( new AFCH.MOSOrderPositionFinder() ).insertAtSection( this.text, insertWikitext, insertSection );
+		return this.text;
+	};
+
+	AFCH.Text.prototype.getActiveWikitext = function () {
+		return this.text.replace( /<!--[\s\S]*?(?:-->|$)|<(nowiki|pre|source|syntaxhighlight)\b[^>]*>[\s\S]*?<\/\1\s*>|<(?:nowiki|pre|source|syntaxhighlight)\b[^>]*\/\s*>/gi, '' );
+	};
+
+	AFCH.Text.prototype.addUncategorizedTag = function () {
+		this.text = AFCH.removeTemplates( this.text, [ 'Uncategorized' ] );
+		const activeText = this.getActiveWikitext();
+		const hasCategories = /\[\[\s*Category\s*:\s*[^\]|]+(?:\|[^\]]*)?\]\]/i.test( activeText );
+		if ( hasCategories ) {
+			return '';
+		}
+		this.text = AFCH.removeTemplates( this.text, [ 'Improve categories' ] );
+		return this.addWikitextToSection(
+			'{{Uncategorized|date={{subst:CURRENTMONTHNAME}} {{subst:CURRENTYEAR}}}}',
+			'improveCategories'
+		);
+	};
+
 	AFCH.Text.prototype.updateShortDescription = function ( existingShortDescription, newShortDescription ) {
 		const shortDescTemplateExists = /\{\{[Ss]hort ?desc(ription)?\s*\|/.test( this.text );
 		const shortDescExists = !!existingShortDescription;
